@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="light_grey">#e5e5e5</color>
+    <color name="darker_grey">#9f9f9f</color>
+    <color name="graphite_grey">#cbcbcb</color>
+    <color name="navy_blue">#1f70c3</color>
+    <color name="dark_navy_blue">#1d5288</color>
+
+    <color name="button_login_state_enabled_false">#223f5c</color>
+    <color name="button_login_state_unpressed">#113151</color>
+    <color name="button_login_state_pressed">#0c243c</color>
+</resources>
