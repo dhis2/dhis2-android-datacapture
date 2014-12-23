@@ -1,5 +1,6 @@
 package org.hisp.dhis.mobile.datacapture.ui.activities;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,7 @@ import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationItem;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationMenuItem;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationSection;
+import org.hisp.dhis.mobile.datacapture.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,8 +149,10 @@ public class MenuActivity extends ActionBarActivity {
         items.add(new NavigationSection(inflater, PROFILE_SECTION, R.string.profile_section));
         items.add(new NavigationMenuItem(inflater, MY_ACCOUNT_MENU_ITEM,
                 R.string.my_account, R.drawable.ic_username));
+        /*
         items.add(new NavigationMenuItem(inflater, MESSAGES_MENU_ITEM,
                 R.string.messages, R.drawable.ic_messages));
+        */
         items.add(new NavigationMenuItem(inflater, LOG_OUT_MENU_ITEM,
                 R.string.log_out, R.drawable.ic_log_out));
 
@@ -195,6 +199,9 @@ public class MenuActivity extends ActionBarActivity {
             number = MESSAGES_MENU_ITEM;
         } else if (id == LOG_OUT_MENU_ITEM) {
             number = LOG_OUT_MENU_ITEM;
+            PreferenceUtils.remove(this, LoginActivity.SERVER_URL);
+            PreferenceUtils.remove(this, LoginActivity.USER_CREDENTIALS);
+            startActivity(new Intent(this, LoginActivity.class));
         } else if (id == ABOUT_MENU_ITEM) {
             number = ABOUT_MENU_ITEM;
         } else {

@@ -1,44 +1,34 @@
 package org.hisp.dhis.mobile.datacapture.ui.activities;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 
 
 public class LauncherActivity extends ActionBarActivity {
-    private Button mLaunchMenuActivity;
-    private Button mLaunchLoginActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 
-        mLaunchLoginActivity = (Button) findViewById(R.id.launch_login_activity_button);
-        mLaunchMenuActivity = (Button) findViewById(R.id.launch_menu_activity_button);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        mLaunchLoginActivity.setOnClickListener(new View.OnClickListener() {
+        DHISManager manager = DHISManager.getInstance();
 
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LauncherActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
+        Intent intent;
+        if (manager.getServerUrl() == null || manager.getCredentials() == null) {
+            intent = new Intent(this, LoginActivity.class);
+        } else {
+            intent = new Intent(this, MenuActivity.class);
+        }
 
-        mLaunchMenuActivity.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LauncherActivity.this, MenuActivity.class);
-                startActivity(intent);
-            }
-        });
+        startActivity(intent);
+        finish();
     }
 }

@@ -10,6 +10,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.hisp.dhis.mobile.datacapture.ui.activities.LoginActivity">
 
+    <include layout="@layout/progress_bar_light" />
+
     <LinearLayout
         android:id="@+id/login_views_container"
         android:layout_width="390dp"
@@ -30,36 +32,46 @@
         <org.hisp.dhis.mobile.datacapture.ui.views.FontEditText
             android:id="@+id/server_url"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="44dp"
             android:layout_marginBottom="1px"
             android:background="@drawable/edittext_login_custom_shape"
             android:drawableLeft="@drawable/ic_server"
+            android:drawablePadding="7dp"
+            android:gravity="center_vertical"
             android:hint="@string/server_url"
             android:inputType="textUri"
-            android:padding="9dp"
+            android:paddingLeft="7dp"
+            android:singleLine="true"
             app:font="@string/regular_font_name" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.FontEditText
             android:id="@+id/username"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="44dp"
             android:layout_marginBottom="1px"
             android:background="@drawable/edittext_login_custom_shape"
             android:drawableLeft="@drawable/ic_username"
+            android:drawablePadding="7dp"
+            android:gravity="center_vertical"
             android:hint="@string/username"
-            android:padding="9dp"
+            android:paddingLeft="7dp"
+            android:singleLine="true"
             app:font="@string/regular_font_name" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.FontEditText
             android:id="@+id/password"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="44dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/edittext_login_custom_shape"
             android:drawableLeft="@drawable/ic_password"
+            android:drawablePadding="7dp"
+            android:gravity="center_vertical"
             android:hint="@string/password"
             android:inputType="textPassword"
-            android:padding="9dp" />
+            android:paddingLeft="7dp"
+            android:singleLine="true"
+            app:font="@string/regular_font_name" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.FontButton
             android:id="@+id/login_button"
