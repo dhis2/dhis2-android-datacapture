@@ -30,8 +30,6 @@ public interface DBSchema {
             DashboardItemColumns.ACCESS + " TEXT NOT NULL," +
             DashboardItemColumns.TYPE + " TEXT NOT NULL," +
             DashboardItemColumns.CONTENT_COUNT + " INTEGER," +
-            DashboardItemColumns.ITEM + " TEXT," +
-            /*
             DashboardItemColumns.MESSAGES + " INTEGER," +
             DashboardItemColumns.USERS + " TEXT," +
             DashboardItemColumns.REPORTS + " TEXT," +
@@ -41,7 +39,6 @@ public interface DBSchema {
             DashboardItemColumns.EVENT_CHART + " TEXT," +
             DashboardItemColumns.REPORT_TABLE + " TEXT," +
             DashboardItemColumns.MAP + " TEXT," +
-            */
             " FOREIGN KEY" + "(" + DashboardItemColumns.DASHBOARD_DB_ID + ")" +
             " REFERENCES " + DashboardColumns.TABLE_NAME + "(" + DashboardColumns.DB_ID + ")" +
             " ON DELETE CASCADE" + ")";

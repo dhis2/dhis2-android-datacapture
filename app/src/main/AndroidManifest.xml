@@ -11,6 +11,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_label"
         android:theme="@style/AppTheme" >
+        <provider
+            android:name=".io.DBContentProvider"
+            android:authorities="org.hisp.dhis.mobile.datacapture.io.DBContentProvider"
+            android:exported="false" />
         <activity
             android:name=".ui.activities.LauncherActivity"
             android:label="@string/app_label" >

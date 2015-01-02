@@ -1,6 +1,7 @@
 package org.hisp.dhis.mobile.datacapture.api.android.managers;
 
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardConverter;
+import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardItemConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DataSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.OptionSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ProgramsConverter;
@@ -42,5 +43,10 @@ public final class JsonManager implements IJsonManager {
     @Override
     public IJsonConverter<Report> getReportConverter() {
         return new ReportConverter();
+    }
+
+    @Override
+    public IJsonConverter<DashboardItem> getDashboardItemConverter() {
+        return new DashboardItemConverter();
     }
 }

@@ -19,6 +19,8 @@ import android.widget.ListView;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.AggregateReportFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardViewPagerFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.StubFragment;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationItem;
@@ -199,9 +201,6 @@ public class MenuActivity extends ActionBarActivity {
             number = MESSAGES_MENU_ITEM;
         } else if (id == LOG_OUT_MENU_ITEM) {
             number = LOG_OUT_MENU_ITEM;
-            PreferenceUtils.remove(this, LoginActivity.SERVER_URL);
-            PreferenceUtils.remove(this, LoginActivity.USER_CREDENTIALS);
-            startActivity(new Intent(this, LoginActivity.class));
         } else if (id == ABOUT_MENU_ITEM) {
             number = ABOUT_MENU_ITEM;
         } else {
@@ -211,6 +210,13 @@ public class MenuActivity extends ActionBarActivity {
         Fragment fragment;
         if (id == AGGREGATE_REPORT_MENU_ITEM) {
             fragment = new AggregateReportFragment();
+        } else if (id == LOG_OUT_MENU_ITEM) {
+            fragment = new StubFragment();
+            PreferenceUtils.remove(this, LoginActivity.SERVER_URL);
+            PreferenceUtils.remove(this, LoginActivity.USER_CREDENTIALS);
+            startActivity(new Intent(this, LoginActivity.class));
+        } else if (id == DASHBOARD_MENU_ITEM) {
+            fragment = new DashboardViewPagerFragment();
         } else {
             fragment = new StubFragment();
         }

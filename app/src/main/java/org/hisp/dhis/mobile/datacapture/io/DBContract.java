@@ -55,8 +55,6 @@ public class DBContract {
         public static final String DASHBOARD_DB_ID = "dashboardDBId";
         public static final String TYPE = "type";
         public static final String CONTENT_COUNT = "contentCount";
-        public static final String ITEM = "item";
-        /*
         public static final String MESSAGES = "messages";
         public static final String USERS = "users";
         public static final String REPORTS = "reports";
@@ -66,6 +64,5 @@ public class DBContract {
         public static final String EVENT_CHART = "eventChart";
         public static final String REPORT_TABLE = "reportTable";
         public static final String MAP = "map";
-        */
     }
 }

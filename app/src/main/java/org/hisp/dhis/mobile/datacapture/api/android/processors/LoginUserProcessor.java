@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.api.android.tasks;
+package org.hisp.dhis.mobile.datacapture.api.android.processors;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,11 +14,11 @@ import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.ui.activities.LoginActivity;
 import org.hisp.dhis.mobile.datacapture.utils.PreferenceUtils;
 
-public class LoginTask extends AsyncTask<Void, Void, OnUserLoginEvent> {
+public class LoginUserProcessor extends AsyncTask<Void, Void, OnUserLoginEvent> {
     private Context mContext;
     private LoginUserEvent mEvent;
 
-    public LoginTask(Context context, LoginUserEvent event) {
+    public LoginUserProcessor(Context context, LoginUserEvent event) {
         mContext = context;
         mEvent = event;
     }

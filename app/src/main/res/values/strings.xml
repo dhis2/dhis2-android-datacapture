@@ -42,4 +42,6 @@
     <!-- Fragment "Swipe to refresh message" -->
     <string name="swipe_to_refresh_message">Swipe to refresh</string>
 
+    <string name="refresh_dashboards">Refresh dashboards</string>
+
 </resources>

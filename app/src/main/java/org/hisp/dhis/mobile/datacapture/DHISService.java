@@ -7,8 +7,10 @@ import android.util.Log;
 
 import com.squareup.otto.Subscribe;
 
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.tasks.LoginTask;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
 
 public class DHISService extends Service {
     private static final String TAG = DHISService.class.getSimpleName();
@@ -45,6 +47,11 @@ public class DHISService extends Service {
 
     @Subscribe
     public void onUserLoginEvent(LoginUserEvent event) {
-        (new LoginTask(getBaseContext(), event)).execute();
+        (new LoginUserProcessor(getBaseContext(), event)).execute();
+    }
+
+    @Subscribe
+    public void onDashboardSyncEvent(DashboardSyncEvent event) {
+        (new DashboardSyncProcessor(getBaseContext())).execute();
     }
 }
