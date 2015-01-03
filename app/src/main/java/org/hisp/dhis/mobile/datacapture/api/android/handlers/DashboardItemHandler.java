@@ -188,6 +188,21 @@ public final class DashboardItemHandler {
         }
     }
 
+    // This method is intended to work with an array of Dashboard items,
+    // where dashboardIndex is the index of Dashboard to which we want to attach Dashboard Item
+    public static ContentProviderOperation insertWithBackReference(int dashboardIndex,
+                                                                   DashboardItem dashboardItem) {
+        if (isCorrect(dashboardItem)) {
+            return ContentProviderOperation.newInsert(DashboardItemColumns.CONTENT_URI)
+                    .withValueBackReference(DashboardItemColumns.DB_ID, dashboardIndex)
+                    .withValues(toContentValues(dashboardItem))
+                    .withValue(DashboardItemColumns.STATE, State.GETTING.toString())
+                    .build();
+        } else {
+            return null;
+        }
+    }
+
     private static boolean isCorrect(DashboardItem dashboardItem) {
         return (dashboardItem != null && dashboardItem.getAccess() != null &&
                 !isEmpty(dashboardItem.getId()) && !isEmpty(dashboardItem.getCreated()) &&
@@ -201,55 +216,4 @@ public final class DashboardItemHandler {
         }
         return dashboardItemMap;
     }
-
-/*
-    private List<ContentProviderOperation> updateDashboardItems(DBItemHolder<Dashboard> oldDashboard,
-                                                                Dashboard newDashboard) {
-        List<ContentProviderOperation> ops = new ArrayList<>();
-        if (newDashboard == null) {
-            return ops;
-        }
-
-        final String SELECTION = DashboardItemColumns.DASHBOARD_DB_ID + " = " + oldDashboard.getDatabaseId();
-        Cursor dashboardItemsCursor = mContext.getContentResolver().query(DashboardItemColumns.CONTENT_URI,
-                DashboardItemHandler.PROJECTION, SELECTION, null, null);
-
-        Map<String, DashboardItem> dashboardItemMap = DashboardItemHandler.toMap(newDashboard.getDashboardItems());
-        if (dashboardItemsCursor != null && dashboardItemsCursor.getCount() > 0) {
-            dashboardItemsCursor.moveToFirst();
-            do {
-                DBItemHolder<DashboardItem> oldDashboardItem = DashboardItemHandler.fromCursor(dashboardItemsCursor);
-                DashboardItem newDashboardItem = dashboardItemMap.get(oldDashboardItem.getItem().getId());
-
-                if (newDashboardItem == null) {
-                    Log.d(TAG, "|    Removing dashboard item {id, name}: " + oldDashboardItem.getItem().getId() +
-                            " " + oldDashboardItem.getItem().getType());
-                    putDashboardItemDeleteOperation(ops, oldDashboardItem);
-                    continue;
-                }
-
-                DateTime newLastUpdated = DateTimeTypeAdapter.deserializeDateTime(newDashboardItem.getLastUpdated());
-                DateTime oldLastUpdated = DateTimeTypeAdapter.deserializeDateTime(oldDashboardItem.getItem().getLastUpdated());
-
-                if (newLastUpdated.isAfter(oldLastUpdated)) {
-                    Log.d(TAG, "|    Updating dashboard item {id, name}: " + oldDashboardItem.getItem().getId() +
-                            " " + oldDashboardItem.getItem().getType());
-                    putDashboardItemUpdateOperation(ops, oldDashboardItem, newDashboardItem);
-                }
-
-                dashboardItemMap.remove(oldDashboardItem.getItem().getId());
-            } while (dashboardItemsCursor.moveToNext());
-        }
-
-        for (String key : dashboardItemMap.keySet()) {
-            DashboardItem dashboardItem = dashboardItemMap.get(key);
-            Log.d(TAG, "|    Inserting dashboard item {id, name}: " + dashboardItem.getId() +
-                    " " + dashboardItem.getType());
-            putDashboardItemInsertOperation(ops, oldDashboard, dashboardItemMap.get(key));
-        }
-
-        return ops;
-    }
-
-*/
 }
