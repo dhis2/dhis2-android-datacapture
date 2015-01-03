@@ -76,9 +76,6 @@ public class DashboardViewPagerFragment extends BaseFragment
         final int gray = Color.parseColor(getString(R.color.darker_grey));
 
         mAdapter = new DashboardViewPagerAdapter(getChildFragmentManager());
-        /* List<DashboardFragment> fragments = new ArrayList<DashboardFragment>();
-        fragments.add(new DashboardFragment());
-        mAdapter.setData(fragments); */
         mViewPager = (ViewPager) view.findViewById(R.id.view_pager);
         mViewPager.setAdapter(mAdapter);
 
@@ -141,16 +138,6 @@ public class DashboardViewPagerFragment extends BaseFragment
     }
 
     private void onDashboardsLoaded(List<DBItemHolder<Dashboard>> dashboards) {
-        for (DBItemHolder<Dashboard> dashboard : dashboards) {
-            System.out.println("Dashboard: " + dashboard.getItem().getName());
-        }
-
-        List<DashboardFragment> fragments = new ArrayList<>();
-        for (DBItemHolder<Dashboard> dashboard : dashboards) {
-            DashboardFragment fragment = new DashboardFragment();
-            fragments.add(fragment);
-        }
-
         mAdapter.setData(dashboards);
         mSlidingTabLayout.setViewPager(mViewPager);
     }

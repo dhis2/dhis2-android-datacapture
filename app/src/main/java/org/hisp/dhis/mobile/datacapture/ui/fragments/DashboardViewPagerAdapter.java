@@ -10,6 +10,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import java.util.List;
 
 public class DashboardViewPagerAdapter extends FragmentPagerAdapter {
+    private static final String EMPTY_TITLE = "";
     private List<DBItemHolder<Dashboard>> mDashboards;
 
     public DashboardViewPagerAdapter(FragmentManager fm) {
@@ -39,7 +40,7 @@ public class DashboardViewPagerAdapter extends FragmentPagerAdapter {
         if (mDashboards != null && mDashboards.size() > 0) {
             return mDashboards.get(position).getItem().getName();
         } else {
-            return "";
+            return EMPTY_TITLE;
         }
     }
 
