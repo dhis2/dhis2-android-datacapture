@@ -112,6 +112,7 @@ public final class DashboardItemHandler {
 
         DBItemHolder<DashboardItem> holder = new DBItemHolder<>();
         holder.setDataBaseId(cursor.getInt(DATABASE_ID));
+        holder.setItem(dashboardItem);
         return holder;
     }
 
@@ -194,7 +195,7 @@ public final class DashboardItemHandler {
                                                                    DashboardItem dashboardItem) {
         if (isCorrect(dashboardItem)) {
             return ContentProviderOperation.newInsert(DashboardItemColumns.CONTENT_URI)
-                    .withValueBackReference(DashboardItemColumns.DB_ID, dashboardIndex)
+                    .withValueBackReference(DashboardItemColumns.DASHBOARD_DB_ID, dashboardIndex)
                     .withValues(toContentValues(dashboardItem))
                     .withValue(DashboardItemColumns.STATE, State.GETTING.toString())
                     .build();

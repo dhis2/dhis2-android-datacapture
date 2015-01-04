@@ -20,7 +20,7 @@ public class DashboardViewPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (mDashboards != null && mDashboards.size() > 0) {
-            return new DashboardFragment();
+            return DashboardFragment.newInstance(mDashboards.get(position).getDatabaseId());
         } else {
             return null;
         }

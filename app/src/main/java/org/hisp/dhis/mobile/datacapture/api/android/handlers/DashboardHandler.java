@@ -12,8 +12,6 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
-import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
-import org.hisp.dhis.mobile.datacapture.io.DBContract;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 
 import java.util.HashMap;
@@ -117,13 +115,6 @@ public final class DashboardHandler {
         } else {
             return null;
         }
-
-        // Update dashboard itself, then update child dashboard items
-        /*
-        ops.add(ContentProviderOperation.newUpdate(uri)
-                .withValues(DashboardHandler.toContentValues(newDashboard)).build());
-        ops.addAll(updateDashboardItems(oldDashboard, newDashboard));
-        */
     }
 
 
@@ -136,31 +127,6 @@ public final class DashboardHandler {
         } else {
             return null;
         }
-
-        /*
-        ops.add(ContentProviderOperation.newInsert(DashboardColumns.CONTENT_URI)
-                .withValue(DashboardColumns.STATE, State.GETTING.toString())
-                .withValues(DashboardHandler.toContentValues(dashboard)).build());
-
-        List<DashboardItem> dashboardItems = dashboard.getDashboardItems();
-        if (dashboardItems == null || dashboardItems.size() <= 0) {
-            return;
-        }
-
-        int dashboardInsertionIndex = ops.size() - 1;
-        for (DashboardItem dashboardItem : dashboardItems) {
-            System.out.println("Inserting dashboard: " + dashboardItem.getType());
-            if (!isDashboardItemCorrect(dashboardItem)) {
-                continue;
-            }
-            ContentValues values = DashboardItemHandler.toContentValues(dashboardItem);
-            ops.add(ContentProviderOperation.newInsert(DBContract.DashboardItemColumns.CONTENT_URI)
-                    .withValueBackReference(DBContract.DashboardItemColumns.DASHBOARD_DB_ID, dashboardInsertionIndex)
-                    .withValue(DBContract.DashboardItemColumns.STATE, State.GETTING.toString())
-                    .withValues(values)
-                    .build());
-        }
-        */
     }
 
     public static Map<String, Dashboard> toMap(List<Dashboard> dashboardList) {
