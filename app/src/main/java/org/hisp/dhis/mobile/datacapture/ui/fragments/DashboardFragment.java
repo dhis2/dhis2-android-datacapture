@@ -78,7 +78,7 @@ public class DashboardFragment extends BaseFragment implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> loader) {
-
+        // reset the state of screen
     }
 
     public static class ItemsLoader extends AbsCursorLoader<List<DBItemHolder<DashboardItem>>> {

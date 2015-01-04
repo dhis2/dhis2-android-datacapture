@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.ui.fragments;
+package org.hisp.dhis.mobile.datacapture.ui.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -6,14 +6,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardFragment;
 
 import java.util.List;
 
-public class DashboardViewPagerAdapter extends FragmentPagerAdapter {
+public class DashboardAdapter extends FragmentPagerAdapter {
     private static final String EMPTY_TITLE = "";
     private List<DBItemHolder<Dashboard>> mDashboards;
 
-    public DashboardViewPagerAdapter(FragmentManager fm) {
+    public DashboardAdapter(FragmentManager fm) {
         super(fm);
     }
 

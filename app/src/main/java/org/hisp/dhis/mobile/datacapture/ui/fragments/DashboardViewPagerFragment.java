@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +29,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
+import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     private static final int LOADER_ID = 826752394;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
-    private DashboardViewPagerAdapter mAdapter;
+    private DashboardAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class DashboardViewPagerFragment extends BaseFragment
         final int blue = Color.parseColor(getString(R.color.navy_blue));
         final int gray = Color.parseColor(getString(R.color.darker_grey));
 
-        mAdapter = new DashboardViewPagerAdapter(getChildFragmentManager());
+        mAdapter = new DashboardAdapter(getChildFragmentManager());
         mViewPager = (ViewPager) view.findViewById(R.id.view_pager);
         mViewPager.setAdapter(mAdapter);
 
