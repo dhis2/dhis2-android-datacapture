@@ -9,6 +9,7 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
@@ -17,14 +18,16 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardItemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<DashboardItem>>>> {
     private static final int LOADER_ID = 74734523;
+    private GridView mGridView;
+    private DashboardItemAdapter mAdapter;
 
     public static DashboardFragment newInstance(int dashboardId) {
         DashboardFragment fragment = new DashboardFragment();
@@ -36,7 +39,6 @@ public class DashboardFragment extends BaseFragment implements LoaderManager.Loa
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup group, Bundle bundle) {
         return inflater.inflate(R.layout.fragment_dashboard, group, false);
@@ -44,7 +46,10 @@ public class DashboardFragment extends BaseFragment implements LoaderManager.Loa
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        mAdapter = new DashboardItemAdapter(getActivity());
 
+        mGridView = (GridView) view.findViewById(R.id.grid);
+        mGridView.setAdapter(mAdapter);
     }
 
     @Override
@@ -70,8 +75,12 @@ public class DashboardFragment extends BaseFragment implements LoaderManager.Loa
                                CursorHolder<List<DBItemHolder<DashboardItem>>> data) {
         if (loader != null && loader.getId() == LOADER_ID) {
             for (DBItemHolder<DashboardItem> item : data.getData()) {
-                System.out.println("Item {id, type}: " + item.getItem().getId() +
+                System.out.println("Item {id, type}: " + item.getDatabaseId() +
                 " " + item.getItem().getType());
+            }
+
+            if (mAdapter != null) {
+                mAdapter.swapData(data.getData());
             }
         }
     }
