@@ -10,12 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
+import org.hisp.dhis.mobile.datacapture.utils.DateTimeTypeAdapter;
 import org.hisp.dhis.mobile.datacapture.utils.PicassoProvider;
+import org.joda.time.DateTime;
 
 public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
     private static final String DATE_FORMAT = "YYYY-MM-dd";
@@ -25,12 +28,14 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
 
     private OnItemClickListener mOnClickListener;
     private Picasso mImageLoader;
+    private Transformation mImageTransformation;
     private String mServerUrl;
 
     public DashboardItemAdapter(Context context) {
         super(context);
 
         mImageLoader = PicassoProvider.getInstance(context);
+        mImageTransformation = new ImgTransformation();
         mServerUrl = DHISManager.getInstance().getServerUrl();
     }
 
@@ -78,7 +83,8 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
 
         String lastUpdated = "";
         if (item.getLastUpdated() != null) {
-            // lastUpdated = item.getLastUpdated().toString(DATE_FORMAT);
+            DateTime dateTime = DateTimeTypeAdapter.deserializeDateTime(item.getLastUpdated());
+            lastUpdated = dateTime.toString(DATE_FORMAT);
         }
 
         holder.lastUpdated.setText(lastUpdated);
@@ -147,7 +153,12 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
 
         holder.itemName.setText(name);
         mImageLoader.load(request)
-                // .placeholder(R.drawable.stub_dashboard_background)
+                //.resize(160, 100)
+                .transform(mImageTransformation)
+                        //.centerInside()
+                        //.fit()
+                        //.centerCrop()
+                .placeholder(R.drawable.stub_dashboard_background)
                 .into(holder.itemImage);
     }
 

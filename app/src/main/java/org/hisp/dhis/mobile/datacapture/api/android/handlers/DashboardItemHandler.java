@@ -181,7 +181,7 @@ public final class DashboardItemHandler {
         if (isCorrect(dashboardItem)) {
             return ContentProviderOperation.newInsert(DashboardItemColumns.CONTENT_URI)
                     .withValue(DashboardItemColumns.DASHBOARD_DB_ID, dashboard.getDatabaseId())
-                    .withValue(DashboardItemColumns.STATE, State.GETTING)
+                    .withValue(DashboardItemColumns.STATE, State.GETTING.toString())
                     .withValues(toContentValues(dashboardItem))
                     .build();
         } else {

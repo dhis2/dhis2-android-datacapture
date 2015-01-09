@@ -9,7 +9,6 @@
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="description">ImageView description</string>
-
     <string name="drawer_open">Open navigation menu</string>
     <string name="drawer_close">Close navigation menu</string>
 
@@ -20,31 +19,31 @@
     <string name="login_button">Log in</string>
     <!-- END string resources for LoginActivity -->
 
+
     <!-- START string resources for MenuActivity -->
     <string name="analytics">ANALYTICS</string>
     <string name="dashboard">Dashboard</string>
     <string name="interpretations">Interpretations</string>
-
     <string name="data_entry_section">DATA ENTRY</string>
     <string name="aggregate_report">Aggregate Report</string>
     <string name="single_event">Single Event</string>
     <string name="reports">Reports</string>
-
     <string name="profile_section">PROFILE</string>
     <string name="my_account">Account</string>
     <string name="messages">Messages</string>
     <string name="log_out">Log out</string>
-
     <string name="other">OTHER</string>
     <string name="about">About</string>
     <!-- END string resources for MenuActivity -->
 
+
     <!-- Fragment "Swipe to refresh message" -->
     <string name="swipe_to_refresh_message">Swipe to refresh</string>
-
     <string name="refresh_dashboards">Refresh dashboards</string>
     <string name="share_interpretation">Share interpretation</string>
     <string name="users">users</string>
     <string name="resources">resources</string>
+    <string name="graphical_resource">Graphical resource</string>
+    <string name="title_activity_dashboard_item_detail">DashboardItemDetailActivity</string>
 
 </resources>

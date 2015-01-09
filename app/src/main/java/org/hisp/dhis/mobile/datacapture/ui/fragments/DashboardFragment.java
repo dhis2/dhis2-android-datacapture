@@ -4,7 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
+import android.os.Handler;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
+import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
@@ -24,16 +26,17 @@ import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardItemAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DashboardFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<DashboardItem>>>> {
+public class DashboardFragment extends BaseFragment implements LoaderCallbacks<CursorHolder<List<DBItemHolder<DashboardItem>>>>,
+        DashboardItemAdapter.OnItemClickListener {
     private static final int LOADER_ID = 74734523;
     private GridView mGridView;
     private DashboardItemAdapter mAdapter;
 
-    public static DashboardFragment newInstance(int dashboardId) {
+    public static DashboardFragment newInstance(DBItemHolder<Dashboard> dashboard) {
         DashboardFragment fragment = new DashboardFragment();
         Bundle args = new Bundle();
 
-        args.putInt(DashboardItemColumns.DASHBOARD_DB_ID, dashboardId);
+        args.putInt(DashboardItemColumns.DASHBOARD_DB_ID, dashboard.getDatabaseId());
         fragment.setArguments(args);
 
         return fragment;
@@ -55,15 +58,26 @@ public class DashboardFragment extends BaseFragment implements LoaderManager.Loa
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
+        // getLoaderManager().initLoader(LOADER_ID, getArguments(), DashboardFragment.this);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded()) {
+                    getLoaderManager().initLoader(LOADER_ID, getArguments(), DashboardFragment.this);
+                }
+            }
+        }, 1000);
     }
 
     @Override
     public Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            String SELECTION = DashboardItemColumns.STATE + " != " + '"' + State.DELETING + '"' +
-                    " AND " + DashboardItemColumns.DASHBOARD_DB_ID +
-                    " = " + getArguments().getInt(DashboardItemColumns.DASHBOARD_DB_ID);
+            int dashboardId = getArguments().getInt(DashboardItemColumns.DASHBOARD_DB_ID);
+            String SELECTION = DashboardItemColumns.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
+                    DashboardItemColumns.STATE + " != " + "'" + State.DELETING + "'" + " AND " +
+                    DashboardItemColumns.TYPE + " != " + "'" + DashboardItem.TYPE_REPORT_TABLES + "'" + " AND " +
+                    DashboardItemColumns.TYPE + " != " + "'" + DashboardItem.TYPE_MESSAGES + "'";
             return new ItemsLoader(getActivity(), DashboardItemColumns.CONTENT_URI,
                     DashboardItemHandler.PROJECTION, SELECTION, null, null);
         }
@@ -73,21 +87,26 @@ public class DashboardFragment extends BaseFragment implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> loader,
                                CursorHolder<List<DBItemHolder<DashboardItem>>> data) {
-        if (loader != null && loader.getId() == LOADER_ID) {
-            for (DBItemHolder<DashboardItem> item : data.getData()) {
-                System.out.println("Item {id, type}: " + item.getDatabaseId() +
-                " " + item.getItem().getType());
-            }
-
-            if (mAdapter != null) {
-                mAdapter.swapData(data.getData());
-            }
+        if (loader != null && loader.getId() == LOADER_ID && mAdapter != null) {
+            mAdapter.swapData(data.getData());
         }
     }
 
     @Override
     public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> loader) {
         // reset the state of screen
+    }
+
+    @Override
+    public void onItemClick(DashboardItem dashboardItem) {
+        if (dashboardItem != null) {
+
+        }
+    }
+
+    @Override
+    public void onItemShareInterpretation(DashboardItem dashboardItem) {
+
     }
 
     public static class ItemsLoader extends AbsCursorLoader<List<DBItemHolder<DashboardItem>>> {

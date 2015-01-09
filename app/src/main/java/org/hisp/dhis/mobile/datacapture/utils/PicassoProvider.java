@@ -12,7 +12,19 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 public final class PicassoProvider {
+    private static Picasso mPicasso;
+
     private PicassoProvider() {
+    }
+
+    public static Picasso getInstance(Context context) {
+        if (mPicasso == null) {
+            mPicasso = new Picasso.Builder(context)
+                    .downloader(new MyPicassoDownloader(context))
+                    .build();
+        }
+
+        return mPicasso;
     }
 
     private static class MyPicassoDownloader extends OkHttpDownloader {
@@ -25,14 +37,8 @@ public final class PicassoProvider {
         protected HttpURLConnection openConnection(Uri path) throws IOException {
             String credentials = DHISManager.getInstance().getCredentials();
             HttpURLConnection connection = super.openConnection(path);
-            connection.setRequestProperty("Authorization", "Basic " + credentials);
+            connection.setRequestProperty("Authorization", credentials);
             return connection;
         }
-    }
-
-    public static Picasso getInstance(Context context) {
-        return new Picasso.Builder(context)
-                .downloader(new MyPicassoDownloader(context))
-                .build();
     }
 }

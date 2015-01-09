@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="240dp"
         android:orientation="vertical"
         android:paddingLeft="7dp"
         android:paddingRight="7dp"
@@ -34,7 +34,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:drawable="@drawable/ic_overflow_menu" />
+                android:background="@drawable/transparent_selector"
+                android:contentDescription="@string/graphical_resource"
+                android:src="@drawable/ic_overflow_menu" />
         </RelativeLayout>
 
         <org.hisp.dhis.mobile.datacapture.ui.views.FontTextView
@@ -51,30 +53,32 @@
             android:background="@color/light_grey" />
 
         <!-- This layout is used only in order to catch click events -->
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/dashboard_item_body_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/transparent_selector"
             android:clickable="true"
-            android:orientation="vertical">
+            android:gravity="center"
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/dashboard_item_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:padding="15dp" />
+                android:contentDescription="@string/graphical_resource" />
 
             <org.hisp.dhis.mobile.datacapture.ui.views.FontTextView
                 android:id="@+id/dashboard_item_text"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/navy_blue"
                 android:textSize="17sp"
                 app:font="@string/light_font_name" />
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 

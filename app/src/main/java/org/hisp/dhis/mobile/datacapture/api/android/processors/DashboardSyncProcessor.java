@@ -105,7 +105,6 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
                 Log.d(TAG, "Removing dashboard {id, name}: " +
                         oldDashboard.getItem().getId() + " : " + oldDashboard.getItem().getName());
                 deleteDashboard(ops, oldDashboard);
-                // ops.add(deleteDashboard(oldDashboard));
                 continue;
             }
 
@@ -116,15 +115,6 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
                 Log.d(TAG, "Updating dashboard {id, name}: " +
                         oldDashboard.getItem().getId() + " : " + oldDashboard.getItem().getName());
                 updateDashboard(ops, oldDashboard, newDashboard);
-                // List<ContentProviderOperation> updateOps = updateDashboard(oldDashboard, newDashboard);
-
-                /*
-                if (updateOps != null) {
-                    Log.d(TAG, "Updating dashboard {id, name}: " +
-                            oldDashboard.getItem().getId() + " : " + oldDashboard.getItem().getName());
-                    ops.addAll(updateOps);
-                }
-                */
             }
 
             newDashboards.remove(oldDashboard.getItem().getId());
@@ -135,12 +125,6 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
             Dashboard dashboard = newDashboards.get(key);
             Log.d(TAG, "Inserting new dashboard {id, name}: " + dashboard.getName() + " " + dashboard.getId());
             insertDashboard(ops, dashboard);
-
-            /* List<ContentProviderOperation> insertOps = insertDashboard(dashboard);
-            if (insertOps != null) {
-                Log.d(TAG, "Inserting new dashboard {id, name}: " + dashboard.getName() + " " + dashboard.getId());
-                ops.addAll(insertOps);
-            } */
         }
 
         return ops;
@@ -148,17 +132,16 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
 
     private void insertDashboard(List<ContentProviderOperation> ops,
                                  Dashboard dashboard) throws APIException {
-        // final List<ContentProviderOperation> ops = new ArrayList<>();
         final List<DashboardItem> dashboardItems = new ArrayList<>();
 
         ContentProviderOperation dashboardInsertOp = DashboardHandler.insert(dashboard);
         if (dashboardInsertOp == null) {
-            return;// ops;
+            return;
         }
 
         ops.add(dashboardInsertOp);
         if (dashboard.getDashboardItems() == null || dashboard.getDashboardItems().size() <= 0) {
-            return;// ops;
+            return;
         }
 
         // we have to download full sized dashboard items before inserting them
@@ -167,7 +150,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
         }
 
         if (dashboardItems.size() <= 0) {
-            return;// ops;
+            return;
         }
 
         final int dashboardIndex = ops.size() - 1;
@@ -178,14 +161,11 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
                 ops.add(op);
             }
         }
-
-        //return ops;
     }
 
     private void updateDashboard(List<ContentProviderOperation> ops,
                                  DBItemHolder<Dashboard> oldDashboard,
                                  Dashboard newDashboard) throws APIException {
-        // List<ContentProviderOperation> ops = new ArrayList<>();
         ContentProviderOperation dashboardUpdateOp = DashboardHandler.update(oldDashboard, newDashboard);
 
         if (dashboardUpdateOp == null) {
@@ -236,8 +216,6 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
                 ops.add(op);
             }
         }
-
-        //return ops;
     }
 
     private void deleteDashboard(List<ContentProviderOperation> ops,
@@ -246,7 +224,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
     }
 
     private List<DBItemHolder<Dashboard>> readDashboards() {
-        final String SELECTION = DashboardColumns.STATE + " = " + '"' + State.GETTING.toString() + '"';
+        final String SELECTION = DashboardColumns.STATE + " = " + "'" + State.GETTING.toString() + "'";
         Cursor cursor = mContext.getContentResolver().query(
                 DashboardColumns.CONTENT_URI, DashboardHandler.PROJECTION, SELECTION, null, null
         );
@@ -266,7 +244,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
 
     private List<DBItemHolder<DashboardItem>> readDashboardItems(int dashboardId) {
         final String SELECTION = DashboardItemColumns.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
-                DashboardItemColumns.STATE + " = " + '"' + State.GETTING.toString() + '"';
+                DashboardItemColumns.STATE + " = " + "'" + State.GETTING.toString() + "'";
         Cursor cursor = mContext.getContentResolver().query(
                 DashboardItemColumns.CONTENT_URI, DashboardItemHandler.PROJECTION, SELECTION, null, null
         );
