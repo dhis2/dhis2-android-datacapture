@@ -1,13 +1,13 @@
 package org.hisp.dhis.mobile.datacapture.api.android.events;
 
 public final class GetReportTableEvent {
-    private String mUrl;
+    private String mId;
 
-    public void setUrl(String url) {
-        mUrl = url;
+    public void setId(String id) {
+        mId = id;
     }
 
-    public String getUrl() {
-        return mUrl;
+    public String getId() {
+        return mId;
     }
 }

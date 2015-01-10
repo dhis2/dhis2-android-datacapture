@@ -6,6 +6,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.converters.DataSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.OptionSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ProgramsConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ReportConverter;
+import org.hisp.dhis.mobile.datacapture.api.android.converters.ReportTableConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.UserAccountConverter;
 import org.hisp.dhis.mobile.datacapture.api.managers.IJsonConverter;
 import org.hisp.dhis.mobile.datacapture.api.managers.IJsonManager;
@@ -48,5 +49,10 @@ public final class JsonManager implements IJsonManager {
     @Override
     public IJsonConverter<DashboardItem> getDashboardItemConverter() {
         return new DashboardItemConverter();
+    }
+
+    @Override
+    public IJsonConverter<String> getReportTableConverter() {
+        return new ReportTableConverter();
     }
 }

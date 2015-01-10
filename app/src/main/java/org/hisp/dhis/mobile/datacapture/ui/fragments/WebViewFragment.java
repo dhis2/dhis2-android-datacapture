@@ -12,10 +12,20 @@ import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnGotReportTableEvent;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 
 public class WebViewFragment extends BaseFragment {
-    public static final String WEB_URL_EXTRA = "webViewUrlExtra";
     private WebView mWebView;
+
+    public static WebViewFragment newInstance(String id) {
+        WebViewFragment fragment = new WebViewFragment();
+        Bundle args = new Bundle();
+
+        args.putString(DashboardItemColumns.ID, id);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mWebView = (WebView) inflater.inflate(R.layout.fragment_web_view, container, false);
@@ -24,17 +34,17 @@ public class WebViewFragment extends BaseFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (getArguments() != null && getArguments().getString(WEB_URL_EXTRA) != null) {
+        if (getArguments() != null && getArguments().getString(DashboardItemColumns.ID) != null) {
             GetReportTableEvent event = new GetReportTableEvent();
-            event.setUrl(getArguments().getString(WEB_URL_EXTRA));
+            event.setId(getArguments().getString(DashboardItemColumns.ID));
             BusProvider.getInstance().post(event);
         }
     }
 
     @Subscribe
     public void onGotReportTable(OnGotReportTableEvent event) {
-        if (event.getApiException() == null) {
-            mWebView.loadData(event.getReportTable(), "text/html", "UTF-8");
+        if (event.getHolder().getException() == null) {
+            mWebView.loadData(event.getHolder().getItem(), "text/html", "UTF-8");
         }
     }
 }

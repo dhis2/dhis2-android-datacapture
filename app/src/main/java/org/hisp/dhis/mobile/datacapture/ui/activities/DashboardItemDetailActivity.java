@@ -101,32 +101,26 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
             Log.d(TAG, "DashboardItem Type: " + mDashboardItem.getType());
 
             Fragment fragment = null;
-            Bundle params = new Bundle();
             String serverUrl = DHISManager.getInstance().getServerUrl();
 
             if (DashboardItem.TYPE_MAP.equals(mDashboardItem.getType()) && mDashboardItem.getMap() != null) {
                 setTitle(mDashboardItem.getMap().getName());
                 String request = serverUrl + "/api/maps/" + mDashboardItem.getMap().getId() + "/data.png";
-                params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
-                fragment = new ImageViewFragment();
+                fragment = ImageViewFragment.newInstance(request);
                 mCanShareInterpretation = true;
             } else if (DashboardItem.TYPE_CHART.equals(mDashboardItem.getType()) && mDashboardItem.getChart() != null) {
                 setTitle(mDashboardItem.getChart().getName());
                 String request = serverUrl + "/api/charts/" + mDashboardItem.getChart().getId() + "/data.png";
-                params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
-                fragment = new ImageViewFragment();
+                fragment = ImageViewFragment.newInstance(request);
                 mCanShareInterpretation = true;
             } else if (DashboardItem.TYPE_EVENT_CHART.equals(mDashboardItem.getType()) && mDashboardItem.getEventChart() != null) {
                 setTitle(mDashboardItem.getEventChart().getName());
                 String request = serverUrl + "/api/eventCharts/" + mDashboardItem.getEventChart().getId() + "/data.png";
-                params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
-                fragment = new ImageViewFragment();
+                fragment = ImageViewFragment.newInstance(request);
                 mCanShareInterpretation = false;
             } else if (DashboardItem.TYPE_REPORT_TABLE.equals(mDashboardItem.getType()) && mDashboardItem.getReportTable() != null) {
                 setTitle(mDashboardItem.getReportTable().getName());
-                String request = serverUrl + "/api/reportTables/" + mDashboardItem.getReportTable().getId() + "/data.html";
-                params.putString(WebViewFragment.WEB_URL_EXTRA, request);
-                fragment = new WebViewFragment();
+                fragment = WebViewFragment.newInstance(mDashboardItem.getReportTable().getId());
                 mCanShareInterpretation = true;
             } else if (DashboardItem.TYPE_USERS.equals(mDashboardItem.getType()) && mDashboardItem.getUsers() != null) {
                 setTitle(getString(R.string.users));
@@ -135,8 +129,7 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
                 for (int i = 0; i < users.size(); i++) {
                     userNames[i] = users.get(i).getName();
                 }
-                params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, userNames);
-                fragment = new ListViewFragment();
+                fragment = ListViewFragment.newInstance(userNames);
                 mCanShareInterpretation = false;
             } else if (DashboardItem.TYPE_RESOURCES.equals(mDashboardItem.getType()) && mDashboardItem.getResources() != null) {
                 setTitle(getString(R.string.resources));
@@ -145,8 +138,7 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
                 for (int i = 0; i < resources.size(); i++) {
                     resourcesLabels[i] = resources.get(i).getName();
                 }
-                params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, resourcesLabels);
-                fragment = new ListViewFragment();
+                fragment = ListViewFragment.newInstance(resourcesLabels);
                 mCanShareInterpretation = false;
             } else if (DashboardItem.TYPE_REPORTS.equals(mDashboardItem.getType()) && mDashboardItem.getReports() != null) {
                 setTitle(getString(R.string.reports));
@@ -155,17 +147,16 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
                 for (int i = 0; i < reports.size(); i++) {
                     reportLabels[i] = reports.get(i).getName();
                 }
-                params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, reportLabels);
-                fragment = new ListViewFragment();
+                fragment = ListViewFragment.newInstance(reportLabels);
                 mCanShareInterpretation = false;
             }
 
             supportInvalidateOptionsMenu();
 
             if (fragment != null) {
-                fragment.setArguments(params);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.dashboard_item_detail_frame, fragment).commitAllowingStateLoss();
+                        .replace(R.id.dashboard_item_detail_frame, fragment)
+                        .commitAllowingStateLoss();
             }
         }
     }
