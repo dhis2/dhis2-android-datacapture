@@ -71,16 +71,18 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
             holder = (ViewHolder) view.getTag();
         }
 
-        DashboardItem dashboardItem = ((DBItemHolder<DashboardItem>) getItem(position)).getItem();
-        handleDashboardItems(dashboardItem, holder);
+        DBItemHolder<DashboardItem> dbItem = ((DBItemHolder<DashboardItem>) getItem(position));
+        handleDashboardItems(dbItem, holder);
         return view;
     }
 
-    public void handleDashboardItems(final DashboardItem item, final ViewHolder holder) {
-        if (item == null) {
+    public void handleDashboardItems(final DBItemHolder<DashboardItem> dbItem,
+                                     final ViewHolder holder) {
+        if (dbItem == null || dbItem.getItem() == null) {
             return;
         }
 
+        DashboardItem item = dbItem.getItem();
         String lastUpdated = "";
         if (item.getLastUpdated() != null) {
             DateTime dateTime = DateTimeTypeAdapter.deserializeDateTime(item.getLastUpdated());
@@ -118,7 +120,7 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
             @Override
             public void onClick(View view) {
                 if (mOnClickListener != null) {
-                    mOnClickListener.onItemClick(item);
+                    mOnClickListener.onItemClick(dbItem);
                 }
             }
         });
@@ -137,7 +139,7 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (menuItem.getItemId() == MENU_ITEM_ID) {
                     if (mOnClickListener != null) {
-                        mOnClickListener.onItemShareInterpretation(item);
+                        mOnClickListener.onItemShareInterpretation(dbItem);
                     }
                     return true;
                 }
@@ -146,6 +148,7 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
         });
     }
 
+    // TODO Finish image resizing
     private void handleItemsWithImages(String name, String request, ViewHolder holder) {
         holder.itemName.setVisibility(View.VISIBLE);
         holder.itemImage.setVisibility(View.VISIBLE);
@@ -171,8 +174,9 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(DashboardItem dashboardItem);
-        public void onItemShareInterpretation(DashboardItem dashboardItem);
+        public void onItemClick(DBItemHolder<DashboardItem> dbItem);
+
+        public void onItemShareInterpretation(DBItemHolder<DashboardItem> dbItem);
     }
 
     private static class ViewHolder {

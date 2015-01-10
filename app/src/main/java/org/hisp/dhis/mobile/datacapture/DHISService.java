@@ -8,8 +8,10 @@ import android.util.Log;
 import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.GetReportTableProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
 
 public class DHISService extends Service {
@@ -53,5 +55,10 @@ public class DHISService extends Service {
     @Subscribe
     public void onDashboardSyncEvent(DashboardSyncEvent event) {
         (new DashboardSyncProcessor(getBaseContext())).execute();
+    }
+
+    @Subscribe
+    public void onGetReportTable(GetReportTableEvent event) {
+        (new GetReportTableProcessor(event)).execute();
     }
 }

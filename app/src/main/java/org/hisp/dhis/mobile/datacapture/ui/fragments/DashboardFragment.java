@@ -1,6 +1,7 @@
 package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardItemDetailActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardItemAdapter;
 
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class DashboardFragment extends BaseFragment implements LoaderCallbacks<C
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mAdapter = new DashboardItemAdapter(getActivity());
+        mAdapter.setOnItemClickListener(this);
 
         mGridView = (GridView) view.findViewById(R.id.grid);
         mGridView.setAdapter(mAdapter);
@@ -98,14 +101,16 @@ public class DashboardFragment extends BaseFragment implements LoaderCallbacks<C
     }
 
     @Override
-    public void onItemClick(DashboardItem dashboardItem) {
-        if (dashboardItem != null) {
-
+    public void onItemClick(DBItemHolder<DashboardItem> dbItem) {
+        if (dbItem != null) {
+            Intent intent = DashboardItemDetailActivity.prepareIntent(getActivity(),
+                    dbItem.getDatabaseId());
+            startActivity(intent);
         }
     }
 
     @Override
-    public void onItemShareInterpretation(DashboardItem dashboardItem) {
+    public void onItemShareInterpretation(DBItemHolder<DashboardItem> dbItem) {
 
     }
 

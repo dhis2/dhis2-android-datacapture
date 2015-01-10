@@ -27,8 +27,7 @@ public class ListViewFragment extends Fragment {
                 getArguments().getStringArray(STRING_ARRAY_EXTRA) != null &&
                 getArguments().getStringArray(STRING_ARRAY_EXTRA).length > 0) {
             mAdapter = new ArrayAdapter<>(getActivity(),
-                    //R.layout.listview_row_simple_item_layout, R.id.text_label,
-                    0,0,
+                    R.layout.listview_row_simple_item_layout, R.id.text_label,
                     getArguments().getStringArray(STRING_ARRAY_EXTRA));
             mListView.setAdapter(mAdapter);
         }

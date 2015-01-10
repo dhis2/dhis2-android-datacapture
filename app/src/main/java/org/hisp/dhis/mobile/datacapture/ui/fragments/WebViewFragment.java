@@ -6,7 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+import com.squareup.otto.Subscribe;
+
+import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.OnGotReportTableEvent;
 
 public class WebViewFragment extends BaseFragment {
     public static final String WEB_URL_EXTRA = "webViewUrlExtra";
@@ -20,25 +25,16 @@ public class WebViewFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         if (getArguments() != null && getArguments().getString(WEB_URL_EXTRA) != null) {
-            // new DownloadDataAsyncTask<String>(getActivity(), this, getArguments()).execute();
+            GetReportTableEvent event = new GetReportTableEvent();
+            event.setUrl(getArguments().getString(WEB_URL_EXTRA));
+            BusProvider.getInstance().post(event);
         }
     }
 
-    /*
-    @Override
-    public String doInBackground(Context context, Bundle params) {
-        Response response = HTTPClient.get(context, params.getString(WEB_URL_EXTRA));
-        if (!HTTPClient.isError(response.getCode())) {
-            return response.getBody();
-        } else {
-            return null;
+    @Subscribe
+    public void onGotReportTable(OnGotReportTableEvent event) {
+        if (event.getApiException() == null) {
+            mWebView.loadData(event.getReportTable(), "text/html", "UTF-8");
         }
     }
-
-    @Override
-    public void onPostExecute(String result) {
-        if (result != null) {
-            mWebView.loadData(result, "text/html", "UTF-8");
-        }
-    } */
 }

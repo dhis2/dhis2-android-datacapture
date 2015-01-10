@@ -1,29 +1,48 @@
 package org.hisp.dhis.mobile.datacapture.ui.activities;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItemElement;
 import org.hisp.dhis.mobile.datacapture.api.models.User;
+import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
+import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.ImageViewFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.ListViewFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.WebViewFragment;
 
 import java.util.List;
 
-public class DashboardItemDetailActivity extends ActionBarActivity {
+public class DashboardItemDetailActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<CursorHolder<DashboardItem>> {
+    private static final String TAG = DashboardItemDetailActivity.class.getSimpleName();
+    private static final int LOADER_ID = 12834514;
 
-    public static Intent prepareIntent(Context context, DashboardItem dashboardItem) {
-        // TODO Create intent, put dashboard item into extras of intent.
-        return null;
+    private DashboardItem mDashboardItem;
+    private boolean mCanShareInterpretation;
+
+    public static Intent prepareIntent(FragmentActivity activity, int dashboardId) {
+        Intent intent = new Intent(activity, DashboardItemDetailActivity.class);
+        intent.putExtra(DashboardItemColumns.DB_ID, dashboardId);
+        return intent;
     }
 
     @Override
@@ -31,14 +50,24 @@ public class DashboardItemDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard_item_detail);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        mCanShareInterpretation = false;
+    }
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        getSupportLoaderManager().initLoader(LOADER_ID, getIntent().getExtras(), this);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_dashboard_item_detail, menu);
         return true;
     }
@@ -52,70 +81,116 @@ public class DashboardItemDetailActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void handleDashboardItem(DashboardItem dashboardItem) {
-        Fragment fragment = null;
-        Bundle params = new Bundle();
-        String serverUrl = DHISManager.getInstance().getServerUrl();
-        if (DashboardItem.TYPE_MAP.equals(dashboardItem.getType()) && dashboardItem.getMap() != null) {
-            setTitle(dashboardItem.getMap().getName());
-            String request = serverUrl + "/api/maps/" + dashboardItem.getMap().getId() + "/data.png";
-            params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
-            fragment = new ImageViewFragment();
-            // mCanShareInterpretation = true;
-        } else if (DashboardItem.TYPE_CHART.equals(dashboardItem.getType()) && dashboardItem.getChart() != null) {
-            setTitle(dashboardItem.getChart().getName());
-            String request = serverUrl + "/api/charts/" + dashboardItem.getChart().getId() + "/data.png";
-            params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
-            fragment = new ImageViewFragment();
-            // mCanShareInterpretation = true;
-        } else if (DashboardItem.TYPE_EVENT_CHART.equals(dashboardItem.getType()) && dashboardItem.getEventChart() != null) {
-            setTitle(dashboardItem.getEventChart().getName());
-            String request = serverUrl + "/api/eventCharts/" + dashboardItem.getEventChart().getId() + "/data.png";
-            params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
-            fragment = new ImageViewFragment();
-            // mCanShareInterpretation = false;
-        } else if (DashboardItem.TYPE_REPORT_TABLE.equals(dashboardItem.getType()) && dashboardItem.getReportTable() != null) {
-            setTitle(dashboardItem.getReportTable().getName());
-            String request = serverUrl + "/api/reportTables/" + dashboardItem.getReportTable().getId() + "/data.html";
-            params.putString(WebViewFragment.WEB_URL_EXTRA, request);
-            fragment = new WebViewFragment();
-            // mCanShareInterpretation = true;
-        } else if (DashboardItem.TYPE_USERS.equals(dashboardItem.getType()) && dashboardItem.getUsers() != null) {
-            setTitle(getString(R.string.users));
-            List<User> users = dashboardItem.getUsers();
-            String[] userNames = new String[users.size()];
-            for (int i = 0; i < users.size(); i++) {
-                userNames[i] = users.get(i).getName();
+    @Override
+    public Loader<CursorHolder<DashboardItem>> onCreateLoader(int loaderId, Bundle args) {
+        if (LOADER_ID == loaderId) {
+            int id = args.getInt(DashboardItemColumns.DB_ID);
+            Uri uri = ContentUris.withAppendedId(DashboardItemColumns.CONTENT_URI, id);
+            return new ItemLoader(getBaseContext(), uri, DashboardItemHandler.PROJECTION, null, null, null);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<CursorHolder<DashboardItem>> loader,
+                               CursorHolder<DashboardItem> data) {
+        if (loader != null && loader.getId() == LOADER_ID &&
+                data != null && data.getData() != null) {
+            mDashboardItem = data.getData();
+            Log.d(TAG, "DashboardItem Type: " + mDashboardItem.getType());
+
+            Fragment fragment = null;
+            Bundle params = new Bundle();
+            String serverUrl = DHISManager.getInstance().getServerUrl();
+
+            if (DashboardItem.TYPE_MAP.equals(mDashboardItem.getType()) && mDashboardItem.getMap() != null) {
+                setTitle(mDashboardItem.getMap().getName());
+                String request = serverUrl + "/api/maps/" + mDashboardItem.getMap().getId() + "/data.png";
+                params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
+                fragment = new ImageViewFragment();
+                mCanShareInterpretation = true;
+            } else if (DashboardItem.TYPE_CHART.equals(mDashboardItem.getType()) && mDashboardItem.getChart() != null) {
+                setTitle(mDashboardItem.getChart().getName());
+                String request = serverUrl + "/api/charts/" + mDashboardItem.getChart().getId() + "/data.png";
+                params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
+                fragment = new ImageViewFragment();
+                mCanShareInterpretation = true;
+            } else if (DashboardItem.TYPE_EVENT_CHART.equals(mDashboardItem.getType()) && mDashboardItem.getEventChart() != null) {
+                setTitle(mDashboardItem.getEventChart().getName());
+                String request = serverUrl + "/api/eventCharts/" + mDashboardItem.getEventChart().getId() + "/data.png";
+                params.putString(ImageViewFragment.IMAGE_URL_EXTRA, request);
+                fragment = new ImageViewFragment();
+                mCanShareInterpretation = false;
+            } else if (DashboardItem.TYPE_REPORT_TABLE.equals(mDashboardItem.getType()) && mDashboardItem.getReportTable() != null) {
+                setTitle(mDashboardItem.getReportTable().getName());
+                String request = serverUrl + "/api/reportTables/" + mDashboardItem.getReportTable().getId() + "/data.html";
+                params.putString(WebViewFragment.WEB_URL_EXTRA, request);
+                fragment = new WebViewFragment();
+                mCanShareInterpretation = true;
+            } else if (DashboardItem.TYPE_USERS.equals(mDashboardItem.getType()) && mDashboardItem.getUsers() != null) {
+                setTitle(getString(R.string.users));
+                List<User> users = mDashboardItem.getUsers();
+                String[] userNames = new String[users.size()];
+                for (int i = 0; i < users.size(); i++) {
+                    userNames[i] = users.get(i).getName();
+                }
+                params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, userNames);
+                fragment = new ListViewFragment();
+                mCanShareInterpretation = false;
+            } else if (DashboardItem.TYPE_RESOURCES.equals(mDashboardItem.getType()) && mDashboardItem.getResources() != null) {
+                setTitle(getString(R.string.resources));
+                List<DashboardItemElement> resources = mDashboardItem.getResources();
+                String[] resourcesLabels = new String[resources.size()];
+                for (int i = 0; i < resources.size(); i++) {
+                    resourcesLabels[i] = resources.get(i).getName();
+                }
+                params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, resourcesLabels);
+                fragment = new ListViewFragment();
+                mCanShareInterpretation = false;
+            } else if (DashboardItem.TYPE_REPORTS.equals(mDashboardItem.getType()) && mDashboardItem.getReports() != null) {
+                setTitle(getString(R.string.reports));
+                List<DashboardItemElement> reports = mDashboardItem.getReports();
+                String[] reportLabels = new String[reports.size()];
+                for (int i = 0; i < reports.size(); i++) {
+                    reportLabels[i] = reports.get(i).getName();
+                }
+                params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, reportLabels);
+                fragment = new ListViewFragment();
+                mCanShareInterpretation = false;
             }
-            params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, userNames);
-            fragment = new ListViewFragment();
-            // mCanShareInterpretation = false;
-        } else if (DashboardItem.TYPE_RESOURCES.equals(dashboardItem.getType()) && dashboardItem.getResources() != null) {
-            setTitle(getString(R.string.resources));
-            List<DashboardItemElement> resources = dashboardItem.getResources();
-            String[] resourcesLabels = new String[resources.size()];
-            for (int i = 0; i < resources.size(); i++) {
-                resourcesLabels[i] = resources.get(i).getName();
+
+            supportInvalidateOptionsMenu();
+
+            if (fragment != null) {
+                fragment.setArguments(params);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.dashboard_item_detail_frame, fragment).commitAllowingStateLoss();
             }
-            params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, resourcesLabels);
-            fragment = new ListViewFragment();
-            // mCanShareInterpretation = false;
-        } else if (DashboardItem.TYPE_REPORTS.equals(dashboardItem.getType()) && dashboardItem.getReports() != null) {
-            setTitle(getString(R.string.reports));
-            List<DashboardItemElement> reports = dashboardItem.getReports();
-            String[] reportLabels = new String[reports.size()];
-            for (int i = 0; i < reports.size(); i++) {
-                reportLabels[i] = reports.get(i).getName();
-            }
-            params.putStringArray(ListViewFragment.STRING_ARRAY_EXTRA, reportLabels);
-            fragment = new ListViewFragment();
-            // mCanShareInterpretation = false;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<CursorHolder<DashboardItem>> loader) {
+
+    }
+
+    private static class ItemLoader extends AbsCursorLoader<DashboardItem> {
+
+        public ItemLoader(Context context, Uri uri, String[] projection,
+                          String selection, String[] selectionArgs, String sortOrder) {
+            super(context, uri, projection, selection, selectionArgs, sortOrder);
         }
 
-        if (fragment != null) {
-            fragment.setArguments(params);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.dashboard_item_detail_frame, fragment).commitAllowingStateLoss();
+        @Override
+        protected DashboardItem readDataFromCursor(Cursor cursor) {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                DBItemHolder<DashboardItem> dbItem = DashboardItemHandler.fromCursor(cursor);
+                return dbItem.getItem();
+            } else {
+                return null;
+            }
         }
     }
 }
