@@ -21,6 +21,6 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="16dp"
         android:textSize="17sp"
-        app:font="@string/regular_medium_font_name" />
+        app:font="@string/medium_font_name" />
 
 </LinearLayout>

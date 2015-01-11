@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
@@ -36,11 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardViewPagerFragment extends BaseFragment
-        implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<Dashboard>>>> {
+        implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<Dashboard>>>>,
+        ViewPager.OnPageChangeListener, View.OnClickListener {
     private static final int LOADER_ID = 826752394;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private DashboardAdapter mAdapter;
+    private ImageButton mEditButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,9 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_dashboard_view_pager, container, false);
+        View root = inflater.inflate(R.layout.fragment_dashboard_view_pager, container, false);
+        mEditButton = (ImageButton) root.findViewById(R.id.dashboard_edit_button);
+        return root;
     }
 
     @Override
@@ -93,7 +98,11 @@ public class DashboardViewPagerFragment extends BaseFragment
             }
 
         });
+
         mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setOnPageChangeListener(this);
+
+        mEditButton.setOnClickListener(this);
     }
 
     @Override
@@ -119,7 +128,8 @@ public class DashboardViewPagerFragment extends BaseFragment
     public void onLoadFinished(Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> loader,
                                CursorHolder<List<DBItemHolder<Dashboard>>> data) {
         if (loader != null && loader.getId() == LOADER_ID && data != null) {
-            onDashboardsLoaded(data.getData());
+            mAdapter.setData(data.getData());
+            mSlidingTabLayout.setViewPager(mViewPager);
         }
     }
 
@@ -137,9 +147,38 @@ public class DashboardViewPagerFragment extends BaseFragment
         }
     }
 
-    private void onDashboardsLoaded(List<DBItemHolder<Dashboard>> dashboards) {
-        mAdapter.setData(dashboards);
-        mSlidingTabLayout.setViewPager(mViewPager);
+    @Override
+    public void onPageScrolled(int position, float positionOffset,
+                               int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        DBItemHolder<Dashboard> dbItem = mAdapter.getDashboard(position);
+        if (dbItem != null) {
+            Dashboard dashboard = dbItem.getItem();
+            boolean isDashboardEditable = dashboard.getAccess().isManage();
+            setEditButtonVisibility(isDashboardEditable);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    @Override
+    public void onClick(View view) {
+        int position = mViewPager.getCurrentItem();
+        DBItemHolder<Dashboard> dbItem = mAdapter.getDashboard(position);
+        Toast.makeText(getActivity(), "Name: " + dbItem.getItem().getName(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void setEditButtonVisibility(boolean isEditable) {
+        if (isEditable) {
+            mEditButton.setVisibility(View.VISIBLE);
+        } else {
+            mEditButton.setVisibility(View.GONE);
+        }
     }
 
     public static class DashboardListLoader extends AbsCursorLoader<List<DBItemHolder<Dashboard>>> {

@@ -34,6 +34,6 @@
             2) Specify the name of the font with extension -->
     <string name="light_font_name">Roboto-Light.ttf</string>
     <string name="regular_font_name">Roboto-Regular.ttf</string>
-    <string name="regular_bold_font_name">Roboto-Bold.ttf</string>
-    <string name="regular_medium_font_name">Roboto-Medium.ttf</string>
+    <string name="bold_font_name">Roboto-Bold.ttf</string>
+    <string name="medium_font_name">Roboto-Medium.ttf</string>
 </resources>

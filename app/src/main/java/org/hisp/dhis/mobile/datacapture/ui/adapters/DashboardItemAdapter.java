@@ -20,6 +20,7 @@ import org.hisp.dhis.mobile.datacapture.utils.DateTimeTypeAdapter;
 import org.hisp.dhis.mobile.datacapture.utils.PicassoProvider;
 import org.joda.time.DateTime;
 
+// TODO find bottleneck in performance of this adapter
 public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
     private static final String DATE_FORMAT = "YYYY-MM-dd";
     private static final int MENU_GROUP_ID = 935482352;
@@ -156,11 +157,7 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
 
         holder.itemName.setText(name);
         mImageLoader.load(request)
-                //.resize(160, 100)
                 .transform(mImageTransformation)
-                        //.centerInside()
-                        //.fit()
-                        //.centerCrop()
                 .placeholder(R.drawable.stub_dashboard_background)
                 .into(holder.itemImage);
     }

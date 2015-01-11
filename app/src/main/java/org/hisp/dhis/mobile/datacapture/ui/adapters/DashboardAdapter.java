@@ -45,6 +45,14 @@ public class DashboardAdapter extends FragmentPagerAdapter {
         }
     }
 
+    public DBItemHolder<Dashboard> getDashboard(int position) {
+        if (mDashboards != null && mDashboards.size() > 0) {
+            return mDashboards.get(position);
+        } else {
+            return null;
+        }
+    }
+
     public void setData(List<DBItemHolder<Dashboard>> dashboards) {
         boolean hasToNotifyAdapter = mDashboards != dashboards;
         mDashboards = dashboards;

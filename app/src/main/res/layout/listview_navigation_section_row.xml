@@ -16,6 +16,6 @@
         android:layout_marginTop="16dp"
         android:textColor="@color/navy_blue"
         android:textSize="12sp"
-        app:font="@string/regular_bold_font_name" />
+        app:font="@string/bold_font_name" />
 
 </LinearLayout>
