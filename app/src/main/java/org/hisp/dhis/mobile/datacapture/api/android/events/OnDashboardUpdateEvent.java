@@ -1,4 +1,4 @@
 package org.hisp.dhis.mobile.datacapture.api.android.events;
 
-public class OnDashboardUpdateEvent {
+public final class OnDashboardUpdateEvent extends AbsResponseEvent<String> {
 }

@@ -43,8 +43,8 @@ public class WebViewFragment extends BaseFragment {
 
     @Subscribe
     public void onGotReportTable(OnGotReportTableEvent event) {
-        if (event.getHolder().getException() == null) {
-            mWebView.loadData(event.getHolder().getItem(), "text/html", "UTF-8");
+        if (event.getResponseHolder().getException() == null) {
+            mWebView.loadData(event.getResponseHolder().getItem(), "text/html", "UTF-8");
         }
     }
 }

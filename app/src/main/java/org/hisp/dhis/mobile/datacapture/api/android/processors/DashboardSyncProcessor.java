@@ -269,10 +269,10 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
         try {
             ops = updateDashboards();
         } catch (APIException exception) {
-            event.setException(exception);
+            event.getResponseHolder().setException(exception);
         }
 
-        if (ops == null || ops.size() == 0 || event.getException() != null) {
+        if (ops == null || ops.size() == 0 || event.getResponseHolder().getException() != null) {
             return event;
         }
 

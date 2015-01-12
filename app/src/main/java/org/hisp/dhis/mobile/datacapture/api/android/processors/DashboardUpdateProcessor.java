@@ -7,18 +7,23 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 
 import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
+import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
+import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
+import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
 
 import java.util.ArrayList;
 
 public class DashboardUpdateProcessor extends AsyncTask<Void, Void, OnDashboardUpdateEvent> {
-    private DashboardUpdateEvent mEvent;
+    private DBItemHolder<Dashboard> mDbItem;
+    private Dashboard mDashboard;
     private Context mContext;
 
     public DashboardUpdateProcessor(Context context, DashboardUpdateEvent event) {
@@ -31,16 +36,37 @@ public class DashboardUpdateProcessor extends AsyncTask<Void, Void, OnDashboardU
         }
 
         mContext = context;
-        mEvent = event;
+        mDbItem = event.getDbItem();
+        mDashboard = event.getDashboard();
     }
 
     @Override
     protected OnDashboardUpdateEvent doInBackground(Void... params) {
-        DBItemHolder<Dashboard> dbItem = mEvent.getDbItem();
-        Dashboard dashboard = mEvent.getDashboard();
+        updateDashboard(State.PUTTING);
 
+        DHISManager.getInstance().updateDashboard(new ApiRequestCallback<String>() {
+            @Override
+            public void onSuccess(Response response, String s) {
+                updateDashboard(State.GETTING);
+            }
+
+            @Override
+            public void onFailure(APIException e) {
+
+            }
+        }, mDashboard);
+
+        return new OnDashboardUpdateEvent();
+    }
+
+    @Override
+    protected void onPostExecute(OnDashboardUpdateEvent event) {
+        BusProvider.getInstance().post(event);
+    }
+
+    private void updateDashboard(State state) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        ops.add(DashboardHandler.update(dbItem, dashboard, State.PUTTING));
+        ops.add(DashboardHandler.update(mDbItem, mDashboard, state));
 
         try {
             mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
@@ -49,12 +75,5 @@ public class DashboardUpdateProcessor extends AsyncTask<Void, Void, OnDashboardU
         } catch (OperationApplicationException e) {
             e.printStackTrace();
         }
-
-        return new OnDashboardUpdateEvent();
-    }
-
-    @Override
-    protected void onPostExecute(OnDashboardUpdateEvent event) {
-        BusProvider.getInstance().post(event);
     }
 }

@@ -35,7 +35,7 @@ public class GetReportTableProcessor extends AsyncTask<Void, Void, OnGotReportTa
         }, mEvent.getId());
 
         OnGotReportTableEvent event = new OnGotReportTableEvent();
-        event.setHolder(holder);
+        event.setResponseHolder(holder);
         return event;
     }
 

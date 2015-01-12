@@ -55,4 +55,14 @@ public final class JsonManager implements IJsonManager {
     public IJsonConverter<String> getReportTableConverter() {
         return new ReportTableConverter();
     }
+
+    @Override
+    public IJsonConverter<String> getDashboardNameConverter() {
+        return null;
+    }
+
+    @Override
+    public IJsonConverter<String> getDashboardDeleteConverter() {
+        return null;
+    }
 }

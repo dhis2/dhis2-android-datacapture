@@ -129,12 +129,12 @@ public class LoginActivity extends BaseActivity {
 
     @Subscribe
     public void onUserLogin(OnUserLoginEvent event) {
-        if (event.getUserAccount() != null) {
+        if (event.getResponseHolder().getItem() != null) {
             startActivity(new Intent(this, MenuActivity.class));
         } else {
             hideProgress();
             String message = "Failure";
-            event.getApiException().printStackTrace();
+            event.getResponseHolder().getException().printStackTrace();
         }
         // Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
     }

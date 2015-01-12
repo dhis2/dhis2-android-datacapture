@@ -143,9 +143,9 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Subscribe
     public void onDashboardSyncedEvent(OnDashboardsSyncedEvent event) {
-        if (event.getException() != null) {
+        if (event.getResponseHolder().getException() != null) {
             Toast.makeText(getActivity(), "Refresh Failed", Toast.LENGTH_SHORT).show();
-            event.getException().printStackTrace();
+            event.getResponseHolder().getException().printStackTrace();
         }
     }
 

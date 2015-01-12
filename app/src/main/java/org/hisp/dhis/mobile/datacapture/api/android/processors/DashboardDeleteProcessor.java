@@ -7,18 +7,22 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 
 import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
+import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
+import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
+import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
 
 import java.util.ArrayList;
 
 public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardDeleteEvent> {
-    private DashboardDeleteEvent mEvent;
+    private DBItemHolder<Dashboard> mDbItem;
     private Context mContext;
 
     public DashboardDeleteProcessor(Context context, DashboardDeleteEvent event) {
@@ -31,14 +35,36 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
         }
 
         mContext = context;
-        mEvent = event;
+        mDbItem = event.getDashboard();
     }
 
     @Override
     protected OnDashboardDeleteEvent doInBackground(Void... params) {
-        DBItemHolder<Dashboard> dbItem = mEvent.getDashboard();
+        updateDashboardState(State.DELETING);
+
+        DHISManager.getInstance().deleteDashboard(new ApiRequestCallback<String>() {
+            @Override
+            public void onSuccess(Response response, String string) {
+                deleteDashboard();
+            }
+
+            @Override
+            public void onFailure(APIException e) {
+
+            }
+        }, mDbItem.getItem().getId());
+
+        return new OnDashboardDeleteEvent();
+    }
+
+    @Override
+    protected void onPostExecute(OnDashboardDeleteEvent event) {
+        BusProvider.getInstance().post(event);
+    }
+
+    private void updateDashboardState(State state) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        ops.add(DashboardHandler.update(dbItem, dbItem.getItem(), State.DELETING));
+        ops.add(DashboardHandler.update(mDbItem, mDbItem.getItem(), state));
 
         try {
             mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
@@ -48,11 +74,18 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
             e.printStackTrace();
         }
 
-        return new OnDashboardDeleteEvent();
     }
 
-    @Override
-    protected void onPostExecute(OnDashboardDeleteEvent event) {
-        BusProvider.getInstance().post(event);
+    private void deleteDashboard() {
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+        ops.add(DashboardHandler.delete(mDbItem));
+
+        try {
+            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (OperationApplicationException e) {
+            e.printStackTrace();
+        }
     }
 }

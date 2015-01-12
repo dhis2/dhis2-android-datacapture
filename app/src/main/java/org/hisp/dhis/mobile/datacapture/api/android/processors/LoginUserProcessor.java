@@ -7,6 +7,7 @@ import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnUserLoginEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.UserAccount;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
@@ -25,16 +26,18 @@ public class LoginUserProcessor extends AsyncTask<Void, Void, OnUserLoginEvent> 
 
     @Override
     protected OnUserLoginEvent doInBackground(Void... params) {
+        final ResponseHolder<UserAccount> holder = new ResponseHolder<>();
+        final OnUserLoginEvent event = new OnUserLoginEvent();
+
         DHISManager manager = DHISManager.getInstance();
         manager.setServerUrl(mEvent.getServerUrl());
 
-        final OnUserLoginEvent event = new OnUserLoginEvent();
         final String credentials = DHISManager.getInstance()
                 .getBase64Manager().toBase64(mEvent.getUsername(), mEvent.getPassword());
         manager.login(new ApiRequestCallback<UserAccount>() {
             @Override
             public void onSuccess(Response response, UserAccount userAccount) {
-                event.setUserAccount(userAccount);
+                holder.setItem(userAccount);
                 PreferenceUtils.put(mContext,
                         LoginActivity.SERVER_URL, mEvent.getServerUrl());
                 PreferenceUtils.put(mContext,
@@ -43,9 +46,11 @@ public class LoginUserProcessor extends AsyncTask<Void, Void, OnUserLoginEvent> 
 
             @Override
             public void onFailure(APIException e) {
-                event.setApiException(e);
+                holder.setException(e);
             }
         }, mEvent.getUsername(), mEvent.getPassword());
+
+        event.setResponseHolder(holder);
         return event;
     }
 
