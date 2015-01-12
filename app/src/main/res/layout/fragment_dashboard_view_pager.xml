@@ -26,10 +26,9 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_gravity="bottom|right"
-        android:layout_margin="24dp"
+        android:layout_margin="16dp"
         android:background="@drawable/circular_button_shape"
-        android:elevation="8dp"
         android:scaleType="center"
-        android:src="@drawable/ic_refresh" />
+        android:src="@drawable/ic_edit" />
 
 </FrameLayout>

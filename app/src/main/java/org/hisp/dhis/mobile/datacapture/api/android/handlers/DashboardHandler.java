@@ -107,16 +107,21 @@ public final class DashboardHandler {
 
     public static ContentProviderOperation update(DBItemHolder<Dashboard> oldDashboard,
                                                   Dashboard newDashboard) {
+        return update(oldDashboard, newDashboard, State.GETTING);
+    }
+
+    public static ContentProviderOperation update(DBItemHolder<Dashboard> oldDashboard,
+                                                  Dashboard newDashboard, State state) {
         if (isCorrect(newDashboard)) {
             Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI,
                     oldDashboard.getDatabaseId());
             return ContentProviderOperation.newUpdate(uri)
-                    .withValues(DashboardHandler.toContentValues(newDashboard)).build();
+                    .withValues(DashboardHandler.toContentValues(newDashboard))
+                    .withValue(DashboardColumns.STATE, state.toString()).build();
         } else {
             return null;
         }
     }
-
 
     public static ContentProviderOperation insert(Dashboard dashboard) {
         if (isCorrect(dashboard)) {

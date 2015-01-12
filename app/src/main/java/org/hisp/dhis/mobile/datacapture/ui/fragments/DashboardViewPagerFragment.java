@@ -1,6 +1,7 @@
 package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
+import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardEditActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 
@@ -170,7 +172,8 @@ public class DashboardViewPagerFragment extends BaseFragment
     public void onClick(View view) {
         int position = mViewPager.getCurrentItem();
         DBItemHolder<Dashboard> dbItem = mAdapter.getDashboard(position);
-        Toast.makeText(getActivity(), "Name: " + dbItem.getItem().getName(), Toast.LENGTH_SHORT).show();
+        Intent intent = DashboardEditActivity.prepareIntent(getActivity(), dbItem);
+        startActivity(intent);
     }
 
     private void setEditButtonVisibility(boolean isEditable) {

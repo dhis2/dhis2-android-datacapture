@@ -45,6 +45,10 @@
             android:name=".ui.activities.DashboardItemDetailActivity"
             android:label="@string/title_activity_dashboard_item_detail" >
         </activity>
+        <activity
+            android:name=".ui.activities.DashboardEditActivity"
+            android:label="@string/title_activity_dashboard_edit" >
+        </activity>
     </application>
 
 </manifest>

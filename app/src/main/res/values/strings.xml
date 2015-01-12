@@ -8,6 +8,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_dashboard_item_detail">DashboardItemDetailActivity</string>
+    <string name="title_activity_dashboard_edit">DashboardEditActivity</string>
     <string name="description">ImageView description</string>
     <string name="drawer_open">Open navigation menu</string>
     <string name="drawer_close">Close navigation menu</string>
@@ -44,6 +46,6 @@
     <string name="users">users</string>
     <string name="resources">resources</string>
     <string name="graphical_resource">Graphical resource</string>
-    <string name="title_activity_dashboard_item_detail">DashboardItemDetailActivity</string>
-
+    <string name="enter_dashboard_name">Enter dashboard name</string>
+    <string name="delete">Delete</string>
 </resources>
