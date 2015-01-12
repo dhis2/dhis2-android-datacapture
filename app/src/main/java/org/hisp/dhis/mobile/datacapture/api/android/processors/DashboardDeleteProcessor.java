@@ -12,6 +12,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
@@ -40,21 +41,27 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
 
     @Override
     protected OnDashboardDeleteEvent doInBackground(Void... params) {
+        final ResponseHolder<String> holder = new ResponseHolder<>();
+        final OnDashboardDeleteEvent event = new OnDashboardDeleteEvent();
+
         updateDashboardState(State.DELETING);
 
         DHISManager.getInstance().deleteDashboard(new ApiRequestCallback<String>() {
             @Override
             public void onSuccess(Response response, String string) {
+                holder.setItem(string);
+                holder.setResponse(response);
                 deleteDashboard();
             }
 
             @Override
             public void onFailure(APIException e) {
-
+                holder.setException(e);
             }
         }, mDbItem.getItem().getId());
 
-        return new OnDashboardDeleteEvent();
+        event.setResponseHolder(holder);
+        return event;
     }
 
     @Override

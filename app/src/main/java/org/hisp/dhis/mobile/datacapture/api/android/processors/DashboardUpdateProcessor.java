@@ -12,6 +12,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
@@ -42,21 +43,26 @@ public class DashboardUpdateProcessor extends AsyncTask<Void, Void, OnDashboardU
 
     @Override
     protected OnDashboardUpdateEvent doInBackground(Void... params) {
+        final ResponseHolder<String> holder = new ResponseHolder<>();
+        final OnDashboardUpdateEvent event = new OnDashboardUpdateEvent();
         updateDashboard(State.PUTTING);
 
         DHISManager.getInstance().updateDashboard(new ApiRequestCallback<String>() {
             @Override
             public void onSuccess(Response response, String s) {
+                holder.setItem(s);
+                holder.setResponse(response);
                 updateDashboard(State.GETTING);
             }
 
             @Override
             public void onFailure(APIException e) {
-
+                holder.setException(e);
             }
         }, mDashboard);
 
-        return new OnDashboardUpdateEvent();
+        event.setResponseHolder(holder);
+        return event;
     }
 
     @Override
