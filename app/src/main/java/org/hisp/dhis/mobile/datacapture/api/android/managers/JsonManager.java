@@ -1,7 +1,9 @@
 package org.hisp.dhis.mobile.datacapture.api.android.managers;
 
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardConverter;
+import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardDeleteConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardItemConverter;
+import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardNameConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DataSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.OptionSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ProgramsConverter;
@@ -10,7 +12,13 @@ import org.hisp.dhis.mobile.datacapture.api.android.converters.ReportTableConver
 import org.hisp.dhis.mobile.datacapture.api.android.converters.UserAccountConverter;
 import org.hisp.dhis.mobile.datacapture.api.managers.IJsonConverter;
 import org.hisp.dhis.mobile.datacapture.api.managers.IJsonManager;
-import org.hisp.dhis.mobile.datacapture.api.models.*;
+import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
+import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
+import org.hisp.dhis.mobile.datacapture.api.models.DataSetHolder;
+import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
+import org.hisp.dhis.mobile.datacapture.api.models.ProgramHolder;
+import org.hisp.dhis.mobile.datacapture.api.models.Report;
+import org.hisp.dhis.mobile.datacapture.api.models.UserAccount;
 
 import java.util.List;
 
@@ -58,11 +66,11 @@ public final class JsonManager implements IJsonManager {
 
     @Override
     public IJsonConverter<String> getDashboardNameConverter() {
-        return null;
+        return new DashboardNameConverter();
     }
 
     @Override
     public IJsonConverter<String> getDashboardDeleteConverter() {
-        return null;
+        return new DashboardDeleteConverter();
     }
 }
