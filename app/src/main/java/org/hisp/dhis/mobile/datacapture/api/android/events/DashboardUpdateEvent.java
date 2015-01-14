@@ -1,25 +1,22 @@
 package org.hisp.dhis.mobile.datacapture.api.android.events;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
-import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
-
 public class DashboardUpdateEvent {
-    private DBItemHolder<Dashboard> mDbItem;
-    private Dashboard mDashboard;
+    private int mDataBaseId;
+    private String mName;
 
-    public DBItemHolder<Dashboard> getDbItem() {
-        return mDbItem;
+    public int getDataBaseId() {
+        return mDataBaseId;
     }
 
-    public void setDbItem(DBItemHolder<Dashboard> dbItem) {
-        mDbItem = dbItem;
+    public void setDataBaseId(int dataBaseId) {
+        mDataBaseId = dataBaseId;
     }
 
-    public Dashboard getDashboard() {
-        return mDashboard;
+    public String getName() {
+        return mName;
     }
 
-    public void setDashboard(Dashboard dashboard) {
-        mDashboard = dashboard;
+    public void setName(String name) {
+        mName = name;
     }
 }

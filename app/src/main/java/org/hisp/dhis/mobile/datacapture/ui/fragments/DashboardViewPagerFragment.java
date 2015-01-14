@@ -22,7 +22,9 @@ import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
@@ -33,6 +35,7 @@ import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
 import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardEditActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardAdapter;
+import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ import java.util.List;
 
 public class DashboardViewPagerFragment extends BaseFragment
         implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<Dashboard>>>>,
-        ViewPager.OnPageChangeListener, View.OnClickListener {
+        ViewPager.OnPageChangeListener, View.OnClickListener, EditDialogFragment.EditNameDialogListener {
     private static final int LOADER_ID = 826752394;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -65,10 +68,15 @@ public class DashboardViewPagerFragment extends BaseFragment
             BusProvider.getInstance().post(new DashboardSyncEvent());
             Toast.makeText(getActivity(), "Refreshing dashboards", Toast.LENGTH_SHORT).show();
             return true;
+        } else if (menuItem.getItemId() == R.id.add_dashboard) {
+            EditDialogFragment fragment = new EditDialogFragment();
+            fragment.setListener(this);
+            fragment.show(getChildFragmentManager(),
+                    EditDialogFragment.EDIT_DIALOG_FRAGMENT);
+            return true;
         }
         return false;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -144,7 +152,6 @@ public class DashboardViewPagerFragment extends BaseFragment
     @Subscribe
     public void onDashboardSyncedEvent(OnDashboardsSyncedEvent event) {
         if (event.getResponseHolder().getException() != null) {
-            Toast.makeText(getActivity(), "Refresh Failed", Toast.LENGTH_SHORT).show();
             event.getResponseHolder().getException().printStackTrace();
         }
     }
@@ -182,6 +189,25 @@ public class DashboardViewPagerFragment extends BaseFragment
         } else {
             mEditButton.setVisibility(View.GONE);
         }
+    }
+
+    @Subscribe
+    public void onDashboardCreateEvent(OnDashboardCreateEvent event) {
+        if (event.getResponseHolder().getException() != null) {
+            event.getResponseHolder().getException().printStackTrace();
+            System.out.println("URL: " + event.getResponseHolder().getException().getUrl());
+            System.out.println("BODY: " + new String(event.getResponseHolder().getException().getResponse().getBody()));
+        } else {
+            System.out.println("Response body: " + event.getResponseHolder().getItem());
+        }
+    }
+
+    @Override
+    public void onFinishEditDialog(String inputText) {
+        DashboardCreateEvent event = new DashboardCreateEvent();
+        event.setDashboardName(inputText);
+        BusProvider.getInstance().post(event);
+        Toast.makeText(getActivity(), inputText, Toast.LENGTH_SHORT).show();
     }
 
     public static class DashboardListLoader extends AbsCursorLoader<List<DBItemHolder<Dashboard>>> {

@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public final class NetworkManager implements INetworkManager {
     private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
-    private static final long TIME_OUT = 1500;
+    private static final long TIME_OUT = 3000;
 
     private static com.squareup.okhttp.Request buildOkRequest(Request request) {
         if (request == null) {

@@ -5,18 +5,21 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.Toast;
 
+import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
+import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
@@ -31,17 +34,49 @@ import java.util.List;
 public class DashboardFragment extends BaseFragment implements LoaderCallbacks<CursorHolder<List<DBItemHolder<DashboardItem>>>>,
         DashboardItemAdapter.OnItemClickListener {
     private static final int LOADER_ID = 74734523;
+
+    private static final String DB_ID_EXTRA = "dashboardId";
+    private static final String ACCESS_DELETE_EXTRA = "accessDeleteExtra";
+    private static final String ACCESS_UPDATE_EXTRA = "accessUpdateExtra";
+    private static final String ACCESS_READ_EXTRA = "accessReadExtra";
+    private static final String ACCESS_WRITE_EXTRA = "accessWriteExtra";
+    private static final String ACCESS_MANAGE_EXTRA = "accessManagerExtra";
+    private static final String ACCESS_EXTERNALIZE_EXTRA = "accessExternalizeExtra";
+
     private GridView mGridView;
     private DashboardItemAdapter mAdapter;
 
     public static DashboardFragment newInstance(DBItemHolder<Dashboard> dashboard) {
         DashboardFragment fragment = new DashboardFragment();
+
         Bundle args = new Bundle();
+        args.putInt(DB_ID_EXTRA, dashboard.getDatabaseId());
+        putAccessInBundle(args, dashboard.getItem().getAccess());
 
-        args.putInt(DashboardItemColumns.DASHBOARD_DB_ID, dashboard.getDatabaseId());
         fragment.setArguments(args);
-
         return fragment;
+    }
+
+    private static void putAccessInBundle(Bundle args, Access access) {
+        args.putBoolean(ACCESS_DELETE_EXTRA, access.isDelete());
+        args.putBoolean(ACCESS_UPDATE_EXTRA, access.isUpdate());
+        args.putBoolean(ACCESS_READ_EXTRA, access.isRead());
+        args.putBoolean(ACCESS_WRITE_EXTRA, access.isWrite());
+        args.putBoolean(ACCESS_MANAGE_EXTRA, access.isManage());
+        args.putBoolean(ACCESS_EXTERNALIZE_EXTRA, access.isExternalize());
+    }
+
+    private static Access getAccessFromBundle(Bundle args) {
+        Access access = new Access();
+
+        access.setDelete(args.getBoolean(ACCESS_DELETE_EXTRA));
+        access.setUpdate(args.getBoolean(ACCESS_UPDATE_EXTRA));
+        access.setRead(args.getBoolean(ACCESS_READ_EXTRA));
+        access.setWrite(args.getBoolean(ACCESS_WRITE_EXTRA));
+        access.setManage(args.getBoolean(ACCESS_MANAGE_EXTRA));
+        access.setExternalize(args.getBoolean(ACCESS_EXTERNALIZE_EXTRA));
+
+        return access;
     }
 
     @Override
@@ -51,8 +86,10 @@ public class DashboardFragment extends BaseFragment implements LoaderCallbacks<C
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Access access = getAccessFromBundle(getArguments());
         mAdapter = new DashboardItemAdapter(getActivity());
         mAdapter.setOnItemClickListener(this);
+        mAdapter.setDashboardAccess(access);
 
         mGridView = (GridView) view.findViewById(R.id.grid);
         mGridView.setAdapter(mAdapter);
@@ -61,24 +98,17 @@ public class DashboardFragment extends BaseFragment implements LoaderCallbacks<C
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // getLoaderManager().initLoader(LOADER_ID, getArguments(), DashboardFragment.this);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded()) {
-                    getLoaderManager().initLoader(LOADER_ID, getArguments(), DashboardFragment.this);
-                }
-            }
-        }, 1000);
+        if (isAdded()) {
+            getLoaderManager().initLoader(LOADER_ID, getArguments(), DashboardFragment.this);
+        }
     }
 
     @Override
     public Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            int dashboardId = getArguments().getInt(DashboardItemColumns.DASHBOARD_DB_ID);
+            int dashboardId = getArguments().getInt(DB_ID_EXTRA);
             String SELECTION = DashboardItemColumns.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
-                    DashboardItemColumns.STATE + " != " + "'" + State.DELETING + "'" + " AND " +
+                    DashboardItemColumns.STATE + " != " + "'" + State.DELETING.toString() + "'" + " AND " +
                     DashboardItemColumns.TYPE + " != " + "'" + DashboardItem.TYPE_REPORT_TABLES + "'" + " AND " +
                     DashboardItemColumns.TYPE + " != " + "'" + DashboardItem.TYPE_MESSAGES + "'";
             return new ItemsLoader(getActivity(), DashboardItemColumns.CONTENT_URI,
@@ -111,7 +141,19 @@ public class DashboardFragment extends BaseFragment implements LoaderCallbacks<C
 
     @Override
     public void onItemShareInterpretation(DBItemHolder<DashboardItem> dbItem) {
+        Toast.makeText(getActivity(), "Item: " + dbItem.getDatabaseId(), Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void onItemDelete(DBItemHolder<DashboardItem> dbItem) {
+        final int dashboardId = getArguments().getInt(DB_ID_EXTRA);
+        final int dashboardItemId = dbItem.getDatabaseId();
+        final DashboardItemDeleteEvent event = new DashboardItemDeleteEvent();
+
+        event.setDashboardDbId(dashboardId);
+        event.setDashboardItemDbId(dashboardItemId);
+
+        BusProvider.getInstance().post(event);
     }
 
     public static class ItemsLoader extends AbsCursorLoader<List<DBItemHolder<DashboardItem>>> {

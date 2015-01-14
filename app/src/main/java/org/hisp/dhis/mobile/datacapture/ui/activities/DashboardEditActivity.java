@@ -19,9 +19,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
@@ -159,17 +162,35 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if (DialogInterface.BUTTON_POSITIVE == which) {
-            Toast.makeText(this, mEditDashboardName.getText().toString(), Toast.LENGTH_SHORT).show();
+            DashboardUpdateEvent event = new DashboardUpdateEvent();
+            int dashboardId = getIntent().getExtras().getInt(DashboardColumns.DB_ID);
+            String name = mEditDashboardName.getText().toString();
+
+            event.setDataBaseId(dashboardId);
+            event.setName(name);
+
+            BusProvider.getInstance().post(event);
         }
     }
 
     private void deleteDashboard() {
-        Toast.makeText(this, "Deleting dashboard", Toast.LENGTH_SHORT).show();
+        int dashboardId = getIntent().getExtras().getInt(DashboardColumns.DB_ID);
+        DashboardDeleteEvent event = new DashboardDeleteEvent();
+        event.setDashboardDbId(dashboardId);
+        BusProvider.getInstance().post(event);
+        finish();
     }
 
     @Override
     public void onDeleteButtonClicked(DBItemHolder<DashboardItem> item) {
-        Toast.makeText(this, "Deleting dashboard item: " + item.getItem().getType(), Toast.LENGTH_SHORT).show();
+        final int dashboardId = getIntent().getExtras().getInt(DashboardColumns.DB_ID);
+        final int dashboardItemId = item.getDatabaseId();
+        final DashboardItemDeleteEvent event = new DashboardItemDeleteEvent();
+
+        event.setDashboardDbId(dashboardId);
+        event.setDashboardItemDbId(dashboardItemId);
+
+        BusProvider.getInstance().post(event);
     }
 
     private static class DashboardLoader extends AbsCursorLoader<DBItemHolder<Dashboard>> {
@@ -232,8 +253,8 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
                                    CursorHolder<DBItemHolder<Dashboard>> data) {
             if (loader != null && loader.getId() == DASHBOARD_LOADER_ID &&
                     data != null && data.getData() != null) {
-                Dashboard dashboard = data.getData().getItem();
-                mChangeNameButton.setText(dashboard.getName());
+                DBItemHolder<Dashboard> dashboard = data.getData();
+                mChangeNameButton.setText(dashboard.getItem().getName());
             }
         }
 

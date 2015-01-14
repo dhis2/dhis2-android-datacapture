@@ -72,7 +72,6 @@ public final class DashboardItemHandler {
         }
 
         Gson gson = new Gson();
-
         Access access = gson.fromJson(cursor.getString(ACCESS), Access.class);
 
         Type usersType = new TypeToken<List<User>>() { }.getType();
@@ -212,8 +211,10 @@ public final class DashboardItemHandler {
 
     public static Map<String, DashboardItem> toMap(List<DashboardItem> dashboardItems) {
         Map<String, DashboardItem> dashboardItemMap = new HashMap<>();
-        for (DashboardItem dashboard : dashboardItems) {
-            dashboardItemMap.put(dashboard.getId(), dashboard);
+        if (dashboardItems != null && dashboardItems.size() > 0) {
+            for (DashboardItem dashboard : dashboardItems) {
+                dashboardItemMap.put(dashboard.getId(), dashboard);
+            }
         }
         return dashboardItemMap;
     }

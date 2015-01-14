@@ -263,16 +263,18 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
 
     @Override
     protected OnDashboardsSyncedEvent doInBackground(Void... params) {
+        final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnDashboardsSyncedEvent event = new OnDashboardsSyncedEvent();
 
         ArrayList<ContentProviderOperation> ops = null;
         try {
             ops = updateDashboards();
         } catch (APIException exception) {
-            event.getResponseHolder().setException(exception);
+            holder.setException(exception);
         }
 
-        if (ops == null || ops.size() == 0 || event.getResponseHolder().getException() != null) {
+        if (ops == null || ops.size() == 0 || holder.getException() != null) {
+            event.setResponseHolder(holder);
             return event;
         }
 
@@ -284,6 +286,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
             e.printStackTrace();
         }
 
+        event.setResponseHolder(holder);
         return event;
     }
 

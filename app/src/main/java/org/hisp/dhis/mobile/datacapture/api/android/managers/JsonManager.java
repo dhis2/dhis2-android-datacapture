@@ -1,14 +1,13 @@
 package org.hisp.dhis.mobile.datacapture.api.android.managers;
 
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardConverter;
-import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardDeleteConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardItemConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardNameConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DataSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.OptionSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ProgramsConverter;
+import org.hisp.dhis.mobile.datacapture.api.android.converters.RawConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ReportConverter;
-import org.hisp.dhis.mobile.datacapture.api.android.converters.ReportTableConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.UserAccountConverter;
 import org.hisp.dhis.mobile.datacapture.api.managers.IJsonConverter;
 import org.hisp.dhis.mobile.datacapture.api.managers.IJsonManager;
@@ -60,17 +59,12 @@ public final class JsonManager implements IJsonManager {
     }
 
     @Override
-    public IJsonConverter<String> getReportTableConverter() {
-        return new ReportTableConverter();
+    public IJsonConverter<String> getRawConverter() {
+        return new RawConverter();
     }
 
     @Override
     public IJsonConverter<String> getDashboardNameConverter() {
         return new DashboardNameConverter();
-    }
-
-    @Override
-    public IJsonConverter<String> getDashboardDeleteConverter() {
-        return new DashboardDeleteConverter();
     }
 }

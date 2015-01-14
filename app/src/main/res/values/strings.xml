@@ -48,4 +48,5 @@
     <string name="graphical_resource">Graphical resource</string>
     <string name="enter_dashboard_name">Enter dashboard name</string>
     <string name="delete">Delete</string>
+    <string name="add_dashboard">Add dashboard</string>
 </resources>

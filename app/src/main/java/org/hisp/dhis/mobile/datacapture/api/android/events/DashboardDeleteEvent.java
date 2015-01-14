@@ -1,16 +1,13 @@
 package org.hisp.dhis.mobile.datacapture.api.android.events;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
-import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
-
 public final class DashboardDeleteEvent {
-    private DBItemHolder<Dashboard> mDashboard;
+    private int mDashboardDbId;
 
-    public DBItemHolder<Dashboard> getDashboard() {
-        return mDashboard;
+    public int getDashboardDbId() {
+        return mDashboardDbId;
     }
 
-    public void setDashboard(DBItemHolder<Dashboard> dashboard) {
-        mDashboard = dashboard;
+    public void setDashboardDbId(int dashboardId) {
+        mDashboardDbId = dashboardId;
     }
 }

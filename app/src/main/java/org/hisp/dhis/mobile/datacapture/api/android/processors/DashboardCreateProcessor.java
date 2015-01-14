@@ -18,14 +18,13 @@ public class DashboardCreateProcessor extends AsyncTask<Void, Void, OnDashboardC
         if (event == null) {
             throw new IllegalArgumentException("DashboardCreateEvent must not be null");
         }
-
         mEvent = event;
     }
 
     @Override
     protected OnDashboardCreateEvent doInBackground(Void... params) {
         final ResponseHolder<String> holder = new ResponseHolder<>();
-        OnDashboardCreateEvent event = new OnDashboardCreateEvent();
+        final OnDashboardCreateEvent event = new OnDashboardCreateEvent();
 
         DHISManager.getInstance().postDashboard(new ApiRequestCallback<String>() {
             @Override

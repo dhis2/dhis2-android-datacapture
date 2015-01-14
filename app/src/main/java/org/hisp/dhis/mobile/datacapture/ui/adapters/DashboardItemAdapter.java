@@ -15,6 +15,7 @@ import com.squareup.picasso.Transformation;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
+import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.utils.DateTimeTypeAdapter;
 import org.hisp.dhis.mobile.datacapture.utils.PicassoProvider;
@@ -24,13 +25,18 @@ import org.joda.time.DateTime;
 public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
     private static final String DATE_FORMAT = "YYYY-MM-dd";
     private static final int MENU_GROUP_ID = 935482352;
-    private static final int MENU_ITEM_ID = 893226352;
-    private static final int MENU_ITEM_ORDER = 100;
+    private static final int MENU_SHARE_ITEM_ID = 893226352;
+    private static final int MENU_DELETE_ITEM_ID = 14920632;
+    private static final int MENU_SHARE_ITEM_ORDER = 100;
+    private static final int MENU_DELETE_ITEM_ORDER = 110;
 
-    private OnItemClickListener mOnClickListener;
+    private String mServerUrl;
+    private Access mDashboardAccess;
+
+    private OnItemClickListener mClickListener;
+
     private Picasso mImageLoader;
     private Transformation mImageTransformation;
-    private String mServerUrl;
 
     public DashboardItemAdapter(Context context) {
         super(context);
@@ -41,7 +47,11 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        mOnClickListener = listener;
+        mClickListener = listener;
+    }
+
+    public void setDashboardAccess(Access access) {
+        mDashboardAccess = access;
     }
 
     @Override
@@ -54,8 +64,10 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
 
             View itemViewButton = view.findViewById(R.id.dashboard_item_menu);
             PopupMenu menu = new PopupMenu(getContext(), itemViewButton);
-            menu.getMenu().add(MENU_GROUP_ID, MENU_ITEM_ID,
-                    MENU_ITEM_ORDER, R.string.share_interpretation);
+            menu.getMenu().add(MENU_GROUP_ID, MENU_SHARE_ITEM_ID,
+                    MENU_SHARE_ITEM_ORDER, R.string.share_interpretation);
+            menu.getMenu().add(MENU_GROUP_ID, MENU_DELETE_ITEM_ID,
+                    MENU_DELETE_ITEM_ORDER, R.string.delete);
 
             holder = new ViewHolder(
                     view.findViewById(R.id.dashboard_item_body_container),
@@ -77,6 +89,7 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
         return view;
     }
 
+    // TODO Try to create only one Click Listener for each type of view and keep it inside of view holder
     public void handleDashboardItems(final DBItemHolder<DashboardItem> dbItem,
                                      final ViewHolder holder) {
         if (dbItem == null || dbItem.getItem() == null) {
@@ -84,6 +97,10 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
         }
 
         DashboardItem item = dbItem.getItem();
+        boolean isItemShareable = false;
+        boolean isDashboardManageable = false;
+        boolean isItemDeletable = false;
+
         String lastUpdated = "";
         if (item.getLastUpdated() != null) {
             DateTime dateTime = DateTimeTypeAdapter.deserializeDateTime(item.getLastUpdated());
@@ -94,62 +111,84 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
         if (DashboardItem.TYPE_CHART.equals(item.getType()) && item.getChart() != null) {
             String request = mServerUrl + "/api/charts/" + item.getChart().getId() + "/data.png";
             handleItemsWithImages(item.getChart().getName(), request, holder);
-            holder.itemMenuButton.setVisibility(View.VISIBLE);
+            isItemShareable = true;
         } else if (DashboardItem.TYPE_MAP.equals(item.getType()) && item.getMap() != null) {
             String request = mServerUrl + "/api/maps/" + item.getMap().getId() + "/data.png";
             handleItemsWithImages(item.getMap().getName(), request, holder);
-            holder.itemMenuButton.setVisibility(View.VISIBLE);
+            isItemShareable = true;
         } else if (DashboardItem.TYPE_EVENT_CHART.equals(item.getType()) && item.getEventChart() != null) {
             String request = mServerUrl + "/api/eventCharts/" + item.getEventChart().getId() + "/data.png";
             handleItemsWithImages(item.getEventChart().getName(), request, holder);
-            holder.itemMenuButton.setVisibility(View.GONE);
+            isItemShareable = false;
         } else if (DashboardItem.TYPE_REPORT_TABLE.equals(item.getType()) && item.getReportTable() != null) {
             handleItemsWithoutImages(item.getReportTable().getName(), holder);
-            holder.itemMenuButton.setVisibility(View.VISIBLE);
+            isItemShareable = true;
         } else if (DashboardItem.TYPE_USERS.equals(item.getType())) {
             handleItemsWithoutImages(getContext().getString(R.string.users), holder);
-            holder.itemMenuButton.setVisibility(View.GONE);
+            isItemShareable = false;
         } else if (DashboardItem.TYPE_REPORTS.equals(item.getType())) {
             handleItemsWithoutImages(getContext().getString(R.string.reports), holder);
-            holder.itemMenuButton.setVisibility(View.GONE);
+            isItemShareable = false;
         } else if (DashboardItem.TYPE_RESOURCES.equals(item.getType())) {
             handleItemsWithoutImages(getContext().getString(R.string.resources), holder);
+            isItemShareable = false;
+        }
+
+        isDashboardManageable = mDashboardAccess.isManage();
+        isItemDeletable = dbItem.getItem().getAccess().isDelete();
+
+        boolean isMenuVisible = isItemShareable || (isDashboardManageable && isItemDeletable);
+        if (isMenuVisible) {
+            holder.itemMenuButton.setVisibility(View.VISIBLE);
+
+            MenuItem share = holder.popupMenu.getMenu().findItem(MENU_SHARE_ITEM_ID);
+            MenuItem delete = holder.popupMenu.getMenu().findItem(MENU_DELETE_ITEM_ID);
+
+            share.setVisible(isItemShareable);
+            delete.setVisible(isDashboardManageable && isItemDeletable);
+        } else {
             holder.itemMenuButton.setVisibility(View.GONE);
         }
 
-        holder.itemBody.setOnClickListener(new View.OnClickListener() {
+        holder.itemMenuButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                if (mOnClickListener != null) {
-                    mOnClickListener.onItemClick(dbItem);
-                }
-            }
-        });
-
-        holder.itemMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 if (holder.popupMenu != null) {
                     holder.popupMenu.show();
                 }
             }
         });
 
+        holder.itemBody.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if (mClickListener != null) {
+                    mClickListener.onItemClick(dbItem);
+                }
+            }
+        });
+
         holder.popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if (menuItem.getItemId() == MENU_ITEM_ID) {
-                    if (mOnClickListener != null) {
-                        mOnClickListener.onItemShareInterpretation(dbItem);
-                    }
-                    return true;
+                if (mClickListener == null) {
+                    return false;
                 }
-                return false;
+
+                if (menuItem.getItemId() == MENU_SHARE_ITEM_ID) {
+                    mClickListener.onItemShareInterpretation(dbItem);
+                } else if (menuItem.getItemId() == MENU_DELETE_ITEM_ID) {
+                    mClickListener.onItemDelete(dbItem);
+                }
+
+                return true;
             }
         });
     }
 
-    // TODO Finish image resizing
     private void handleItemsWithImages(String name, String request, ViewHolder holder) {
         holder.itemName.setVisibility(View.VISIBLE);
         holder.itemImage.setVisibility(View.VISIBLE);
@@ -172,8 +211,8 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
 
     public interface OnItemClickListener {
         public void onItemClick(DBItemHolder<DashboardItem> dbItem);
-
         public void onItemShareInterpretation(DBItemHolder<DashboardItem> dbItem);
+        public void onItemDelete(DBItemHolder<DashboardItem> dbItem);
     }
 
     private static class ViewHolder {

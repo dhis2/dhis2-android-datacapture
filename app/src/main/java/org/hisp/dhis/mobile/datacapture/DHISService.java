@@ -7,10 +7,18 @@ import android.util.Log;
 
 import com.squareup.otto.Subscribe;
 
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardCreateProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardDeleteProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardUpdateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.GetReportTableProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
 
@@ -60,5 +68,25 @@ public class DHISService extends Service {
     @Subscribe
     public void onGetReportTable(GetReportTableEvent event) {
         (new GetReportTableProcessor(event)).execute();
+    }
+
+    @Subscribe
+    public void onDashboardDeleteEvent(DashboardDeleteEvent event) {
+        (new DashboardDeleteProcessor(getBaseContext(), event)).execute();
+    }
+
+    @Subscribe
+    public void onDashboardUpdateEvent(DashboardUpdateEvent event) {
+        (new DashboardUpdateProcessor(getBaseContext(), event)).execute();
+    }
+
+    @Subscribe
+    public void onDashboardItemDeleteEvent(DashboardItemDeleteEvent event) {
+        (new DashboardItemDeleteProcessor(getBaseContext(), event)).execute();
+    }
+
+    @Subscribe
+    public void onDashboardCreateEvent(DashboardCreateEvent event) {
+        (new DashboardCreateProcessor(event)).execute();
     }
 }
