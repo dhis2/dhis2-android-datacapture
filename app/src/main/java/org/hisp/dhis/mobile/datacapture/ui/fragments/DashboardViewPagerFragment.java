@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
@@ -48,7 +47,8 @@ public class DashboardViewPagerFragment extends BaseFragment
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private DashboardAdapter mAdapter;
-    private ImageButton mEditButton;
+
+    // private FloatingActionButton mEditButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_dashboard_view_pager, container, false);
-        mEditButton = (ImageButton) root.findViewById(R.id.dashboard_edit_button);
+        // mEditButton = (FloatingActionButton) root.findViewById(R.id.dashboard_edit_button);
         return root;
     }
 
@@ -112,7 +112,7 @@ public class DashboardViewPagerFragment extends BaseFragment
         mSlidingTabLayout.setViewPager(mViewPager);
         mSlidingTabLayout.setOnPageChangeListener(this);
 
-        mEditButton.setOnClickListener(this);
+        // mEditButton.setOnClickListener(this);
     }
 
     @Override
@@ -185,9 +185,9 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     private void setEditButtonVisibility(boolean isEditable) {
         if (isEditable) {
-            mEditButton.setVisibility(View.VISIBLE);
+            // mEditButton.setVisibility(View.VISIBLE);
         } else {
-            mEditButton.setVisibility(View.GONE);
+            // mEditButton.setVisibility(View.GONE);
         }
     }
 

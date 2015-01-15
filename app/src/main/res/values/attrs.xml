@@ -35,4 +35,14 @@
     <declare-styleable name="SelectorHint">
         <attr name="hint" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="FloatingActionButton">
+        <attr name="colorPressed" format="color" />
+        <attr name="colorNormal" format="color" />
+        <attr name="shadow" format="boolean" />
+        <attr name="type" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="mini" value="1" />
+        </attr>
+    </declare-styleable>
 </resources>
