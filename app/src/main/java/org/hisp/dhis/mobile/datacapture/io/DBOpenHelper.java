@@ -17,7 +17,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(DBSchema.CREATE_DASHBOARD_TABLE);
         db.execSQL(DBSchema.CREATE_DASHBOARD_ITEMS_TABLE);
-        // execute sql commands on initialization
+        db.execSQL(DBSchema.CREATE_INTERPRETATIONS_TABLE);
 
     }
 
@@ -25,7 +25,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DBSchema.DROP_DASHBOARD_TABLE);
         db.execSQL(DBSchema.DROP_DASHBOARD_ITEMS_TABLE);
-        // handle DB schema version changes
+        db.execSQL(DBSchema.DROP_INTERPRETATIONS_TABLE);
     }
 
     /**

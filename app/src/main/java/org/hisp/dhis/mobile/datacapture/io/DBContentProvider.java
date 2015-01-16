@@ -10,6 +10,7 @@ import android.net.Uri;
 
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 
 import static android.content.ContentUris.parseId;
 import static android.content.ContentUris.withAppendedId;
@@ -27,6 +28,8 @@ public class DBContentProvider extends ContentProvider {
     private static final int DASHBOARD_ID = 601;
     private static final int DASHBOARD_ITEMS = 701;
     private static final int DASHBOARD_ITEM_ID = 702;
+    private static final int INTERPRETATIONS = 800;
+    private static final int INTERPRETATIONS_ID = 801;
     private static final UriMatcher URI_MATCHER = buildMatcher();
 
     private DBOpenHelper mDBHelper;
@@ -39,6 +42,8 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, DashboardColumns.PATH + "/#", DASHBOARD_ID);
         matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH, DASHBOARD_ITEMS);
         matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH + "/#", DASHBOARD_ITEM_ID);
+        matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH, INTERPRETATIONS);
+        matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH + "/#", INTERPRETATIONS_ID);
         return matcher;
     }
 
@@ -53,6 +58,10 @@ public class DBContentProvider extends ContentProvider {
                 return DashboardItemColumns.CONTENT_TYPE;
             case DASHBOARD_ITEM_ID:
                 return DashboardItemColumns.CONTENT_ITEM_TYPE;
+            case INTERPRETATIONS:
+                return InterpretationColumns.CONTENT_TYPE;
+            case INTERPRETATIONS_ID:
+                return InterpretationColumns.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("No corresponding Uri type was found");
         }
@@ -95,6 +104,18 @@ public class DBContentProvider extends ContentProvider {
                 qBuilder.appendWhere(DashboardItemColumns.DB_ID + " = " + id);
                 break;
             }
+
+            case INTERPRETATIONS: {
+                qBuilder.setTables(InterpretationColumns.TABLE_NAME);
+                break;
+            }
+
+            case INTERPRETATIONS_ID: {
+                long id = parseId(uri);
+                qBuilder.setTables(InterpretationColumns.TABLE_NAME);
+                qBuilder.appendWhere(InterpretationColumns.DB_ID + " = " + id);
+                break;
+            }
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -121,6 +142,14 @@ public class DBContentProvider extends ContentProvider {
 
             case DASHBOARD_ITEMS: {
                 long id = db.insertOrThrow(DashboardItemColumns.TABLE_NAME, null, values);
+                if (!isInBatchMode()) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return withAppendedId(uri, id);
+            }
+
+            case INTERPRETATIONS: {
+                long id = db.insertOrThrow(InterpretationColumns.TABLE_NAME, null, values);
                 if (!isInBatchMode()) {
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
@@ -165,6 +194,22 @@ public class DBContentProvider extends ContentProvider {
                 long id = parseId(uri);
                 table = DashboardItemColumns.TABLE_NAME;
                 where = DashboardItemColumns.DB_ID + " = " + id;
+                if (!isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                break;
+            }
+
+            case INTERPRETATIONS: {
+                table = InterpretationColumns.TABLE_NAME;
+                where = selection;
+                break;
+            }
+
+            case INTERPRETATIONS_ID: {
+                long id = parseId(uri);
+                table = InterpretationColumns.TABLE_NAME;
+                where = InterpretationColumns.DB_ID + " = " + id;
                 if (!isEmpty(selection)) {
                     where += " AND " + selection;
                 }
@@ -216,6 +261,22 @@ public class DBContentProvider extends ContentProvider {
                 long id = parseId(uri);
                 table = DashboardItemColumns.TABLE_NAME;
                 where = DashboardItemColumns.DB_ID + " = " + id;
+                if (!isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                break;
+            }
+
+            case INTERPRETATIONS: {
+                table = InterpretationColumns.TABLE_NAME;
+                where = selection;
+                break;
+            }
+
+            case INTERPRETATIONS_ID: {
+                long id = parseId(uri);
+                table = InterpretationColumns.TABLE_NAME;
+                where = InterpretationColumns.DB_ID + " = " + id;
                 if (!isEmpty(selection)) {
                     where += " AND " + selection;
                 }

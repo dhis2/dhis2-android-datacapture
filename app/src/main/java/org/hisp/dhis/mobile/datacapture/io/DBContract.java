@@ -30,28 +30,25 @@ public class DBContract {
             TimeStampColumns, AccessColumns, StateColumns {
         public static final String TABLE_NAME = "dashboardTable";
         public static final String PATH = TABLE_NAME;
-
-        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Dashboard";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Dashboard";
-
         public static final String NAME = "name";
         public static final String ITEM_COUNT = "itemCount";
+
     }
 
     public static interface DashboardItemColumns extends BaseDBColumns,
             TimeStampColumns, AccessColumns, StateColumns {
         public static final String TABLE_NAME = "dashboardItemColumns";
         public static final String PATH = TABLE_NAME;
-
-        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.DashboardItem";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.DashboardItem";
-
         public static final String DASHBOARD_DB_ID = "dashboardDBId";
         public static final String TYPE = "type";
         public static final String CONTENT_COUNT = "contentCount";
@@ -64,5 +61,34 @@ public class DBContract {
         public static final String EVENT_CHART = "eventChart";
         public static final String REPORT_TABLE = "reportTable";
         public static final String MAP = "map";
+
+    }
+
+    public static interface InterpretationColumns extends BaseDBColumns,
+            TimeStampColumns, AccessColumns, StateColumns {
+        public static final String TABLE_NAME = "interpretationsTable";
+        public static final String PATH = TABLE_NAME;
+
+        public static final String TYPE = "type";
+        public static final String NAME = "name";
+        public static final String DISPLAY_NAME = "displayName";
+        public static final String TEXT = "text";
+        public static final String EXTERNAL_ACCESS = "externalAccess";
+
+        public static final String MAP = "map";
+        public static final String CHART = "chart";
+        public static final String REPORT_TABLE = "reportTable";
+
+        public static final String DATASET = "dataSet";
+        public static final String ORGANIZATION_UNIT = "organisationUnit";
+        public static final String PERIOD = "period";
+        public static final String USER = "user";
+        public static final String COMMENTS = "comments";
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Interpretation";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Interpretation";
+
     }
 }

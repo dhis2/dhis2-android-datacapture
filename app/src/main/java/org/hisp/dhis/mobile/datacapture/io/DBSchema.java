@@ -3,6 +3,8 @@ package org.hisp.dhis.mobile.datacapture.io;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 
+import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+
 public interface DBSchema {
 
     /**
@@ -44,4 +46,27 @@ public interface DBSchema {
             " ON DELETE CASCADE" + ")";
 
     public static final String DROP_DASHBOARD_ITEMS_TABLE = "DROP TABLE IF EXISTS " + DashboardItemColumns.TABLE_NAME;
+
+    public static final String CREATE_INTERPRETATIONS_TABLE = "CREATE TABLE " + InterpretationColumns.TABLE_NAME + "(" +
+            InterpretationColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            InterpretationColumns.ID + " TEXT NOT NULL UNIQUE," +
+            InterpretationColumns.CREATED + " TEXT NOT NULL," +
+            InterpretationColumns.LAST_UPDATED + " TEXT NOT NULL," +
+            InterpretationColumns.STATE + " TEXT NOT NULL," +
+            InterpretationColumns.ACCESS + " TEXT NOT NULL," +
+            InterpretationColumns.TYPE + " TEXT NOT NULL," +
+            InterpretationColumns.NAME + " TEXT," +
+            InterpretationColumns.DISPLAY_NAME + " TEXT," +
+            InterpretationColumns.TEXT + " TEXT," +
+            InterpretationColumns.EXTERNAL_ACCESS + " INTEGER," +
+            InterpretationColumns.MAP + " TEXT," +
+            InterpretationColumns.CHART + " TEXT," +
+            InterpretationColumns.REPORT_TABLE + " TEXT," +
+            InterpretationColumns.DATASET + " TEXT," +
+            InterpretationColumns.ORGANIZATION_UNIT + " TEXT," +
+            InterpretationColumns.PERIOD + " TEXT," +
+            InterpretationColumns.USER + " TEXT," +
+            InterpretationColumns.COMMENTS + " TEXT" + ")";
+
+    public static final String DROP_INTERPRETATIONS_TABLE = "DROP TABLE IF EXISTS " + InterpretationColumns.TABLE_NAME;
 }
