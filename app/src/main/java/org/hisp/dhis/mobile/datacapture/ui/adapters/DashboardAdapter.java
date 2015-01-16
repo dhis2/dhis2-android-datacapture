@@ -53,7 +53,7 @@ public class DashboardAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void setData(List<DBItemHolder<Dashboard>> dashboards) {
+    public void swapData(List<DBItemHolder<Dashboard>> dashboards) {
         boolean hasToNotifyAdapter = mDashboards != dashboards;
         mDashboards = dashboards;
 

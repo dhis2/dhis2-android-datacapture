@@ -27,6 +27,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardCreateEven
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
@@ -35,6 +36,7 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract;
 import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardEditActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
+import org.hisp.dhis.mobile.datacapture.ui.views.FloatingActionButton;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -47,8 +49,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private DashboardAdapter mAdapter;
-
-    // private FloatingActionButton mEditButton;
+    private FloatingActionButton mEditButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +82,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_dashboard_view_pager, container, false);
-        // mEditButton = (FloatingActionButton) root.findViewById(R.id.dashboard_edit_button);
+        mEditButton = (FloatingActionButton) root.findViewById(R.id.button_edit_dashboard);
         return root;
     }
 
@@ -112,7 +113,7 @@ public class DashboardViewPagerFragment extends BaseFragment
         mSlidingTabLayout.setViewPager(mViewPager);
         mSlidingTabLayout.setOnPageChangeListener(this);
 
-        // mEditButton.setOnClickListener(this);
+        mEditButton.setOnClickListener(this);
     }
 
     @Override
@@ -138,7 +139,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     public void onLoadFinished(Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> loader,
                                CursorHolder<List<DBItemHolder<Dashboard>>> data) {
         if (loader != null && loader.getId() == LOADER_ID && data != null) {
-            mAdapter.setData(data.getData());
+            mAdapter.swapData(data.getData());
             mSlidingTabLayout.setViewPager(mViewPager);
         }
     }
@@ -151,8 +152,15 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Subscribe
     public void onDashboardSyncedEvent(OnDashboardsSyncedEvent event) {
-        if (event.getResponseHolder().getException() != null) {
-            event.getResponseHolder().getException().printStackTrace();
+        final ResponseHolder<String> sendResponseHolder = event.getSendResponse();
+        final ResponseHolder<String> getResponseHolder = event.getRetrieveResponse();
+
+        if (sendResponseHolder != null && sendResponseHolder.getException() != null) {
+            sendResponseHolder.getException().printStackTrace();
+        }
+
+        if (getResponseHolder != null && getResponseHolder.getException() != null) {
+            getResponseHolder.getException().printStackTrace();
         }
     }
 
@@ -185,9 +193,9 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     private void setEditButtonVisibility(boolean isEditable) {
         if (isEditable) {
-            // mEditButton.setVisibility(View.VISIBLE);
+            mEditButton.setVisibility(View.VISIBLE);
         } else {
-            // mEditButton.setVisibility(View.GONE);
+            mEditButton.setVisibility(View.GONE);
         }
     }
 
@@ -195,10 +203,6 @@ public class DashboardViewPagerFragment extends BaseFragment
     public void onDashboardCreateEvent(OnDashboardCreateEvent event) {
         if (event.getResponseHolder().getException() != null) {
             event.getResponseHolder().getException().printStackTrace();
-            System.out.println("URL: " + event.getResponseHolder().getException().getUrl());
-            System.out.println("BODY: " + new String(event.getResponseHolder().getException().getResponse().getBody()));
-        } else {
-            System.out.println("Response body: " + event.getResponseHolder().getItem());
         }
     }
 

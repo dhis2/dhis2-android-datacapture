@@ -23,21 +23,25 @@
         android:orientation="horizontal"
         android:weightSum="1">
 
-        <Button
+        <org.hisp.dhis.mobile.datacapture.ui.views.FontButton
             android:id="@+id/discard_changes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:background="@drawable/transparent_selector"
-            android:text="@android:string/cancel" />
+            android:text="@android:string/cancel"
+            android:textSize="14sp"
+            app:font="@string/regular_font_name" />
 
-        <Button
+        <org.hisp.dhis.mobile.datacapture.ui.views.FontButton
             android:id="@+id/save_changes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:background="@drawable/transparent_selector"
-            android:text="@android:string/ok" />
+            android:text="@android:string/ok"
+            android:textSize="14sp"
+            app:font="@string/regular_font_name" />
 
     </LinearLayout>
 

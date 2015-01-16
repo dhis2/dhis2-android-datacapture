@@ -22,6 +22,7 @@
     </LinearLayout>
 
     <org.hisp.dhis.mobile.datacapture.ui.views.FloatingActionButton
+        android:id="@+id/button_edit_dashboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
