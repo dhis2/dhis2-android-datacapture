@@ -55,6 +55,7 @@ public class InterpretationUpdateTextProcessor extends AsyncTask<Void, Void, OnI
 
             @Override
             public void onFailure(APIException e) {
+                e.printStackTrace();
                 holder.setException(e);
             }
         }, dbItem.getItem().getId(), mEvent.getText());

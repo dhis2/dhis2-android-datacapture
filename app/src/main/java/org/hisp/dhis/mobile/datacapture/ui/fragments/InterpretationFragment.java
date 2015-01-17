@@ -18,7 +18,9 @@ import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.mobile.datacapture.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationsSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
@@ -29,6 +31,7 @@ import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.InterpretationAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.CommentsDialog;
+import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +40,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class InterpretationFragment extends BaseFragment
         implements LoaderCallbacks<CursorHolder<List<DBItemHolder<Interpretation>>>>,
-        InterpretationAdapter.OnItemClickListener {
+        InterpretationAdapter.OnItemClickListener, EditDialogFragment.EditDialogListener {
     private static final int LOADER_ID = 366916901;
     private static final String STATE_PROGRESS = "stateProgress";
 
@@ -109,7 +112,7 @@ public class InterpretationFragment extends BaseFragment
     @Override
     public Loader<CursorHolder<List<DBItemHolder<Interpretation>>>> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {
-            final String SELECTION = InterpretationColumns.STATE + " = " + "'" + State.GETTING.toString() + "'";
+            final String SELECTION = InterpretationColumns.STATE + " != " + "'" + State.DELETING.toString() + "'";
             return new InterpretationLoader(getActivity(), InterpretationColumns.CONTENT_URI,
                     InterpretationHandler.PROJECTION, SELECTION, null, null);
         }
@@ -135,13 +138,19 @@ public class InterpretationFragment extends BaseFragment
     }
 
     @Override
-    public void onEditInterpretation(DBItemHolder<Interpretation> interpretation) {
-
+    public void onEditInterpretation(DBItemHolder<Interpretation> dbItem) {
+        EditDialogFragment fragment = EditDialogFragment.newInstance(
+                dbItem.getDatabaseId(), dbItem.getItem().getText());
+        fragment.setListener(this);
+        fragment.show(getChildFragmentManager(),
+                EditDialogFragment.EDIT_DIALOG_FRAGMENT);
     }
 
     @Override
     public void onDeleteInterpretation(DBItemHolder<Interpretation> interpretation) {
-
+        InterpretationDeleteEvent event = new InterpretationDeleteEvent();
+        event.setInterpretationId(interpretation.getDatabaseId());
+        BusProvider.getInstance().post(event);
     }
 
     @Override
@@ -149,6 +158,14 @@ public class InterpretationFragment extends BaseFragment
         CommentsDialog dialog = new CommentsDialog();
         dialog.setData(interpretation.getItem().getComments());
         dialog.show(getChildFragmentManager(), CommentsDialog.COMMENTS_DIALOG);
+    }
+
+    @Override
+    public void onFinishEditDialog(int id, String inputText) {
+        InterpretationUpdateTextEvent event = new InterpretationUpdateTextEvent();
+        event.setDbId(id);
+        event.setText(inputText);
+        BusProvider.getInstance().post(event);
     }
 
     public static class InterpretationLoader extends AbsCursorLoader<List<DBItemHolder<Interpretation>>> {

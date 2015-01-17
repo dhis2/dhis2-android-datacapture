@@ -46,7 +46,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class DashboardViewPagerFragment extends BaseFragment
         implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<Dashboard>>>>,
-        ViewPager.OnPageChangeListener, View.OnClickListener, EditDialogFragment.EditNameDialogListener {
+        ViewPager.OnPageChangeListener, View.OnClickListener, EditDialogFragment.EditDialogListener {
     private static final int LOADER_ID = 826752394;
     private static final String STATE_PROGRESS = "stateProgress";
 
@@ -224,7 +224,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     }
 
     @Override
-    public void onFinishEditDialog(String inputText) {
+    public void onFinishEditDialog(int id, String inputText) {
         DashboardCreateEvent event = new DashboardCreateEvent();
         event.setDashboardName(inputText);
         BusProvider.getInstance().post(event);

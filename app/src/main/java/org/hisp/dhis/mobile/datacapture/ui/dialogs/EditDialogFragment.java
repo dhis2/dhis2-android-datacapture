@@ -12,21 +12,39 @@ import org.hisp.dhis.mobile.datacapture.R;
 
 public class EditDialogFragment extends DialogFragment implements View.OnClickListener {
     public static final String EDIT_DIALOG_FRAGMENT = EditDialogFragment.class.getName();
+    private static final String EXTRA_STRING = "extraString";
+    private static final String EXTRA_ID = "extraId";
+
     private EditText mEditText;
     private Button mOk;
     private Button mCancel;
-    private EditNameDialogListener mListener;
+    private EditDialogListener mListener;
+
+    public static EditDialogFragment newInstance(int id, String string) {
+        Bundle args = new Bundle();
+        EditDialogFragment fragment = new EditDialogFragment();
+
+        args.putString(EXTRA_STRING, string);
+        args.putInt(EXTRA_ID, id);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.save_changes && mListener != null) {
-            mListener.onFinishEditDialog(mEditText.getText().toString());
+            int id = -1;
+            if (getArguments() != null) {
+                id = getArguments().getInt(EXTRA_ID, id);
+            }
+            mListener.onFinishEditDialog(id, mEditText.getText().toString());
         }
 
         dismiss();
     }
 
-    public void setListener(EditNameDialogListener listener) {
+    public void setListener(EditDialogListener listener) {
         mListener = listener;
     }
 
@@ -34,7 +52,8 @@ public class EditDialogFragment extends DialogFragment implements View.OnClickLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Light_Dialog);
+        setStyle(DialogFragment.STYLE_NO_TITLE,
+                R.style.Theme_AppCompat_Light_Dialog);
     }
 
     @Override
@@ -52,9 +71,14 @@ public class EditDialogFragment extends DialogFragment implements View.OnClickLi
 
         mOk.setOnClickListener(this);
         mCancel.setOnClickListener(this);
+
+        if (getArguments() != null) {
+            String text = getArguments().getString(EXTRA_STRING, "");
+            mEditText.setText(text);
+        }
     }
 
-    public interface EditNameDialogListener {
-        void onFinishEditDialog(String inputText);
+    public interface EditDialogListener {
+        void onFinishEditDialog(int id, String inputText);
     }
 }
