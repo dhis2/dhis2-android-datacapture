@@ -21,6 +21,7 @@ import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.AggregateReportFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardViewPagerFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.InterpretationFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.StubFragment;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationItem;
@@ -217,6 +218,8 @@ public class MenuActivity extends ActionBarActivity {
             startActivity(new Intent(this, LoginActivity.class));
         } else if (id == DASHBOARD_MENU_ITEM) {
             fragment = new DashboardViewPagerFragment();
+        } else if (id == INTERPRETATIONS_MENU_ITEM) {
+            fragment = new InterpretationFragment();
         } else {
             fragment = new StubFragment();
         }

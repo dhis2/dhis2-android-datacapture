@@ -42,14 +42,19 @@ import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+
 public class DashboardViewPagerFragment extends BaseFragment
         implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<Dashboard>>>>,
         ViewPager.OnPageChangeListener, View.OnClickListener, EditDialogFragment.EditNameDialogListener {
     private static final int LOADER_ID = 826752394;
+    private static final String STATE_PROGRESS = "stateProgress";
+
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private DashboardAdapter mAdapter;
     private FloatingActionButton mEditButton;
+    private SmoothProgressBar mProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,8 @@ public class DashboardViewPagerFragment extends BaseFragment
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.refresh_dashboards) {
             BusProvider.getInstance().post(new DashboardSyncEvent());
-            Toast.makeText(getActivity(), "Refreshing dashboards", Toast.LENGTH_SHORT).show();
+            mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBar.progressiveStart();
             return true;
         } else if (menuItem.getItemId() == R.id.add_dashboard) {
             EditDialogFragment fragment = new EditDialogFragment();
@@ -81,9 +87,7 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_dashboard_view_pager, container, false);
-        mEditButton = (FloatingActionButton) root.findViewById(R.id.button_edit_dashboard);
-        return root;
+        return inflater.inflate(R.layout.fragment_dashboard_view_pager, container, false);
     }
 
     @Override
@@ -113,13 +117,27 @@ public class DashboardViewPagerFragment extends BaseFragment
         mSlidingTabLayout.setViewPager(mViewPager);
         mSlidingTabLayout.setOnPageChangeListener(this);
 
+        mEditButton = (FloatingActionButton) view.findViewById(R.id.button_edit_dashboard);
         mEditButton.setOnClickListener(this);
+
+        mProgressBar = (SmoothProgressBar) view.findViewById(R.id.progress_bar);
+        if (savedInstanceState != null && savedInstanceState.getBoolean(STATE_PROGRESS)) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle out) {
+        out.putBoolean(STATE_PROGRESS, mProgressBar.isShown());
+        super.onSaveInstanceState(out);
     }
 
     @Override
@@ -143,7 +161,6 @@ public class DashboardViewPagerFragment extends BaseFragment
             mSlidingTabLayout.setViewPager(mViewPager);
         }
     }
-
 
     @Override
     public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> loader) {
@@ -212,6 +229,12 @@ public class DashboardViewPagerFragment extends BaseFragment
         event.setDashboardName(inputText);
         BusProvider.getInstance().post(event);
         Toast.makeText(getActivity(), inputText, Toast.LENGTH_SHORT).show();
+    }
+
+    @Subscribe
+    public void onDashboardsSyncEvent(OnDashboardsSyncedEvent event) {
+        mProgressBar.progressiveStop();
+        mProgressBar.setVisibility(View.GONE);
     }
 
     public static class DashboardListLoader extends AbsCursorLoader<List<DBItemHolder<Dashboard>>> {

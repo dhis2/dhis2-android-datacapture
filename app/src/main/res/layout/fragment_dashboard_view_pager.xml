@@ -28,4 +28,6 @@
         android:layout_gravity="bottom|right"
         android:src="@drawable/ic_edit" />
 
+    <include layout="@layout/progress_bar" />
+
 </FrameLayout>

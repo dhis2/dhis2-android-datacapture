@@ -42,8 +42,8 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, DashboardColumns.PATH + "/#", DASHBOARD_ID);
         matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH, DASHBOARD_ITEMS);
         matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH + "/#", DASHBOARD_ITEM_ID);
-        matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH, INTERPRETATIONS);
-        matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH + "/#", INTERPRETATIONS_ID);
+        matcher.addURI(DBContract.AUTHORITY, InterpretationColumns.PATH, INTERPRETATIONS);
+        matcher.addURI(DBContract.AUTHORITY, InterpretationColumns.PATH + "/#", INTERPRETATIONS_ID);
         return matcher;
     }
 

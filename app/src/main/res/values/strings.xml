@@ -49,4 +49,7 @@
     <string name="enter_dashboard_name">Enter dashboard name</string>
     <string name="delete">Delete</string>
     <string name="add_dashboard">Add dashboard</string>
+    <string name="comments">Comments</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
 </resources>

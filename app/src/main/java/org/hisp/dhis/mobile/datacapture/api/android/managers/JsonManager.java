@@ -4,6 +4,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardConverte
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardItemConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DashboardNameConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.DataSetConverter;
+import org.hisp.dhis.mobile.datacapture.api.android.converters.InterpretationConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.OptionSetConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.ProgramsConverter;
 import org.hisp.dhis.mobile.datacapture.api.android.converters.RawConverter;
@@ -14,6 +15,7 @@ import org.hisp.dhis.mobile.datacapture.api.managers.IJsonManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSetHolder;
+import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
 import org.hisp.dhis.mobile.datacapture.api.models.ProgramHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
@@ -66,5 +68,10 @@ public final class JsonManager implements IJsonManager {
     @Override
     public IJsonConverter<String> getDashboardNameConverter() {
         return new DashboardNameConverter();
+    }
+
+    @Override
+    public IJsonConverter<List<Interpretation>> getInterpretationConverter() {
+        return new InterpretationConverter();
     }
 }

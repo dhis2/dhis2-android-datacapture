@@ -60,7 +60,7 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
         ViewHolder holder;
 
         if (convertView == null) {
-            view = getInflater().inflate(R.layout.gridview_dashboard_item, parent, false);
+            view = getInflater().inflate(R.layout.gridview_dashboard_item_layout, parent, false);
 
             View itemViewButton = view.findViewById(R.id.dashboard_item_menu);
             PopupMenu menu = new PopupMenu(getContext(), itemViewButton);

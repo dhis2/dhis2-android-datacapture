@@ -2,10 +2,13 @@ package org.hisp.dhis.mobile.datacapture;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
+import com.squareup.otto.ThreadEnforcer;
 
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
@@ -13,6 +16,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEv
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardCreateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardDeleteProcessor;
@@ -20,6 +24,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDele
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardUpdateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.GetReportTableProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
 
 public class DHISService extends Service {
@@ -57,36 +62,49 @@ public class DHISService extends Service {
 
     @Subscribe
     public void onUserLoginEvent(LoginUserEvent event) {
-        (new LoginUserProcessor(getBaseContext(), event)).execute();
+        executeTask(new LoginUserProcessor(getBaseContext(), event));
     }
 
     @Subscribe
     public void onDashboardSyncEvent(DashboardSyncEvent event) {
-        (new DashboardSyncProcessor(getBaseContext())).execute();
+        executeTask(new DashboardSyncProcessor(getBaseContext()));
     }
 
     @Subscribe
     public void onGetReportTable(GetReportTableEvent event) {
-        (new GetReportTableProcessor(event)).execute();
+        executeTask(new GetReportTableProcessor(event));
     }
 
     @Subscribe
     public void onDashboardDeleteEvent(DashboardDeleteEvent event) {
-        (new DashboardDeleteProcessor(getBaseContext(), event)).execute();
+        executeTask(new DashboardDeleteProcessor(getBaseContext(), event));
     }
 
     @Subscribe
     public void onDashboardUpdateEvent(DashboardUpdateEvent event) {
-        (new DashboardUpdateProcessor(getBaseContext(), event)).execute();
+        executeTask(new DashboardUpdateProcessor(getBaseContext(), event));
     }
 
     @Subscribe
     public void onDashboardItemDeleteEvent(DashboardItemDeleteEvent event) {
-        (new DashboardItemDeleteProcessor(getBaseContext(), event)).execute();
+        executeTask(new DashboardItemDeleteProcessor(getBaseContext(), event));
     }
 
     @Subscribe
     public void onDashboardCreateEvent(DashboardCreateEvent event) {
-        (new DashboardCreateProcessor(event)).execute();
+        executeTask(new DashboardCreateProcessor(event));
+    }
+
+    @Subscribe
+    public void onInterpretationsSyncEvent(InterpretationSyncEvent event) {
+        executeTask(new InterpretationSyncProcessor(getBaseContext()));
+    }
+
+    private <T> void executeTask(AsyncTask<Void, Void, T> task) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            task.execute();
+        }
     }
 }

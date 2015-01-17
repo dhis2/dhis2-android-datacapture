@@ -1,14 +1,19 @@
 package org.hisp.dhis.mobile.datacapture.api.android.handlers;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Comment;
+import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItemElement;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.api.models.InterpretationDataSet;
@@ -19,7 +24,11 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static android.text.TextUtils.isEmpty;
 
 public final class InterpretationHandler {
     public static final String[] PROJECTION = {
@@ -42,6 +51,7 @@ public final class InterpretationHandler {
             InterpretationColumns.USER,
             InterpretationColumns.COMMENTS
     };
+
 
     private static final String TAG = InterpretationHandler.class.getSimpleName();
 
@@ -141,4 +151,52 @@ public final class InterpretationHandler {
         return holder;
     }
 
+    public static Map<String, Interpretation> toMap(List<Interpretation> interpretations) {
+        Map<String, Interpretation> map = new HashMap<>();
+        for (Interpretation interpretation: interpretations) {
+            map.put(interpretation.getId(), interpretation);
+        }
+        return map;
+    }
+
+    private static boolean isCorrect(Interpretation interpretation) {
+        return (interpretation != null &&
+                interpretation.getAccess() != null &&
+                !isEmpty(interpretation.getId()) &&
+                !isEmpty(interpretation.getCreated()) &&
+                !isEmpty(interpretation.getLastUpdated()) &&
+                !isEmpty(interpretation.getType()));
+    }
+
+    public static ContentProviderOperation delete(DBItemHolder<Interpretation> dbItem) {
+        Uri uri = ContentUris.withAppendedId(
+                InterpretationColumns.CONTENT_URI, dbItem.getDatabaseId()
+        );
+        return ContentProviderOperation.newDelete(uri).build();
+    }
+
+    public static ContentProviderOperation update(DBItemHolder<Interpretation> dbItem,
+                                                  Interpretation interpretation) {
+        if (!isCorrect(interpretation)) {
+            return null;
+        }
+
+        Uri uri = ContentUris.withAppendedId(
+                InterpretationColumns.CONTENT_URI, dbItem.getDatabaseId()
+        );
+        return ContentProviderOperation.newUpdate(uri)
+                .withValues(InterpretationHandler.toContentValues(interpretation))
+                .withValue(InterpretationColumns.STATE, State.GETTING.toString())
+                .build();
+    }
+
+    public static ContentProviderOperation insert(Interpretation interpretation) {
+        if (!isCorrect(interpretation)) {
+            return null;
+        }
+        return ContentProviderOperation.newInsert(InterpretationColumns.CONTENT_URI)
+                .withValues(InterpretationHandler.toContentValues(interpretation))
+                .withValue(InterpretationColumns.STATE, State.GETTING.toString())
+                .build();
+    }
 }

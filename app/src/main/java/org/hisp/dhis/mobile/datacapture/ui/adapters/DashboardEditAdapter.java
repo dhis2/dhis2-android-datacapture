@@ -24,7 +24,7 @@ public class DashboardEditAdapter extends DBBaseAdapter<DashboardItem> {
         ViewHolder holder;
 
         if (convertView == null) {
-            view = getInflater().inflate(R.layout.listview_row_edit_dashboard, parent, false);
+            view = getInflater().inflate(R.layout.listview_row_edit_dashboard_layout, parent, false);
             holder = new ViewHolder(
                     (TextView) view.findViewById(R.id.dashboard_item_name),
                     (ImageButton) view.findViewById(R.id.delete_dashboard_item)
