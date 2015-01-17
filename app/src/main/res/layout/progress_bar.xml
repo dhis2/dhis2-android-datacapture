@@ -12,7 +12,7 @@
     app:spb_mirror_mode="false"
     app:spb_progressiveStart_activated="true"
     app:spb_progressiveStart_speed="1.5"
-    app:spb_progressiveStop_speed="3.4"
+    app:spb_progressiveStop_speed="2.0"
     app:spb_reversed="false"
     app:spb_sections_count="5"
     app:spb_speed="1.5"

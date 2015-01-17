@@ -16,7 +16,9 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEv
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardCreateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardDeleteProcessor;
@@ -24,7 +26,9 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDele
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardUpdateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.GetReportTableProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyncProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationUpdateTextProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
 
 public class DHISService extends Service {
@@ -100,7 +104,18 @@ public class DHISService extends Service {
         executeTask(new InterpretationSyncProcessor(getBaseContext()));
     }
 
+    @Subscribe
+    public void onInterpretationDeleteEvent(InterpretationDeleteEvent event) {
+        executeTask(new InterpretationDeleteProcessor(getBaseContext(), event));
+    }
+
+    @Subscribe
+    public void onInterpretationTextUpdateEvent(InterpretationUpdateTextEvent event) {
+        executeTask(new InterpretationUpdateTextProcessor(getBaseContext(), event));
+    }
+
     private <T> void executeTask(AsyncTask<Void, Void, T> task) {
+        Log.d(TAG, "Starting: " + task.getClass().getSimpleName());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {

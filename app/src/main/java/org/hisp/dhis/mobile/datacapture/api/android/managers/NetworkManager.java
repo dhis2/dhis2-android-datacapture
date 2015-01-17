@@ -10,13 +10,21 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 public final class NetworkManager implements INetworkManager {
-    private static final MediaType JSON
-            = MediaType.parse("application/json; charset=utf-8");
-    private static final long TIME_OUT = 3000;
+    private static final String JSON_TYPE = "application/json";
+    private static final String TEXT_TYPE = "text/plain";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
+
+    private static final MediaType JSON =
+            MediaType.parse(JSON_TYPE + ";" + "charset=utf-8");
+    private static final MediaType TEXT =
+            MediaType.parse(TEXT_TYPE + ";" + "charset=utf-8");
+
+    private static final long TIME_OUT = 1500;
 
     private static com.squareup.okhttp.Request buildOkRequest(Request request) {
         if (request == null) {
@@ -37,7 +45,14 @@ public final class NetworkManager implements INetworkManager {
         if (request.getBody() != null) {
             body = new String(request.getBody());
         }
-        com.squareup.okhttp.RequestBody requestBody = com.squareup.okhttp.RequestBody.create(JSON, body);
+
+        com.squareup.okhttp.RequestBody requestBody;
+        if (isPlainText(request.getHeaders())) {
+            requestBody = com.squareup.okhttp.RequestBody.create(TEXT, body);
+        } else {
+            requestBody = com.squareup.okhttp.RequestBody.create(JSON, body);
+        }
+
 
         if (RestMethod.PUT.equals(method)) {
             return okRequestBuilder.put(requestBody).url(url).build();
@@ -69,10 +84,8 @@ public final class NetworkManager implements INetworkManager {
 
         return new Response(
                 okResponse.request().urlString(),
-                okResponse.code(),
-                okResponse.message(),
-                headers,
-                okResponse.body().bytes()
+                okResponse.code(), okResponse.message(),
+                headers, okResponse.body().bytes()
         );
     }
 
@@ -86,5 +99,18 @@ public final class NetworkManager implements INetworkManager {
         com.squareup.okhttp.Response okResponse = client.newCall(okRequest).execute();
 
         return buildResponse(okResponse);
+    }
+
+    private static boolean isPlainText(List<Header> headers) {
+        Header contentType = null;
+        if (headers != null && headers.size() > 0) {
+            for (Header header: headers) {
+                if (CONTENT_TYPE_HEADER.equals(header.getName())) {
+                    contentType = header;
+                }
+            }
+        }
+
+        return contentType != null && TEXT_TYPE.equals(contentType.getValue());
     }
 }

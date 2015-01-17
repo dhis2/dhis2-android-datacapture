@@ -69,7 +69,6 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
         DHISManager.getInstance().deleteDashboard(new ApiRequestCallback<String>() {
             @Override
             public void onSuccess(Response response, String string) {
-                System.out.println("**** ****: " + string);
                 holder.setItem(string);
                 holder.setResponse(response);
                 deleteDashboard();
@@ -77,7 +76,6 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
 
             @Override
             public void onFailure(APIException e) {
-                e.printStackTrace();
                 holder.setException(e);
             }
         }, dbItem.getItem().getId());

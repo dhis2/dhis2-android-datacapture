@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
@@ -104,7 +103,6 @@ public class InterpretationFragment extends BaseFragment
 
     @Subscribe
     public void onInterpretationsSyncEvent(OnInterpretationsSyncEvent event) {
-        mProgressBar.progressiveStop();
         mProgressBar.setVisibility(View.GONE);
     }
 
@@ -170,7 +168,6 @@ public class InterpretationFragment extends BaseFragment
                 do {
                     dbItems.add(InterpretationHandler.fromCursor(cursor));
                 } while (cursor.moveToNext());
-                cursor.close();
             }
 
             return dbItems;
