@@ -11,6 +11,7 @@ import android.net.Uri;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 
 import static android.content.ContentUris.parseId;
 import static android.content.ContentUris.withAppendedId;
@@ -30,6 +31,8 @@ public class DBContentProvider extends ContentProvider {
     private static final int DASHBOARD_ITEM_ID = 702;
     private static final int INTERPRETATIONS = 800;
     private static final int INTERPRETATIONS_ID = 801;
+    private static final int KEY_VALUES = 1000;
+    private static final int KEY_VALUE_ID = 1001;
     private static final UriMatcher URI_MATCHER = buildMatcher();
 
     private DBOpenHelper mDBHelper;
@@ -44,6 +47,8 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, DashboardItemColumns.PATH + "/#", DASHBOARD_ITEM_ID);
         matcher.addURI(DBContract.AUTHORITY, InterpretationColumns.PATH, INTERPRETATIONS);
         matcher.addURI(DBContract.AUTHORITY, InterpretationColumns.PATH + "/#", INTERPRETATIONS_ID);
+        matcher.addURI(DBContract.AUTHORITY, KeyValueColumns.PATH, KEY_VALUES);
+        matcher.addURI(DBContract.AUTHORITY, KeyValueColumns.PATH + "/#", KEY_VALUE_ID);
         return matcher;
     }
 
@@ -62,6 +67,10 @@ public class DBContentProvider extends ContentProvider {
                 return InterpretationColumns.CONTENT_TYPE;
             case INTERPRETATIONS_ID:
                 return InterpretationColumns.CONTENT_ITEM_TYPE;
+            case KEY_VALUES:
+                return KeyValueColumns.CONTENT_TYPE;
+            case KEY_VALUE_ID:
+                return KeyValueColumns.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("No corresponding Uri type was found");
         }
@@ -116,6 +125,19 @@ public class DBContentProvider extends ContentProvider {
                 qBuilder.appendWhere(InterpretationColumns.DB_ID + " = " + id);
                 break;
             }
+
+            case KEY_VALUES: {
+                qBuilder.setTables(KeyValueColumns.TABLE_NAME);
+                break;
+            }
+
+            case KEY_VALUE_ID: {
+                long id = parseId(uri);
+                qBuilder.setTables(KeyValueColumns.TABLE_NAME);
+                qBuilder.appendWhere(KeyValueColumns.DB_ID + " = " + id);
+                break;
+            }
+
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -150,6 +172,14 @@ public class DBContentProvider extends ContentProvider {
 
             case INTERPRETATIONS: {
                 long id = db.insertOrThrow(InterpretationColumns.TABLE_NAME, null, values);
+                if (!isInBatchMode()) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return withAppendedId(uri, id);
+            }
+
+            case KEY_VALUES: {
+                long id = db.insertOrThrow(KeyValueColumns.TABLE_NAME, null, values);
                 if (!isInBatchMode()) {
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
@@ -210,6 +240,22 @@ public class DBContentProvider extends ContentProvider {
                 long id = parseId(uri);
                 table = InterpretationColumns.TABLE_NAME;
                 where = InterpretationColumns.DB_ID + " = " + id;
+                if (!isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                break;
+            }
+
+            case KEY_VALUES: {
+                table = KeyValueColumns.TABLE_NAME;
+                where = selection;
+                break;
+            }
+
+            case KEY_VALUE_ID: {
+                long id = parseId(uri);
+                table = KeyValueColumns.TABLE_NAME;
+                where = KeyValueColumns.DB_ID + " = " + id;
                 if (!isEmpty(selection)) {
                     where += " AND " + selection;
                 }
@@ -277,6 +323,22 @@ public class DBContentProvider extends ContentProvider {
                 long id = parseId(uri);
                 table = InterpretationColumns.TABLE_NAME;
                 where = InterpretationColumns.DB_ID + " = " + id;
+                if (!isEmpty(selection)) {
+                    where += " AND " + selection;
+                }
+                break;
+            }
+
+            case KEY_VALUES: {
+                table = KeyValueColumns.TABLE_NAME;
+                where = selection;
+                break;
+            }
+
+            case KEY_VALUE_ID: {
+                long id = parseId(uri);
+                table = KeyValueColumns.TABLE_NAME;
+                where = KeyValueColumns.DB_ID + " = " + id;
                 if (!isEmpty(selection)) {
                     where += " AND " + selection;
                 }

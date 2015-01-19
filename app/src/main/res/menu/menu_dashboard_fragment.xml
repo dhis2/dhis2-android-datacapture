@@ -10,10 +10,10 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/refresh_dashboards"
+        android:id="@+id/refresh"
         android:icon="@drawable/ic_refresh"
         android:orderInCategory="110"
-        android:title="@string/refresh_dashboards"
+        android:title="@string/refresh"
         app:showAsAction="always" />
 
 </menu>

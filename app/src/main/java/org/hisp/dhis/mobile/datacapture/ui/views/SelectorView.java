@@ -1,27 +1,22 @@
 package org.hisp.dhis.mobile.datacapture.ui.views;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import org.hisp.dhis.mobile.datacapture.R;
 
-public abstract class AbsSelectorView extends LinearLayout {
+public class SelectorView extends LinearLayout {
+    private SelectorView mChildSelectorView;
     private FontTextView mTextView;
-    private Dialog mDialog;
 
-    public AbsSelectorView(Context context) {
+    public SelectorView(Context context) {
         super(context);
         init(context, null);
     }
 
-    public AbsSelectorView(Context context, AttributeSet attributes) {
+    public SelectorView(Context context, AttributeSet attributes) {
         super(context, attributes);
 
         if (!isInEditMode()) {
@@ -37,22 +32,13 @@ public abstract class AbsSelectorView extends LinearLayout {
         setBackgroundResource(R.drawable.card_background);
         setOrientation(LinearLayout.VERTICAL);
 
-        View contentView = onCreateDialogView(LayoutInflater.from(getContext()), this);
-        mDialog = new Dialog(context);
-        mDialog.setContentView(contentView);
+        int pxs = getResources().getDimensionPixelSize(R.dimen.selector_view_padding);
+        setPadding(pxs, pxs, pxs, pxs);
 
         mTextView = new FontTextView(context);
+        mTextView.setClickable(true);
         mTextView.setBackgroundResource(R.drawable.spinner_background_holo_light);
         mTextView.setFont(getContext().getString(R.string.regular_font_name));
-        mTextView.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (mDialog != null) {
-                    mDialog.show();
-                }
-            }
-        });
 
         LayoutParams textViewParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         mTextView.setLayoutParams(textViewParams);
@@ -67,14 +53,13 @@ public abstract class AbsSelectorView extends LinearLayout {
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
+
         if (mTextView != null) {
             mTextView.setEnabled(enabled);
         }
-    }
 
-    public void show() {
-        if (mDialog != null) {
-            mDialog.show();
+        if (mChildSelectorView != null) {
+            mChildSelectorView.setEnabled(enabled);
         }
     }
 
@@ -84,24 +69,15 @@ public abstract class AbsSelectorView extends LinearLayout {
         }
     }
 
-    public void dismiss() {
-        if (mDialog != null) {
-            mDialog.dismiss();
-        }
+    public void setOnClickListener(OnClickListener listener) {
+        mTextView.setOnClickListener(listener);
     }
 
-    private float calculatePixels(int dps) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dps,
-                getResources().getDisplayMetrics());
-    }
-
-    protected Dialog getDialog() {
-        return mDialog;
+    public void chainWith(SelectorView childSelectorView) {
+        mChildSelectorView = childSelectorView;
     }
 
     protected FontTextView getTextView() {
         return mTextView;
     }
-
-    public abstract View onCreateDialogView(LayoutInflater inflater, ViewGroup container);
 }

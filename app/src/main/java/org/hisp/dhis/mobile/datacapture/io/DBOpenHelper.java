@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "dhis2.db";
     private static final String ENABLE_FOREIGN_KEYS = "PRAGMA foreign_keys = ON;";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public DBOpenHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);
@@ -18,7 +18,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.CREATE_DASHBOARD_TABLE);
         db.execSQL(DBSchema.CREATE_DASHBOARD_ITEMS_TABLE);
         db.execSQL(DBSchema.CREATE_INTERPRETATIONS_TABLE);
-
+        db.execSQL(DBSchema.CREATE_KEY_VALUE_TABLE);
     }
 
     @Override
@@ -26,6 +26,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.DROP_DASHBOARD_TABLE);
         db.execSQL(DBSchema.DROP_DASHBOARD_ITEMS_TABLE);
         db.execSQL(DBSchema.DROP_INTERPRETATIONS_TABLE);
+        db.execSQL(DBSchema.DROP_KEY_VALUE_TABLE);
     }
 
     /**

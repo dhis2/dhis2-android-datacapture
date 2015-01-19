@@ -1,28 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/aggregate_report_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:orientation="vertical">
 
-    <org.hisp.dhis.mobile.datacapture.ui.views.ListSelectorView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        app:hint="Choose organization unit" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp">
 
-    <org.hisp.dhis.mobile.datacapture.ui.views.ListSelectorView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        app:hint="Choose data set" />
+        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            app:hint="Choose organization unit" />
 
-    <org.hisp.dhis.mobile.datacapture.ui.views.ListSelectorView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        app:hint="Choose period" />
+        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            app:hint="Choose data set" />
 
-</LinearLayout>
+        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            app:hint="Choose period" />
+    </LinearLayout>
+
+
+    <include layout="@layout/progress_bar" />
+
+</FrameLayout>

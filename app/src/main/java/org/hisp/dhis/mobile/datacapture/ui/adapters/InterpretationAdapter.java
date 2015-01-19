@@ -109,6 +109,8 @@ public class InterpretationAdapter extends DBBaseAdapter<Interpretation> {
         if (interpretation.getAccess() != null) {
             Access access = interpretation.getAccess();
             if (access.isDelete() || access.isUpdate()) {
+                System.out.println("Interpretation ID: " + dbItem.getItem().getId());
+                System.out.println("Interpretation ID: " + dbItem.getItem().getUser().getName());
                 holder.itemMenu.setVisibility(View.VISIBLE);
                 holder.popupMenu.getMenu().findItem(MENU_ITEM_EDIT_ID)
                         .setVisible(access.isDelete());

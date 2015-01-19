@@ -8,13 +8,13 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
-import com.squareup.otto.ThreadEnforcer;
 
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
@@ -25,6 +25,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardDeletePr
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardUpdateProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.DatasetSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.GetReportTableProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyncProcessor;
@@ -112,6 +113,11 @@ public class DHISService extends Service {
     @Subscribe
     public void onInterpretationTextUpdateEvent(InterpretationUpdateTextEvent event) {
         executeTask(new InterpretationUpdateTextProcessor(getBaseContext(), event));
+    }
+
+    @Subscribe
+    public void onDatasetSyncEvent(DatasetSyncEvent event) {
+        executeTask(new DatasetSyncProcessor(getBaseContext()));
     }
 
     private <T> void executeTask(AsyncTask<Void, Void, T> task) {

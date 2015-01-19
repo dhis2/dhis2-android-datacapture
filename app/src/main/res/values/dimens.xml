@@ -8,5 +8,7 @@
     <dimen name="floating_action_button_size_mini">40dp</dimen>
     <dimen name="floating_action_button_shadow_size">12dp</dimen>
 
+    <dimen name="selector_view_padding">8dp</dimen>
+
     <integer name="column_nums">1</integer>
 </resources>

@@ -2,8 +2,8 @@ package org.hisp.dhis.mobile.datacapture.io;
 
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
-
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 
 public interface DBSchema {
 
@@ -69,4 +69,12 @@ public interface DBSchema {
             InterpretationColumns.COMMENTS + " TEXT" + ")";
 
     public static final String DROP_INTERPRETATIONS_TABLE = "DROP TABLE IF EXISTS " + InterpretationColumns.TABLE_NAME;
+
+    public static final String CREATE_KEY_VALUE_TABLE = "CREATE TABLE " + KeyValueColumns.TABLE_NAME + "(" +
+            DBContract.KeyValueColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            DBContract.KeyValueColumns.KEY + " TEXT NOT NULL," +
+            DBContract.KeyValueColumns.TYPE + " TEXT NOT NULL," +
+            DBContract.KeyValueColumns.VALUE + " TEXT" + ")";
+
+    public static final String DROP_KEY_VALUE_TABLE = "DROP TABLE IF EXISTS " + KeyValueColumns.TABLE_NAME;
 }

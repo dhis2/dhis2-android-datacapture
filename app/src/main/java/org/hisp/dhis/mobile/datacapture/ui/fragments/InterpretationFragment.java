@@ -90,12 +90,12 @@ public class InterpretationFragment extends BaseFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_interpretation_fragment, menu);
+        inflater.inflate(R.menu.menu_refresh, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.refresh_interpretations) {
+        if (menuItem.getItemId() == R.id.refresh) {
             BusProvider.getInstance().post(new InterpretationSyncEvent());
             mProgressBar.setVisibility(View.VISIBLE);
             mProgressBar.progressiveStart();

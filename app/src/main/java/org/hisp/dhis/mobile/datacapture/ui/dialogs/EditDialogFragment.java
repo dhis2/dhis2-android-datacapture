@@ -12,8 +12,12 @@ import org.hisp.dhis.mobile.datacapture.R;
 
 public class EditDialogFragment extends DialogFragment implements View.OnClickListener {
     public static final String EDIT_DIALOG_FRAGMENT = EditDialogFragment.class.getName();
+
     private static final String EXTRA_STRING = "extraString";
     private static final String EXTRA_ID = "extraId";
+
+    private static final String EMPTY_STRING = "";
+    private static final int EMPTY_ID = -1;
 
     private EditText mEditText;
     private Button mOk;
@@ -31,12 +35,16 @@ public class EditDialogFragment extends DialogFragment implements View.OnClickLi
         return fragment;
     }
 
+    public static EditDialogFragment newInstance() {
+        return newInstance(EMPTY_ID, EMPTY_STRING);
+    }
+
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.save_changes && mListener != null) {
-            int id = -1;
+            int id = EMPTY_ID;
             if (getArguments() != null) {
-                id = getArguments().getInt(EXTRA_ID, id);
+                id = getArguments().getInt(EXTRA_ID);
             }
             mListener.onFinishEditDialog(id, mEditText.getText().toString());
         }
@@ -73,7 +81,7 @@ public class EditDialogFragment extends DialogFragment implements View.OnClickLi
         mCancel.setOnClickListener(this);
 
         if (getArguments() != null) {
-            String text = getArguments().getString(EXTRA_STRING, "");
+            String text = getArguments().getString(EXTRA_STRING);
             mEditText.setText(text);
         }
     }

@@ -26,15 +26,16 @@ public class DataSetConverter implements IJsonConverter<DataSetHolder> {
         JsonObject jForms = jDocument.getAsJsonObject(FORMS);
 
         Gson gson = new Gson();
-        List<OrganisationUnit> units = new ArrayList<OrganisationUnit>();
+        List<OrganisationUnit> units = new ArrayList<>();
         for (Map.Entry<String, JsonElement> entry : jOrganizationUnits.entrySet()) {
             OrganisationUnit unit = gson.fromJson(entry.getValue(), OrganisationUnit.class);
             units.add(unit);
         }
 
-        List<DataSet> dataSets = new ArrayList<DataSet>();
+        List<DataSet> dataSets = new ArrayList<>();
         for (Map.Entry<String, JsonElement> entry : jForms.entrySet()) {
             DataSet dataSet = gson.fromJson(entry.getValue(), DataSet.class);
+            dataSet.setId(entry.getKey());
             dataSets.add(dataSet);
         }
 

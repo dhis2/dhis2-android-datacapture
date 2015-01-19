@@ -70,13 +70,13 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == R.id.refresh_dashboards) {
+        if (menuItem.getItemId() == R.id.refresh) {
             BusProvider.getInstance().post(new DashboardSyncEvent());
             mProgressBar.setVisibility(View.VISIBLE);
             mProgressBar.progressiveStart();
             return true;
         } else if (menuItem.getItemId() == R.id.add_dashboard) {
-            EditDialogFragment fragment = new EditDialogFragment();
+            EditDialogFragment fragment = EditDialogFragment.newInstance();
             fragment.setListener(this);
             fragment.show(getChildFragmentManager(),
                     EditDialogFragment.EDIT_DIALOG_FRAGMENT);

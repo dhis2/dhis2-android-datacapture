@@ -41,7 +41,7 @@
 
     <!-- Fragment "Swipe to refresh message" -->
     <string name="swipe_to_refresh_message">Swipe to refresh</string>
-    <string name="refresh_dashboards">Refresh dashboards</string>
+    <string name="refresh">Refresh</string>
     <string name="share_interpretation">Share interpretation</string>
     <string name="users">users</string>
     <string name="resources">resources</string>
