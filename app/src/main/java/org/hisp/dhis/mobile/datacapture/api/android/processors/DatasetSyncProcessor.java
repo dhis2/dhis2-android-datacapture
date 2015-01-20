@@ -9,7 +9,7 @@ import android.os.RemoteException;
 
 import com.google.gson.Gson;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;

@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture;
+package org.hisp.dhis.mobile.datacapture.utils;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;

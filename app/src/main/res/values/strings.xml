@@ -52,4 +52,8 @@
     <string name="comments">Comments</string>
     <string name="edit">Edit</string>
     <string name="close">Close</string>
+
+    <string name="choose_org_unit">Choose organization unit</string>
+    <string name="choose_dataset">Choose dataset</string>
+    <string name="choose_period">Choose period</string>
 </resources>

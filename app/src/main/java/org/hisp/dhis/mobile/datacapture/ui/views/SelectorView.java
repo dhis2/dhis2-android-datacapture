@@ -37,6 +37,7 @@ public class SelectorView extends LinearLayout {
 
         mTextView = new FontTextView(context);
         mTextView.setClickable(true);
+        mTextView.setId(getId());
         mTextView.setBackgroundResource(R.drawable.spinner_background_holo_light);
         mTextView.setFont(getContext().getString(R.string.regular_font_name));
 

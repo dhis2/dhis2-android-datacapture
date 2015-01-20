@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 
 import com.squareup.otto.Subscribe;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnUserLoginEvent;

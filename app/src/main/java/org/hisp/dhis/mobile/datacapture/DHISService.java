@@ -31,6 +31,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationDel
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationUpdateTextProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 public class DHISService extends Service {
     private static final String TAG = DHISService.class.getSimpleName();

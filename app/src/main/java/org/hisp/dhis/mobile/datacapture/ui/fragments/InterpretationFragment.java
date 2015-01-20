@@ -16,7 +16,7 @@ import android.widget.GridView;
 
 import com.squareup.otto.Subscribe;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
@@ -30,7 +30,7 @@ import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.InterpretationAdapter;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.CommentsDialog;
+import org.hisp.dhis.mobile.datacapture.ui.dialogs.CommentsDialogFragment;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
 
 import java.util.ArrayList;
@@ -155,9 +155,9 @@ public class InterpretationFragment extends BaseFragment
 
     @Override
     public void onShowCommentsDialog(DBItemHolder<Interpretation> interpretation) {
-        CommentsDialog dialog = new CommentsDialog();
+        CommentsDialogFragment dialog = new CommentsDialogFragment();
         dialog.setData(interpretation.getItem().getComments());
-        dialog.show(getChildFragmentManager(), CommentsDialog.COMMENTS_DIALOG);
+        dialog.show(getChildFragmentManager(), CommentsDialogFragment.COMMENTS_DIALOG);
     }
 
     @Override

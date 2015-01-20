@@ -66,7 +66,7 @@ public class EditDialogFragment extends DialogFragment implements View.OnClickLi
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_edit_layout, parent, false);
+        return inflater.inflate(R.layout.dialog_fragment_edittext_layout, parent, false);
     }
 
     @Override

@@ -1,16 +1,14 @@
 package org.hisp.dhis.mobile.datacapture.api.android.processors;
 
 import android.content.ContentProviderOperation;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;

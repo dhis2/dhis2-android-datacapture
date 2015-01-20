@@ -13,22 +13,24 @@
         android:padding="8dp">
 
         <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
+            android:id="@+id/org_unit_selector"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            app:hint="Choose organization unit" />
+            app:hint="@string/choose_org_unit" />
+
+        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
+            android:id="@+id/dataset_selector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            app:hint="@string/choose_dataset" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            app:hint="Choose data set" />
-
-        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            app:hint="Choose period" />
+            app:hint="@string/choose_period" />
     </LinearLayout>
 
 

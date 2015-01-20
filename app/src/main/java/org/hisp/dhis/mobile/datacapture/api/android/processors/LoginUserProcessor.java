@@ -3,7 +3,7 @@ package org.hisp.dhis.mobile.datacapture.api.android.processors;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnUserLoginEvent;

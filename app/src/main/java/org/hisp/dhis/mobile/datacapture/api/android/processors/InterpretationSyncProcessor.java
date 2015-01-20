@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationsSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;

@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <ListView
-        android:id="@+id/comments_list"
+        android:id="@+id/simple_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:cacheColorHint="@color/transparent" />
@@ -20,7 +20,7 @@
         android:background="@color/light_grey" />
 
     <org.hisp.dhis.mobile.datacapture.ui.views.FontButton
-        android:id="@+id/button_close_comments_dialog"
+        android:id="@+id/close_listview_dialog_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/transparent_selector"

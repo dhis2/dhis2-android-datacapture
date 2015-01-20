@@ -14,8 +14,8 @@ import org.hisp.dhis.mobile.datacapture.ui.adapters.CommentsAdapter;
 
 import java.util.List;
 
-public class CommentsDialog extends DialogFragment implements View.OnClickListener {
-    public static final String COMMENTS_DIALOG = CommentsDialog.class.getName();
+public class CommentsDialogFragment extends DialogFragment implements View.OnClickListener {
+    public static final String COMMENTS_DIALOG = CommentsDialogFragment.class.getName();
     private Button mCloseButton;
     private ListView mListView;
 
@@ -30,17 +30,17 @@ public class CommentsDialog extends DialogFragment implements View.OnClickListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_commets_list, container, false);
+        return inflater.inflate(R.layout.dialog_fragment_listview, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mAdapter = new CommentsAdapter(getActivity());
-        mListView = (ListView) view.findViewById(R.id.comments_list);
+        mListView = (ListView) view.findViewById(R.id.simple_listview);
         mListView.setAdapter(mAdapter);
         mAdapter.swapData(mData);
 
-        mCloseButton = (Button) view.findViewById(R.id.button_close_comments_dialog);
+        mCloseButton = (Button) view.findViewById(R.id.close_listview_dialog_button);
         mCloseButton.setOnClickListener(this);
     }
 

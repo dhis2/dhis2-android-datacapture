@@ -2,7 +2,7 @@ package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
 import android.support.v4.app.Fragment;
 
-import org.hisp.dhis.mobile.datacapture.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 public class BaseFragment extends Fragment {
 
