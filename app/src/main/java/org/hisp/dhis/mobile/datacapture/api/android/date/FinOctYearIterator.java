@@ -10,8 +10,8 @@ import java.util.List;
 public class FinOctYearIterator extends YearIterator {
     private static final String OCTOBER = "Oct";
 
-    public FinOctYearIterator(String allowFutureP) {
-        super(allowFutureP);
+    public FinOctYearIterator(boolean allowFuturePeriod) {
+        super(allowFuturePeriod);
     }
 
     @Override

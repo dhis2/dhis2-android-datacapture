@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,7 +31,10 @@ import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment;
-import org.hisp.dhis.mobile.datacapture.ui.views.SelectorView;
+import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment.OnDialogItemClickListener;
+import org.hisp.dhis.mobile.datacapture.ui.dialogs.PeriodDialogFragment;
+import org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton;
+import org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.utils.ObjectHolder;
 
@@ -41,30 +45,70 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
-        implements LoaderManager.LoaderCallbacks<CursorHolder<List<OrganisationUnit>>>,
-        ListViewDialogFragment.OnDialogItemClickListener, View.OnClickListener {
-    private static final String STATE_OBJECT_ID = "state:StateObjectId";
-    private static final int ORG_UNIT_DIALOG = 6732824;
-    private static final int DATASET_DIALOG = 5431432;
-    private static final int PERIOD_DIALOG = 2344653;
+        implements View.OnClickListener, LoaderCallbacks<CursorHolder<List<OrganisationUnit>>> {
+    private static final String STATE = "state:AggregateReportFragment";
     private static final int LOADER_ID = 345784834;
 
     private SmoothProgressBar mProgressBar;
-
-    private SelectorView mOrgUnitView;
-    private SelectorView mDataSetView;
-
-    private List<OrganisationUnit> mUnits;
-
-    private ReportFragmentState mState;
+    private CardTextViewButton mOrgUnitButton;
+    private CardTextViewButton mDataSetButton;
+    private CardTextViewButton mPeriodButton;
+    private CardDetailedButton mButton;
 
     private ListViewDialogFragment mOrgUnitDialog;
     private ListViewDialogFragment mDataSetDialog;
+    private PeriodDialogFragment mPeriodDialog;
+
+    private FragmentState mState;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_aggregate_report_layout, container, false);
+
+        mProgressBar = (SmoothProgressBar) view.findViewById(R.id.progress_bar);
+
+        mOrgUnitButton = (CardTextViewButton) view.findViewById(R.id.org_unit_button);
+        mDataSetButton = (CardTextViewButton) view.findViewById(R.id.dataset_button);
+        mPeriodButton = (CardTextViewButton) view.findViewById(R.id.period_button);
+        mButton = (CardDetailedButton) view.findViewById(R.id.data_entry_button);
+
+        mOrgUnitDialog = new ListViewDialogFragment();
+        mDataSetDialog = new ListViewDialogFragment();
+        mPeriodDialog = new PeriodDialogFragment();
+
+        mOrgUnitButton.setOnClickListener(this);
+        mDataSetButton.setOnClickListener(this);
+        mPeriodButton.setOnClickListener(this);
+        mButton.setOnClickListener(this);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (savedInstanceState != null &&
+                savedInstanceState.getInt(STATE, -1) > 0) {
+            int id = savedInstanceState.getInt(STATE, -1);
+            mState = (FragmentState) ObjectHolder.getInstance().pop(id);
+        }
+
+        if (mState == null) {
+            mState = new FragmentState();
+        }
+
+        mProgressBar.setVisibility(mState.isSyncInProcess() ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
     }
 
     @Override
@@ -84,55 +128,33 @@ public class AggregateReportFragment extends BaseFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_aggregate_report_layout, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mProgressBar = (SmoothProgressBar) view.findViewById(R.id.progress_bar);
-
-        mOrgUnitView = (SelectorView) view.findViewById(R.id.org_unit_selector);
-        mDataSetView = (SelectorView) view.findViewById(R.id.dataset_selector);
-
-        mOrgUnitDialog = ListViewDialogFragment.newInstance(ORG_UNIT_DIALOG);
-        mDataSetDialog = ListViewDialogFragment.newInstance(DATASET_DIALOG);
-
-        mOrgUnitView.setOnClickListener(this);
-        mDataSetView.setOnClickListener(this);
-
-        if (savedInstanceState != null &&
-                savedInstanceState.getInt(STATE_OBJECT_ID, -1) > 0) {
-            int id = savedInstanceState.getInt(STATE_OBJECT_ID, -1);
-            mState = (ReportFragmentState) ObjectHolder.getInstance().pop(id);
-        }
-
-        if (mState != null && mState.isIsSyncInProgress()) {
-            mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            mProgressBar.setVisibility(View.GONE);
-            mState = new ReportFragmentState();
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.org_unit_button: {
+                mOrgUnitDialog.show(getChildFragmentManager());
+                break;
+            }
+            case R.id.dataset_button: {
+                mDataSetDialog.show(getChildFragmentManager());
+                break;
+            }
+            case R.id.period_button: {
+                mPeriodDialog.show(getChildFragmentManager());
+                break;
+            }
+            case R.id.data_entry_button: {
+                Toast.makeText(getActivity(), "Start DataEntry Activity",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            }
         }
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        int id = ObjectHolder.getInstance().put(mState);
-        outState.putInt(STATE_OBJECT_ID, id);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Subscribe
-    public void onDataSetSyncEvent(OnDatasetSyncEvent event) {
-        mProgressBar.setVisibility(View.GONE);
+    public void onSaveInstanceState(Bundle out) {
+        mState.setSyncInProcess(mProgressBar.isShown());
+        out.putInt(STATE, ObjectHolder.getInstance().put(mState));
+        super.onSaveInstanceState(out);
     }
 
     @Override
@@ -152,8 +174,20 @@ public class AggregateReportFragment extends BaseFragment
                                CursorHolder<List<OrganisationUnit>> data) {
         if (loader != null && LOADER_ID == loader.getId() &&
                 data != null && data.getData() != null) {
-            mUnits = data.getData();
-            handleUnits();
+            handleUnits(data.getData());
+
+            // restoring from saved state
+            if (mState.getOrganisationUnit() != null) {
+                onUnitSelected(mState.getOrganisationUnit());
+
+                if (mState.getDataSet() != null) {
+                    onDataSetSelected(mState.getDataSet());
+
+                    if (mState.getPeriod() != null) {
+                        onPeriodSelected(mState.getPeriod());
+                    }
+                }
+            }
         }
     }
 
@@ -161,77 +195,98 @@ public class AggregateReportFragment extends BaseFragment
     public void onLoaderReset(Loader<CursorHolder<List<OrganisationUnit>>> loader) {
     }
 
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.org_unit_selector: {
-                mOrgUnitDialog.show(getChildFragmentManager(),
-                        ListViewDialogFragment.TAG);
-                break;
-            }
-            case R.id.dataset_selector: {
-                mDataSetDialog.show(getChildFragmentManager(),
-                        ListViewDialogFragment.TAG);
-                break;
-            }
-        }
+    @Subscribe
+    public void onDataSetSyncEvent(OnDatasetSyncEvent event) {
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
-    @Override
-    public void onItemClickListener(int dialogId, int position) {
-        switch (dialogId) {
-            case ORG_UNIT_DIALOG: {
-                OrganisationUnit unit = mUnits.get(position);
-                mState.setOrgUnit(unit);
-                mOrgUnitView.setText(unit.getLabel());
-                handleDataSets();
-                break;
-            }
-            case DATASET_DIALOG: {
-                OrganisationUnit unit = mState.getOrgUnit();
-                DataSet dataSet = unit.getDataSets().get(position);
-                mState.setDataSet(dataSet);
-                mDataSetView.setText(dataSet.getLabel());
-                break;
-            }
-            case PERIOD_DIALOG: {
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("Unsupported dialog");
-            }
-        }
-    }
-
-    private void handleUnits() {
-        ArrayList<String> labels = new ArrayList<>();
-        for (OrganisationUnit unit : mUnits) {
+    private void handleUnits(final List<OrganisationUnit> units) {
+        List<String> labels = new ArrayList<>();
+        for (OrganisationUnit unit : units) {
             labels.add(unit.getLabel());
         }
 
+        mOrgUnitButton.setEnabled(true);
         mOrgUnitDialog.swapData(labels);
-        mOrgUnitView.setEnabled(true);
+        mOrgUnitDialog.setOnItemClickListener(new OnDialogItemClickListener() {
+            @Override
+            public void onItemClickListener(int position) {
+                onUnitSelected(units.get(position));
+            }
+        });
     }
 
-    private void handleDataSets() {
-        List<DataSet> dataSets = mState.getOrgUnit().getDataSets();
-        ArrayList<String> labels = new ArrayList<>();
+    private void onUnitSelected(OrganisationUnit unit) {
+        mOrgUnitButton.setText(unit.getLabel());
+        mState.setOrganisationUnit(unit);
+        handleDataSets(unit.getDataSets());
+        handleViews(0);
+    }
+
+    private void handleDataSets(final List<DataSet> dataSets) {
+        List<String> labels = new ArrayList<>();
         for (DataSet dataSet : dataSets) {
             labels.add(dataSet.getLabel());
         }
 
+        mDataSetButton.setEnabled(true);
         mDataSetDialog.swapData(labels);
-        mDataSetView.setEnabled(true);
+        mDataSetDialog.setOnItemClickListener(new OnDialogItemClickListener() {
+            @Override
+            public void onItemClickListener(int position) {
+                onDataSetSelected(dataSets.get(position));
+            }
+        });
     }
 
-    private void handlePeriod() {
-        DataSet dataSet = mState.getDataSet();
-        // do stuff here
+    private void onDataSetSelected(DataSet dataSet) {
+        mDataSetButton.setText(dataSet.getLabel());
+        mState.setDataSet(dataSet);
+        handlePeriod(dataSet);
+        handleViews(1);
     }
 
-    public static class UnitsLoader extends AbsCursorLoader<List<OrganisationUnit>> {
+    private void handlePeriod(DataSet dataSet) {
+        mPeriodButton.setEnabled(true);
+        mPeriodDialog.setPeriodType(dataSet.getOptions().getPeriodType(),
+                dataSet.getOptions().isAllowFuturePeriods());
+        mPeriodDialog.setOnItemClickListener(new PeriodDialogFragment.OnDialogItemClickListener() {
+            @Override
+            public void onItemClickListener(DateHolder date) {
+                onPeriodSelected(date);
+            }
+        });
+    }
 
+    private void onPeriodSelected(DateHolder dateHolder) {
+        mPeriodButton.setText(dateHolder.getLabel());
+        mState.setPeriod(dateHolder);
+        handleButton();
+        mButton.show();
+    }
+
+    private void handleButton() {
+        String orgUnit = getString(R.string.organization_unit) + ": " +
+                mState.getOrganisationUnit().getLabel();
+        String dataSet = getString(R.string.dataset) + ": " +
+                mState.getDataSet().getLabel();
+        String period = getString(R.string.period) + ": " +
+                mState.getPeriod().getLabel();
+        mButton.setFirstLineText(orgUnit);
+        mButton.setSecondLineText(dataSet);
+        mButton.setThirdLineText(period);
+    }
+
+    protected void handleViews(int level) {
+        switch (level) {
+            case 0:
+                mPeriodButton.setEnabled(false);
+            case 1:
+                mButton.hide();
+        }
+    }
+
+    static class UnitsLoader extends AbsCursorLoader<List<OrganisationUnit>> {
         public UnitsLoader(Context context, Uri uri, String[] projection,
                            String selection, String[] selectionArgs, String sortOrder) {
             super(context, uri, projection, selection, selectionArgs, sortOrder);
@@ -255,42 +310,42 @@ public class AggregateReportFragment extends BaseFragment
         }
     }
 
-    static class ReportFragmentState {
-        private OrganisationUnit mOrgUnit;
-        private DataSet mDataSet;
-        private DateHolder mDateHolder;
-        private boolean mIsSyncInProgress;
+    static class FragmentState {
+        private boolean isSyncInProcess;
+        private OrganisationUnit organisationUnit;
+        private DataSet dataSet;
+        private DateHolder period;
 
-        public OrganisationUnit getOrgUnit() {
-            return mOrgUnit;
+        public boolean isSyncInProcess() {
+            return isSyncInProcess;
         }
 
-        public void setOrgUnit(OrganisationUnit orgUnit) {
-            mOrgUnit = orgUnit;
+        public void setSyncInProcess(boolean isSyncInProcess) {
+            this.isSyncInProcess = isSyncInProcess;
         }
 
         public DataSet getDataSet() {
-            return mDataSet;
+            return dataSet;
         }
 
         public void setDataSet(DataSet dataSet) {
-            mDataSet = dataSet;
+            this.dataSet = dataSet;
         }
 
-        public DateHolder getDateHolder() {
-            return mDateHolder;
+        public OrganisationUnit getOrganisationUnit() {
+            return organisationUnit;
         }
 
-        public void setDateHolder(DateHolder dateHolder) {
-            mDateHolder = dateHolder;
+        public void setOrganisationUnit(OrganisationUnit organisationUnit) {
+            this.organisationUnit = organisationUnit;
         }
 
-        public boolean isIsSyncInProgress() {
-            return mIsSyncInProgress;
+        public DateHolder getPeriod() {
+            return period;
         }
 
-        public void setIsSyncInProgress(boolean isSyncInProgress) {
-            mIsSyncInProgress = isSyncInProgress;
+        public void setPeriod(DateHolder period) {
+            this.period = period;
         }
     }
 }

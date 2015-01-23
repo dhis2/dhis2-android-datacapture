@@ -19,8 +19,8 @@ public class QuarterYearIterator extends CustomDateIteratorClass<List<DateHolder
     private LocalDate mCheckDate;
     private boolean mAllowFP;
 
-    public QuarterYearIterator(String allowFutureP) {
-        mAllowFP = allowFutureP.equals(DateIteratorFactory.TRUE);
+    public QuarterYearIterator(boolean allowFuturePeriod) {
+        mAllowFP = allowFuturePeriod;
         mPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         mCheckDate = new LocalDate(mPeriod);
     }

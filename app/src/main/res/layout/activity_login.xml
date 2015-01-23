@@ -78,7 +78,7 @@
             android:layout_width="180dp"
             android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/button_login_selector"
+            android:background="@drawable/button_blue_selector"
             android:text="@string/login_button"
             android:textColor="@color/white"
             android:textSize="17sp"

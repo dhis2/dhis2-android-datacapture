@@ -21,8 +21,8 @@ public class BiMonthIterator extends CustomDateIteratorClass<List<DateHolder>> {
     private LocalDate mCheckDate;
     private LocalDate mPeriod;
 
-    public BiMonthIterator(String allowFutureP) {
-        mAllowFP = allowFutureP.equals(DateIteratorFactory.TRUE);
+    public BiMonthIterator(boolean allowFuturePeriod) {
+        mAllowFP = allowFuturePeriod;
         mPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         mCheckDate = new LocalDate(mPeriod);
     }

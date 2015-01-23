@@ -15,8 +15,8 @@ public class DayIterator extends CustomDateIteratorClass<List<DateHolder>> {
     private LocalDate mPeriod;
     private LocalDate mCheckDate;
 
-    public DayIterator(String allowFutureP) {
-        mAllowFP = allowFutureP.equals(DateIteratorFactory.TRUE);
+    public DayIterator(boolean allowFuturePeriod) {
+        mAllowFP = allowFuturePeriod;
         mPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         mCheckDate = new LocalDate(mPeriod);
     }

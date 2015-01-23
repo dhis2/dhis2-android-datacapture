@@ -12,27 +12,32 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
-            android:id="@+id/org_unit_selector"
+        <org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton
+            android:id="@+id/org_unit_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="4dp"
             app:hint="@string/choose_org_unit" />
 
-        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
-            android:id="@+id/dataset_selector"
+        <org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton
+            android:id="@+id/dataset_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="4dp"
             app:hint="@string/choose_dataset" />
 
-        <org.hisp.dhis.mobile.datacapture.ui.views.SelectorView
+        <org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton
+            android:id="@+id/period_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="4dp"
             app:hint="@string/choose_period" />
-    </LinearLayout>
 
+        <org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton
+            android:id="@+id/data_entry_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <include layout="@layout/progress_bar" />
 

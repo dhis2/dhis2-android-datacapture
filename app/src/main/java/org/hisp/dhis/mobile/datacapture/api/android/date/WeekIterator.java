@@ -16,8 +16,8 @@ public class WeekIterator extends CustomDateIteratorClass<List<DateHolder>> {
     private LocalDate mPeriod;
     private LocalDate mCheckDate;
 
-    public WeekIterator(String allowFutureP) {
-        mAllowFP = allowFutureP.equals(DateIteratorFactory.TRUE);
+    public WeekIterator(boolean allowFuturePeriod) {
+        mAllowFP = allowFuturePeriod;
         mPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         mCheckDate = new LocalDate(mPeriod);
     }

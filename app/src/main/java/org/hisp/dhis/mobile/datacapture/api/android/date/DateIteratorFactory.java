@@ -5,8 +5,6 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.DateHolder;
 import java.util.List;
 
 public class DateIteratorFactory {
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
     private static final String YEARLY = "Yearly";
     private static final String FINANCIAL_APRIL = "FinancialApril";
     private static final String FINANCIAL_JULY = "FinancialJuly";
@@ -17,13 +15,9 @@ public class DateIteratorFactory {
     private static final String MONTHLY = "Monthly";
     private static final String WEEKLY = "Weekly";
     private static final String DAILY = "Daily";
-    private static final String WRONG_ALLOW_FP_PARAM = "Wrong allowFuturePeriod parameter";
     private static final String WRONG_PERIOD_TYPE = "Wrong periodType";
 
-    public static CustomDateIterator<List<DateHolder>> getDateIterator(String periodType, String allowFP) {
-        if ((allowFP == null) || (!allowFP.equals(TRUE) && !allowFP.equals(FALSE))) {
-            throw new IllegalArgumentException(WRONG_ALLOW_FP_PARAM);
-        }
+    public static CustomDateIterator<List<DateHolder>> getDateIterator(String periodType, boolean allowFP) {
 
         if (periodType != null) {
             if (periodType.equals(YEARLY)) {

@@ -10,8 +10,8 @@ import java.util.List;
 public class FinJulyYearIterator extends YearIterator {
     private static final String JULY = "July";
 
-    public FinJulyYearIterator(String allowFutureP) {
-        super(allowFutureP);
+    public FinJulyYearIterator(boolean allowFuturePeriod) {
+        super(allowFuturePeriod);
     }
 
     @Override

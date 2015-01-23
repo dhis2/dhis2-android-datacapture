@@ -32,7 +32,7 @@
         <attr name="font" format="reference" />
     </declare-styleable>
 
-    <declare-styleable name="SelectorHint">
+    <declare-styleable name="ButtonHint">
         <attr name="hint" format="string" />
     </declare-styleable>
 
