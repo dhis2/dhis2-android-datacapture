@@ -60,14 +60,14 @@ public class CardDetailedButton extends CardView {
                 R.dimen.card_detail_button_padding);
 
         mContainer = new LinearLayout(getContext());
+        mContainer.setId(getId());
         mContainer.setBackgroundResource(R.drawable.transparent_selector);
         mContainer.setLayoutParams(containerParams);
-        mContainer.setClickable(true);
         mContainer.setOrientation(LinearLayout.HORIZONTAL);
         mContainer.setPadding(containerPadding, containerPadding,
                 containerPadding, containerPadding);
         mContainer.setWeightSum(WEIGHT_SUM);
-
+        mContainer.setClickable(true);
 
         // configure text views
         LinearLayout.LayoutParams textViewParams = new LinearLayout.LayoutParams(
@@ -123,7 +123,7 @@ public class CardDetailedButton extends CardView {
         imgViewParams.gravity = Gravity.CENTER_VERTICAL;
 
         ImageView imageView = new ImageView(getContext());
-        imageView.setImageResource(R.drawable.ic_dashboard);
+        imageView.setImageResource(R.drawable.ic_next);
         imageView.setLayoutParams(imgViewParams);
 
         // attach both text view container and image view to main container
@@ -150,19 +150,23 @@ public class CardDetailedButton extends CardView {
         mContainer.setOnClickListener(clickListener);
     }
 
-    public void show() {
-        if (!isShown()) {
-            Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.in_up);
-            startAnimation(animation);
+    public void show(boolean withAnim) {
+        if (getVisibility() != View.VISIBLE) {
+            if (withAnim) {
+                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.in_up);
+                startAnimation(animation);
+            }
             setVisibility(View.VISIBLE);
         }
     }
 
-    public void hide() {
-        if (isShown()) {
-            Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.out_down);
-            startAnimation(animation);
-            setVisibility(View.GONE);
+    public void hide(boolean withAnim) {
+        if (getVisibility() == View.VISIBLE) {
+            if (withAnim) {
+                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.out_down);
+                startAnimation(animation);
+            }
+            setVisibility(View.INVISIBLE);
         }
     }
 }

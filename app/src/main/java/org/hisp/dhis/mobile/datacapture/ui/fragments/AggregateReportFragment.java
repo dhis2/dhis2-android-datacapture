@@ -1,6 +1,7 @@
 package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
+import org.hisp.dhis.mobile.datacapture.ui.activities.ReportEntryActivity;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment.OnDialogItemClickListener;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.PeriodDialogFragment;
@@ -92,6 +94,11 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        mOrgUnitButton.setEnabled(false);
+        mDataSetButton.setEnabled(false);
+        mPeriodButton.setEnabled(false);
+        mButton.hide(false);
+
         if (savedInstanceState != null &&
                 savedInstanceState.getInt(STATE, -1) > 0) {
             int id = savedInstanceState.getInt(STATE, -1);
@@ -143,8 +150,7 @@ public class AggregateReportFragment extends BaseFragment
                 break;
             }
             case R.id.data_entry_button: {
-                Toast.makeText(getActivity(), "Start DataEntry Activity",
-                        Toast.LENGTH_SHORT).show();
+                startReportEntryActivity();
                 break;
             }
         }
@@ -177,14 +183,18 @@ public class AggregateReportFragment extends BaseFragment
             handleUnits(data.getData());
 
             // restoring from saved state
-            if (mState.getOrganisationUnit() != null) {
-                onUnitSelected(mState.getOrganisationUnit());
+            OrganisationUnit unit = mState.getOrganisationUnit();
+            DataSet dataSet = mState.getDataSet();
+            DateHolder period = mState.getPeriod();
 
-                if (mState.getDataSet() != null) {
-                    onDataSetSelected(mState.getDataSet());
+            if (unit != null) {
+                onUnitSelected(unit);
 
-                    if (mState.getPeriod() != null) {
-                        onPeriodSelected(mState.getPeriod());
+                if (dataSet != null) {
+                    onDataSetSelected(dataSet);
+
+                    if (period != null) {
+                        onPeriodSelected(period);
                     }
                 }
             }
@@ -219,6 +229,8 @@ public class AggregateReportFragment extends BaseFragment
     private void onUnitSelected(OrganisationUnit unit) {
         mOrgUnitButton.setText(unit.getLabel());
         mState.setOrganisationUnit(unit);
+        mState.setDataSet(null);
+        mState.setPeriod(null);
         handleDataSets(unit.getDataSets());
         handleViews(0);
     }
@@ -242,6 +254,7 @@ public class AggregateReportFragment extends BaseFragment
     private void onDataSetSelected(DataSet dataSet) {
         mDataSetButton.setText(dataSet.getLabel());
         mState.setDataSet(dataSet);
+        mState.setPeriod(null);
         handlePeriod(dataSet);
         handleViews(1);
     }
@@ -262,7 +275,7 @@ public class AggregateReportFragment extends BaseFragment
         mPeriodButton.setText(dateHolder.getLabel());
         mState.setPeriod(dateHolder);
         handleButton();
-        mButton.show();
+        handleViews(2);
     }
 
     private void handleButton() {
@@ -277,13 +290,26 @@ public class AggregateReportFragment extends BaseFragment
         mButton.setThirdLineText(period);
     }
 
-    protected void handleViews(int level) {
+    private void handleViews(int level) {
         switch (level) {
             case 0:
                 mPeriodButton.setEnabled(false);
             case 1:
-                mButton.hide();
+                mButton.hide(true);
+                break;
+            case 2:
+                mButton.show(true);
         }
+    }
+
+    private void startReportEntryActivity() {
+        String orgUnitId = mState.getOrganisationUnit().getId();
+        String dataSetId = mState.getDataSet().getId();
+        String period = mState.getPeriod().getDate();
+        Intent intent = ReportEntryActivity.newIntent(
+                getActivity(), orgUnitId, dataSetId, period
+        );
+        startActivity(intent);
     }
 
     static class UnitsLoader extends AbsCursorLoader<List<OrganisationUnit>> {
@@ -301,8 +327,7 @@ public class AggregateReportFragment extends BaseFragment
 
                 DBItemHolder<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
                 Gson gson = new Gson();
-                Type type = new TypeToken<List<OrganisationUnit>>() {
-                }.getType();
+                Type type = new TypeToken<List<OrganisationUnit>>() { }.getType();
                 units = gson.fromJson(dbItem.getItem().getValue(), type);
             }
 

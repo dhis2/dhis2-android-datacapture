@@ -4,6 +4,9 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
 
 public interface DBSchema {
 
@@ -77,4 +80,48 @@ public interface DBSchema {
             DBContract.KeyValueColumns.VALUE + " TEXT" + ")";
 
     public static final String DROP_KEY_VALUE_TABLE = "DROP TABLE IF EXISTS " + KeyValueColumns.TABLE_NAME;
+
+
+    public static final String CREATE_REPORTS_TABLE = "CREATE TABLE " + ReportColumns.TABLE_NAME + "(" +
+            ReportColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            ReportColumns.ORG_UNIT_ID + " TEXT NOT NULL," +
+            ReportColumns.DATASET_ID + " TEXT NOT NULL," +
+            ReportColumns.PERIOD + " TEXT NOT NULL," +
+            ReportColumns.COMPLETE_DATE + " TEXT," +
+            ReportColumns.STATE + " TEXT NOT NULL," +
+            " UNIQUE " + "(" +
+                            ReportColumns.ORG_UNIT_ID + "," +
+                            ReportColumns.DATASET_ID + "," +
+                            ReportColumns.PERIOD +
+                          ")" +
+            ")";
+
+    public static final String DROP_REPORTS_TABLE = "DROP TABLE IF EXISTS " + ReportColumns.TABLE_NAME;
+
+    public static final String CREATE_REPORT_GROUP_TABLE = "CREATE TABLE " + ReportGroupColumns.TABLE_NAME + "(" +
+            ReportGroupColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            ReportGroupColumns.LABEL + " TEXT NOT NULL," +
+            ReportGroupColumns.DATA_ELEMENT_COUNT + " INTEGER," +
+            ReportGroupColumns.REPORT_DB_ID + " INTEGER NOT NULL," +
+            " FOREIGN KEY " + "(" + ReportGroupColumns.REPORT_DB_ID + ")" +
+            " REFERENCES " + ReportColumns.TABLE_NAME + "(" + ReportColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " + ")";
+
+    public static final String DROP_REPORT_GROUP_TABLE = "DROP TABLE IF EXISTS " + ReportGroupColumns.TABLE_NAME;
+
+    public static final String CREATE_REPORT_FIELDS_TABLE = "CREATE TABLE " + ReportFieldColumns.TABLE_NAME + "(" +
+            ReportFieldColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            ReportFieldColumns.LABEL + " TEXT," +
+            ReportFieldColumns.TYPE + " TEXT NOT NULL," +
+            ReportFieldColumns.DATA_ELEMENT + " TEXT NOT NULL," +
+            ReportFieldColumns.CATEGORY_OPTION_COMBO + " TEXT NOT NULL," +
+            ReportFieldColumns.OPTION_SET + " TEXT," +
+            ReportFieldColumns.VALUE + " TEXT," +
+            ReportFieldColumns.GROUP_DB_ID + " INTEGER NOT NULL," +
+            " FOREIGN KEY " + "(" + ReportFieldColumns.GROUP_DB_ID + ")" +
+            " REFERENCES " + ReportGroupColumns.TABLE_NAME + "(" + ReportGroupColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " + ")";
+
+    public static final String DROP_REPORT_FIELDS_TABLE = "DROP TABLE IF EXISTS " + ReportFieldColumns.TABLE_NAME;
+
 }

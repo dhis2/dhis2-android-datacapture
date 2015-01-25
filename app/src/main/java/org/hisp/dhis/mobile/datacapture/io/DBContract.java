@@ -4,6 +4,8 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
+
 public class DBContract {
     public static final String AUTHORITY = "org.hisp.dhis.mobile.datacapture.io.DBContentProvider";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
@@ -108,6 +110,80 @@ public class DBContract {
                 "/org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+    }
+
+    public static interface ReportColumns extends StateColumns {
+        public static final String TABLE_NAME = "reportTable";
+        public static final String PATH = TABLE_NAME;
+
+        public static final String DB_ID = "reportDBId";
+        //public static final String DB_ID = BaseColumns._ID;
+        //public static final String FULL_DB_ID = TABLE_NAME + "." + DB_ID;
+
+        public static final String ORG_UNIT_ID = "orgUnitId";
+        //public static final String FULL_ORG_UNIT_ID = TABLE_NAME + "." + ORG_UNIT_ID;
+
+        public static final String DATASET_ID = "dataSetId";
+        //public static final String FULL_DATASET_ID = TABLE_NAME + "." + DATASET_ID;
+
+        public static final String PERIOD = "period";
+        //public static final String FULL_PERIOD = TABLE_NAME + "." + PERIOD;
+
+        public static final String COMPLETE_DATE = "completeDate";
+        //public static final String FULL_COMPLETE_DATE = TABLE_NAME + "." + COMPLETE_DATE;
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Report";
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Report";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+    }
+
+    public static interface ReportGroupColumns {
+        public static final String TABLE_NAME = "reportsGroupTable";
+        public static final String PATH = TABLE_NAME;
+
+        public static final String DB_ID = "reportGroupDBId";
+        //public static final String DB_ID = BaseColumns._ID;
+        //public static final String FULL_DB_ID = TABLE_NAME + "." + DB_ID;
+
+        public static final String LABEL = "groupLabel";
+        //public static final String FULL_LABEL = TABLE_NAME + "." + LABEL;
+
+        public static final String DATA_ELEMENT_COUNT = "dataElementCount";
+        //public static final String FULL_DATA_ELEMENT_COUNT = TABLE_NAME + "." + DATA_ELEMENT_COUNT;
+
+        // ForeignKey to ReportColumns(_id)
+        public static final String REPORT_DB_ID = "reportDBId";
+        //public static final String FULL_REPORT_DB_ID = TABLE_NAME + "." + REPORT_DB_ID;
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Group";
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Group";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+    }
+
+    public static interface ReportFieldColumns {
+        public static final String TABLE_NAME = "reportFieldsTable";
+        public static final String PATH = TABLE_NAME;
+
+        public static final String DB_ID = BaseColumns._ID;
+        public static final String LABEL = "label";
+        public static final String TYPE = "type";
+        public static final String DATA_ELEMENT = "dataElement";
+        public static final String CATEGORY_OPTION_COMBO = "categoryOptionCombo";
+        public static final String OPTION_SET = "optionSet";
+        public static final String VALUE = "value";
+
+        // ForeignKey to GroupColumns(_id)
+        public static final String GROUP_DB_ID = "reportGroupId";
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Field";
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Field";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
     }
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.squareup.otto.Subscribe;
 
+import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
@@ -20,6 +21,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteE
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.CreateReportProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardCreateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDeleteProcessor;
@@ -119,6 +121,11 @@ public class DHISService extends Service {
     @Subscribe
     public void onDatasetSyncEvent(DatasetSyncEvent event) {
         executeTask(new DatasetSyncProcessor(getBaseContext()));
+    }
+
+    @Subscribe
+    public void onCreateReportEvent(CreateReportEvent event) {
+        executeTask(new CreateReportProcessor(getBaseContext(), event));
     }
 
     private <T> void executeTask(AsyncTask<Void, Void, T> task) {

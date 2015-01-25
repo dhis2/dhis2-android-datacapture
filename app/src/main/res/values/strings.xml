@@ -52,12 +52,12 @@
     <string name="comments">Comments</string>
     <string name="edit">Edit</string>
     <string name="close">Close</string>
-
     <string name="choose_org_unit">Choose organization unit</string>
     <string name="choose_dataset">Choose dataset</string>
     <string name="choose_period">Choose period</string>
-
     <string name="organization_unit">Organization unit</string>
     <string name="dataset">Dataset</string>
     <string name="period">Period</string>
+    <string name="title_activity_report_entry">ReportEntryActivity</string>
+
 </resources>

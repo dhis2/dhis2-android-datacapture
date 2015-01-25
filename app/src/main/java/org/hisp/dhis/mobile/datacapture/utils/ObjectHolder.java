@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ObjectHolder {
+    private static final int FIRST_ID = 11;
     private static ObjectHolder mStateHolder;
 
     private Map<Integer, WeakReference<Object>> mData;
@@ -13,7 +14,7 @@ public class ObjectHolder {
 
     private ObjectHolder() {
         mData = new HashMap<>();
-        mId = new AtomicInteger();
+        mId = new AtomicInteger(FIRST_ID);
     }
 
     public Object pop(int id) {

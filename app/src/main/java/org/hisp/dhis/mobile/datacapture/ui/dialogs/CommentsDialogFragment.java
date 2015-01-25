@@ -5,7 +5,6 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 
 import org.hisp.dhis.mobile.datacapture.R;
@@ -14,9 +13,9 @@ import org.hisp.dhis.mobile.datacapture.ui.adapters.CommentsAdapter;
 
 import java.util.List;
 
-public class CommentsDialogFragment extends DialogFragment implements View.OnClickListener {
+// TODO implement 'close' button
+public class CommentsDialogFragment extends DialogFragment {
     public static final String COMMENTS_DIALOG = CommentsDialogFragment.class.getName();
-    private Button mCloseButton;
     private ListView mListView;
 
     private CommentsAdapter mAdapter;
@@ -39,14 +38,6 @@ public class CommentsDialogFragment extends DialogFragment implements View.OnCli
         mListView = (ListView) view.findViewById(R.id.simple_listview);
         mListView.setAdapter(mAdapter);
         mAdapter.swapData(mData);
-
-        mCloseButton = (Button) view.findViewById(R.id.close_listview_dialog_button);
-        mCloseButton.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        dismiss();
     }
 
     public void setData(List<Comment> comments) {

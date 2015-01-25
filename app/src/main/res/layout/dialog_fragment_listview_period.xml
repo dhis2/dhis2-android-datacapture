@@ -16,7 +16,8 @@
             android:layout_height="50dp"
             android:layout_marginRight="1dp"
             android:layout_weight="0.5"
-            android:background="@drawable/button_blue_selector" />
+            android:background="@drawable/button_dialog_selector"
+            android:drawableLeft="@drawable/ic_previous_light" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.FontButton
             android:id="@+id/next"
@@ -24,7 +25,8 @@
             android:layout_height="50dp"
             android:layout_marginLeft="1dp"
             android:layout_weight="0.5"
-            android:background="@drawable/button_blue_selector" />
+            android:background="@drawable/button_dialog_selector"
+            android:drawableRight="@drawable/ic_next_light" />
     </LinearLayout>
 
     <include layout="@layout/listview_simple" />
