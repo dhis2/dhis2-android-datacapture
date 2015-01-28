@@ -51,7 +51,8 @@ public class DBContentProvider extends ContentProvider {
     private static final int KEY_VALUE_ID = 1001;
 
     private static final int REPORTS = 1100;
-    private static final int REPORT_ID = 1101;
+    private static final int REPORTS_WITH_GROUPS = 1101;
+    private static final int REPORT_ID = 1102;
 
     private static final int REPORT_GROUPS = 1200;
     private static final int REPORT_GROUP_ID = 1201;
@@ -79,6 +80,7 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, KeyValueColumns.PATH + "/#", KEY_VALUE_ID);
 
         matcher.addURI(DBContract.AUTHORITY, ReportColumns.PATH, REPORTS);
+        matcher.addURI(DBContract.AUTHORITY, ReportColumns.PATH_WITH_GROUPS, REPORTS_WITH_GROUPS);
         matcher.addURI(DBContract.AUTHORITY, ReportColumns.PATH + "/#", REPORT_ID);
 
         matcher.addURI(DBContract.AUTHORITY, ReportGroupColumns.PATH, REPORT_GROUPS);
@@ -88,24 +90,6 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, ReportFieldColumns.PATH + "/#", REPORT_FIELD_ID);
         return matcher;
     }
-
-    /*
-    private static Map<String, String> buildProjectionMap() {
-        Map<String, String> map = new HashMap<>();
-
-        map.put(ReportColumns.DB_ID, ReportColumns.FULL_DB_ID);
-        map.put(ReportColumns.ORG_UNIT_ID, ReportColumns.FULL_ORG_UNIT_ID);
-        map.put(ReportColumns.DATASET_ID, ReportColumns.FULL_DATASET_ID);
-        map.put(ReportColumns.PERIOD, ReportColumns.FULL_PERIOD);
-        map.put(ReportColumns.COMPLETE_DATE, ReportColumns.FULL_COMPLETE_DATE);
-
-        map.put(ReportGroupColumns.DB_ID, ReportGroupColumns.FULL_DB_ID);
-        map.put(ReportGroupColumns.LABEL, ReportGroupColumns.FULL_LABEL);
-        map.put(ReportGroupColumns.DATA_ELEMENT_COUNT,
-                ReportGroupColumns.FULL_DATA_ELEMENT_COUNT);
-        return map;
-    }
-    */
 
     @Override
     public String getType(Uri uri) {
@@ -212,26 +196,24 @@ public class DBContentProvider extends ContentProvider {
             }
 
             case REPORTS: {
-                //qBuilder.setTables(ReportColumns.TABLE_NAME);
-                qBuilder.setTables(
-                        ReportColumns.TABLE_NAME +
-                                " LEFT OUTER JOIN " + ReportGroupColumns.TABLE_NAME +
-                                " ON " + ReportColumns.TABLE_NAME + "." + ReportColumns.DB_ID +
-                                " = " + ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.REPORT_DB_ID
-                );
+                qBuilder.setTables(ReportColumns.TABLE_NAME);
                 break;
             }
 
             case REPORT_ID: {
                 long id = parseId(uri);
-                //qBuilder.setTables(ReportColumns.TABLE_NAME);
+                qBuilder.setTables(ReportColumns.TABLE_NAME);
+                qBuilder.appendWhere(ReportColumns.DB_ID + " = " + id);
+                break;
+            }
+
+            case REPORTS_WITH_GROUPS: {
                 qBuilder.setTables(
                         ReportColumns.TABLE_NAME +
                                 " LEFT OUTER JOIN " + ReportGroupColumns.TABLE_NAME +
                                 " ON " + ReportColumns.TABLE_NAME + "." + ReportColumns.DB_ID +
                                 " = " + ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.REPORT_DB_ID
                 );
-                qBuilder.appendWhere(ReportColumns.DB_ID + " = " + id);
                 break;
             }
 

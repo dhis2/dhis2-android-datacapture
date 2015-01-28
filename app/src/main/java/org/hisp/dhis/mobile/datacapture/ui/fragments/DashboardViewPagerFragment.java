@@ -92,8 +92,8 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        final int blue = Color.parseColor(getString(R.color.navy_blue));
-        final int gray = Color.parseColor(getString(R.color.darker_grey));
+        final int blue = getResources().getColor(R.color.navy_blue);
+        final int gray = getResources().getColor(R.color.darker_grey);
 
         mAdapter = new DashboardAdapter(getChildFragmentManager());
         mViewPager = (ViewPager) view.findViewById(R.id.view_pager);

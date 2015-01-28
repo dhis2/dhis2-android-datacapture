@@ -51,7 +51,6 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
 
     @Override
     protected OnCreateReportEvent doInBackground(Void... params) {
-        checkReports();
         OnCreateReportEvent event = new OnCreateReportEvent();
         DBItemHolder<Report> report = readReport();
 
@@ -125,7 +124,7 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
     }
 
     private DBItemHolder<Report> readReport() {
-        final String ORG_UNIT = ReportColumns.ORG_UNIT_ID + " = " + "'" +  mEvent.getReport().getOrgUnit() + "'";
+        final String ORG_UNIT = ReportColumns.ORG_UNIT_ID + " = " + "'" + mEvent.getReport().getOrgUnit() + "'";
         final String DATASET = ReportColumns.DATASET_ID + " = " + "'" + mEvent.getReport().getDataSet() + "'";
         final String PERIOD = ReportColumns.PERIOD + " = " + "'" + mEvent.getReport().getPeriod() + "'";
         final String SELECTION = ORG_UNIT + " AND " + DATASET + " AND " + PERIOD;
@@ -140,22 +139,6 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
             cursor.close();
         }
         return dbItem;
-    }
-
-    // TODO Note that while are you trying to read only reports, ReportGroup table is being joined
-    // That is why in output you a lot of the same ids (since you are being displayed not reports, but their groups)
-    private void checkReports() {
-        Cursor cursor = mContext.getContentResolver().query(ReportColumns.CONTENT_URI,
-                ReportHandler.PROJECTION, null, null, null);
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            do {
-                DBItemHolder<Report> dbItem = ReportHandler.fromCursor(cursor);
-                System.out.println("ID: " + dbItem.getDatabaseId() + " ORG_UNIT: " + dbItem.getItem().getOrgUnit() +
-                "DATASET: " + dbItem.getItem().getDataSet() + " PERIOD: " + dbItem.getItem().getPeriod());
-            } while(cursor.moveToNext());
-            cursor.close();
-        }
     }
 
     @Override

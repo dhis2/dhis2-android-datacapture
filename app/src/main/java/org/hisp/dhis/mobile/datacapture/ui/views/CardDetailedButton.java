@@ -76,7 +76,6 @@ public class CardDetailedButton extends CardView {
 
         int textViewMargin = getResources().getDimensionPixelSize(
                 R.dimen.card_detail_text_view_margin);
-        int navyBlueColor = getResources().getColor(R.color.navy_blue);
 
         textViewParams.setMargins(0, 0, 0, textViewMargin);
 
@@ -93,13 +92,11 @@ public class CardDetailedButton extends CardView {
         mSecondLine.setEllipsize(TextUtils.TruncateAt.END);
         mSecondLine.setFont(getResources().getString(R.string.light_font_name));
         mSecondLine.setTextSize(TypedValue.COMPLEX_UNIT_SP, SMALL_TEXT_SIZE);
-        mSecondLine.setTextColor(navyBlueColor);
 
         mThirdLine.setSingleLine(true);
         mThirdLine.setEllipsize(TextUtils.TruncateAt.END);
         mThirdLine.setFont(getResources().getString(R.string.light_font_name));
         mThirdLine.setTextSize(TypedValue.COMPLEX_UNIT_SP, SMALL_TEXT_SIZE);
-        mThirdLine.setTextColor(navyBlueColor);
 
         // configure container with text views
         LinearLayout.LayoutParams textViewContainerParams = new LinearLayout.LayoutParams(

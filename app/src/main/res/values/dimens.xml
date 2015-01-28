@@ -10,7 +10,7 @@
 
     <dimen name="card_detail_button_padding">8dp</dimen>
     <dimen name="card_detail_text_view_margin">4dp</dimen>
-    <dimen name="card_text_view_margin">5dp</dimen>
+    <dimen name="card_text_view_margin">8dp</dimen>
 
     <integer name="column_nums">1</integer>
 </resources>

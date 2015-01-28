@@ -17,21 +17,21 @@
             android:id="@+id/org_unit_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="6dp"
             app:hint="@string/choose_org_unit" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton
             android:id="@+id/dataset_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="6dp"
             app:hint="@string/choose_dataset" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton
             android:id="@+id/period_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="6dp"
             app:hint="@string/choose_period" />
 
         <org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton

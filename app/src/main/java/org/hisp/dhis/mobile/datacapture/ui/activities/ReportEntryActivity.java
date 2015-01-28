@@ -3,11 +3,13 @@ package org.hisp.dhis.mobile.datacapture.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -17,15 +19,17 @@ import android.widget.ProgressBar;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportGroupHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
+import org.hisp.dhis.mobile.datacapture.ui.adapters.ReportGroupAdapter;
+import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReportEntryActivity extends ActionBarActivity
@@ -36,8 +40,9 @@ public class ReportEntryActivity extends ActionBarActivity
 
     private static final int LOADER_ID = 89254134;
 
-    private ListView mListView;
-    private ProgressBar mProgressBar;
+    private SlidingTabLayout mSlidingTabLayout;
+    private ViewPager mViewPager;
+    private ReportGroupAdapter mAdapter;
 
     public static Intent newIntent(FragmentActivity activity,
                                    String orgUnitId, String dataSetId, String period) {
@@ -69,13 +74,34 @@ public class ReportEntryActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_entry);
 
-        Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(actionBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        //Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(actionBar);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
 
-        mListView = (ListView) findViewById(R.id.list);
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mAdapter = new ReportGroupAdapter(getSupportFragmentManager());
+
+        final int blue = getResources().getColor(R.color.navy_blue);
+        final int gray = getResources().getColor(R.color.darker_grey);
+
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+
+            @Override
+            public int getIndicatorColor(int position) {
+                return blue;
+            }
+
+            @Override
+            public int getDividerColor(int position) {
+                return gray;
+            }
+
+        });
+
+        mViewPager.setAdapter(mAdapter);
+        mSlidingTabLayout.setViewPager(mViewPager);
     }
 
     @Override
@@ -107,7 +133,7 @@ public class ReportEntryActivity extends ActionBarActivity
             final String DATASET = ReportColumns.DATASET_ID + " = " + "'" + report.getDataSet() + "'";
             final String PERIOD = ReportColumns.PERIOD + " = " + "'" + report.getPeriod() + "'";
             final String SELECTION = ORG_UNIT + " AND " + DATASET + " AND " + PERIOD;
-            return new ReportLoader(this, ReportColumns.CONTENT_URI,
+            return new ReportLoader(this, ReportColumns.CONTENT_URI_WITH_GROUPS,
                     ReportGroupHandler.PROJECTION, SELECTION, null, null);
         }
         return null;
@@ -117,13 +143,13 @@ public class ReportEntryActivity extends ActionBarActivity
     public void onLoadFinished(Loader<CursorHolder<List<DBItemHolder<Group>>>> loader,
                                CursorHolder<List<DBItemHolder<Group>>> data) {
         if (loader != null && LOADER_ID == loader.getId() && data != null) {
-
+            mAdapter.swapData(data.getData());
+            mSlidingTabLayout.setViewPager(mViewPager);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<Group>>>> loader) {
-
     }
 
     static class ReportLoader extends AbsCursorLoader<List<DBItemHolder<Group>>> {
@@ -135,19 +161,16 @@ public class ReportEntryActivity extends ActionBarActivity
 
         @Override
         protected List<DBItemHolder<Group>> readDataFromCursor(Cursor cursor) {
-            if (cursor != null) {
-                System.out.println("Count of values: " + cursor.getCount());
-            }
+            List<DBItemHolder<Group>> dbItems = new ArrayList<>();
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 do {
-                    System.out.println("Cursor label: " + cursor.getString(1));
-                } while(cursor.moveToNext());
-                //return ReportHandler.fromCursor(cursor);
-                return null;
-            } else {
-                return null;
+                    DBItemHolder<Group> group = ReportGroupHandler.fromCursor(cursor);
+                    dbItems.add(group);
+                } while (cursor.moveToNext());
             }
+
+            return dbItems;
         }
     }
 }

@@ -9,9 +9,9 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
 
 public final class ReportGroupHandler {
     public static final String[] PROJECTION = new String[] {
-            ReportGroupColumns.DB_ID,
-            ReportGroupColumns.LABEL,
-            ReportGroupColumns.DATA_ELEMENT_COUNT,
+            ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.DB_ID,
+            ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.LABEL,
+            ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.DATA_ELEMENT_COUNT,
     };
 
     private static final int DB_ID = 0;

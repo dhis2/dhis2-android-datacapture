@@ -116,47 +116,33 @@ public class DBContract {
     public static interface ReportColumns extends StateColumns {
         public static final String TABLE_NAME = "reportTable";
         public static final String PATH = TABLE_NAME;
+        public static final String PATH_WITH_GROUPS = ReportColumns.TABLE_NAME +
+                "/" + ReportGroupColumns.TABLE_NAME;
 
-        public static final String DB_ID = "reportDBId";
-        //public static final String DB_ID = BaseColumns._ID;
-        //public static final String FULL_DB_ID = TABLE_NAME + "." + DB_ID;
-
+        public static final String DB_ID = BaseColumns._ID;
         public static final String ORG_UNIT_ID = "orgUnitId";
-        //public static final String FULL_ORG_UNIT_ID = TABLE_NAME + "." + ORG_UNIT_ID;
-
         public static final String DATASET_ID = "dataSetId";
-        //public static final String FULL_DATASET_ID = TABLE_NAME + "." + DATASET_ID;
-
         public static final String PERIOD = "period";
-        //public static final String FULL_PERIOD = TABLE_NAME + "." + PERIOD;
-
         public static final String COMPLETE_DATE = "completeDate";
-        //public static final String FULL_COMPLETE_DATE = TABLE_NAME + "." + COMPLETE_DATE;
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Report";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Report";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+        public static final Uri CONTENT_URI_WITH_GROUPS = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_WITH_GROUPS);
     }
 
     public static interface ReportGroupColumns {
         public static final String TABLE_NAME = "reportsGroupTable";
         public static final String PATH = TABLE_NAME;
 
-        public static final String DB_ID = "reportGroupDBId";
-        //public static final String DB_ID = BaseColumns._ID;
-        //public static final String FULL_DB_ID = TABLE_NAME + "." + DB_ID;
-
+        public static final String DB_ID = BaseColumns._ID;
         public static final String LABEL = "groupLabel";
-        //public static final String FULL_LABEL = TABLE_NAME + "." + LABEL;
-
         public static final String DATA_ELEMENT_COUNT = "dataElementCount";
-        //public static final String FULL_DATA_ELEMENT_COUNT = TABLE_NAME + "." + DATA_ELEMENT_COUNT;
 
         // ForeignKey to ReportColumns(_id)
         public static final String REPORT_DB_ID = "reportDBId";
-        //public static final String FULL_REPORT_DB_ID = TABLE_NAME + "." + REPORT_DB_ID;
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Group";

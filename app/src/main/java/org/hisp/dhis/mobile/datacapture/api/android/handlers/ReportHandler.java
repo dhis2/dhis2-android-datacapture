@@ -11,21 +11,10 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
 public final class ReportHandler {
     public static final String[] PROJECTION = new String[] {
             ReportColumns.TABLE_NAME + "." + ReportColumns.DB_ID,
-            ReportColumns.ORG_UNIT_ID,
-            ReportColumns.DATASET_ID,
-            ReportColumns.PERIOD,
-            ReportColumns.COMPLETE_DATE,
-    };
-
-    public static final String[] PROJECTION_WITH_GROUPS = new String[] {
-            ReportColumns.DB_ID,
-            ReportColumns.ORG_UNIT_ID,
-            ReportColumns.DATASET_ID,
-            ReportColumns.PERIOD,
-            ReportColumns.COMPLETE_DATE,
-            ReportGroupColumns.DB_ID,
-            ReportGroupColumns.LABEL,
-            ReportGroupColumns.DATA_ELEMENT_COUNT,
+            ReportColumns.TABLE_NAME + "." + ReportColumns.ORG_UNIT_ID,
+            ReportColumns.TABLE_NAME + "." + ReportColumns.DATASET_ID,
+            ReportColumns.TABLE_NAME + "." + ReportColumns.PERIOD,
+            ReportColumns.TABLE_NAME + "." + ReportColumns.COMPLETE_DATE,
     };
 
     private static final int DB_ID = 0;
