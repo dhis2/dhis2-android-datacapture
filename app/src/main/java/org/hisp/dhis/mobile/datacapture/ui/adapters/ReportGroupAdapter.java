@@ -21,7 +21,8 @@ public class ReportGroupAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (mGroups != null && mGroups.size() > 0) {
-            return new ReportGroupFragment();
+            int groupdId = mGroups.get(position).getDatabaseId();
+            return ReportGroupFragment.newInstance(groupdId);
         } else {
             return null;
         }
