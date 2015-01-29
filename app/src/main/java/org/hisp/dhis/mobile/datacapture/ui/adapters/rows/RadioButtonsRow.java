@@ -21,6 +21,7 @@ public class RadioButtonsRow implements Row {
 
     private final Field mField;
     private final RowTypes mType;
+    private OnFieldValueSetListener mListener;
     
     public RadioButtonsRow(Field field, RowTypes type) {
         if (!RowTypes.GENDER.equals(type) && !RowTypes.BOOLEAN.equals(type)) {
@@ -71,6 +72,11 @@ public class RadioButtonsRow implements Row {
 
         holder.updateViews(mField);
         return view;
+    }
+
+    @Override
+    public void setListener(OnFieldValueSetListener listener) {
+        mListener = listener;
     }
 
     @Override

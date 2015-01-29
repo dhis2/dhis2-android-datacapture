@@ -6,5 +6,6 @@ import android.view.ViewGroup;
 
 public interface Row {
     public View getView(LayoutInflater inflater, View convertView, ViewGroup container);
+    public void setListener(OnFieldValueSetListener listener);
     public int getViewType();
 }

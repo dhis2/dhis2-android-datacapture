@@ -34,6 +34,11 @@ public class FontButton extends Button {
         }
     }
 
+    public void setFont(int resId) {
+        String name = getResources().getString(resId);
+        setFont(name);
+    }
+
     private void setFont(final String fontName) {
         if (getContext() != null && getContext().getAssets() != null && fontName != null) {
             Typeface typeface = TypefaceManager.getTypeface(getContext().getAssets(), fontName);

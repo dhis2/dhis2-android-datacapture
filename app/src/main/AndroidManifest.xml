@@ -51,7 +51,7 @@
         </activity>
         <activity
             android:name=".ui.activities.ReportEntryActivity"
-            android:label="@string/title_activity_report_entry" >
+            android:label="@string/title_activity_report_entry">
         </activity>
     </application>
 

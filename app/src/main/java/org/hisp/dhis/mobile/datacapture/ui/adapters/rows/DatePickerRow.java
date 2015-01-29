@@ -18,7 +18,9 @@ import org.joda.time.LocalDate;
 
 public class DatePickerRow implements Row {
     private static final String EMPTY_FIELD = "";
+
     private Field mField;
+    private OnFieldValueSetListener mListener;
 
     public DatePickerRow(Field field) {
         mField = field;
@@ -56,6 +58,11 @@ public class DatePickerRow implements Row {
 
         holder.updateViews(mField);
         return view;
+    }
+
+    @Override
+    public void setListener(OnFieldValueSetListener listener) {
+        mListener = listener;
     }
 
     @Override

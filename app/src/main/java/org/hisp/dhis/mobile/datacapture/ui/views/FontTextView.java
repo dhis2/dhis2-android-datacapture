@@ -50,6 +50,11 @@ public class FontTextView extends TextView {
         }
     }
 
+    public void setFont(int resId) {
+        String name = getResources().getString(resId);
+        setFont(name);
+    }
+
     public void setFont(final String fontName) {
         if (getContext() != null && getContext().getAssets() != null && fontName != null) {
             Typeface typeface = TypefaceManager.getTypeface(getContext().getAssets(), fontName);

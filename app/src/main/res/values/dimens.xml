@@ -12,5 +12,10 @@
     <dimen name="card_detail_text_view_margin">4dp</dimen>
     <dimen name="card_text_view_margin">8dp</dimen>
 
+    <dimen name="value_entry_view_text_view_padding">12dp</dimen>
+    <dimen name="value_entry_view_edit_text_padding">12dp</dimen>
+    <dimen name="value_entry_view_button_padding">12dp</dimen>
+    <dimen name="value_entry_view_button_margin">8dp</dimen>
+
     <integer name="column_nums">1</integer>
 </resources>

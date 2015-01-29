@@ -78,4 +78,7 @@
     <string name="gender_other">Other</string>
 
     <string name="find_option">Find option</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 </resources>

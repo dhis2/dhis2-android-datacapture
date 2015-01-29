@@ -16,6 +16,7 @@ public class CheckBoxRow implements Row {
     private static final String EMPTY_FIELD = "";
 
     private Field mField;
+    private OnFieldValueSetListener mListener;
 
     public CheckBoxRow(Field field) {
         mField = field;
@@ -43,6 +44,11 @@ public class CheckBoxRow implements Row {
 
         holder.updateViews(mField);
         return view;
+    }
+
+    @Override
+    public void setListener(OnFieldValueSetListener listener) {
+        mListener = listener;
     }
 
     @Override
@@ -83,9 +89,9 @@ public class CheckBoxRow implements Row {
             textLabel.setText(field.getLabel());
             listener.setField(field);
 
-            if (field.getValue().equals(TRUE)) {
+            if (TRUE.equals(field.getValue())) {
                 checkBox.setChecked(true);
-            } else if (field.getValue().equals(EMPTY_FIELD)) {
+            } else if (EMPTY_FIELD.equals(field.getValue())) {
                 checkBox.setChecked(false);
             }
         }

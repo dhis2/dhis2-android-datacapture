@@ -23,7 +23,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.95"
-                android:background="@drawable/editbox_selector"
+                android:background="@drawable/editbox_background_normal"
                 android:completionThreshold="1"
                 android:hint="@string/find_option"
                 android:imeOptions="actionNext|flagNoExtractUi"

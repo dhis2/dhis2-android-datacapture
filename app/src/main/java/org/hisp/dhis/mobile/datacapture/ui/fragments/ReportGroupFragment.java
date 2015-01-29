@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.google.gson.Gson;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.events.FieldValueChangeEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportFieldHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
@@ -30,10 +31,12 @@ import org.hisp.dhis.mobile.datacapture.ui.adapters.FieldAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.AutoCompleteRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.CheckBoxRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.DatePickerRow;
-import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.EditTextRow;
+import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.ValueEntryViewRow;
+import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.OnFieldValueSetListener;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.RadioButtonsRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.Row;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.RowTypes;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +79,8 @@ public class ReportGroupFragment extends Fragment
     @Override
     public Loader<CursorHolder<FieldsHolder>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            int groupdId = args.getInt(ReportGroupColumns.DB_ID);
-            final String SELECTION = ReportFieldColumns.GROUP_DB_ID + " = " + "'" + groupdId + "'";
+            int groupId = args.getInt(ReportGroupColumns.DB_ID);
+            final String SELECTION = ReportFieldColumns.GROUP_DB_ID + " = " + "'" + groupId + "'";
             return new FieldsLoader(getActivity(), ReportFieldColumns.CONTENT_URI,
                     ReportFieldHandler.PROJECTION, SELECTION, null, null);
         } else {
@@ -120,34 +123,41 @@ public class ReportGroupFragment extends Fragment
                 } while(cursor.moveToNext());
             }
 
+            OnFieldValueChangedListener listener = new OnFieldValueChangedListener();
             for (DBItemHolder<Field> dbItem: fields) {
                 Field field = dbItem.getItem();
 
-                if (RowTypes.TEXT.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.TEXT));
-                } else if (RowTypes.LONG_TEXT.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.LONG_TEXT));
-                } else if (RowTypes.NUMBER.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.NUMBER));
-                } else if (RowTypes.INTEGER.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.INTEGER));
-                } else if (RowTypes.INTEGER_NEGATIVE.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.INTEGER_NEGATIVE));
-                } else if (RowTypes.INTEGER_ZERO_OR_POSITIVE.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.INTEGER_ZERO_OR_POSITIVE));
-                } else if (RowTypes.INTEGER_POSITIVE.name().equals(field.getType())) {
-                    rows.add(new EditTextRow(field, RowTypes.INTEGER_POSITIVE));
-                } else if (RowTypes.BOOLEAN.name().equals(field.getType())) {
-                    rows.add(new RadioButtonsRow(field, RowTypes.BOOLEAN));
-                } else if (RowTypes.GENDER.name().equals(field.getType())) {
-                    rows.add(new RadioButtonsRow(field, RowTypes.GENDER));
-                } else if (RowTypes.TRUE_ONLY.name().equals(field.getType())) {
-                    rows.add(new CheckBoxRow(field));
-                } else if (RowTypes.AUTO_COMPLETE.name().equals(field.getType())) {
+                Row row = null;
+                if (field.getOptionSet() != null) {
                     OptionSet optionSet = readOptionSet(field.getOptionSet());
-                    rows.add(new AutoCompleteRow(field, optionSet));
+                    row = new AutoCompleteRow(field, optionSet);
+                } else if (RowTypes.TEXT.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.TEXT);
+                } else if (RowTypes.LONG_TEXT.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.LONG_TEXT);
+                } else if (RowTypes.NUMBER.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.NUMBER);
+                } else if (RowTypes.INTEGER.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.INTEGER);
+                } else if (RowTypes.INTEGER_NEGATIVE.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.INTEGER_NEGATIVE);
+                } else if (RowTypes.INTEGER_ZERO_OR_POSITIVE.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.INTEGER_ZERO_OR_POSITIVE);
+                } else if (RowTypes.INTEGER_POSITIVE.name().equals(field.getType())) {
+                    row = new ValueEntryViewRow(dbItem, RowTypes.INTEGER_POSITIVE);
+                } else if (RowTypes.BOOLEAN.name().equals(field.getType())) {
+                    row = new RadioButtonsRow(field, RowTypes.BOOLEAN);
+                } else if (RowTypes.GENDER.name().equals(field.getType())) {
+                    row = new RadioButtonsRow(field, RowTypes.GENDER);
+                } else if (RowTypes.TRUE_ONLY.name().equals(field.getType())) {
+                    row = new CheckBoxRow(field);
                 } else if (RowTypes.DATE.name().equals(field.getType())) {
-                    rows.add(new DatePickerRow(field));
+                    row = new DatePickerRow(field);
+                }
+
+                if (row != null) {
+                    row.setListener(listener);
+                    rows.add(row);
                 }
             }
 
@@ -175,6 +185,17 @@ public class ReportGroupFragment extends Fragment
             }
 
             return null;
+        }
+    }
+
+    static class OnFieldValueChangedListener implements OnFieldValueSetListener {
+
+        @Override
+        public void onFieldValueSet(int fieldId, String value) {
+            FieldValueChangeEvent event = new FieldValueChangeEvent();
+            event.setFieldId(fieldId);
+            event.setValue(value);
+            BusProvider.getInstance().post(event);
         }
     }
 

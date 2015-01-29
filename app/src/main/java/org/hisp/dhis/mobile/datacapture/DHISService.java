@@ -16,6 +16,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEv
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.FieldValueChangeEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
@@ -28,6 +29,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDele
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardUpdateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DatasetSyncProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.FieldChangeValueProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.GetReportTableProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyncProcessor;
@@ -126,6 +128,11 @@ public class DHISService extends Service {
     @Subscribe
     public void onCreateReportEvent(CreateReportEvent event) {
         executeTask(new CreateReportProcessor(getBaseContext(), event));
+    }
+
+    @Subscribe
+    public void onFieldValueChangeEvent(FieldValueChangeEvent event) {
+        executeTask(new FieldChangeValueProcessor(getBaseContext(), event));
     }
 
     private <T> void executeTask(AsyncTask<Void, Void, T> task) {

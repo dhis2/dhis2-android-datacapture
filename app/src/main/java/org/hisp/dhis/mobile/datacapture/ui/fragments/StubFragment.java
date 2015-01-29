@@ -20,8 +20,8 @@ public class StubFragment extends Fragment {
             number = getArguments().getInt(NUMBER_EXTRA);
         }
         View view = inflater.inflate(R.layout.fragment_stub, group, false);
-        TextView stubTextView = (TextView) view.findViewById(R.id.stub_text_view);
-        stubTextView.setText("StubFragment: " + number);
+        //TextView stubTextView = (TextView) view.findViewById(R.id.stub_text_view);
+        //stubTextView.setText("StubFragment: " + number);
 
         return view;
     }

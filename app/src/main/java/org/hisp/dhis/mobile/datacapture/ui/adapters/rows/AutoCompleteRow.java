@@ -25,6 +25,7 @@ public class AutoCompleteRow implements Row {
     private Field mField;
     private List<String> mOptions;
     private ArrayAdapter<String> mAdapter;
+    private OnFieldValueSetListener mListener;
 
     public AutoCompleteRow(Field field, OptionSet optionset) {
         mField = field;
@@ -74,6 +75,11 @@ public class AutoCompleteRow implements Row {
 
         holder.updateViews(mField);
         return view;
+    }
+
+    @Override
+    public void setListener(OnFieldValueSetListener listener) {
+        mListener = listener;
     }
 
     @Override
