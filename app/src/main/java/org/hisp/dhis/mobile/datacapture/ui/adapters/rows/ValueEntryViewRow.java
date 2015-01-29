@@ -124,6 +124,30 @@ public class ValueEntryViewRow implements Row {
         }
     }
 
+    private static class ValueSetListener implements OnValueSetListener {
+        private DBItemHolder<Field> field;
+        private OnFieldValueSetListener listener;
+
+        public void setField(DBItemHolder<Field> field) {
+            this.field = field;
+        }
+
+        public void setListener(OnFieldValueSetListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onValueSet(String newValue) {
+            String value = field.getItem().getValue();
+            if (newValue != null && !newValue.equals(value)) {
+                field.getItem().setValue(newValue);
+                if (listener != null) {
+                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                }
+            }
+        }
+    }
+
     private static class NegInpFilter implements InputFilter {
 
         @Override
@@ -168,27 +192,6 @@ public class ValueEntryViewRow implements Row {
             }
 
             return str;
-        }
-    }
-
-    private static class ValueSetListener implements OnValueSetListener {
-        private DBItemHolder<Field> field;
-        private OnFieldValueSetListener listener;
-
-        public void setField(DBItemHolder<Field> field) {
-            this.field = field;
-        }
-
-        public void setListener(OnFieldValueSetListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void onValueSet(String value) {
-            field.getItem().setValue(value);
-            if (listener != null) {
-                listener.onFieldValueSet(field.getDatabaseId(), value);
-            }
         }
     }
 }

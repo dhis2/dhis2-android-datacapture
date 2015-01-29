@@ -9,16 +9,17 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 
 public class CheckBoxRow implements Row {
     private static final String TRUE = "true";
     private static final String EMPTY_FIELD = "";
 
-    private Field mField;
+    private DBItemHolder<Field> mField;
     private OnFieldValueSetListener mListener;
 
-    public CheckBoxRow(Field field) {
+    public CheckBoxRow(DBItemHolder<Field> field) {
         mField = field;
     }
 
@@ -31,8 +32,8 @@ public class CheckBoxRow implements Row {
             View root = inflater.inflate(R.layout.listview_row_checkbox, container, false);
             TextView textLabel = (TextView) root.findViewById(R.id.text_label);
             CheckBox checkBox = (CheckBox) root.findViewById(R.id.checkbox);
-            CheckBoxListener listener = new CheckBoxListener();
 
+            CheckBoxListener listener = new CheckBoxListener();
             holder = new CheckBoxHolder(textLabel, checkBox, listener);
 
             root.setTag(holder);
@@ -42,7 +43,7 @@ public class CheckBoxRow implements Row {
             holder = (CheckBoxHolder) view.getTag();
         }
 
-        holder.updateViews(mField);
+        holder.updateViews(mField, mListener);
         return view;
     }
 
@@ -57,21 +58,35 @@ public class CheckBoxRow implements Row {
     }
 
     private static class CheckBoxListener implements OnCheckedChangeListener {
-        private Field field;
+        private DBItemHolder<Field> field;
+        private OnFieldValueSetListener listener;
 
-        public void setField(Field field) {
+        public void setListener(OnFieldValueSetListener listener) {
+            this.listener = listener;
+        }
+
+        public void setField(DBItemHolder<Field> field) {
             this.field = field;
         }
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (isChecked) {
-                field.setValue(TRUE);
+                setValue(TRUE);
             } else {
-                field.setValue(EMPTY_FIELD);
+                setValue(EMPTY_FIELD);
             }
         }
 
+        private void setValue(String newValue) {
+            String currentValue = field.getItem().getValue();
+            if (newValue != null && !newValue.equals(currentValue)) {
+                field.getItem().setValue(newValue);
+                if (listener != null) {
+                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                }
+            }
+        }
     }
 
     private static class CheckBoxHolder {
@@ -79,19 +94,25 @@ public class CheckBoxRow implements Row {
         final CheckBox checkBox;
         final CheckBoxListener listener;
 
-        public CheckBoxHolder(TextView textLabel, CheckBox checkBox, CheckBoxListener listener) {
+        public CheckBoxHolder(TextView textLabel, CheckBox checkBox,
+                              CheckBoxListener listener) {
             this.textLabel = textLabel;
             this.checkBox = checkBox;
             this.listener = listener;
         }
 
-        public void updateViews(Field field) {
-            textLabel.setText(field.getLabel());
+        public void updateViews(DBItemHolder<Field> field,
+                                OnFieldValueSetListener onValueSetListener) {
             listener.setField(field);
+            listener.setListener(onValueSetListener);
 
-            if (TRUE.equals(field.getValue())) {
+            textLabel.setText(field.getItem().getLabel());
+            checkBox.setOnCheckedChangeListener(listener);
+
+            String value = field.getItem().getValue();
+            if (TRUE.equals(value)) {
                 checkBox.setChecked(true);
-            } else if (EMPTY_FIELD.equals(field.getValue())) {
+            } else if (EMPTY_FIELD.equals(value)) {
                 checkBox.setChecked(false);
             }
         }

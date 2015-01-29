@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -24,25 +25,25 @@ import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.FieldAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.AutoCompleteRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.CheckBoxRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.DatePickerRow;
-import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.ValueEntryViewRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.OnFieldValueSetListener;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.RadioButtonsRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.Row;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.RowTypes;
+import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.ValueEntryViewRow;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReportGroupFragment extends Fragment
-        implements LoaderCallbacks<CursorHolder<ReportGroupFragment.FieldsHolder>> {
+        implements LoaderCallbacks<CursorHolder<List<Row>>> {
     private static final int LOADER_ID = 438915134;
     private ListView mListView;
     private FieldAdapter mAdapter;
@@ -77,7 +78,7 @@ public class ReportGroupFragment extends Fragment
     }
 
     @Override
-    public Loader<CursorHolder<FieldsHolder>> onCreateLoader(int id, Bundle args) {
+    public Loader<CursorHolder<List<Row>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             int groupId = args.getInt(ReportGroupColumns.DB_ID);
             final String SELECTION = ReportFieldColumns.GROUP_DB_ID + " = " + "'" + groupId + "'";
@@ -89,21 +90,20 @@ public class ReportGroupFragment extends Fragment
     }
 
     @Override
-    public void onLoadFinished(Loader<CursorHolder<FieldsHolder>> loader,
-                               CursorHolder<FieldsHolder> data) {
+    public void onLoadFinished(Loader<CursorHolder<List<Row>>> loader,
+                               CursorHolder<List<Row>> data) {
         if (loader != null && loader.getId() == LOADER_ID &&
                 data != null && data.getData() != null) {
-            List<DBItemHolder<Field>> fields = data.getData().fields;
-            List<Row> rows = data.getData().rows;
+            List<Row> rows = data.getData();
             mAdapter.swapData(rows);
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<CursorHolder<FieldsHolder>> loader) { }
+    public void onLoaderReset(Loader<CursorHolder<List<Row>>> loader) {}
 
-    static class FieldsLoader extends AbsCursorLoader<FieldsHolder> {
+    static class FieldsLoader extends AbsCursorLoader<List<Row>> {
 
         public FieldsLoader(Context context, Uri uri, String[] projection,
                             String selection, String[] selectionArgs, String sortOrder) {
@@ -111,7 +111,7 @@ public class ReportGroupFragment extends Fragment
         }
 
         @Override
-        protected FieldsHolder readDataFromCursor(Cursor cursor) {
+        protected List<Row> readDataFromCursor(Cursor cursor) {
             List<DBItemHolder<Field>> fields = new ArrayList<>();
             List<Row> rows = new ArrayList<>();
 
@@ -120,11 +120,11 @@ public class ReportGroupFragment extends Fragment
 
                 do {
                     fields.add(ReportFieldHandler.fromCursor(cursor));
-                } while(cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
 
-            OnFieldValueChangedListener listener = new OnFieldValueChangedListener();
-            for (DBItemHolder<Field> dbItem: fields) {
+            OnFieldValueChangedListener listener = new OnFieldValueChangedListener(getContext());
+            for (DBItemHolder<Field> dbItem : fields) {
                 Field field = dbItem.getItem();
 
                 Row row = null;
@@ -146,11 +146,11 @@ public class ReportGroupFragment extends Fragment
                 } else if (RowTypes.INTEGER_POSITIVE.name().equals(field.getType())) {
                     row = new ValueEntryViewRow(dbItem, RowTypes.INTEGER_POSITIVE);
                 } else if (RowTypes.BOOLEAN.name().equals(field.getType())) {
-                    row = new RadioButtonsRow(field, RowTypes.BOOLEAN);
+                    row = new RadioButtonsRow(dbItem, RowTypes.BOOLEAN);
                 } else if (RowTypes.GENDER.name().equals(field.getType())) {
-                    row = new RadioButtonsRow(field, RowTypes.GENDER);
+                    row = new RadioButtonsRow(dbItem, RowTypes.GENDER);
                 } else if (RowTypes.TRUE_ONLY.name().equals(field.getType())) {
-                    row = new CheckBoxRow(field);
+                    row = new CheckBoxRow(dbItem);
                 } else if (RowTypes.DATE.name().equals(field.getType())) {
                     row = new DatePickerRow(field);
                 }
@@ -161,7 +161,7 @@ public class ReportGroupFragment extends Fragment
                 }
             }
 
-            return new FieldsHolder(fields, rows);
+            return rows;
         }
 
         private OptionSet readOptionSet(String optionSetId) {
@@ -189,6 +189,11 @@ public class ReportGroupFragment extends Fragment
     }
 
     static class OnFieldValueChangedListener implements OnFieldValueSetListener {
+        private Context context;
+
+        public OnFieldValueChangedListener(Context context) {
+            this.context = context;
+        }
 
         @Override
         public void onFieldValueSet(int fieldId, String value) {
@@ -196,16 +201,7 @@ public class ReportGroupFragment extends Fragment
             event.setFieldId(fieldId);
             event.setValue(value);
             BusProvider.getInstance().post(event);
-        }
-    }
-
-    static class FieldsHolder {
-        public final List<DBItemHolder<Field>> fields;
-        public final List<Row> rows;
-
-        FieldsHolder(List<DBItemHolder<Field>> fields, List<Row> rows) {
-            this.fields = fields;
-            this.rows = rows;
+            Toast.makeText(context, "posting event", Toast.LENGTH_SHORT).show();
         }
     }
 }
