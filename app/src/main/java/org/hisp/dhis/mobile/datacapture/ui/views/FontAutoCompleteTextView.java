@@ -34,6 +34,11 @@ public class FontAutoCompleteTextView extends AutoCompleteTextView {
         }
     }
 
+    public void setFont(int restId) {
+        String name = getResources().getString(restId);
+        setFont(name);
+    }
+
     private void setFont(final String fontName) {
         if (getContext() != null && getContext().getAssets() != null && fontName != null) {
             Typeface typeface = TypefaceManager.getTypeface(getContext().getAssets(), fontName);

@@ -5,11 +5,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <org.hisp.dhis.mobile.datacapture.ui.views.ValueEntryView
+    <org.hisp.dhis.mobile.datacapture.ui.views.AutoCompleteValueEntryView
         android:id="@+id/stub_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="center"
         android:layout_marginTop="160dp"
         android:textSize="17sp"
         app:font="@string/bold_font_name" />
