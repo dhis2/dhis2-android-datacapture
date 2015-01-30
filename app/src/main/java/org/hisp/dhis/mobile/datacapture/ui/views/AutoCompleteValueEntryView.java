@@ -67,6 +67,7 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
         // init auto complete with drop down button
         mAutoCompleteContainer = initAutoCompleteContainer();
         mAutoComplete = initAutoComplete();
+
         mShowDropDown = initDropDownButton();
         mAutoCompleteContainer.addView(mAutoComplete);
         mAutoCompleteContainer.addView(mShowDropDown);
@@ -117,6 +118,7 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
         textView.setLayoutParams(params);
         textView.setClickable(true);
         textView.setOnClickListener(this);
+        textView.setHint(R.string.find_option);
         textView.setBackgroundResource(R.drawable.textfield_disabled_holo_light);
         textView.setPadding(padding, padding, padding, padding);
 
@@ -154,6 +156,7 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
         autoComplete.setBackgroundResource(R.drawable.editbox_background_normal);
         autoComplete.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         autoComplete.setPadding(padding, padding, padding, padding);
+        autoComplete.setHint(R.string.find_option);
         autoComplete.setSingleLine(true);
         autoComplete.setThreshold(1);
         autoComplete.setTextColor(black);
@@ -235,7 +238,8 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
 
     private void showEntryView() {
         mTextView.setVisibility(View.GONE);
-        mAutoComplete.setVisibility(View.VISIBLE);
+        mAutoCompleteContainer.setVisibility(View.VISIBLE);
+        //mAutoComplete.setVisibility(View.VISIBLE);
         mAutoComplete.requestFocus();
         mAutoComplete.setHint(mTextView.getHint());
         mAutoComplete.setText(mTextView.getText());
@@ -244,8 +248,9 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
 
     private void hideEntryView(boolean saveValue) {
         mTextView.setVisibility(View.VISIBLE);
-        mAutoComplete.setVisibility(View.GONE);
+        //mAutoComplete.setVisibility(View.GONE);
         mAutoComplete.clearFocus();
+        mAutoCompleteContainer.setVisibility(View.GONE);
         if (saveValue) {
             String value = mAutoComplete.getText().toString();
             mTextView.setText(value);
