@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -19,10 +20,10 @@ import org.joda.time.LocalDate;
 public class DatePickerRow implements Row {
     private static final String EMPTY_FIELD = "";
 
-    private Field mField;
+    private DBItemHolder<Field> mField;
     private OnFieldValueSetListener mListener;
 
-    public DatePickerRow(Field field) {
+    public DatePickerRow(DBItemHolder<Field> field) {
         mField = field;
     }
 
@@ -56,7 +57,7 @@ public class DatePickerRow implements Row {
             holder = (DatePickerRowHolder) view.getTag();
         }
 
-        holder.updateViews(mField);
+        holder.updateViews(mField, mListener);
         return view;
     }
 
@@ -68,6 +69,47 @@ public class DatePickerRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.DATE.ordinal();
+    }
+
+    private class DatePickerRowHolder {
+        final TextView textLabel;
+        final EditText editText;
+        final ImageButton clearButton;
+
+        final DateSetListener dateSetListener;
+        final OnEditTextClickListener invokerListener;
+        final ClearButtonListener clearButtonListener;
+
+        public DatePickerRowHolder(TextView textLabel, EditText editText,
+                                   ImageButton clearButton, ClearButtonListener clearButtonListener,
+                                   DateSetListener dateSetListener, OnEditTextClickListener invokerListener) {
+            this.textLabel = textLabel;
+            this.editText = editText;
+            this.clearButton = clearButton;
+
+            this.dateSetListener = dateSetListener;
+            this.invokerListener = invokerListener;
+            this.clearButtonListener = clearButtonListener;
+        }
+
+        public void updateViews(DBItemHolder<Field> field, OnFieldValueSetListener listener) {
+            textLabel.setText(field.getItem().getLabel());
+
+            dateSetListener.setField(field);
+            dateSetListener.setEditText(editText);
+            dateSetListener.setListener(listener);
+
+            invokerListener.setListener(dateSetListener);
+
+            editText.setText(field.getItem().getValue());
+            editText.setOnClickListener(invokerListener);
+
+            clearButtonListener.setEditText(editText);
+            clearButtonListener.setField(field);
+            clearButtonListener.setListener(listener);
+
+            clearButton.setOnClickListener(clearButtonListener);
+        }
     }
 
     private static class OnEditTextClickListener implements OnClickListener {
@@ -99,81 +141,65 @@ public class DatePickerRow implements Row {
 
     private static class ClearButtonListener implements OnClickListener {
         private EditText editText;
-        private Field field;
+        private DBItemHolder<Field> field;
+        private OnFieldValueSetListener listener;
 
         public void setEditText(EditText editText) {
             this.editText = editText;
         }
 
-        public void setField(Field field) {
+        public void setField(DBItemHolder<Field> field) {
             this.field = field;
+        }
+
+        public void setListener(OnFieldValueSetListener listener) {
+            this.listener = listener;
         }
 
         @Override
         public void onClick(View view) {
             editText.setText(EMPTY_FIELD);
-            field.setValue(EMPTY_FIELD);
-        }
-    }
-
-    private class DatePickerRowHolder {
-        final TextView textLabel;
-        final EditText editText;
-        final ImageButton clearButton;
-
-        final DateSetListener dateSetListener;
-        final OnEditTextClickListener invokerListener;
-        final ClearButtonListener clearButtonListener;
-
-        public DatePickerRowHolder(TextView textLabel, EditText editText,
-                                   ImageButton clearButton, ClearButtonListener clearButtonListener,
-                                   DateSetListener dateSetListener, OnEditTextClickListener invokerListener) {
-            this.textLabel = textLabel;
-            this.editText = editText;
-            this.clearButton = clearButton;
-
-            this.dateSetListener = dateSetListener;
-            this.invokerListener = invokerListener;
-            this.clearButtonListener = clearButtonListener;
-        }
-
-        public void updateViews(Field field) {
-            textLabel.setText(field.getLabel());
-
-            dateSetListener.setField(field);
-            dateSetListener.setEditText(editText);
-
-            invokerListener.setListener(dateSetListener);
-
-            editText.setText(field.getValue());
-            editText.setOnClickListener(invokerListener);
-
-            clearButtonListener.setEditText(editText);
-            clearButtonListener.setField(field);
-            clearButton.setOnClickListener(clearButtonListener);
+            setValue(field, EMPTY_FIELD, listener);
         }
     }
 
     private class DateSetListener implements DatePickerDialog.OnDateSetListener {
         private static final String DATE_FORMAT = "YYYY-MM-dd";
-        private Field field;
+        private DBItemHolder<Field> field;
         private EditText editText;
+        private OnFieldValueSetListener listener;
 
-        public void setField(Field field) {
+        public void setField(DBItemHolder<Field> field) {
             this.field = field;
         }
 
         public void setEditText(EditText editText) {
             this.editText = editText;
+        }
+
+        public void setListener(OnFieldValueSetListener listener) {
+            this.listener = listener;
         }
 
         @Override
         public void onDateSet(DatePicker view, int year,
                               int monthOfYear, int dayOfMonth) {
             LocalDate date = new LocalDate(year, monthOfYear + 1, dayOfMonth);
-            String dateString = date.toString(DATE_FORMAT);
-            field.setValue(dateString);
-            editText.setText(dateString);
+            String newValue = date.toString(DATE_FORMAT);
+            editText.setText(newValue);
+            setValue(field, newValue, listener);
+        }
+    }
+
+    private static void setValue(DBItemHolder<Field> field,
+                                 String newValue,
+                                 OnFieldValueSetListener listener) {
+        String currentValue = field.getItem().getValue();
+        if (newValue != null && !newValue.equals(currentValue)) {
+            field.getItem().setValue(newValue);
+            if (listener != null) {
+                listener.onFieldValueSet(field.getDatabaseId(), newValue);
+            }
         }
     }
 }

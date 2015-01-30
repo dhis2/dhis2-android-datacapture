@@ -152,7 +152,7 @@ public class ReportGroupFragment extends Fragment
                 } else if (RowTypes.TRUE_ONLY.name().equals(field.getType())) {
                     row = new CheckBoxRow(dbItem);
                 } else if (RowTypes.DATE.name().equals(field.getType())) {
-                    row = new DatePickerRow(field);
+                    row = new DatePickerRow(dbItem);
                 }
 
                 if (row != null) {
