@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -45,14 +46,16 @@ import java.util.List;
 public class ReportGroupFragment extends Fragment
         implements LoaderCallbacks<CursorHolder<List<Row>>> {
     private static final int LOADER_ID = 438915134;
+    private TextView mTextView;
     private ListView mListView;
     private FieldAdapter mAdapter;
 
-    public static ReportGroupFragment newInstance(int groupId) {
+    public static ReportGroupFragment newInstance(int groupId, String label) {
         ReportGroupFragment fragment = new ReportGroupFragment();
         Bundle args = new Bundle();
 
         args.putInt(ReportGroupColumns.DB_ID, groupId);
+        args.putString(ReportGroupColumns.LABEL, label);
         fragment.setArguments(args);
 
         return fragment;
@@ -61,12 +64,17 @@ public class ReportGroupFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_group_report, container, false);
+        mTextView = (TextView) root.findViewById(R.id.report_group_label);
         mListView = (ListView) root.findViewById(R.id.list);
         return root;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (getArguments() != null) {
+            String label = getArguments().getString(ReportGroupColumns.LABEL);
+            mTextView.setText(label);
+        }
         mAdapter = new FieldAdapter(getActivity());
         mListView.setAdapter(mAdapter);
     }
@@ -130,7 +138,7 @@ public class ReportGroupFragment extends Fragment
                 Row row = null;
                 if (field.getOptionSet() != null) {
                     OptionSet optionSet = readOptionSet(field.getOptionSet());
-                    row = new AutoCompleteRow(field, optionSet);
+                    row = new AutoCompleteRow(dbItem, optionSet);
                 } else if (RowTypes.TEXT.name().equals(field.getType())) {
                     row = new ValueEntryViewRow(dbItem, RowTypes.TEXT);
                 } else if (RowTypes.LONG_TEXT.name().equals(field.getType())) {

@@ -16,18 +16,22 @@ import android.widget.LinearLayout;
 
 import org.hisp.dhis.mobile.datacapture.R;
 
+import java.util.List;
+
 public class AutoCompleteValueEntryView extends LinearLayout implements View.OnClickListener {
+    private static final String EMPTY_FIELD = "";
     private static final int NORMAL_TEXT_SIZE = 16;
     private static final int SMALL_TEXT_SIZE = 11;
 
     private static final float AUTO_COMPLETE_CONTAINER_WEIGHT_SUM = 1f;
-    private static final float AUTO_COMPLETE_WEIGHT = 0.95f;
-    private static final float DROP_DOWN_BUTTON_WEIGHT = 0.05f;
+    private static final float AUTO_COMPLETE_WEIGHT = 0.9f;
+    private static final float DROP_DOWN_BUTTON_WEIGHT = 0.1f;
 
     private FrameLayout mTextContainer;
     private FontTextView mTextView;
 
     private LinearLayout mAutoCompleteContainer;
+    private AutoCompleteAdapter mAdapter;
     private FontAutoCompleteTextView mAutoComplete;
     private ImageButton mShowDropDown;
 
@@ -36,6 +40,8 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
     private FontTextView mSaveButton;
 
     private OnValueSetListener mListener;
+
+    private List<String> mOptions;
 
     public AutoCompleteValueEntryView(Context context) {
         super(context);
@@ -66,7 +72,9 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
 
         // init auto complete with drop down button
         mAutoCompleteContainer = initAutoCompleteContainer();
+        mAdapter = new AutoCompleteAdapter(getContext());
         mAutoComplete = initAutoComplete();
+        mAutoComplete.setAdapter(mAdapter);
 
         mShowDropDown = initDropDownButton();
         mAutoCompleteContainer.addView(mAutoComplete);
@@ -175,6 +183,7 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
         button.setImageResource(R.drawable.ic_drop_down);
         button.setBackgroundResource(R.drawable.transparent_selector);
         button.setOnClickListener(this);
+        button.setPadding(40, 20, 40, 20);
 
         return button;
     }
@@ -239,7 +248,6 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
     private void showEntryView() {
         mTextView.setVisibility(View.GONE);
         mAutoCompleteContainer.setVisibility(View.VISIBLE);
-        //mAutoComplete.setVisibility(View.VISIBLE);
         mAutoComplete.requestFocus();
         mAutoComplete.setHint(mTextView.getHint());
         mAutoComplete.setText(mTextView.getText());
@@ -247,17 +255,28 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
     }
 
     private void hideEntryView(boolean saveValue) {
-        mTextView.setVisibility(View.VISIBLE);
-        //mAutoComplete.setVisibility(View.GONE);
-        mAutoComplete.clearFocus();
-        mAutoCompleteContainer.setVisibility(View.GONE);
         if (saveValue) {
             String value = mAutoComplete.getText().toString();
-            mTextView.setText(value);
-            if (mListener != null) {
-                mListener.onValueSet(value);
+            if (mOptions != null) {
+                if (EMPTY_FIELD.equals(value) || mOptions.contains(value)) {
+                    mTextView.setText(value);
+                    if (mListener != null) {
+                        mListener.onValueSet(value);
+                    }
+                    hideEntryView();
+                } else {
+                    mAutoComplete.setError("Incorrect value");
+                }
             }
+        } else {
+            hideEntryView();
         }
+    }
+
+    private void hideEntryView() {
+        mTextView.setVisibility(View.VISIBLE);
+        mAutoComplete.clearFocus();
+        mAutoCompleteContainer.setVisibility(View.GONE);
         mButtonsContainer.setVisibility(View.GONE);
     }
 
@@ -277,8 +296,9 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
         mTextView.setText(resId);
     }
 
-    public void setAdapter(ArrayAdapter<String> adapter) {
-        mAutoComplete.setAdapter(adapter);
+    public void swapData(List<String> options) {
+        mOptions = options;
+        mAdapter.swapData(options);
     }
 
     public static interface OnValueSetListener {

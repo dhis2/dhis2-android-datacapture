@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -13,37 +12,10 @@
 
         <include layout="@layout/listview_row_text_view_label" />
 
-        <LinearLayout
+        <org.hisp.dhis.mobile.datacapture.ui.views.AutoCompleteValueEntryView
+            android:id="@+id/find_option"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <org.hisp.dhis.mobile.datacapture.ui.views.FontAutoCompleteTextView
-                android:id="@+id/find_option"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.95"
-                android:background="@drawable/editbox_background_normal"
-                android:completionThreshold="1"
-                android:hint="@string/find_option"
-                android:imeOptions="actionNext|flagNoExtractUi"
-                android:paddingBottom="11dp"
-                android:paddingTop="11dp"
-                android:singleLine="true"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                app:font="@string/regular_font_name" />
-
-            <ImageButton
-                android:id="@+id/show_drop_down_list"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0.05"
-                android:background="@drawable/transparent_selector"
-                android:contentDescription="@string/graphical_resource"
-                android:src="@drawable/ic_drop_down" />
-        </LinearLayout>
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

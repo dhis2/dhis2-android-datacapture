@@ -21,8 +21,9 @@ public class ReportGroupAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (mGroups != null && mGroups.size() > 0) {
-            int groupdId = mGroups.get(position).getDatabaseId();
-            return ReportGroupFragment.newInstance(groupdId);
+            int groupId = mGroups.get(position).getDatabaseId();
+            String label = mGroups.get(position).getItem().getLabel();
+            return ReportGroupFragment.newInstance(groupId, label);
         } else {
             return null;
         }
@@ -44,6 +45,11 @@ public class ReportGroupAdapter extends FragmentPagerAdapter {
         } else {
             return EMPTY_TITLE;
         }
+    }
+
+    @Override
+    public float getPageWidth(int position) {
+        return 0.33f;
     }
 
     public void swapData(List<DBItemHolder<Group>> groups) {

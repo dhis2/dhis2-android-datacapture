@@ -1,33 +1,26 @@
 package org.hisp.dhis.mobile.datacapture.ui.adapters.rows;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.Option;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
+import org.hisp.dhis.mobile.datacapture.ui.views.AutoCompleteValueEntryView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AutoCompleteRow implements Row {
-    private static final String EMPTY_FIELD = "";
-    private Field mField;
+    private DBItemHolder<Field> mField;
     private List<String> mOptions;
-    private ArrayAdapter<String> mAdapter;
     private OnFieldValueSetListener mListener;
 
-    public AutoCompleteRow(Field field, OptionSet optionset) {
+    public AutoCompleteRow(DBItemHolder<Field> field, OptionSet optionset) {
         mField = field;
         mOptions = new ArrayList<>();
         if (optionset != null && optionset.getOptions() != null &&
@@ -43,28 +36,16 @@ public class AutoCompleteRow implements Row {
         View view;
         AutoCompleteRowHolder holder;
 
-        if (mAdapter == null) {
-            mAdapter = new ArrayAdapter<>(inflater.getContext(),
-                    android.R.layout.simple_spinner_dropdown_item, mOptions);
-        }
-
         if (convertView == null) {
             View root = inflater.inflate(
                     R.layout.listview_row_autocomplete, container, false);
-
             TextView textLabel = (TextView)
                     root.findViewById(R.id.text_label);
-            AutoCompleteTextView autoComplete = (AutoCompleteTextView)
+            AutoCompleteValueEntryView autoComplete = (AutoCompleteValueEntryView)
                     root.findViewById(R.id.find_option);
-            ImageButton showOptions = (ImageButton)
-                    root.findViewById(R.id.show_drop_down_list);
 
-            OnFocusListener onFocusChangeListener = new OnFocusListener();
-            EditTextWatcher textWatcher = new EditTextWatcher();
-            DropDownButtonListener listener = new DropDownButtonListener();
-
-            holder = new AutoCompleteRowHolder(textLabel, autoComplete, showOptions,
-                    listener, onFocusChangeListener, textWatcher);
+            ValueSetListener listener = new ValueSetListener();
+            holder = new AutoCompleteRowHolder(textLabel, autoComplete, listener);
 
             root.setTag(holder);
             view = root;
@@ -73,7 +54,7 @@ public class AutoCompleteRow implements Row {
             holder = (AutoCompleteRowHolder) view.getTag();
         }
 
-        holder.updateViews(mField);
+        holder.updateViews(mField, mListener);
         return view;
     }
 
@@ -87,62 +68,25 @@ public class AutoCompleteRow implements Row {
         return RowTypes.AUTO_COMPLETE.ordinal();
     }
 
-    private static class EditTextWatcher implements TextWatcher {
-        private Field field;
+    private static class ValueSetListener implements AutoCompleteValueEntryView.OnValueSetListener {
+        private OnFieldValueSetListener listener;
+        private DBItemHolder<Field> field;
 
-        public void setField(Field field) {
+        public void setField(DBItemHolder<Field> field) {
             this.field = field;
         }
 
-        @Override
-        public void afterTextChanged(Editable arg) {
-            field.setValue(arg.toString());
+        public void setListener(OnFieldValueSetListener listener) {
+            this.listener = listener;
         }
 
         @Override
-        public void beforeTextChanged(CharSequence s, int start,
-                                      int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start,
-                                  int before, int count) {
-        }
-
-    }
-
-    private static class DropDownButtonListener implements OnClickListener {
-        private AutoCompleteTextView autoComplete;
-
-        public void setAutoComplete(AutoCompleteTextView autoComplete) {
-            this.autoComplete = autoComplete;
-        }
-
-        @Override
-        public void onClick(View v) {
-            autoComplete.showDropDown();
-        }
-
-    }
-
-    private static class OnFocusListener implements OnFocusChangeListener {
-        private AutoCompleteTextView autoComplete;
-        private List<String> options;
-
-        public void setAutoComplete(AutoCompleteTextView autoComplete) {
-            this.autoComplete = autoComplete;
-        }
-
-        public void setOptions(List<String> options) {
-            this.options = options;
-        }
-
-        @Override
-        public void onFocusChange(View view, boolean hasFocus) {
-            if (!hasFocus) {
-                String choice = autoComplete.getText().toString();
-                if (!options.contains(choice)) {
-                    autoComplete.setText(EMPTY_FIELD);
+        public void onValueSet(String newValue) {
+            String value = field.getItem().getValue();
+            if (newValue != null && !newValue.equals(value)) {
+                field.getItem().setValue(newValue);
+                if (listener != null) {
+                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
                 }
             }
         }
@@ -150,39 +94,28 @@ public class AutoCompleteRow implements Row {
 
     private class AutoCompleteRowHolder {
         final TextView textLabel;
-        final AutoCompleteTextView autoComplete;
-        final ImageButton button;
-        final DropDownButtonListener listener;
-        final OnFocusListener onFocusListener;
-        final EditTextWatcher textWatcher;
+        final AutoCompleteValueEntryView autoComplete;
+        final ValueSetListener listener;
 
-        public AutoCompleteRowHolder(TextView textLabel, AutoCompleteTextView autoComplete,
-                                     ImageButton button, DropDownButtonListener listener,
-                                     OnFocusListener onFocusListener, EditTextWatcher textWatcher) {
-
+        public AutoCompleteRowHolder(TextView textLabel,
+                                     AutoCompleteValueEntryView autoComplete,
+                                     ValueSetListener listener) {
             this.textLabel = textLabel;
             this.autoComplete = autoComplete;
-            this.button = button;
             this.listener = listener;
-            this.onFocusListener = onFocusListener;
-            this.textWatcher = textWatcher;
         }
 
-        public void updateViews(Field field) {
-            textLabel.setText(field.getLabel());
+        public void updateViews(DBItemHolder<Field> field,
+                                OnFieldValueSetListener onFieldValueSetListener) {
+            textLabel.setText(field.getItem().getLabel());
 
-            onFocusListener.setAutoComplete(autoComplete);
-            onFocusListener.setOptions(mOptions);
-            autoComplete.setAdapter(mAdapter);
-            autoComplete.setOnFocusChangeListener(onFocusListener);
+            listener.setField(field);
+            listener.setListener(onFieldValueSetListener);
 
-            textWatcher.setField(mField);
-            autoComplete.addTextChangedListener(textWatcher);
-            autoComplete.setText(mField.getValue());
-
-            listener.setAutoComplete(autoComplete);
-            button.setOnClickListener(listener);
-            autoComplete.clearFocus();
+            autoComplete.setText(mField.getItem().getValue());
+            autoComplete.swapData(mOptions);
+            autoComplete.setOnValueSetListener(listener);
+            autoComplete.resetView();
         }
     }
 }

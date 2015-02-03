@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
+import org.hisp.dhis.mobile.datacapture.ui.views.AutoCompleteValueEntryView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StubFragment extends Fragment {
     public static final String NUMBER_EXTRA = "numberExtra";
@@ -19,9 +23,21 @@ public class StubFragment extends Fragment {
         if (getArguments() != null) {
             number = getArguments().getInt(NUMBER_EXTRA);
         }
-        View view = inflater.inflate(R.layout.fragment_stub, group, false);
+
         //TextView stubTextView = (TextView) view.findViewById(R.id.stub_text_view);
         //stubTextView.setText("StubFragment: " + number);
+
+        View view = inflater.inflate(R.layout.fragment_stub, group, false);
+        AutoCompleteValueEntryView autoComplete = (AutoCompleteValueEntryView)
+                view.findViewById(R.id.stub_text_view);
+        List<String> values = new ArrayList<>();
+        values.add("1");
+        values.add("2");
+        values.add("3");
+        values.add("4");
+        values.add("5");
+        values.add("Hello");
+        autoComplete.swapData(values);
 
         return view;
     }

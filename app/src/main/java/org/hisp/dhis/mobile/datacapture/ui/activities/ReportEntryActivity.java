@@ -3,7 +3,6 @@ package org.hisp.dhis.mobile.datacapture.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -11,10 +10,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
@@ -26,7 +22,6 @@ import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.ReportGroupAdapter;
-import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 import java.util.ArrayList;
@@ -40,7 +35,7 @@ public class ReportEntryActivity extends ActionBarActivity
 
     private static final int LOADER_ID = 89254134;
 
-    private SlidingTabLayout mSlidingTabLayout;
+    // private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private ReportGroupAdapter mAdapter;
 
@@ -79,14 +74,19 @@ public class ReportEntryActivity extends ActionBarActivity
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setHomeButtonEnabled(true);
 
-        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        // mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mViewPager.setPageMargin(40);
+        mViewPager.setPadding(40, 40, 40, 0);
+        mViewPager.setOffscreenPageLimit(6);
+        mViewPager.setClipToPadding(false);
+
         mAdapter = new ReportGroupAdapter(getSupportFragmentManager());
 
         final int blue = getResources().getColor(R.color.navy_blue);
         final int gray = getResources().getColor(R.color.darker_grey);
 
-        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+        /* mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
 
             @Override
             public int getIndicatorColor(int position) {
@@ -98,10 +98,10 @@ public class ReportEntryActivity extends ActionBarActivity
                 return gray;
             }
 
-        });
+        }); */
 
         mViewPager.setAdapter(mAdapter);
-        mSlidingTabLayout.setViewPager(mViewPager);
+        // mSlidingTabLayout.setViewPager(mViewPager);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ReportEntryActivity extends ActionBarActivity
                                CursorHolder<List<DBItemHolder<Group>>> data) {
         if (loader != null && LOADER_ID == loader.getId() && data != null) {
             mAdapter.swapData(data.getData());
-            mSlidingTabLayout.setViewPager(mViewPager);
+            // mSlidingTabLayout.setViewPager(mViewPager);
         }
     }
 

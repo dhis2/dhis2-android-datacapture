@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:cacheColorHint="@color/transparent"
     android:clipToPadding="false"
-    android:descendantFocusability="afterDescendants"
+    android:focusable="false"
     android:divider="@color/transparent"
     android:dividerHeight="4dp"
     android:paddingBottom="7dp"
