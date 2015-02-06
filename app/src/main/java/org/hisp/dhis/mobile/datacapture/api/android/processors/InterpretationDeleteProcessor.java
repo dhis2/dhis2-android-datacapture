@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationDeleteEvent;
@@ -21,25 +19,14 @@ import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 
-public class InterpretationDeleteProcessor extends AsyncTask<Void, Void, OnInterpretationDeleteEvent> {
-    private Context mContext;
-    private InterpretationDeleteEvent mEvent;
+public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDeleteEvent, OnInterpretationDeleteEvent> {
 
     public InterpretationDeleteProcessor(Context context, InterpretationDeleteEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
-
-        if (event == null) {
-            throw new IllegalArgumentException("InterpretationDeleteEvent must not be null");
-        }
-
-        mContext = context;
-        mEvent = event;
+        super(context, event);
     }
 
     @Override
-    protected OnInterpretationDeleteEvent doInBackground(Void... params) {
+    public OnInterpretationDeleteEvent process() {
         final DBItemHolder<Interpretation> dbItem = readInterpretation();
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnInterpretationDeleteEvent event = new OnInterpretationDeleteEvent();
@@ -63,16 +50,11 @@ public class InterpretationDeleteProcessor extends AsyncTask<Void, Void, OnInter
         return event;
     }
 
-    @Override
-    protected void onPostExecute(OnInterpretationDeleteEvent event) {
-        BusProvider.getInstance().post(event);
-    }
-
     private DBItemHolder<Interpretation> readInterpretation() {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, mEvent.getInterpretationId()
+                InterpretationColumns.CONTENT_URI, getEvent().getInterpretationId()
         );
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = getContext().getContentResolver().query(
                 uri, InterpretationHandler.PROJECTION, null, null, null
         );
 
@@ -88,19 +70,19 @@ public class InterpretationDeleteProcessor extends AsyncTask<Void, Void, OnInter
 
     private void deleteInterpretation() {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, mEvent.getInterpretationId()
+                InterpretationColumns.CONTENT_URI, getEvent().getInterpretationId()
         );
 
-        mContext.getContentResolver().delete(uri, null, null);
+        getContext().getContentResolver().delete(uri, null, null);
     }
 
     private void updateInterpretationState(State state) {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, mEvent.getInterpretationId()
+                InterpretationColumns.CONTENT_URI, getEvent().getInterpretationId()
         );
 
         ContentValues values = new ContentValues();
         values.put(InterpretationColumns.STATE, state.toString());
-        mContext.getContentResolver().update(uri, values, null, null);
+        getContext().getContentResolver().update(uri, values, null, null);
     }
 }

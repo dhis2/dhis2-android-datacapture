@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardItemDeleteEvent;
@@ -24,26 +22,13 @@ import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 
-public class DashboardItemDeleteProcessor extends AsyncTask<Void, Void, OnDashboardItemDeleteEvent> {
-    private Context mContext;
-    private int mDashboardDbId;
-    private int mDashboardItemDbId;
-
+public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDeleteEvent, OnDashboardItemDeleteEvent> {
     public DashboardItemDeleteProcessor(Context context, DashboardItemDeleteEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context object must be null");
-        }
-
-        if (event == null) {
-            throw new IllegalArgumentException("OnDashboardItemDeleteEvent must not be null");
-        }
-
-        mContext = context;
-        mDashboardDbId = event.getDashboardDbId();
-        mDashboardItemDbId = event.getDashboardItemDbId();
+        super(context, event);
     }
+
     @Override
-    protected OnDashboardItemDeleteEvent doInBackground(Void... params) {
+    public OnDashboardItemDeleteEvent process() {
         final DBItemHolder<Dashboard> mDashboard = readDashboard();
         final DBItemHolder<DashboardItem> mDashboardItem = readDashboardItem();
         final ResponseHolder<String> holder = new ResponseHolder<>();
@@ -71,14 +56,10 @@ public class DashboardItemDeleteProcessor extends AsyncTask<Void, Void, OnDashbo
         return event;
     }
 
-    @Override
-    protected void onPostExecute(OnDashboardItemDeleteEvent event) {
-        BusProvider.getInstance().post(event);
-    }
-
     private DBItemHolder<DashboardItem> readDashboardItem() {
-        Uri uri = ContentUris.withAppendedId(DashboardItemColumns.CONTENT_URI, mDashboardItemDbId);
-        Cursor cursor = mContext.getContentResolver().query(
+        Uri uri = ContentUris.withAppendedId(
+                DashboardItemColumns.CONTENT_URI, getEvent().getDashboardItemDbId());
+        Cursor cursor = getContext().getContentResolver().query(
                 uri, DashboardItemHandler.PROJECTION, null, null, null
         );
 
@@ -93,8 +74,9 @@ public class DashboardItemDeleteProcessor extends AsyncTask<Void, Void, OnDashbo
     }
 
     private DBItemHolder<Dashboard> readDashboard() {
-        Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, mDashboardDbId);
-        Cursor cursor = mContext.getContentResolver().query(
+        Uri uri = ContentUris.withAppendedId(
+                DashboardColumns.CONTENT_URI, getEvent().getDashboardDbId());
+        Cursor cursor = getContext().getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
 
@@ -109,14 +91,16 @@ public class DashboardItemDeleteProcessor extends AsyncTask<Void, Void, OnDashbo
     }
 
     private void deleteDashboardItem() {
-        Uri uri = ContentUris.withAppendedId(DashboardItemColumns.CONTENT_URI, mDashboardItemDbId);
-        mContext.getContentResolver().delete(uri, null, null);
+        Uri uri = ContentUris.withAppendedId(
+                DashboardItemColumns.CONTENT_URI, getEvent().getDashboardItemDbId());
+        getContext().getContentResolver().delete(uri, null, null);
     }
 
     private void updateDashboardItemState(State state) {
-        Uri uri = ContentUris.withAppendedId(DashboardItemColumns.CONTENT_URI, mDashboardItemDbId);
+        Uri uri = ContentUris.withAppendedId(
+                DashboardItemColumns.CONTENT_URI, getEvent().getDashboardItemDbId());
         ContentValues values = new ContentValues();
         values.put(DashboardItemColumns.STATE, state.toString());
-        mContext.getContentResolver().update(uri, values, null, null);
+        getContext().getContentResolver().update(uri, values, null, null);
     }
 }

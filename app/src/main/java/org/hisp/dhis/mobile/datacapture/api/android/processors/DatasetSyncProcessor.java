@@ -4,13 +4,12 @@ import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 
 import com.google.gson.Gson;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
@@ -34,19 +33,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEvent> {
-    private Context mContext;
+public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatasetSyncEvent> {
 
     public DatasetSyncProcessor(Context context) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
-
-        mContext = context;
+        super(context);
     }
 
     @Override
-    protected OnDatasetSyncEvent doInBackground(Void... params) {
+    public OnDatasetSyncEvent process() {
         final OnDatasetSyncEvent event = new OnDatasetSyncEvent();
         final ResponseHolder<String> holder = new ResponseHolder<>();
 
@@ -58,11 +52,6 @@ public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEve
 
         event.setResponseHolder(holder);
         return event;
-    }
-
-    @Override
-    protected void onPostExecute(OnDatasetSyncEvent event) {
-        BusProvider.getInstance().post(event);
     }
 
     private void updateDataSets() throws APIException {
@@ -117,7 +106,7 @@ public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEve
         final String ORG_UNITS_KEY = KeyValue.Type.ORG_UNITS_WITH_DATASETS.toString();
         final String SELECTION = KeyValueColumns.KEY + " = " + "'" + ORG_UNITS_KEY + "'" + " AND "
                 + KeyValueColumns.TYPE + " = " + "'" + ORG_UNITS_KEY + "'";
-        mContext.getContentResolver().delete(
+        getContext().getContentResolver().delete(
                 KeyValueColumns.CONTENT_URI, SELECTION, null
         );
 
@@ -134,13 +123,13 @@ public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEve
         keyValue.setValue(gson.toJson(units));
 
         ContentValues values = KeyValueHandler.toContentValues(keyValue);
-        mContext.getContentResolver().insert(KeyValueColumns.CONTENT_URI, values);
+        getContext().getContentResolver().insert(KeyValueColumns.CONTENT_URI, values);
     }
 
     private void saveDatasets(DataSetHolder holder) {
         // remove old datasets before inserting new ones
         final String SELECTION = KeyValueColumns.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
-        mContext.getContentResolver().delete(KeyValueColumns.CONTENT_URI, SELECTION, null);
+        getContext().getContentResolver().delete(KeyValueColumns.CONTENT_URI, SELECTION, null);
 
         List<DataSet> dataSets = holder.getDataSets();
         if (dataSets == null) {
@@ -158,7 +147,7 @@ public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEve
         }
 
         try {
-            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (OperationApplicationException e) {
@@ -170,7 +159,7 @@ public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEve
         final String SELECTION = KeyValueColumns.TYPE + " = " +
                 "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
 
-        mContext.getContentResolver().delete(KeyValueColumns.CONTENT_URI, SELECTION, null);
+        getContext().getContentResolver().delete(KeyValueColumns.CONTENT_URI, SELECTION, null);
 
         if (optionSets == null) {
             return;
@@ -187,7 +176,7 @@ public class DatasetSyncProcessor extends AsyncTask<Void, Void, OnDatasetSyncEve
         }
 
         try {
-            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (OperationApplicationException e) {

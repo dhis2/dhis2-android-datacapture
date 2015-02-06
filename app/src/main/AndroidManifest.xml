@@ -35,12 +35,6 @@
             android:theme="@style/LoginScreenTheme" >
         </activity>
 
-        <service
-            android:name=".DHISService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-
         <activity
             android:name=".ui.activities.DashboardItemDetailActivity"
             android:label="@string/title_activity_dashboard_item_detail" >

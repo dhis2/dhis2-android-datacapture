@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 
 import com.google.gson.Gson;
@@ -28,29 +27,17 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 import java.util.ArrayList;
 
-public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportEvent> {
-    private Context mContext;
-    private CreateReportEvent mEvent;
+public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCreateReportEvent> {
 
     public CreateReportProcessor(Context context, CreateReportEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context object must not be null");
-        }
-
-        if (event == null) {
-            throw new IllegalArgumentException("CreateReportEvent object must not be null");
-        }
-
-        mContext = context;
-        mEvent = event;
+        super(context, event);
     }
 
     @Override
-    protected OnCreateReportEvent doInBackground(Void... params) {
+    public OnCreateReportEvent process() {
         OnCreateReportEvent event = new OnCreateReportEvent();
         DBItemHolder<Report> report = readReport();
 
@@ -61,7 +48,7 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
         DataSet dataSet = readDataSet();
         ArrayList<ContentProviderOperation> ops = insertReport(dataSet);
         try {
-            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (OperationApplicationException e) {
@@ -72,11 +59,11 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
     }
 
     private DataSet readDataSet() {
-        final String KEY = KeyValueColumns.KEY + " = " + "'" + mEvent.getReport().getDataSet() + "'";
+        final String KEY = KeyValueColumns.KEY + " = " + "'" + getEvent().getReport().getDataSet() + "'";
         final String TYPE = KeyValueColumns.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
         final String SELECTION = KEY + " AND " + TYPE;
 
-        Cursor cursor = mContext.getContentResolver().query(KeyValueColumns.CONTENT_URI,
+        Cursor cursor = getContext().getContentResolver().query(KeyValueColumns.CONTENT_URI,
                 KeyValueHandler.PROJECTION, SELECTION, null, null);
         DataSet dataSet = null;
         if (cursor != null && cursor.getCount() > 0) {
@@ -96,7 +83,7 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
     private ArrayList<ContentProviderOperation> insertReport(DataSet dataSet) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
-        ContentValues reportValues = ReportHandler.toContentValues(mEvent.getReport());
+        ContentValues reportValues = ReportHandler.toContentValues(getEvent().getReport());
         ops.add(ContentProviderOperation.newInsert(ReportColumns.CONTENT_URI)
                 .withValues(reportValues)
                 .withValue(ReportColumns.STATE, State.OFFLINE.toString())
@@ -124,12 +111,12 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
     }
 
     private DBItemHolder<Report> readReport() {
-        final String ORG_UNIT = ReportColumns.ORG_UNIT_ID + " = " + "'" + mEvent.getReport().getOrgUnit() + "'";
-        final String DATASET = ReportColumns.DATASET_ID + " = " + "'" + mEvent.getReport().getDataSet() + "'";
-        final String PERIOD = ReportColumns.PERIOD + " = " + "'" + mEvent.getReport().getPeriod() + "'";
+        final String ORG_UNIT = ReportColumns.ORG_UNIT_ID + " = " + "'" + getEvent().getReport().getOrgUnit() + "'";
+        final String DATASET = ReportColumns.DATASET_ID + " = " + "'" + getEvent().getReport().getDataSet() + "'";
+        final String PERIOD = ReportColumns.PERIOD + " = " + "'" + getEvent().getReport().getPeriod() + "'";
         final String SELECTION = ORG_UNIT + " AND " + DATASET + " AND " + PERIOD;
 
-        Cursor cursor = mContext.getContentResolver().query(ReportColumns.CONTENT_URI,
+        Cursor cursor = getContext().getContentResolver().query(ReportColumns.CONTENT_URI,
                 ReportHandler.PROJECTION, SELECTION, null, null);
 
         DBItemHolder<Report> dbItem = null;
@@ -139,10 +126,5 @@ public class CreateReportProcessor extends AsyncTask<Void, Void, OnCreateReportE
             cursor.close();
         }
         return dbItem;
-    }
-
-    @Override
-    protected void onPostExecute(OnCreateReportEvent event) {
-        BusProvider.getInstance().post(event);
     }
 }

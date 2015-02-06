@@ -4,12 +4,11 @@ import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
@@ -32,16 +31,11 @@ import java.util.Map;
 
 import static org.hisp.dhis.mobile.datacapture.utils.DateTimeTypeAdapter.deserializeDateTime;
 
-public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSyncedEvent> {
+public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnDashboardsSyncedEvent> {
     private static final String TAG = DashboardSyncProcessor.class.getSimpleName();
-    private Context mContext;
 
     public DashboardSyncProcessor(Context context) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
-
-        mContext = context;
+        super(context);
     }
 
     private static DashboardItem getDashboardItem(String id) throws APIException {
@@ -88,6 +82,27 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
         } else {
             return holder.getItem();
         }
+    }
+
+    @Override
+    public OnDashboardsSyncedEvent process() {
+        OnDashboardsSyncedEvent event = new OnDashboardsSyncedEvent();
+
+        ResponseHolder<String> sendResponse = sendOfflineDashboards();
+        if (sendResponse.getException() != null) {
+            event.setSendResponse(sendResponse);
+            return event;
+        }
+
+        ResponseHolder<String> retrieveResponse = refreshDashboards();
+        if (retrieveResponse.getException() != null) {
+            event.setRetrieveResponse(retrieveResponse);
+            return event;
+        }
+
+        event.setSendResponse(sendResponse);
+        event.setRetrieveResponse(retrieveResponse);
+        return event;
     }
 
     private ArrayList<ContentProviderOperation> updateDashboards() throws APIException {
@@ -228,7 +243,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
     }
 
     private List<DBItemHolder<Dashboard>> readDashboards(String selection) {
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = getContext().getContentResolver().query(
                 DashboardColumns.CONTENT_URI, DashboardHandler.PROJECTION, selection, null, null
         );
 
@@ -246,7 +261,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
     }
 
     private List<DBItemHolder<DashboardItem>> readDashboardItems(String selection) {
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = getContext().getContentResolver().query(
                 DashboardItemColumns.CONTENT_URI, DashboardItemHandler.PROJECTION, selection, null, null
         );
 
@@ -260,27 +275,6 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
             cursor.close();
         }
         return items;
-    }
-
-    @Override
-    protected OnDashboardsSyncedEvent doInBackground(Void... params) {
-        OnDashboardsSyncedEvent event = new OnDashboardsSyncedEvent();
-
-        ResponseHolder<String> sendResponse = sendOfflineDashboards();
-        if (sendResponse.getException() != null) {
-            event.setSendResponse(sendResponse);
-            return event;
-        }
-
-        ResponseHolder<String> retrieveResponse = refreshDashboards();
-        if (retrieveResponse.getException() != null) {
-            event.setRetrieveResponse(retrieveResponse);
-            return event;
-        }
-
-        event.setSendResponse(sendResponse);
-        event.setRetrieveResponse(retrieveResponse);
-        return event;
     }
 
     private ResponseHolder<String> sendOfflineDashboards() {
@@ -298,7 +292,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
         }
 
         try {
-            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (OperationApplicationException e) {
@@ -428,7 +422,7 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
         }
 
         try {
-            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (OperationApplicationException e) {
@@ -436,10 +430,5 @@ public class DashboardSyncProcessor extends AsyncTask<Void, Void, OnDashboardsSy
         }
 
         return holder;
-    }
-
-    @Override
-    protected void onPostExecute(OnDashboardsSyncedEvent event) {
-        BusProvider.getInstance().post(event);
     }
 }

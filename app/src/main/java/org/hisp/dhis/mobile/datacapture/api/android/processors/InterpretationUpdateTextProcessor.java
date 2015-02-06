@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationTextUpdateEvent;
@@ -21,25 +19,15 @@ import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 
-public class InterpretationUpdateTextProcessor extends AsyncTask<Void, Void, OnInterpretationTextUpdateEvent> {
-    private Context mContext;
-    private InterpretationUpdateTextEvent mEvent;
+public class InterpretationUpdateTextProcessor extends AbsProcessor<InterpretationUpdateTextEvent, OnInterpretationTextUpdateEvent> {
 
-    public InterpretationUpdateTextProcessor(Context context, InterpretationUpdateTextEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
-
-        if (event == null) {
-            throw new IllegalArgumentException("InterpretationUpdateTextEvent must not be null");
-        }
-
-        mContext = context;
-        mEvent = event;
+    public InterpretationUpdateTextProcessor(Context context,
+                                             InterpretationUpdateTextEvent event) {
+        super(context, event);
     }
 
     @Override
-    protected OnInterpretationTextUpdateEvent doInBackground(Void... params) {
+    public OnInterpretationTextUpdateEvent process() {
         final DBItemHolder<Interpretation> dbItem = readInterpretation();
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnInterpretationTextUpdateEvent event = new OnInterpretationTextUpdateEvent();
@@ -58,22 +46,17 @@ public class InterpretationUpdateTextProcessor extends AsyncTask<Void, Void, OnI
                 e.printStackTrace();
                 holder.setException(e);
             }
-        }, dbItem.getItem().getId(), mEvent.getText());
+        }, dbItem.getItem().getId(), getEvent().getText());
 
         event.setResponseHolder(holder);
         return event;
     }
 
-    @Override
-    protected void onPostExecute(OnInterpretationTextUpdateEvent event) {
-        BusProvider.getInstance().post(event);
-    }
-
     private DBItemHolder<Interpretation> readInterpretation() {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, mEvent.getDbId()
+                InterpretationColumns.CONTENT_URI, getEvent().getDbId()
         );
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = getContext().getContentResolver().query(
                 uri, InterpretationHandler.PROJECTION, null, null, null
         );
 
@@ -89,12 +72,12 @@ public class InterpretationUpdateTextProcessor extends AsyncTask<Void, Void, OnI
 
     private void updateInterpretation(State state) {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, mEvent.getDbId()
+                InterpretationColumns.CONTENT_URI, getEvent().getDbId()
         );
 
         ContentValues values = new ContentValues();
-        values.put(InterpretationColumns.TEXT, mEvent.getText());
+        values.put(InterpretationColumns.TEXT, getEvent().getText());
         values.put(InterpretationColumns.STATE, state.toString());
-        mContext.getContentResolver().update(uri, values, null, null);
+        getContext().getContentResolver().update(uri, values, null, null);
     }
 }

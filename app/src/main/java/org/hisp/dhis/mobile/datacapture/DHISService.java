@@ -1,10 +1,8 @@
 package org.hisp.dhis.mobile.datacapture;
 
-import android.app.Service;
-import android.content.Intent;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
@@ -35,49 +33,25 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationDel
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyncProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationUpdateTextProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
-public class DHISService extends Service {
+import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+
+public final class DHISService {
     private static final String TAG = DHISService.class.getSimpleName();
+    private Context mContext;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.i(TAG, "onCreate()");
-
-        BusProvider.getInstance().register(this);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        Log.i(TAG, "onStartCommand()");
-
-        return START_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        Log.i(TAG, "onBind()");
-        return null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "onDestroy()");
-
-        BusProvider.getInstance().unregister(this);
+    public DHISService(Context context) {
+        mContext = isNull(context, "Context must not be null");
     }
 
     @Subscribe
     public void onUserLoginEvent(LoginUserEvent event) {
-        executeTask(new LoginUserProcessor(getBaseContext(), event));
+        executeTask(new LoginUserProcessor(mContext, event));
     }
 
     @Subscribe
     public void onDashboardSyncEvent(DashboardSyncEvent event) {
-        executeTask(new DashboardSyncProcessor(getBaseContext()));
+        executeTask(new DashboardSyncProcessor(mContext));
     }
 
     @Subscribe
@@ -87,17 +61,17 @@ public class DHISService extends Service {
 
     @Subscribe
     public void onDashboardDeleteEvent(DashboardDeleteEvent event) {
-        executeTask(new DashboardDeleteProcessor(getBaseContext(), event));
+        executeTask(new DashboardDeleteProcessor(mContext, event));
     }
 
     @Subscribe
     public void onDashboardUpdateEvent(DashboardUpdateEvent event) {
-        executeTask(new DashboardUpdateProcessor(getBaseContext(), event));
+        executeTask(new DashboardUpdateProcessor(mContext, event));
     }
 
     @Subscribe
     public void onDashboardItemDeleteEvent(DashboardItemDeleteEvent event) {
-        executeTask(new DashboardItemDeleteProcessor(getBaseContext(), event));
+        executeTask(new DashboardItemDeleteProcessor(mContext, event));
     }
 
     @Subscribe
@@ -107,32 +81,32 @@ public class DHISService extends Service {
 
     @Subscribe
     public void onInterpretationsSyncEvent(InterpretationSyncEvent event) {
-        executeTask(new InterpretationSyncProcessor(getBaseContext()));
+        executeTask(new InterpretationSyncProcessor(mContext));
     }
 
     @Subscribe
     public void onInterpretationDeleteEvent(InterpretationDeleteEvent event) {
-        executeTask(new InterpretationDeleteProcessor(getBaseContext(), event));
+        executeTask(new InterpretationDeleteProcessor(mContext, event));
     }
 
     @Subscribe
     public void onInterpretationTextUpdateEvent(InterpretationUpdateTextEvent event) {
-        executeTask(new InterpretationUpdateTextProcessor(getBaseContext(), event));
+        executeTask(new InterpretationUpdateTextProcessor(mContext, event));
     }
 
     @Subscribe
     public void onDatasetSyncEvent(DatasetSyncEvent event) {
-        executeTask(new DatasetSyncProcessor(getBaseContext()));
+        executeTask(new DatasetSyncProcessor(mContext));
     }
 
     @Subscribe
     public void onCreateReportEvent(CreateReportEvent event) {
-        executeTask(new CreateReportProcessor(getBaseContext(), event));
+        executeTask(new CreateReportProcessor(mContext, event));
     }
 
     @Subscribe
     public void onFieldValueChangeEvent(FieldValueChangeEvent event) {
-        executeTask(new FieldChangeValueProcessor(getBaseContext(), event));
+        executeTask(new FieldChangeValueProcessor(mContext, event));
     }
 
     private <T> void executeTask(AsyncTask<Void, Void, T> task) {

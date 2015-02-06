@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -46,16 +45,14 @@ import java.util.List;
 public class ReportGroupFragment extends Fragment
         implements LoaderCallbacks<CursorHolder<List<Row>>> {
     private static final int LOADER_ID = 438915134;
-    private TextView mTextView;
     private ListView mListView;
     private FieldAdapter mAdapter;
 
-    public static ReportGroupFragment newInstance(int groupId, String label) {
+    public static ReportGroupFragment newInstance(int groupId) {
         ReportGroupFragment fragment = new ReportGroupFragment();
         Bundle args = new Bundle();
 
         args.putInt(ReportGroupColumns.DB_ID, groupId);
-        args.putString(ReportGroupColumns.LABEL, label);
         fragment.setArguments(args);
 
         return fragment;
@@ -64,17 +61,12 @@ public class ReportGroupFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_group_report, container, false);
-        mTextView = (TextView) root.findViewById(R.id.report_group_label);
         mListView = (ListView) root.findViewById(R.id.list);
         return root;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (getArguments() != null) {
-            String label = getArguments().getString(ReportGroupColumns.LABEL);
-            mTextView.setText(label);
-        }
         mAdapter = new FieldAdapter(getActivity());
         mListView.setAdapter(mAdapter);
     }
@@ -105,11 +97,10 @@ public class ReportGroupFragment extends Fragment
             List<Row> rows = data.getData();
             mAdapter.swapData(rows);
         }
-
     }
 
     @Override
-    public void onLoaderReset(Loader<CursorHolder<List<Row>>> loader) {}
+    public void onLoaderReset(Loader<CursorHolder<List<Row>>> loader) { }
 
     static class FieldsLoader extends AbsCursorLoader<List<Row>> {
 
@@ -179,6 +170,7 @@ public class ReportGroupFragment extends Fragment
                     KeyValueColumns.CONTENT_URI, KeyValueHandler.PROJECTION, SELECTION, null, null
             );
 
+            OptionSet optionSet = null;
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 DBItemHolder<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
@@ -188,15 +180,15 @@ public class ReportGroupFragment extends Fragment
                         dbItem.getItem().getValue() != null) {
                     Gson gson = new Gson();
                     String jOptionSet = dbItem.getItem().getValue();
-                    return gson.fromJson(jOptionSet, OptionSet.class);
+                    optionSet = gson.fromJson(jOptionSet, OptionSet.class);
                 }
             }
 
-            return null;
+            return optionSet;
         }
     }
 
-    static class OnFieldValueChangedListener implements OnFieldValueSetListener {
+    private static class OnFieldValueChangedListener implements OnFieldValueSetListener {
         private Context context;
 
         public OnFieldValueChangedListener(Context context) {

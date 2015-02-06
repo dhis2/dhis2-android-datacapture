@@ -1,8 +1,5 @@
 package org.hisp.dhis.mobile.datacapture.api.android.processors;
 
-import android.os.AsyncTask;
-
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardCreateEvent;
@@ -11,18 +8,14 @@ import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 
-public class DashboardCreateProcessor extends AsyncTask<Void, Void, OnDashboardCreateEvent> {
-    private DashboardCreateEvent mEvent;
+public class DashboardCreateProcessor extends AbsProcessor<DashboardCreateEvent, OnDashboardCreateEvent> {
 
     public DashboardCreateProcessor(DashboardCreateEvent event) {
-        if (event == null) {
-            throw new IllegalArgumentException("DashboardCreateEvent must not be null");
-        }
-        mEvent = event;
+        super(event);
     }
 
     @Override
-    protected OnDashboardCreateEvent doInBackground(Void... params) {
+    public OnDashboardCreateEvent process() {
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnDashboardCreateEvent event = new OnDashboardCreateEvent();
 
@@ -37,14 +30,9 @@ public class DashboardCreateProcessor extends AsyncTask<Void, Void, OnDashboardC
             public void onFailure(APIException e) {
                 holder.setException(e);
             }
-        }, mEvent.getDashboardName());
+        }, getEvent().getDashboardName());
 
         event.setResponseHolder(holder);
         return event;
-    }
-
-    @Override
-    protected void onPostExecute(OnDashboardCreateEvent event) {
-        BusProvider.getInstance().post(event);
     }
 }

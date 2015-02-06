@@ -21,25 +21,20 @@ import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 
+import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+
 public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardDeleteEvent> {
     private Context mContext;
-    private int mDashboardDbId;
+    private DashboardDeleteEvent mEvent;
 
     public DashboardDeleteProcessor(Context context, DashboardDeleteEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
-
-        if (event == null) {
-            throw new IllegalArgumentException("DashboardDeleteEvent must not be null");
-        }
-
-        mContext = context;
-        mDashboardDbId = event.getDashboardDbId();
+        mContext = isNull(context, "Context must not be null");
+        mEvent = isNull(event, "DashboardDeleteEvent must not be null");
     }
 
     private DBItemHolder<Dashboard> readDashboard() {
-        Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, mDashboardDbId);
+        Uri uri = ContentUris.withAppendedId(
+                DashboardColumns.CONTENT_URI, mEvent.getDashboardDbId());
         Cursor cursor = mContext.getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
@@ -55,7 +50,8 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
     }
 
     private void deleteDashboard() {
-        Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, mDashboardDbId);
+        Uri uri = ContentUris.withAppendedId(
+                DashboardColumns.CONTENT_URI, mEvent.getDashboardDbId());
         mContext.getContentResolver().delete(uri, null, null);
     }
 
@@ -90,7 +86,8 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
     }
 
     private void updateDashboardState(State state) {
-        Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, mDashboardDbId);
+        Uri uri = ContentUris.withAppendedId(
+                DashboardColumns.CONTENT_URI, mEvent.getDashboardDbId());
         ContentValues values = new ContentValues();
         values.put(DashboardColumns.STATE, state.toString());
         mContext.getContentResolver().update(uri, values, null, null);

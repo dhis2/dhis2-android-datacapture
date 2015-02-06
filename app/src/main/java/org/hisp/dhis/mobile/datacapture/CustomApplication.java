@@ -1,16 +1,17 @@
 package org.hisp.dhis.mobile.datacapture;
 
 import android.app.Application;
-import android.content.Intent;
 
 import org.hisp.dhis.mobile.datacapture.api.android.managers.Base64Manager;
 import org.hisp.dhis.mobile.datacapture.api.android.managers.JsonManager;
 import org.hisp.dhis.mobile.datacapture.api.android.managers.NetworkManager;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.ui.activities.LoginActivity;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.utils.PreferenceUtils;
 
 public class CustomApplication extends Application {
+    private DHISService mDHISService;
 
     @Override
     public void onCreate() {
@@ -27,6 +28,7 @@ public class CustomApplication extends Application {
         manager.setServerUrl(serverUrl);
         manager.setCredentials(credentials);
 
-        startService(new Intent(this, DHISService.class));
+        mDHISService = new DHISService(getBaseContext());
+        BusProvider.getInstance().register(mDHISService);
     }
 }

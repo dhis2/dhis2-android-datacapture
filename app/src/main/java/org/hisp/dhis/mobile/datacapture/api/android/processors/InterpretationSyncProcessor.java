@@ -4,12 +4,11 @@ import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
+import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationsSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
@@ -29,16 +28,39 @@ import java.util.Map;
 
 import static org.hisp.dhis.mobile.datacapture.utils.DateTimeTypeAdapter.deserializeDateTime;
 
-public class InterpretationSyncProcessor extends AsyncTask<Void, Void, OnInterpretationsSyncEvent> {
+public class InterpretationSyncProcessor extends AbsProcessor<InterpretationSyncEvent, OnInterpretationsSyncEvent> {
     private static final String TAG = InterpretationSyncProcessor.class.getSimpleName();
-    private Context mContext;
 
     public InterpretationSyncProcessor(Context context) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context object must not be null");
+        super(context);
+    }
+
+    @Override
+    public OnInterpretationsSyncEvent process() {
+        final ResponseHolder<String> holder = new ResponseHolder<>();
+        final OnInterpretationsSyncEvent event = new OnInterpretationsSyncEvent();
+
+        ArrayList<ContentProviderOperation> ops = null;
+        try {
+            ops = updateInterpretations();
+        } catch (APIException e) {
+            holder.setException(e);
         }
 
-        mContext = context;
+        if (holder.getException() != null) {
+            event.setResponseHolder(holder);
+            return event;
+        }
+
+        try {
+            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (OperationApplicationException e) {
+            e.printStackTrace();
+        }
+
+        return event;
     }
 
     private ArrayList<ContentProviderOperation> updateInterpretations() throws APIException {
@@ -129,7 +151,7 @@ public class InterpretationSyncProcessor extends AsyncTask<Void, Void, OnInterpr
     private List<DBItemHolder<Interpretation>> readInterpretations(String selection) {
         List<DBItemHolder<Interpretation>> dbItems = new ArrayList<>();
 
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = getContext().getContentResolver().query(
                 InterpretationColumns.CONTENT_URI, InterpretationHandler.PROJECTION, selection, null, null
         );
 
@@ -142,38 +164,5 @@ public class InterpretationSyncProcessor extends AsyncTask<Void, Void, OnInterpr
         }
 
         return dbItems;
-    }
-
-    @Override
-    protected OnInterpretationsSyncEvent doInBackground(Void... params) {
-        final ResponseHolder<String> holder = new ResponseHolder<>();
-        final OnInterpretationsSyncEvent event = new OnInterpretationsSyncEvent();
-
-        ArrayList<ContentProviderOperation> ops = null;
-        try {
-            ops = updateInterpretations();
-        } catch (APIException e) {
-            holder.setException(e);
-        }
-
-        if (holder.getException() != null) {
-            event.setResponseHolder(holder);
-            return event;
-        }
-
-        try {
-            mContext.getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (OperationApplicationException e) {
-            e.printStackTrace();
-        }
-
-        return event;
-    }
-
-    @Override
-    protected void onPostExecute(OnInterpretationsSyncEvent event) {
-        BusProvider.getInstance().post(event);
     }
 }

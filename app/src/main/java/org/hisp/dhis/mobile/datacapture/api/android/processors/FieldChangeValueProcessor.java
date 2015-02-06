@@ -11,21 +11,15 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.OnFieldValueChangedEv
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
+import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+
 public class FieldChangeValueProcessor extends AsyncTask<Void, Void, OnFieldValueChangedEvent> {
     private Context mContext;
     private FieldValueChangeEvent mEvent;
 
     public FieldChangeValueProcessor(Context context, FieldValueChangeEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
-
-        if (event == null) {
-            throw new IllegalArgumentException("FieldValueChangeEvent must not be null");
-        }
-
-        mContext = context;
-        mEvent = event;
+        mContext = isNull(context, "Context must not be null");
+        mEvent = isNull(event, "FieldValueChangeEvent must not be null");
     }
 
     @Override

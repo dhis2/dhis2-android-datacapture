@@ -21,21 +21,43 @@ import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 
-public class DashboardUpdateProcessor extends AsyncTask<Void, Void, OnDashboardUpdateEvent> {
-    private Context mContext;
-    private DashboardUpdateEvent mEvent;
+public class DashboardUpdateProcessor extends AbsProcessor<DashboardUpdateEvent, OnDashboardUpdateEvent> {
 
     public DashboardUpdateProcessor(Context context, DashboardUpdateEvent event) {
-        if (context == null) {
-            throw new IllegalArgumentException("Context must not be null");
-        }
+        super(context, event);
+    }
 
-        if (event == null) {
-            throw new IllegalArgumentException("DashboardDeleteEvent must not be null");
-        }
+    @Override
+    public OnDashboardUpdateEvent process() {
+        final DBItemHolder<Dashboard> dbItem = readDashboard(
+                getContext(), getEvent().getDataBaseId());
+        final ResponseHolder<String> holder = new ResponseHolder<>();
+        final OnDashboardUpdateEvent event = new OnDashboardUpdateEvent();
 
-        mContext = context;
-        mEvent = event;
+        // change values in database first, including the state of record
+        updateDashboard(getContext(), dbItem.getDatabaseId(),
+                getEvent().getName(), State.PUTTING);
+
+        DHISManager.getInstance().updateDashboardName(new ApiRequestCallback<String>() {
+            @Override
+            public void onSuccess(Response response, String s) {
+                holder.setItem(s);
+                holder.setResponse(response);
+
+                // here updateDashboard is called only for updating
+                // state of Dashboard record in database
+                updateDashboard(getContext(), dbItem.getDatabaseId(),
+                        getEvent().getName(), State.GETTING);
+            }
+
+            @Override
+            public void onFailure(APIException e) {
+                holder.setException(e);
+            }
+        }, dbItem.getItem().getId(), getEvent().getName());
+
+        event.setResponseHolder(holder);
+        return event;
     }
 
     private static void updateDashboard(Context context, int dashboardId,
@@ -61,42 +83,5 @@ public class DashboardUpdateProcessor extends AsyncTask<Void, Void, OnDashboardU
         }
 
         return dashboard;
-    }
-
-    @Override
-    protected OnDashboardUpdateEvent doInBackground(Void... params) {
-        final DBItemHolder<Dashboard> dbItem = readDashboard(mContext, mEvent.getDataBaseId());
-        final ResponseHolder<String> holder = new ResponseHolder<>();
-        final OnDashboardUpdateEvent event = new OnDashboardUpdateEvent();
-
-        // change values in database first, including the state of record
-        updateDashboard(mContext, dbItem.getDatabaseId(),
-                mEvent.getName(), State.PUTTING);
-
-        DHISManager.getInstance().updateDashboardName(new ApiRequestCallback<String>() {
-            @Override
-            public void onSuccess(Response response, String s) {
-                holder.setItem(s);
-                holder.setResponse(response);
-
-                // here updateDashboard is called only for updating
-                // state of Dashboard record in database
-                updateDashboard(mContext, dbItem.getDatabaseId(),
-                        mEvent.getName(), State.GETTING);
-            }
-
-            @Override
-            public void onFailure(APIException e) {
-                holder.setException(e);
-            }
-        }, dbItem.getItem().getId(), mEvent.getName());
-
-        event.setResponseHolder(holder);
-        return event;
-    }
-
-    @Override
-    protected void onPostExecute(OnDashboardUpdateEvent event) {
-        BusProvider.getInstance().post(event);
     }
 }
