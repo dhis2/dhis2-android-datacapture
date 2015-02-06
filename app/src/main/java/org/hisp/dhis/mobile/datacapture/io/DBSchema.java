@@ -7,6 +7,12 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnitColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSetColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.GroupColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.FieldColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionSetColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionColumns;
 
 public interface DBSchema {
 
@@ -124,4 +130,86 @@ public interface DBSchema {
 
     public static final String DROP_REPORT_FIELDS_TABLE = "DROP TABLE IF EXISTS " + ReportFieldColumns.TABLE_NAME;
 
+
+    public static final String CREATE_ORGANIZATION_UNIT_TABLE = "CREATE TABLE " + OrganizationUnitColumns.TABLE_NAME + "(" +
+            OrganizationUnitColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            OrganizationUnitColumns.ID + " TEXT NOT NULL," +
+            OrganizationUnitColumns.LABEL + " TEXT," +
+            OrganizationUnitColumns.LEVEL + " INTEGER," +
+            OrganizationUnitColumns.PARENT + " TEXT" + ")";
+
+    public static final String DROP_ORGANIZATION_UNIT_TABLE = "DROP TABLE IF EXISTS " + OrganizationUnitColumns.TABLE_NAME;
+
+
+    public static final String CREATE_DATASET_TABLE = "CREATE TABLE " + DataSetColumns.TABLE_NAME + "(" +
+            DataSetColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            DataSetColumns.ID + " TEXT NOT NULL," +
+            DataSetColumns.LABEL + " TEXT," +
+            DataSetColumns.SUBTITLE + " TEXT," +
+            DataSetColumns.ALLOW_FUTURE_PERIODS + " INTEGER," +
+            DataSetColumns.EXPIRY_DAYS + " INTEGER," +
+            DataSetColumns.PERIOD_TYPE + " TEXT," +
+            DataSetColumns.ORGANIZATION_UNIT_DB_ID + " INTEGER NOT NULL," +
+            " FOREIGN KEY " + "(" + DataSetColumns.ORGANIZATION_UNIT_DB_ID + ")" +
+            " REFERENCES " + OrganizationUnitColumns.TABLE_NAME + "(" + OrganizationUnitColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " + ")";
+
+    public static final String DROP_DATASET_TABLE = "DROP TABLE IF EXISTS " + DataSetColumns.TABLE_NAME;
+
+
+    public static final String CREATE_GROUP_TABLE = "CREATE TABLE " + GroupColumns.TABLE_NAME + "(" +
+            GroupColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            GroupColumns.LABEL + " TEXT," +
+            GroupColumns.DATA_ELEMENT_COUNT + " INTEGER," +
+            GroupColumns.DATA_SET_DB_ID + " INTEGER NOT NULL," +
+            " FOREIGN KEY " + "(" + GroupColumns.DATA_SET_DB_ID + ")" +
+            " REFERENCES " + DataSetColumns.TABLE_NAME + "(" + DataSetColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " + ")";
+
+    public static final String DROP_GROUP_TABLE = "DROP TABLE OF EXISTS " + GroupColumns.TABLE_NAME;
+
+
+    public static final String CREATE_FIELD_TABLE = "CREATE TABLE" + FieldColumns.TABLE_NAME + "(" +
+            FieldColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            FieldColumns.LABEL + " TEXT," +
+            FieldColumns.TYPE + " TEXT NOT NULL," +
+            FieldColumns.DATA_ELEMENT + " TEXT NOT NULL," +
+            FieldColumns.CATEGORY_OPTION_COMBO + " TEXT NOT NULL," +
+            FieldColumns.OPTION_SET + " TEXT," +
+            FieldColumns.VALUE + " TEXT," +
+            FieldColumns.GROUP_DB_ID + " INTEGER NOT NULL," +
+            FieldColumns.OPTION_SET_DB_ID + " INTEGER," +
+            " FOREIGN KEY " + "(" + FieldColumns.GROUP_DB_ID + ")" +
+            " REFERENCES " + GroupColumns.TABLE_NAME + "(" + GroupColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " +
+            " FOREIGN KEY " + "(" + FieldColumns.OPTION_SET_DB_ID + ")" +
+            " REFERENCES " + OptionSetColumns.TABLE_NAME + "(" + OptionSetColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " + ")";
+
+    public static final String DROP_FIELD_TABLE = "DROP TABLE IF EXISTS " + FieldColumns.TABLE_NAME;
+
+
+    public static final String CREATE_OPTION_SET_TABLE = "CREATE TABLE " + OptionSetColumns.TABLE_NAME + "(" +
+            OptionSetColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            OptionSetColumns.ID + " TEXT NOT NULL," +
+            OptionSetColumns.CREATED + " TEXT NOT NULL," +
+            OptionSetColumns.LAST_UPDATED + " TEXT NOT NULL," +
+            OptionSetColumns.NAME + " TEXT," +
+            OptionSetColumns.DISPLAY_NAME + " TEXT" + ")";
+
+    public static final String DROP_OPTION_SET_TABLE = "DROP TABLE IF EXISTS " + OptionSetColumns.TABLE_NAME;
+
+
+    public static final String CREATE_OPTION_TABLE = "CREATE TABLE " + OptionColumns.TABLE_NAME + "(" +
+            OptionColumns.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            OptionColumns.ID + " TEXT NOT NULL," +
+            OptionColumns.CREATED + " TEXT NOT NULL," +
+            OptionColumns.LAST_UPDATED + " TEXT NOT NULL," +
+            OptionColumns.NAME + " TEXT," +
+            OptionColumns.OPTION_SET_DB_ID + " INTEGER NOT NULL," +
+            " FOREIGN KEY " + "(" + OptionColumns.OPTION_SET_DB_ID + ")" +
+            " REFERENCES " + OptionSetColumns.TABLE_NAME + "(" + OptionSetColumns.DB_ID + ")" +
+            " ON DELETE CASCADE " + ")";
+
+    public static final String DROP_OPTIONS_TABLE = "DROP TABLE IF EXISTS " + OptionColumns.TABLE_NAME;
 }
