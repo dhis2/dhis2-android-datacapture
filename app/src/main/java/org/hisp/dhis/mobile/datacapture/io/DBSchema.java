@@ -211,5 +211,5 @@ public interface DBSchema {
             " REFERENCES " + OptionSetColumns.TABLE_NAME + "(" + OptionSetColumns.DB_ID + ")" +
             " ON DELETE CASCADE " + ")";
 
-    public static final String DROP_OPTIONS_TABLE = "DROP TABLE IF EXISTS " + OptionColumns.TABLE_NAME;
+    public static final String DROP_OPTION_TABLE = "DROP TABLE IF EXISTS " + OptionColumns.TABLE_NAME;
 }

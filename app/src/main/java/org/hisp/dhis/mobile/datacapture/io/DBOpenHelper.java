@@ -23,6 +23,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.CREATE_REPORTS_TABLE);
         db.execSQL(DBSchema.CREATE_REPORT_GROUP_TABLE);
         db.execSQL(DBSchema.CREATE_REPORT_FIELDS_TABLE);
+
+        db.execSQL(DBSchema.CREATE_ORGANIZATION_UNIT_TABLE);
+        db.execSQL(DBSchema.CREATE_DATASET_TABLE);
+        db.execSQL(DBSchema.CREATE_GROUP_TABLE);
+        db.execSQL(DBSchema.CREATE_FIELD_TABLE);
+
+        db.execSQL(DBSchema.CREATE_OPTION_SET_TABLE);
+        db.execSQL(DBSchema.CREATE_OPTION_TABLE);
     }
 
     @Override
@@ -35,6 +43,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.DROP_REPORTS_TABLE);
         db.execSQL(DBSchema.DROP_REPORT_GROUP_TABLE);
         db.execSQL(DBSchema.DROP_REPORT_FIELDS_TABLE);
+
+        db.execSQL(DBSchema.DROP_ORGANIZATION_UNIT_TABLE);
+        db.execSQL(DBSchema.DROP_DATASET_TABLE);
+        db.execSQL(DBSchema.DROP_GROUP_TABLE);
+        db.execSQL(DBSchema.DROP_FIELD_TABLE);
+
+        db.execSQL(DBSchema.DROP_OPTION_SET_TABLE);
+        db.execSQL(DBSchema.DROP_OPTION_TABLE);
     }
 
     /**

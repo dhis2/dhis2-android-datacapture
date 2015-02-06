@@ -14,16 +14,20 @@ import android.net.Uri;
 
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSetColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.FieldColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.GroupColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionSetColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnitColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static android.content.ContentUris.parseId;
@@ -59,6 +63,28 @@ public class DBContentProvider extends ContentProvider {
 
     private static final int REPORT_FIELDS = 1300;
     private static final int REPORT_FIELD_ID = 1301;
+
+    private static final int OPTION_SETS = 1400;
+    private static final int OPTION_SET_ID = 1401;
+
+    private static final int OPTIONS = 1500;
+    private static final int OPTION_ID = 1501;
+
+    private static final int FIELDS = 1600;
+    private static final int FIELDS_WITH_OPTION_SETS = 1602;
+    private static final int FIELD_ID = 1601;
+
+    private static final int GROUPS = 1700;
+    private static final int GROUP_ID = 1701;
+
+    private static final int ORGANIZATION_UNITS = 1800;
+    private static final int ORGANIZATION_UNIT_ID = 1801;
+    private static final int ORGANIZATION_UNIT_WITH_DATASETS = 1802;
+
+    private static final int DATASETS = 1900;
+    private static final int DATASET_ID = 1901;
+    private static final int DATASET_ID_WITH_GROUPS = 1902;
+
     private static final UriMatcher URI_MATCHER = buildMatcher();
 
     private DBOpenHelper mDBHelper;
@@ -88,7 +114,42 @@ public class DBContentProvider extends ContentProvider {
 
         matcher.addURI(DBContract.AUTHORITY, ReportFieldColumns.PATH, REPORT_FIELDS);
         matcher.addURI(DBContract.AUTHORITY, ReportFieldColumns.PATH + "/#", REPORT_FIELD_ID);
+
+        matcher.addURI(DBContract.AUTHORITY, OptionSetColumns.PATH, OPTION_SETS);
+        matcher.addURI(DBContract.AUTHORITY, OptionSetColumns.PATH + "/#", OPTION_SET_ID);
+
+        matcher.addURI(DBContract.AUTHORITY, OptionColumns.PATH, OPTIONS);
+        matcher.addURI(DBContract.AUTHORITY, OptionColumns.PATH + "/#", OPTION_ID);
+
+        matcher.addURI(DBContract.AUTHORITY, FieldColumns.PATH, FIELDS);
+        matcher.addURI(DBContract.AUTHORITY, FieldColumns.PATH + "/#", FIELD_ID);
+        matcher.addURI(DBContract.AUTHORITY,
+                FieldColumns.PATH_WITH_OPTION_SETS,
+                FIELDS_WITH_OPTION_SETS);
+
+        matcher.addURI(DBContract.AUTHORITY, GroupColumns.PATH, GROUPS);
+        matcher.addURI(DBContract.AUTHORITY, GroupColumns.PATH + "/#", GROUP_ID);
+
+        matcher.addURI(DBContract.AUTHORITY, OrganizationUnitColumns.PATH, ORGANIZATION_UNITS);
+        matcher.addURI(DBContract.AUTHORITY, OrganizationUnitColumns.PATH + "/#", ORGANIZATION_UNIT_ID);
+        matcher.addURI(DBContract.AUTHORITY,
+                OrganizationUnitColumns.PATH_WITH_DATASETS + "/#",
+                ORGANIZATION_UNIT_WITH_DATASETS);
+
+        matcher.addURI(DBContract.AUTHORITY, DataSetColumns.PATH, DATASETS);
+        matcher.addURI(DBContract.AUTHORITY, DataSetColumns.PATH + "/#", DATASET_ID);
+        matcher.addURI(DBContract.AUTHORITY,
+                DataSetColumns.PATH_WITH_GROUPS + "/#",
+                DATASET_ID_WITH_GROUPS);
+
         return matcher;
+    }
+
+    @Override
+    public boolean onCreate() {
+        mDBHelper = new DBOpenHelper(getContext());
+        mIsInBatchMode = new ThreadLocal<>();
+        return true;
     }
 
     @Override
@@ -116,6 +177,8 @@ public class DBContentProvider extends ContentProvider {
 
             case REPORTS:
                 return ReportColumns.CONTENT_TYPE;
+            case REPORTS_WITH_GROUPS:
+                return ReportColumns.CONTENT_TYPE_WITH_GROUPS;
             case REPORT_ID:
                 return ReportColumns.CONTENT_ITEM_TYPE;
 
@@ -128,122 +191,419 @@ public class DBContentProvider extends ContentProvider {
                 return ReportFieldColumns.CONTENT_TYPE;
             case REPORT_FIELD_ID:
                 return ReportFieldColumns.CONTENT_ITEM_TYPE;
+
+            case OPTION_SETS:
+                return OptionSetColumns.CONTENT_TYPE;
+            case OPTION_SET_ID:
+                return OptionSetColumns.CONTENT_ITEM_TYPE;
+
+            case OPTIONS:
+                return OptionColumns.CONTENT_TYPE;
+            case OPTION_ID:
+                return OptionColumns.CONTENT_ITEM_TYPE;
+
+            case FIELDS:
+                return FieldColumns.CONTENT_TYPE;
+            case FIELDS_WITH_OPTION_SETS:
+                return FieldColumns.CONTENT_TYPE_WITH_OPTION_SETS;
+            case FIELD_ID:
+                return FieldColumns.CONTENT_ITEM_TYPE;
+
+            case GROUPS:
+                return GroupColumns.CONTENT_TYPE;
+            case GROUP_ID:
+                return GroupColumns.CONTENT_ITEM_TYPE;
+
+            case ORGANIZATION_UNITS:
+                return OrganizationUnitColumns.CONTENT_TYPE;
+            case ORGANIZATION_UNIT_WITH_DATASETS:
+                return OrganizationUnitColumns.CONTENT_TYPE_WITH_DATASETS;
+            case ORGANIZATION_UNIT_ID:
+                return OrganizationUnitColumns.CONTENT_ITEM_TYPE;
+
+            case DATASETS:
+                return DataSetColumns.CONTENT_TYPE;
+            case DATASET_ID:
+                return DataSetColumns.CONTENT_ITEM_TYPE;
+            case DATASET_ID_WITH_GROUPS:
+                return DataSetColumns.CONTENT_ITEM_TYPE_WITH_GROUPS;
+
             default:
                 throw new IllegalArgumentException("No corresponding Uri type was found");
         }
     }
 
     @Override
-    public boolean onCreate() {
-        mDBHelper = new DBOpenHelper(getContext());
-        mIsInBatchMode = new ThreadLocal<>();
-        return true;
-    }
-
-    @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        SQLiteDatabase db = mDBHelper.getReadableDatabase();
-        SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 
         switch (URI_MATCHER.match(uri)) {
-            case DASHBOARDS: {
-                qBuilder.setTables(DashboardColumns.TABLE_NAME);
-                break;
-            }
+            case DASHBOARDS:
+                return query(uri, DashboardColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case DASHBOARD_ID:
+                return queryId(uri, DashboardColumns.TABLE_NAME, DashboardColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case DASHBOARD_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(DashboardColumns.TABLE_NAME);
-                qBuilder.appendWhere(DashboardColumns.DB_ID + " = " + id);
-                break;
-            }
+            case DASHBOARD_ITEMS:
+                return query(uri, DashboardItemColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case DASHBOARD_ITEM_ID:
+                return queryId(uri, DashboardItemColumns.TABLE_NAME, DashboardItemColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case DASHBOARD_ITEMS: {
-                qBuilder.setTables(DashboardItemColumns.TABLE_NAME);
-                break;
-            }
+            case INTERPRETATIONS:
+                return query(uri, InterpretationColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case INTERPRETATIONS_ID:
+                return queryId(uri, InterpretationColumns.TABLE_NAME, InterpretationColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case DASHBOARD_ITEM_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(DashboardItemColumns.TABLE_NAME);
-                qBuilder.appendWhere(DashboardItemColumns.DB_ID + " = " + id);
-                break;
-            }
+            case KEY_VALUES:
+                return query(uri, KeyValueColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case KEY_VALUE_ID:
+                return queryId(uri, KeyValueColumns.TABLE_NAME, KeyValueColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case INTERPRETATIONS: {
-                qBuilder.setTables(InterpretationColumns.TABLE_NAME);
-                break;
-            }
-
-            case INTERPRETATIONS_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(InterpretationColumns.TABLE_NAME);
-                qBuilder.appendWhere(InterpretationColumns.DB_ID + " = " + id);
-                break;
-            }
-
-            case KEY_VALUES: {
-                qBuilder.setTables(KeyValueColumns.TABLE_NAME);
-                break;
-            }
-
-            case KEY_VALUE_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(KeyValueColumns.TABLE_NAME);
-                qBuilder.appendWhere(KeyValueColumns.DB_ID + " = " + id);
-                break;
-            }
-
-            case REPORTS: {
-                qBuilder.setTables(ReportColumns.TABLE_NAME);
-                break;
-            }
-
-            case REPORT_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(ReportColumns.TABLE_NAME);
-                qBuilder.appendWhere(ReportColumns.DB_ID + " = " + id);
-                break;
-            }
-
+            case REPORTS:
+                return query(uri, ReportColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case REPORT_ID:
+                return queryId(uri, ReportColumns.TABLE_NAME, ReportColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
             case REPORTS_WITH_GROUPS: {
-                qBuilder.setTables(
-                        ReportColumns.TABLE_NAME +
-                                " LEFT OUTER JOIN " + ReportGroupColumns.TABLE_NAME +
-                                " ON " + ReportColumns.TABLE_NAME + "." + ReportColumns.DB_ID +
-                                " = " + ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.REPORT_DB_ID
-                );
-                break;
+                String table = ReportColumns.TABLE_NAME +
+                        " LEFT OUTER JOIN " + ReportGroupColumns.TABLE_NAME +
+                        " ON " + ReportColumns.TABLE_NAME + "." + ReportColumns.DB_ID +
+                        " = " + ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.REPORT_DB_ID;
+                return query(uri, table, projection, selection, selectionArgs, sortOrder);
             }
 
-            case REPORT_GROUPS: {
-                qBuilder.setTables(ReportGroupColumns.TABLE_NAME);
-                break;
-            }
+            case REPORT_GROUPS:
+                return query(uri, ReportGroupColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case REPORT_GROUP_ID:
+                return queryId(uri, ReportGroupColumns.TABLE_NAME, ReportGroupColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case REPORT_GROUP_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(ReportGroupColumns.TABLE_NAME);
-                qBuilder.appendWhere(ReportGroupColumns.DB_ID + " = " + id);
-                break;
-            }
+            case REPORT_FIELDS:
+                return query(uri, ReportFieldColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case REPORT_FIELD_ID:
+                return queryId(uri, ReportFieldColumns.TABLE_NAME, ReportFieldColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case REPORT_FIELDS: {
-                qBuilder.setTables(ReportFieldColumns.TABLE_NAME);
-                break;
-            }
+            case OPTION_SETS:
+                return query(uri, OptionSetColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case OPTION_SET_ID:
+                return queryId(uri, OptionSetColumns.TABLE_NAME, OptionSetColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
 
-            case REPORT_FIELD_ID: {
-                long id = parseId(uri);
-                qBuilder.setTables(ReportFieldColumns.TABLE_NAME);
-                qBuilder.appendWhere(ReportFieldColumns.DB_ID + " = " + id);
-                break;
+            case OPTIONS:
+                return query(uri, OptionColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case OPTION_ID:
+                return queryId(uri, OptionColumns.TABLE_NAME, OptionColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
+
+            case FIELDS:
+                return query(uri, FieldColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case FIELDS_WITH_OPTION_SETS: {
+                String table = FieldColumns.TABLE_NAME +
+                        " FULL OUTER JOIN " + OptionSetColumns.TABLE_NAME +
+                        " ON " + FieldColumns.TABLE_NAME + "." + FieldColumns.OPTION_SET +
+                        " = " + OptionSetColumns.TABLE_NAME + "." + OptionSetColumns.ID +
+                        " FULL OUTER JOIN " + OptionColumns.TABLE_NAME +
+                        " ON " + OptionSetColumns.TABLE_NAME + "." + OptionSetColumns.DB_ID +
+                        " = " + OptionColumns.TABLE_NAME + "." + OptionColumns.OPTION_SET_DB_ID;
+                return query(uri, table, projection,
+                        selection, selectionArgs, sortOrder);
+            }
+            case FIELD_ID:
+                return queryId(uri, FieldColumns.TABLE_NAME, FieldColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
+
+            case GROUPS:
+                return query(uri, GroupColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case GROUP_ID:
+                return queryId(uri, GroupColumns.TABLE_NAME, GroupColumns.DB_ID,
+                        projection, selection, selectionArgs, sortOrder);
+
+            case ORGANIZATION_UNITS:
+                return query(uri, OrganizationUnitColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case ORGANIZATION_UNIT_WITH_DATASETS: {
+                String table = OrganizationUnitColumns.TABLE_NAME +
+                        " FULL OUTER JOIN " + DataSetColumns.TABLE_NAME +
+                        " ON " + OrganizationUnitColumns.TABLE_NAME + "." + OrganizationUnitColumns.DB_ID +
+                        " = " + DataSetColumns.TABLE_NAME + "." + DataSetColumns.ORGANIZATION_UNIT_DB_ID;
+                return query(uri, table, projection,
+                        selection, selectionArgs, sortOrder);
+            }
+            case ORGANIZATION_UNIT_ID:
+                return queryId(uri, OrganizationUnitColumns.TABLE_NAME,
+                        OrganizationUnitColumns.DB_ID, projection, selection,
+                        selectionArgs, sortOrder);
+
+            case DATASETS:
+                return query(uri, DataSetColumns.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            case DATASET_ID:
+                return queryId(uri, DataSetColumns.TABLE_NAME,
+                        DataSetColumns.DB_ID, projection, selection,
+                        selectionArgs, sortOrder);
+            case DATASET_ID_WITH_GROUPS: {
+                String table = DataSetColumns.TABLE_NAME +
+                        " FULL OUTER JOIN " + GroupColumns.TABLE_NAME +
+                        " ON " + DataSetColumns.TABLE_NAME + "." + DataSetColumns.DB_ID +
+                        " = " + GroupColumns.TABLE_NAME + "." + GroupColumns.DATA_SET_DB_ID +
+                        " FULL OUTER JOIN " + FieldColumns.TABLE_NAME +
+                        " ON " + GroupColumns.TABLE_NAME + "." + GroupColumns.DB_ID +
+                        " = " + FieldColumns.TABLE_NAME + "." + FieldColumns.GROUP_DB_ID +
+                        " FULL OUTER JOIN " + OptionSetColumns.TABLE_NAME +
+                        " ON " + FieldColumns.TABLE_NAME + "." + FieldColumns.OPTION_SET +
+                        " = " + OptionSetColumns.TABLE_NAME + "." + OptionSetColumns.ID +
+                        " FULL OUTER JOIN " + OptionColumns.TABLE_NAME +
+                        " ON " + OptionSetColumns.TABLE_NAME + "." + OptionSetColumns.DB_ID +
+                        " = " + OptionColumns.TABLE_NAME + "." + OptionColumns.OPTION_SET_DB_ID;
+                return queryId(uri, table,DataSetColumns.DB_ID,
+                        projection, selection,selectionArgs, sortOrder);
             }
 
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
+    }
+
+    @Override
+    public Uri insert(Uri uri, ContentValues values) {
+        switch (URI_MATCHER.match(uri)) {
+            case DASHBOARDS:
+                return insert(DashboardColumns.TABLE_NAME, values, uri);
+            case DASHBOARD_ITEMS:
+                return insert(DashboardItemColumns.TABLE_NAME, values, uri);
+            case INTERPRETATIONS:
+                return insert(InterpretationColumns.TABLE_NAME, values, uri);
+            case KEY_VALUES:
+                return insert(KeyValueColumns.TABLE_NAME, values, uri);
+            case REPORTS:
+                return insert(ReportColumns.TABLE_NAME, values, uri);
+            case REPORT_GROUPS:
+                return insert(ReportGroupColumns.TABLE_NAME, values, uri);
+            case REPORT_FIELDS:
+                return insert(ReportFieldColumns.TABLE_NAME, values, uri);
+            case OPTION_SETS:
+                return insert(OptionSetColumns.TABLE_NAME, values, uri);
+            case OPTIONS:
+                return insert(OptionColumns.TABLE_NAME, values, uri);
+            case FIELDS:
+                return insert(FieldColumns.TABLE_NAME, values, uri);
+            case GROUPS:
+                return insert(GroupColumns.TABLE_NAME, values, uri);
+            case ORGANIZATION_UNITS:
+                return insert(OrganizationUnitColumns.TABLE_NAME, values, uri);
+            case DATASETS:
+                return insert(DataSetColumns.TABLE_NAME, values, uri);
+            default:
+                throw new IllegalArgumentException("Unsupported URI for insertion: " + uri);
+        }
+    }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+
+        switch (URI_MATCHER.match(uri)) {
+            case DASHBOARDS:
+                return delete(uri, DashboardColumns.TABLE_NAME, selection, selectionArgs);
+            case DASHBOARD_ID:
+                return deleteId(uri, DashboardColumns.TABLE_NAME,
+                        DashboardColumns.DB_ID, selection, selectionArgs);
+
+            case DASHBOARD_ITEMS:
+                return delete(uri, DashboardItemColumns.TABLE_NAME, selection, selectionArgs);
+            case DASHBOARD_ITEM_ID:
+                return deleteId(uri, DashboardItemColumns.TABLE_NAME,
+                        DashboardItemColumns.DB_ID, selection, selectionArgs);
+
+            case INTERPRETATIONS:
+                return delete(uri, InterpretationColumns.TABLE_NAME, selection, selectionArgs);
+            case INTERPRETATIONS_ID:
+                return deleteId(uri, InterpretationColumns.TABLE_NAME,
+                        InterpretationColumns.DB_ID, selection, selectionArgs);
+
+            case KEY_VALUES:
+                return delete(uri, KeyValueColumns.TABLE_NAME, selection, selectionArgs);
+            case KEY_VALUE_ID:
+                return deleteId(uri, KeyValueColumns.TABLE_NAME,
+                        KeyValueColumns.DB_ID, selection, selectionArgs);
+
+            case REPORTS:
+                return delete(uri, ReportColumns.TABLE_NAME, selection, selectionArgs);
+            case REPORT_ID:
+                return deleteId(uri, ReportColumns.TABLE_NAME,
+                        ReportColumns.DB_ID, selection, selectionArgs);
+
+            case REPORT_GROUPS:
+                return delete(uri, ReportGroupColumns.TABLE_NAME, selection, selectionArgs);
+            case REPORT_GROUP_ID:
+                return deleteId(uri, ReportGroupColumns.TABLE_NAME,
+                        ReportGroupColumns.DB_ID, selection, selectionArgs);
+
+            case REPORT_FIELDS:
+                return delete(uri, ReportFieldColumns.TABLE_NAME, selection, selectionArgs);
+            case REPORT_FIELD_ID:
+                return deleteId(uri, ReportFieldColumns.TABLE_NAME,
+                        ReportFieldColumns.DB_ID, selection, selectionArgs);
+
+            case OPTION_SETS:
+                return delete(uri, OptionSetColumns.TABLE_NAME, selection, selectionArgs);
+            case OPTION_SET_ID:
+                return deleteId(uri, OptionSetColumns.TABLE_NAME,
+                        OptionSetColumns.DB_ID, selection, selectionArgs);
+
+            case OPTIONS:
+                return delete(uri, OptionColumns.TABLE_NAME, selection, selectionArgs);
+            case OPTION_ID:
+                return deleteId(uri, OptionColumns.TABLE_NAME,
+                        OptionColumns.DB_ID, selection, selectionArgs);
+
+            case FIELDS:
+                return delete(uri, FieldColumns.TABLE_NAME, selection, selectionArgs);
+            case FIELD_ID:
+                return deleteId(uri, FieldColumns.TABLE_NAME,
+                        FieldColumns.DB_ID, selection, selectionArgs);
+
+            case GROUPS:
+                return delete(uri, GroupColumns.TABLE_NAME, selection, selectionArgs);
+            case GROUP_ID:
+                return deleteId(uri, GroupColumns.TABLE_NAME,
+                        GroupColumns.DB_ID, selection, selectionArgs);
+
+            case ORGANIZATION_UNITS:
+                return delete(uri, OrganizationUnitColumns.TABLE_NAME, selection, selectionArgs);
+            case ORGANIZATION_UNIT_ID:
+                return deleteId(uri, OrganizationUnitColumns.TABLE_NAME,
+                        OrganizationUnitColumns.DB_ID, selection, selectionArgs);
+
+            case DATASETS:
+                return delete(uri, DataSetColumns.TABLE_NAME, selection, selectionArgs);
+            case DATASET_ID:
+                return deleteId(uri, DataSetColumns.TABLE_NAME,
+                        DataSetColumns.DB_ID, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        }
+    }
+
+    @Override
+    public int update(Uri uri, ContentValues values,
+                      String selection, String[] selectionArgs) {
+
+        switch (URI_MATCHER.match(uri)) {
+            case DASHBOARDS:
+                return update(uri, DashboardColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case DASHBOARD_ID:
+                return updateId(uri, DashboardColumns.TABLE_NAME,
+                        DashboardColumns.DB_ID, selection, selectionArgs, values);
+
+            case DASHBOARD_ITEMS:
+                return update(uri, DashboardItemColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case DASHBOARD_ITEM_ID:
+                return updateId(uri, DashboardItemColumns.TABLE_NAME,
+                        DashboardItemColumns.DB_ID, selection, selectionArgs, values);
+
+            case INTERPRETATIONS:
+                return update(uri, InterpretationColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case INTERPRETATIONS_ID:
+                return updateId(uri, InterpretationColumns.TABLE_NAME,
+                        InterpretationColumns.DB_ID, selection, selectionArgs, values);
+
+            case KEY_VALUES:
+                return update(uri, KeyValueColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case KEY_VALUE_ID:
+                return updateId(uri, KeyValueColumns.TABLE_NAME,
+                        KeyValueColumns.DB_ID, selection, selectionArgs, values);
+
+            case REPORTS:
+                return update(uri, ReportColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case REPORT_ID:
+                return updateId(uri, ReportColumns.TABLE_NAME,
+                        ReportColumns.DB_ID, selection, selectionArgs, values);
+
+            case REPORT_GROUPS:
+                return update(uri, ReportGroupColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case REPORT_GROUP_ID:
+                return updateId(uri, ReportGroupColumns.TABLE_NAME,
+                        ReportGroupColumns.DB_ID, selection, selectionArgs, values);
+
+            case REPORT_FIELDS:
+                return update(uri, ReportFieldColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case REPORT_FIELD_ID:
+                return updateId(uri, ReportFieldColumns.TABLE_NAME,
+                        ReportFieldColumns.DB_ID, selection, selectionArgs, values);
+
+            case OPTION_SETS:
+                return update(uri, OptionSetColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case OPTION_SET_ID:
+                return updateId(uri, OptionSetColumns.TABLE_NAME,
+                        OptionSetColumns.DB_ID, selection, selectionArgs, values);
+
+            case OPTIONS:
+                return update(uri, OptionColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case OPTION_ID:
+                return updateId(uri, OptionColumns.TABLE_NAME,
+                        OptionColumns.DB_ID, selection, selectionArgs, values);
+
+            case FIELDS:
+                return update(uri, FieldColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case FIELD_ID:
+                return updateId(uri, FieldColumns.TABLE_NAME,
+                        FieldColumns.DB_ID, selection, selectionArgs, values);
+
+            case GROUPS:
+                return update(uri, GroupColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case GROUP_ID:
+                return updateId(uri, GroupColumns.TABLE_NAME,
+                        GroupColumns.DB_ID, selection, selectionArgs, values);
+
+            case ORGANIZATION_UNITS:
+                return update(uri, OrganizationUnitColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case ORGANIZATION_UNIT_ID:
+                return updateId(uri, OrganizationUnitColumns.TABLE_NAME,
+                        OrganizationUnitColumns.DB_ID, selection, selectionArgs, values);
+
+            case DATASETS:
+                return update(uri, DataSetColumns.TABLE_NAME,
+                        selection, selectionArgs, values);
+            case DATASET_ID:
+                return updateId(uri, DataSetColumns.TABLE_NAME,
+                        DataSetColumns.DB_ID, selection, selectionArgs, values);
+            default:
+                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        }
+    }
+
+    private Cursor query(Uri uri, String tableName, String[] projection,
+                         String selection, String[] selectionArgs, String sortOrder) {
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+        SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+        qBuilder.setTables(tableName);
 
         Cursor cursor = qBuilder.query(
                 db, projection, selection, selectionArgs, null, null, sortOrder
@@ -253,326 +613,81 @@ public class DBContentProvider extends ContentProvider {
         return cursor;
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        switch (URI_MATCHER.match(uri)) {
-            case DASHBOARDS: {
-                long id = db.insertOrThrow(DashboardColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
+    private Cursor queryId(Uri uri, String tableName, String colId, String[] projection,
+                           String selection, String[] selectionArgs, String sortOrder) {
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+        SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 
-            case DASHBOARD_ITEMS: {
-                long id = db.insertOrThrow(DashboardItemColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
+        long id = parseId(uri);
+        qBuilder.setTables(tableName);
+        qBuilder.appendWhere(colId + " = " + id);
 
-            case INTERPRETATIONS: {
-                long id = db.insertOrThrow(InterpretationColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
+        Cursor cursor = qBuilder.query(
+                db, projection, selection, selectionArgs, null, null, sortOrder
+        );
 
-            case KEY_VALUES: {
-                long id = db.insertOrThrow(KeyValueColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
-
-            case REPORTS: {
-                long id = db.insertOrThrow(ReportColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
-
-            case REPORT_GROUPS: {
-                long id = db.insertOrThrow(ReportGroupColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
-
-            case REPORT_FIELDS: {
-                long id = db.insertOrThrow(ReportFieldColumns.TABLE_NAME, null, values);
-                if (!isInBatchMode()) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return withAppendedId(uri, id);
-            }
-
-            default:
-                throw new IllegalArgumentException("Unsupported URI for insertion: " + uri);
-        }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
     }
 
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    private Uri insert(String tableName, ContentValues values, Uri uri) {
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        String where;
-        String table;
-
-        switch (URI_MATCHER.match(uri)) {
-            case DASHBOARDS: {
-                table = DashboardColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case DASHBOARD_ID: {
-                long id = parseId(uri);
-                table = DashboardColumns.TABLE_NAME;
-                where = DashboardColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case DASHBOARD_ITEMS: {
-                table = DashboardItemColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case DASHBOARD_ITEM_ID: {
-                long id = parseId(uri);
-                table = DashboardItemColumns.TABLE_NAME;
-                where = DashboardItemColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case INTERPRETATIONS: {
-                table = InterpretationColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case INTERPRETATIONS_ID: {
-                long id = parseId(uri);
-                table = InterpretationColumns.TABLE_NAME;
-                where = InterpretationColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case KEY_VALUES: {
-                table = KeyValueColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case KEY_VALUE_ID: {
-                long id = parseId(uri);
-                table = KeyValueColumns.TABLE_NAME;
-                where = KeyValueColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case REPORTS: {
-                table = ReportColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case REPORT_ID: {
-                long id = parseId(uri);
-                table = ReportColumns.TABLE_NAME;
-                where = ReportColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case REPORT_GROUPS: {
-                table = ReportGroupColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case REPORT_GROUP_ID: {
-                long id = parseId(uri);
-                table = ReportGroupColumns.TABLE_NAME;
-                where = ReportGroupColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case REPORT_FIELDS: {
-                table = ReportFieldColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case REPORT_FIELD_ID: {
-                long id = parseId(uri);
-                table = ReportFieldColumns.TABLE_NAME;
-                where = ReportFieldColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            default:
-                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        long id = db.insertOrThrow(tableName, null, values);
+        if (!isInBatchMode()) {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
+        return withAppendedId(uri, id);
+    }
 
-        int count = db.delete(table, where, selectionArgs);
+    private int delete(Uri uri, String tableName,
+                       String selection, String[] selectionArgs) {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+
+        int count = db.delete(tableName, selection, selectionArgs);
         if (count > 0 && !isInBatchMode()) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return count;
     }
 
-    @Override
-    public int update(Uri uri, ContentValues values,
-                      String selection, String[] selectionArgs) {
+    private int deleteId(Uri uri, String tableName, String colId,
+                         String selection, String[] selectionArgs) {
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        String table;
-        String where;
-
-        switch (URI_MATCHER.match(uri)) {
-            case DASHBOARDS: {
-                table = DashboardColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case DASHBOARD_ID: {
-                long id = parseId(uri);
-                table = DashboardColumns.TABLE_NAME;
-                where = DashboardColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case DASHBOARD_ITEMS: {
-                table = DashboardItemColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case DASHBOARD_ITEM_ID: {
-                long id = parseId(uri);
-                table = DashboardItemColumns.TABLE_NAME;
-                where = DashboardItemColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case INTERPRETATIONS: {
-                table = InterpretationColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case INTERPRETATIONS_ID: {
-                long id = parseId(uri);
-                table = InterpretationColumns.TABLE_NAME;
-                where = InterpretationColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case KEY_VALUES: {
-                table = KeyValueColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case KEY_VALUE_ID: {
-                long id = parseId(uri);
-                table = KeyValueColumns.TABLE_NAME;
-                where = KeyValueColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case REPORTS: {
-                table = ReportColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case REPORT_ID: {
-                long id = parseId(uri);
-                table = ReportColumns.TABLE_NAME;
-                where = ReportColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case REPORT_GROUPS: {
-                table = ReportGroupColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case REPORT_GROUP_ID: {
-                long id = parseId(uri);
-                table = ReportGroupColumns.TABLE_NAME;
-                where = ReportGroupColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            case REPORT_FIELDS: {
-                table = ReportFieldColumns.TABLE_NAME;
-                where = selection;
-                break;
-            }
-
-            case REPORT_FIELD_ID: {
-                long id = parseId(uri);
-                table = ReportFieldColumns.TABLE_NAME;
-                where = ReportFieldColumns.DB_ID + " = " + id;
-                if (!isEmpty(selection)) {
-                    where += " AND " + selection;
-                }
-                break;
-            }
-
-            default:
-                throw new IllegalArgumentException("Unsupported URI: " + uri);
+        long id = parseId(uri);
+        String where = colId + " = " + id;
+        if (!isEmpty(selection)) {
+            where += " AND " + selection;
         }
 
-        int count = db.update(table, values, where, selectionArgs);
+        int count = db.delete(tableName, where, selectionArgs);
+        if (count > 0 && !isInBatchMode()) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return count;
+    }
+
+    private int update(Uri uri, String tableName, String selection,
+                       String[] selectionArgs, ContentValues values) {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        int count = db.update(tableName, values, selection, selectionArgs);
+        if (count > 0 && !isInBatchMode()) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return count;
+    }
+
+    private int updateId(Uri uri, String tableName, String colId,
+                         String selection, String[] selectionArgs,
+                         ContentValues values) {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+
+        long id = parseId(uri);
+        String where = colId + " = " + id;
+        if (!isEmpty(selection)) {
+            where += " AND " + selection;
+        }
+
+        int count = db.update(tableName, values, where, selectionArgs);
         if (count > 0 && !isInBatchMode()) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
@@ -582,8 +697,9 @@ public class DBContentProvider extends ContentProvider {
     @Override
     public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations)
             throws OperationApplicationException {
-        final Set<Uri> contentUris = new HashSet<Uri>();
+        final Set<Uri> contentUris = new HashSet<>();
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+
         mIsInBatchMode.set(true);
         db.beginTransaction();
         try {

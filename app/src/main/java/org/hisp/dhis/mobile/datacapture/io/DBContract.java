@@ -127,10 +127,14 @@ public class DBContract {
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Report";
+        public static final String CONTENT_TYPE_WITH_GROUPS = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Report" + "&" + "models.Group";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Report";
+
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
-        public static final Uri CONTENT_URI_WITH_GROUPS = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_WITH_GROUPS);
+        public static final Uri CONTENT_URI_WITH_GROUPS = Uri.withAppendedPath(
+                BASE_CONTENT_URI, PATH_WITH_GROUPS);
     }
 
     public static interface ReportGroupColumns {
@@ -177,6 +181,8 @@ public class DBContract {
     public static interface OrganizationUnitColumns {
         public static final String TABLE_NAME = "organizationUnitTable";
         public static final String PATH = TABLE_NAME;
+        public static final String PATH_WITH_DATASETS = OrganizationUnitColumns.TABLE_NAME +
+                "/" + DataSetColumns.TABLE_NAME;
 
         public static final String DB_ID = BaseColumns._ID;
         public static final String ID = "id";
@@ -186,15 +192,23 @@ public class DBContract {
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit";
+        public static final String CONTENT_TYPE_WITH_DATASETS = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit" + "&" + "models.DataSet";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit";
+
+
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+        public static final Uri CONTENT_URI_WITH_DATASETS = Uri.withAppendedPath(
+                BASE_CONTENT_URI, PATH_WITH_DATASETS);
     }
 
 
     public static interface DataSetColumns {
         public static final String TABLE_NAME = "dataSetTable";
         public static final String PATH = TABLE_NAME;
+        public static final String PATH_WITH_GROUPS = DataSetColumns.TABLE_NAME +
+                "/" + GroupColumns.TABLE_NAME;
 
         public static final String DB_ID = BaseColumns._ID;
         public static final String ID = "id";
@@ -211,7 +225,12 @@ public class DBContract {
                 "/org.hisp.dhis.mobile.datacapture.api.models.DataSet";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.DataSet";
+        public static final String CONTENT_ITEM_TYPE_WITH_GROUPS = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.DataSet" + "&" + "models.Group";
+
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+        public static final Uri CONTENT_URI_WITH_GROUPS = Uri.withAppendedPath(
+                BASE_CONTENT_URI, PATH_WITH_GROUPS);
     }
 
 
@@ -237,6 +256,8 @@ public class DBContract {
     public static interface FieldColumns {
         public static final String TABLE_NAME = "fieldTable";
         public static final String PATH = TABLE_NAME;
+        public static final String PATH_WITH_OPTION_SETS = FieldColumns.TABLE_NAME +
+                "/" + OptionSetColumns.TABLE_NAME;
 
         public static final String DB_ID = BaseColumns._ID;
         public static final String LABEL = "label";
@@ -254,9 +275,14 @@ public class DBContract {
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Field";
+        public static final String CONTENT_TYPE_WITH_OPTION_SETS = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Field" + "&" + "models.OptionSet";
+
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Field";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+        public static final Uri CONTENT_URI_WITH_OPTION_SETS = Uri.withAppendedPath(
+                BASE_CONTENT_URI, PATH_WITH_OPTION_SETS);
     }
 
 
