@@ -23,8 +23,6 @@ import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
 import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
-import org.hisp.dhis.mobile.datacapture.io.DBContract;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 
 import java.util.ArrayList;
 import java.util.HashMap;

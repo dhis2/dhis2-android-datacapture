@@ -9,11 +9,10 @@ import android.net.Uri;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Comment;
-import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItemElement;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.api.models.InterpretationDataSet;
@@ -106,7 +105,7 @@ public final class InterpretationHandler {
         return values;
     }
 
-    public static DBItemHolder<Interpretation> fromCursor(Cursor cursor) {
+    public static DbRow<Interpretation> fromCursor(Cursor cursor) {
         if (cursor == null) {
             throw new IllegalArgumentException("Cursor object cannot be null");
         }
@@ -145,9 +144,9 @@ public final class InterpretationHandler {
         interpretation.setUser(user);
         interpretation.setComments(comments);
 
-        DBItemHolder<Interpretation> holder = new DBItemHolder<>();
+        DbRow<Interpretation> holder = new DbRow<>();
         holder.setItem(interpretation);
-        holder.setDataBaseId(cursor.getInt(DB_ID));
+        holder.setId(cursor.getInt(DB_ID));
         return holder;
     }
 
@@ -168,21 +167,21 @@ public final class InterpretationHandler {
                 !isEmpty(interpretation.getType()));
     }
 
-    public static ContentProviderOperation delete(DBItemHolder<Interpretation> dbItem) {
+    public static ContentProviderOperation delete(DbRow<Interpretation> dbItem) {
         Uri uri = ContentUris.withAppendedId(
-                Interpretations.CONTENT_URI, dbItem.getDatabaseId()
+                Interpretations.CONTENT_URI, dbItem.getId()
         );
         return ContentProviderOperation.newDelete(uri).build();
     }
 
-    public static ContentProviderOperation update(DBItemHolder<Interpretation> dbItem,
+    public static ContentProviderOperation update(DbRow<Interpretation> dbItem,
                                                   Interpretation interpretation) {
         if (!isCorrect(interpretation)) {
             return null;
         }
 
         Uri uri = ContentUris.withAppendedId(
-                Interpretations.CONTENT_URI, dbItem.getDatabaseId()
+                Interpretations.CONTENT_URI, dbItem.getId()
         );
         return ContentProviderOperation.newUpdate(uri)
                 .withValues(InterpretationHandler.toContentValues(interpretation))

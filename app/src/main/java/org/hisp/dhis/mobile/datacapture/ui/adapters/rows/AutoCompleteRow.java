@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.Option;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AutoCompleteRow implements Row {
-    private DBItemHolder<Field> mField;
+    private DbRow<Field> mField;
     private List<String> mOptions;
     private OnFieldValueSetListener mListener;
 
-    public AutoCompleteRow(DBItemHolder<Field> field, OptionSet optionset) {
+    public AutoCompleteRow(DbRow<Field> field, OptionSet optionset) {
         mField = field;
         mOptions = new ArrayList<>();
         if (optionset != null && optionset.getOptions() != null &&
@@ -70,9 +70,9 @@ public class AutoCompleteRow implements Row {
 
     private static class ValueSetListener implements AutoCompleteValueEntryView.OnValueSetListener {
         private OnFieldValueSetListener listener;
-        private DBItemHolder<Field> field;
+        private DbRow<Field> field;
 
-        public void setField(DBItemHolder<Field> field) {
+        public void setField(DbRow<Field> field) {
             this.field = field;
         }
 
@@ -86,7 +86,7 @@ public class AutoCompleteRow implements Row {
             if (newValue != null && !newValue.equals(value)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
-                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                    listener.onFieldValueSet(field.getId(), newValue);
                 }
             }
         }
@@ -105,7 +105,7 @@ public class AutoCompleteRow implements Row {
             this.listener = listener;
         }
 
-        public void updateViews(DBItemHolder<Field> field,
+        public void updateViews(DbRow<Field> field,
                                 OnFieldValueSetListener onFieldValueSetListener) {
             textLabel.setText(field.getItem().getLabel());
 

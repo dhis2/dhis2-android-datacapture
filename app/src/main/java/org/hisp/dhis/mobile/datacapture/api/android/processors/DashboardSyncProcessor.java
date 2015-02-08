@@ -12,7 +12,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -108,12 +108,12 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
     private ArrayList<ContentProviderOperation> updateDashboards() throws APIException {
         final String SELECTION = DashboardItems.STATE + " = " +
                 "'" + State.GETTING.toString() + "'";
-        List<DBItemHolder<Dashboard>> oldDashboards = readDashboards(SELECTION);
+        List<DbRow<Dashboard>> oldDashboards = readDashboards(SELECTION);
         List<Dashboard> newDashboardList = getDashboards();
         Map<String, Dashboard> newDashboards = DashboardHandler.toMap(newDashboardList);
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
-        for (DBItemHolder<Dashboard> oldDashboard : oldDashboards) {
+        for (DbRow<Dashboard> oldDashboard : oldDashboards) {
             Dashboard newDashboard = newDashboards.get(oldDashboard.getItem().getId());
 
             // if dashboard which we have recently got from server is empty,
@@ -181,7 +181,7 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
     }
 
     private void updateDashboard(List<ContentProviderOperation> ops,
-                                 DBItemHolder<Dashboard> oldDashboard,
+                                 DbRow<Dashboard> oldDashboard,
                                  Dashboard newDashboard) throws APIException {
         ContentProviderOperation dashboardUpdateOp = DashboardHandler.update(oldDashboard, newDashboard);
 
@@ -191,12 +191,12 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
 
         ops.add(dashboardUpdateOp);
 
-        final String SELECTION = DashboardItems.DASHBOARD_DB_ID + " = " + oldDashboard.getDatabaseId() + " AND " +
+        final String SELECTION = DashboardItems.DASHBOARD_DB_ID + " = " + oldDashboard.getId() + " AND " +
                 DashboardItems.STATE + " = " + "'" + State.GETTING.toString() + "'";
-        List<DBItemHolder<DashboardItem>> oldDashboardItems = readDashboardItems(SELECTION);
+        List<DbRow<DashboardItem>> oldDashboardItems = readDashboardItems(SELECTION);
         Map<String, DashboardItem> newDashboardItems = DashboardItemHandler.toMap(newDashboard.getDashboardItems());
 
-        for (DBItemHolder<DashboardItem> oldDashboardItem : oldDashboardItems) {
+        for (DbRow<DashboardItem> oldDashboardItem : oldDashboardItems) {
             DashboardItem newDashboardItem = newDashboardItems.get(oldDashboardItem.getItem().getId());
 
             if (newDashboardItem == null) {
@@ -238,16 +238,16 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
     }
 
     private void deleteDashboard(List<ContentProviderOperation> ops,
-                                 DBItemHolder<Dashboard> dashboard) {
+                                 DbRow<Dashboard> dashboard) {
         ops.add(DashboardHandler.delete(dashboard));
     }
 
-    private List<DBItemHolder<Dashboard>> readDashboards(String selection) {
+    private List<DbRow<Dashboard>> readDashboards(String selection) {
         Cursor cursor = getContext().getContentResolver().query(
                 Dashboards.CONTENT_URI, DashboardHandler.PROJECTION, selection, null, null
         );
 
-        List<DBItemHolder<Dashboard>> dashboards = new ArrayList<>();
+        List<DbRow<Dashboard>> dashboards = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
@@ -260,12 +260,12 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
         return dashboards;
     }
 
-    private List<DBItemHolder<DashboardItem>> readDashboardItems(String selection) {
+    private List<DbRow<DashboardItem>> readDashboardItems(String selection) {
         Cursor cursor = getContext().getContentResolver().query(
                 DashboardItems.CONTENT_URI, DashboardItemHandler.PROJECTION, selection, null, null
         );
 
-        List<DBItemHolder<DashboardItem>> items = new ArrayList<>();
+        List<DbRow<DashboardItem>> items = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
 
@@ -307,8 +307,8 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
 
         final String SELECTION_DELETED = Dashboards.STATE + " = " +
                 "'" + State.DELETING.toString() + "'";
-        List<DBItemHolder<Dashboard>> removedDashboards = readDashboards(SELECTION_DELETED);
-        for (DBItemHolder<Dashboard> dbItem : removedDashboards) {
+        List<DbRow<Dashboard>> removedDashboards = readDashboards(SELECTION_DELETED);
+        for (DbRow<Dashboard> dbItem : removedDashboards) {
             ResponseHolder<String> response = deleteDashboard(dbItem);
             if (response.getException() != null) {
                 throw response.getException();
@@ -319,8 +319,8 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
 
         final String SELECTION_EDITED = Dashboards.STATE + " = " +
                 "'" + State.PUTTING.toString() + "'";
-        List<DBItemHolder<Dashboard>> editedDashboards = readDashboards(SELECTION_EDITED);
-        for (DBItemHolder<Dashboard> dbItem : editedDashboards) {
+        List<DbRow<Dashboard>> editedDashboards = readDashboards(SELECTION_EDITED);
+        for (DbRow<Dashboard> dbItem : editedDashboards) {
             ResponseHolder<String> response = updateDashboard(dbItem);
             if (response.getException() != null) {
                 throw response.getException();
@@ -329,13 +329,13 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
             }
         }
 
-        List<DBItemHolder<Dashboard>> allDashboards = readDashboards(null);
-        for (DBItemHolder<Dashboard> dashboardDbItem : allDashboards) {
+        List<DbRow<Dashboard>> allDashboards = readDashboards(null);
+        for (DbRow<Dashboard> dashboardDbItem : allDashboards) {
             final String SELECTION_DELETED_ITEMS = DashboardItems.DASHBOARD_DB_ID + " = " +
-                    dashboardDbItem.getDatabaseId() + " AND " +
+                    dashboardDbItem.getId() + " AND " +
                     DashboardItems.STATE + " = " + "'" + State.DELETING.toString() + "'";
-            List<DBItemHolder<DashboardItem>> items = readDashboardItems(SELECTION_DELETED_ITEMS);
-            for (DBItemHolder<DashboardItem> dbItem : items) {
+            List<DbRow<DashboardItem>> items = readDashboardItems(SELECTION_DELETED_ITEMS);
+            for (DbRow<DashboardItem> dbItem : items) {
                 ResponseHolder<String> response = deleteDashboardItem(dashboardDbItem, dbItem);
                 if (response.getException() != null) {
                     throw response.getException();
@@ -348,8 +348,8 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
         return ops;
     }
 
-    private ResponseHolder<String> deleteDashboardItem(DBItemHolder<Dashboard> dashboard,
-                                                       DBItemHolder<DashboardItem> item) {
+    private ResponseHolder<String> deleteDashboardItem(DbRow<Dashboard> dashboard,
+                                                       DbRow<DashboardItem> item) {
         final ResponseHolder<String> holder = new ResponseHolder<>();
 
         DHISManager.getInstance().deleteItemFromDashboard(new ApiRequestCallback<String>() {
@@ -368,7 +368,7 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
         return holder;
     }
 
-    private ResponseHolder<String> deleteDashboard(DBItemHolder<Dashboard> dbItem) {
+    private ResponseHolder<String> deleteDashboard(DbRow<Dashboard> dbItem) {
         final ResponseHolder<String> holder = new ResponseHolder<>();
 
         DHISManager.getInstance().deleteDashboard(new ApiRequestCallback<String>() {
@@ -387,7 +387,7 @@ public class DashboardSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnD
         return holder;
     }
 
-    private ResponseHolder<String> updateDashboard(DBItemHolder<Dashboard> dbItem) {
+    private ResponseHolder<String> updateDashboard(DbRow<Dashboard> dbItem) {
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final Dashboard dashboard = dbItem.getItem();
 

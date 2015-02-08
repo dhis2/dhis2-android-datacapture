@@ -3,7 +3,7 @@ package org.hisp.dhis.mobile.datacapture.api.android.handlers;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
 
@@ -31,7 +31,7 @@ public final class ReportHandler {
         return contentValues;
     }
 
-    public static DBItemHolder<Report> fromCursor(Cursor cursor) {
+    public static DbRow<Report> fromCursor(Cursor cursor) {
         Report report = new Report();
 
         report.setOrgUnit(cursor.getString(ORG_UNIT_ID));
@@ -39,8 +39,8 @@ public final class ReportHandler {
         report.setPeriod(cursor.getString(PERIOD));
         report.setCompleteDate(cursor.getString(COMPLETE_DATE));
 
-        DBItemHolder<Report> holder = new DBItemHolder<>();
-        holder.setDataBaseId(cursor.getInt(DB_ID));
+        DbRow<Report> holder = new DbRow<>();
+        holder.setId(cursor.getInt(DB_ID));
         holder.setItem(report);
         return holder;
     }

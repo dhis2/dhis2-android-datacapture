@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -20,10 +20,10 @@ import org.joda.time.LocalDate;
 public class DatePickerRow implements Row {
     private static final String EMPTY_FIELD = "";
 
-    private DBItemHolder<Field> mField;
+    private DbRow<Field> mField;
     private OnFieldValueSetListener mListener;
 
-    public DatePickerRow(DBItemHolder<Field> field) {
+    public DatePickerRow(DbRow<Field> field) {
         mField = field;
     }
 
@@ -92,7 +92,7 @@ public class DatePickerRow implements Row {
             this.clearButtonListener = clearButtonListener;
         }
 
-        public void updateViews(DBItemHolder<Field> field, OnFieldValueSetListener listener) {
+        public void updateViews(DbRow<Field> field, OnFieldValueSetListener listener) {
             textLabel.setText(field.getItem().getLabel());
 
             dateSetListener.setField(field);
@@ -141,14 +141,14 @@ public class DatePickerRow implements Row {
 
     private static class ClearButtonListener implements OnClickListener {
         private EditText editText;
-        private DBItemHolder<Field> field;
+        private DbRow<Field> field;
         private OnFieldValueSetListener listener;
 
         public void setEditText(EditText editText) {
             this.editText = editText;
         }
 
-        public void setField(DBItemHolder<Field> field) {
+        public void setField(DbRow<Field> field) {
             this.field = field;
         }
 
@@ -165,11 +165,11 @@ public class DatePickerRow implements Row {
 
     private class DateSetListener implements DatePickerDialog.OnDateSetListener {
         private static final String DATE_FORMAT = "YYYY-MM-dd";
-        private DBItemHolder<Field> field;
+        private DbRow<Field> field;
         private EditText editText;
         private OnFieldValueSetListener listener;
 
-        public void setField(DBItemHolder<Field> field) {
+        public void setField(DbRow<Field> field) {
             this.field = field;
         }
 
@@ -191,14 +191,14 @@ public class DatePickerRow implements Row {
         }
     }
 
-    private static void setValue(DBItemHolder<Field> field,
+    private static void setValue(DbRow<Field> field,
                                  String newValue,
                                  OnFieldValueSetListener listener) {
         String currentValue = field.getItem().getValue();
         if (newValue != null && !newValue.equals(currentValue)) {
             field.getItem().setValue(newValue);
             if (listener != null) {
-                listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                listener.onFieldValueSet(field.getId(), newValue);
             }
         }
     }

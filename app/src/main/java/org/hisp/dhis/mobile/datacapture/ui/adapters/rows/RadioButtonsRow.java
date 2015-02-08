@@ -8,7 +8,7 @@ import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 
 public class RadioButtonsRow implements Row {
@@ -20,11 +20,11 @@ public class RadioButtonsRow implements Row {
     public static final String MALE = "gender_male";
     public static final String OTHER = "gender_other";
 
-    private final DBItemHolder<Field> mField;
+    private final DbRow<Field> mField;
     private final RowTypes mType;
     private OnFieldValueSetListener mListener;
     
-    public RadioButtonsRow(DBItemHolder<Field> field, RowTypes type) {
+    public RadioButtonsRow(DbRow<Field> field, RowTypes type) {
         if (!RowTypes.GENDER.equals(type) && !RowTypes.BOOLEAN.equals(type)) {
             throw new IllegalArgumentException("Unsupported row type");
         }
@@ -104,7 +104,7 @@ public class RadioButtonsRow implements Row {
             this.listener = listener;
         }
 
-        public void updateViews(DBItemHolder<Field> field,
+        public void updateViews(DbRow<Field> field,
                                 OnFieldValueSetListener onValueSetListener) {
             textLabel.setText(field.getItem().getLabel());
 
@@ -138,11 +138,11 @@ public class RadioButtonsRow implements Row {
     }
 
     private static class CheckedChangeListener implements OnCheckedChangeListener {
-        private DBItemHolder<Field> field;
+        private DbRow<Field> field;
         private RowTypes type;
         private OnFieldValueSetListener listener;
 
-        public void setField(DBItemHolder<Field> field) {
+        public void setField(DbRow<Field> field) {
             this.field = field;
         }
 
@@ -202,7 +202,7 @@ public class RadioButtonsRow implements Row {
             if (newValue != null && !newValue.equals(currentValue)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
-                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                    listener.onFieldValueSet(field.getId(), newValue);
                 }
             }
         }

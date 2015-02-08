@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.ReportGroupFragment;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ReportGroupAdapter extends FragmentPagerAdapter {
     private static final String EMPTY_TITLE = "";
-    private List<DBItemHolder<Group>> mGroups;
+    private List<DbRow<Group>> mGroups;
 
     public ReportGroupAdapter(FragmentManager fm) {
         super(fm);
@@ -21,7 +21,7 @@ public class ReportGroupAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (mGroups != null && mGroups.size() > 0) {
-            int groupId = mGroups.get(position).getDatabaseId();
+            int groupId = mGroups.get(position).getId();
             return ReportGroupFragment.newInstance(groupId);
         } else {
             return null;
@@ -46,7 +46,7 @@ public class ReportGroupAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void swapData(List<DBItemHolder<Group>> groups) {
+    public void swapData(List<DbRow<Group>> groups) {
         boolean hasToNotifyAdapter = mGroups != groups;
         mGroups = groups;
 

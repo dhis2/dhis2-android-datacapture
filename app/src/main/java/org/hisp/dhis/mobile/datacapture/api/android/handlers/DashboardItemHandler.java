@@ -9,7 +9,7 @@ import android.net.Uri;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
@@ -66,7 +66,7 @@ public final class DashboardItemHandler {
     private DashboardItemHandler() {
     }
 
-    public static DBItemHolder<DashboardItem> fromCursor(Cursor cursor) {
+    public static DbRow<DashboardItem> fromCursor(Cursor cursor) {
         if (cursor == null) {
             throw new IllegalArgumentException("Cursor object cannot be null");
         }
@@ -109,8 +109,8 @@ public final class DashboardItemHandler {
         dashboardItem.setReportTable(reportTable);
         dashboardItem.setMap(map);
 
-        DBItemHolder<DashboardItem> holder = new DBItemHolder<>();
-        holder.setDataBaseId(cursor.getInt(DATABASE_ID));
+        DbRow<DashboardItem> holder = new DbRow<>();
+        holder.setId(cursor.getInt(DATABASE_ID));
         holder.setItem(dashboardItem);
         return holder;
     }
@@ -155,18 +155,18 @@ public final class DashboardItemHandler {
         return values;
     }
 
-    public static ContentProviderOperation delete(DBItemHolder<DashboardItem> dashboardItem) {
+    public static ContentProviderOperation delete(DbRow<DashboardItem> dashboardItem) {
         Uri uri = ContentUris.withAppendedId(
-                DashboardItems.CONTENT_URI, dashboardItem.getDatabaseId()
+                DashboardItems.CONTENT_URI, dashboardItem.getId()
         );
         return ContentProviderOperation.newDelete(uri).build();
     }
 
-    public static ContentProviderOperation update(DBItemHolder<DashboardItem> oldItem,
+    public static ContentProviderOperation update(DbRow<DashboardItem> oldItem,
                                                   DashboardItem newItem) {
         if (isCorrect(newItem)) {
             Uri uri = ContentUris.withAppendedId(
-                    DashboardItems.CONTENT_URI, oldItem.getDatabaseId()
+                    DashboardItems.CONTENT_URI, oldItem.getId()
             );
             return ContentProviderOperation.newUpdate(uri)
                     .withValues(toContentValues(newItem)).build();
@@ -175,11 +175,11 @@ public final class DashboardItemHandler {
         }
     }
 
-    public static ContentProviderOperation insert(DBItemHolder<Dashboard> dashboard,
+    public static ContentProviderOperation insert(DbRow<Dashboard> dashboard,
                                                   DashboardItem dashboardItem) {
         if (isCorrect(dashboardItem)) {
             return ContentProviderOperation.newInsert(DashboardItems.CONTENT_URI)
-                    .withValue(DashboardItems.DASHBOARD_DB_ID, dashboard.getDatabaseId())
+                    .withValue(DashboardItems.DASHBOARD_DB_ID, dashboard.getId())
                     .withValue(DashboardItems.STATE, State.GETTING.toString())
                     .withValues(toContentValues(dashboardItem))
                     .build();

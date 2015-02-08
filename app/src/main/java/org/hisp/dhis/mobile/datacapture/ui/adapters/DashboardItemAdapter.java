@@ -13,7 +13,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
@@ -84,13 +84,13 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
             holder = (ViewHolder) view.getTag();
         }
 
-        DBItemHolder<DashboardItem> dbItem = ((DBItemHolder<DashboardItem>) getItem(position));
+        DbRow<DashboardItem> dbItem = ((DbRow<DashboardItem>) getItem(position));
         handleDashboardItems(dbItem, holder);
         return view;
     }
 
     // TODO Try to create only one Click Listener for each type of view and keep it inside of view holder
-    public void handleDashboardItems(final DBItemHolder<DashboardItem> dbItem,
+    public void handleDashboardItems(final DbRow<DashboardItem> dbItem,
                                      final ViewHolder holder) {
         if (dbItem == null || dbItem.getItem() == null) {
             return;
@@ -210,9 +210,9 @@ public class DashboardItemAdapter extends DBBaseAdapter<DashboardItem> {
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(DBItemHolder<DashboardItem> dbItem);
-        public void onItemShareInterpretation(DBItemHolder<DashboardItem> dbItem);
-        public void onItemDelete(DBItemHolder<DashboardItem> dbItem);
+        public void onItemClick(DbRow<DashboardItem> dbItem);
+        public void onItemShareInterpretation(DbRow<DashboardItem> dbItem);
+        public void onItemDelete(DbRow<DashboardItem> dbItem);
     }
 
     private static class ViewHolder {

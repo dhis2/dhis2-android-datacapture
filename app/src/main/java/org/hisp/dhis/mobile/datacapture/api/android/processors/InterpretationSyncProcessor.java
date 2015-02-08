@@ -11,7 +11,7 @@ import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationsSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -65,12 +65,12 @@ public class InterpretationSyncProcessor extends AbsProcessor<InterpretationSync
 
     private ArrayList<ContentProviderOperation> updateInterpretations() throws APIException {
         final String SELECTION = Interpretations.STATE + " = " + "'" + State.GETTING.toString() + "'";
-        List<DBItemHolder<Interpretation>> oldInterpretations = readInterpretations(SELECTION);
+        List<DbRow<Interpretation>> oldInterpretations = readInterpretations(SELECTION);
         List<Interpretation> newInterpretationList = getInterpretations();
         Map<String, Interpretation> newInterpretations = InterpretationHandler.toMap(newInterpretationList);
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
-        for (DBItemHolder<Interpretation> dbItem : oldInterpretations) {
+        for (DbRow<Interpretation> dbItem : oldInterpretations) {
             Interpretation oldInterpretation = dbItem.getItem();
             Interpretation newInterpretation = newInterpretations.get(oldInterpretation.getId());
 
@@ -105,12 +105,12 @@ public class InterpretationSyncProcessor extends AbsProcessor<InterpretationSync
     }
 
     private void deleteInterpretation(List<ContentProviderOperation> ops,
-                                      DBItemHolder<Interpretation> dbItem) {
+                                      DbRow<Interpretation> dbItem) {
         ops.add(InterpretationHandler.delete(dbItem));
     }
 
     private void updateInterpretation(List<ContentProviderOperation> ops,
-                                      DBItemHolder<Interpretation> dbItem,
+                                      DbRow<Interpretation> dbItem,
                                       Interpretation interpretation) {
         ContentProviderOperation op = InterpretationHandler.update(dbItem, interpretation);
         if (op != null) {
@@ -148,8 +148,8 @@ public class InterpretationSyncProcessor extends AbsProcessor<InterpretationSync
         }
     }
 
-    private List<DBItemHolder<Interpretation>> readInterpretations(String selection) {
-        List<DBItemHolder<Interpretation>> dbItems = new ArrayList<>();
+    private List<DbRow<Interpretation>> readInterpretations(String selection) {
+        List<DbRow<Interpretation>> dbItems = new ArrayList<>();
 
         Cursor cursor = getContext().getContentResolver().query(
                 Interpretations.CONTENT_URI, InterpretationHandler.PROJECTION, selection, null, null

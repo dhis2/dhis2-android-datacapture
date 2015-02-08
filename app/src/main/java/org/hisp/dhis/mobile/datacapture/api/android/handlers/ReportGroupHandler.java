@@ -3,7 +3,7 @@ package org.hisp.dhis.mobile.datacapture.api.android.handlers;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 
@@ -25,13 +25,13 @@ public final class ReportGroupHandler {
         return values;
     }
 
-    public static DBItemHolder<Group> fromCursor(Cursor cursor) {
+    public static DbRow<Group> fromCursor(Cursor cursor) {
         Group group = new Group();
         group.setLabel(cursor.getString(LABEL));
         group.setDataElementCount(cursor.getInt(DATA_ELEMENT_COUNT));
 
-        DBItemHolder<Group> holder = new DBItemHolder<>();
-        holder.setDataBaseId(cursor.getInt(DB_ID));
+        DbRow<Group> holder = new DbRow<>();
+        holder.setId(cursor.getInt(DB_ID));
         holder.setItem(group);
         return holder;
     }

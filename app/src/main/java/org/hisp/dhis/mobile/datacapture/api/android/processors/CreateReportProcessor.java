@@ -15,7 +15,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportFieldHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportGroupHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
@@ -39,7 +39,7 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
     @Override
     public OnCreateReportEvent process() {
         OnCreateReportEvent event = new OnCreateReportEvent();
-        DBItemHolder<Report> report = readReport();
+        DbRow<Report> report = readReport();
 
         if (report != null) {
             return event;
@@ -68,7 +68,7 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
         DataSet dataSet = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            DBItemHolder<KeyValue> keyValue = KeyValueHandler.fromCursor(cursor);
+            DbRow<KeyValue> keyValue = KeyValueHandler.fromCursor(cursor);
             cursor.close();
 
             if (keyValue != null && keyValue.getItem() != null) {
@@ -110,7 +110,7 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
         return ops;
     }
 
-    private DBItemHolder<Report> readReport() {
+    private DbRow<Report> readReport() {
         final String ORG_UNIT = Reports.ORG_UNIT_ID + " = " + "'" + getEvent().getReport().getOrgUnit() + "'";
         final String DATASET = Reports.DATASET_ID + " = " + "'" + getEvent().getReport().getDataSet() + "'";
         final String PERIOD = Reports.PERIOD + " = " + "'" + getEvent().getReport().getPeriod() + "'";
@@ -119,7 +119,7 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
         Cursor cursor = getContext().getContentResolver().query(Reports.CONTENT_URI,
                 ReportHandler.PROJECTION, SELECTION, null, null);
 
-        DBItemHolder<Report> dbItem = null;
+        DbRow<Report> dbItem = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dbItem = ReportHandler.fromCursor(cursor);

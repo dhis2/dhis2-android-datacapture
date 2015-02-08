@@ -3,7 +3,6 @@ package org.hisp.dhis.mobile.datacapture.ui.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
@@ -26,7 +26,6 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
@@ -45,7 +44,7 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class DashboardViewPagerFragment extends BaseFragment
-        implements LoaderManager.LoaderCallbacks<CursorHolder<List<DBItemHolder<Dashboard>>>>,
+        implements LoaderManager.LoaderCallbacks<CursorHolder<List<DbRow<Dashboard>>>>,
         ViewPager.OnPageChangeListener, View.OnClickListener, EditDialogFragment.EditDialogListener {
     private static final int LOADER_ID = 826752394;
     private static final String STATE_PROGRESS = "stateProgress";
@@ -141,7 +140,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     }
 
     @Override
-    public Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> onCreateLoader(int id, Bundle args) {
+    public Loader<CursorHolder<List<DbRow<Dashboard>>>> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {
             final String SELECTION = Dashboards.STATE + " != " + '"' + State.DELETING + '"';
             return new DashboardListLoader(
@@ -154,8 +153,8 @@ public class DashboardViewPagerFragment extends BaseFragment
     }
 
     @Override
-    public void onLoadFinished(Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> loader,
-                               CursorHolder<List<DBItemHolder<Dashboard>>> data) {
+    public void onLoadFinished(Loader<CursorHolder<List<DbRow<Dashboard>>>> loader,
+                               CursorHolder<List<DbRow<Dashboard>>> data) {
         if (loader != null && loader.getId() == LOADER_ID && data != null) {
             mAdapter.swapData(data.getData());
             mSlidingTabLayout.setViewPager(mViewPager);
@@ -163,7 +162,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     }
 
     @Override
-    public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> loader) {
+    public void onLoaderReset(Loader<CursorHolder<List<DbRow<Dashboard>>>> loader) {
         // reset state of views
     }
 
@@ -188,7 +187,7 @@ public class DashboardViewPagerFragment extends BaseFragment
 
     @Override
     public void onPageSelected(int position) {
-        DBItemHolder<Dashboard> dbItem = mAdapter.getDashboard(position);
+        DbRow<Dashboard> dbItem = mAdapter.getDashboard(position);
         if (dbItem != null) {
             Dashboard dashboard = dbItem.getItem();
             boolean isDashboardEditable = dashboard.getAccess().isManage();
@@ -203,7 +202,7 @@ public class DashboardViewPagerFragment extends BaseFragment
     @Override
     public void onClick(View view) {
         int position = mViewPager.getCurrentItem();
-        DBItemHolder<Dashboard> dbItem = mAdapter.getDashboard(position);
+        DbRow<Dashboard> dbItem = mAdapter.getDashboard(position);
         Intent intent = DashboardEditActivity.prepareIntent(getActivity(), dbItem);
         startActivity(intent);
     }
@@ -237,15 +236,15 @@ public class DashboardViewPagerFragment extends BaseFragment
         mProgressBar.setVisibility(View.GONE);
     }
 
-    public static class DashboardListLoader extends AbsCursorLoader<List<DBItemHolder<Dashboard>>> {
+    public static class DashboardListLoader extends AbsCursorLoader<List<DbRow<Dashboard>>> {
         public DashboardListLoader(Context context, Uri uri, String[] projection,
                                    String selection, String[] selectionArgs, String sortOrder) {
             super(context, uri, projection, selection, selectionArgs, sortOrder);
         }
 
         @Override
-        protected List<DBItemHolder<Dashboard>> readDataFromCursor(Cursor cursor) {
-            List<DBItemHolder<Dashboard>> dashboards = new ArrayList<>();
+        protected List<DbRow<Dashboard>> readDataFromCursor(Cursor cursor) {
+            List<DbRow<Dashboard>> dashboards = new ArrayList<>();
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
 

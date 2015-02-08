@@ -10,13 +10,12 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportGroupHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReportEntryActivity extends ActionBarActivity
-        implements LoaderCallbacks<CursorHolder<List<DBItemHolder<Group>>>> {
+        implements LoaderCallbacks<CursorHolder<List<DbRow<Group>>>> {
     private static final String ORG_UNIT_ID_EXTRA = "extra:orgUnitId";
     private static final String PERIOD_EXTRA = "extra:Period";
     private static final String DATASET_ID_EXTRA = "extra:dataSetId";
@@ -123,7 +122,7 @@ public class ReportEntryActivity extends ActionBarActivity
     }
 
     @Override
-    public Loader<CursorHolder<List<DBItemHolder<Group>>>> onCreateLoader(int id, Bundle args) {
+    public Loader<CursorHolder<List<DbRow<Group>>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             Report report = getReportFromBundle(args);
             final String ORG_UNIT = Reports.ORG_UNIT_ID + " = " + "'" + report.getOrgUnit() + "'";
@@ -137,8 +136,8 @@ public class ReportEntryActivity extends ActionBarActivity
     }
 
     @Override
-    public void onLoadFinished(Loader<CursorHolder<List<DBItemHolder<Group>>>> loader,
-                               CursorHolder<List<DBItemHolder<Group>>> data) {
+    public void onLoadFinished(Loader<CursorHolder<List<DbRow<Group>>>> loader,
+                               CursorHolder<List<DbRow<Group>>> data) {
         if (loader != null && LOADER_ID == loader.getId() && data != null) {
             mAdapter.swapData(data.getData());
             mSlidingTabLayout.setViewPager(mViewPager);
@@ -146,10 +145,10 @@ public class ReportEntryActivity extends ActionBarActivity
     }
 
     @Override
-    public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<Group>>>> loader) {
+    public void onLoaderReset(Loader<CursorHolder<List<DbRow<Group>>>> loader) {
     }
 
-    static class ReportLoader extends AbsCursorLoader<List<DBItemHolder<Group>>> {
+    static class ReportLoader extends AbsCursorLoader<List<DbRow<Group>>> {
 
         public ReportLoader(Context context, Uri uri, String[] projection,
                             String selection, String[] selectionArgs, String sortOrder) {
@@ -157,12 +156,12 @@ public class ReportEntryActivity extends ActionBarActivity
         }
 
         @Override
-        protected List<DBItemHolder<Group>> readDataFromCursor(Cursor cursor) {
-            List<DBItemHolder<Group>> dbItems = new ArrayList<>();
+        protected List<DbRow<Group>> readDataFromCursor(Cursor cursor) {
+            List<DbRow<Group>> dbItems = new ArrayList<>();
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 do {
-                    DBItemHolder<Group> group = ReportGroupHandler.fromCursor(cursor);
+                    DbRow<Group> group = ReportGroupHandler.fromCursor(cursor);
                     dbItems.add(group);
                 } while (cursor.moveToNext());
             }

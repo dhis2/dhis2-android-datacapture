@@ -9,17 +9,17 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 
 public class CheckBoxRow implements Row {
     private static final String TRUE = "true";
     private static final String EMPTY_FIELD = "";
 
-    private DBItemHolder<Field> mField;
+    private DbRow<Field> mField;
     private OnFieldValueSetListener mListener;
 
-    public CheckBoxRow(DBItemHolder<Field> field) {
+    public CheckBoxRow(DbRow<Field> field) {
         mField = field;
     }
 
@@ -58,14 +58,14 @@ public class CheckBoxRow implements Row {
     }
 
     private static class CheckBoxListener implements OnCheckedChangeListener {
-        private DBItemHolder<Field> field;
+        private DbRow<Field> field;
         private OnFieldValueSetListener listener;
 
         public void setListener(OnFieldValueSetListener listener) {
             this.listener = listener;
         }
 
-        public void setField(DBItemHolder<Field> field) {
+        public void setField(DbRow<Field> field) {
             this.field = field;
         }
 
@@ -83,7 +83,7 @@ public class CheckBoxRow implements Row {
             if (newValue != null && !newValue.equals(currentValue)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
-                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                    listener.onFieldValueSet(field.getId(), newValue);
                 }
             }
         }
@@ -101,7 +101,7 @@ public class CheckBoxRow implements Row {
             this.listener = listener;
         }
 
-        public void updateViews(DBItemHolder<Field> field,
+        public void updateViews(DbRow<Field> field,
                                 OnFieldValueSetListener onValueSetListener) {
             listener.setField(field);
             listener.setListener(onValueSetListener);

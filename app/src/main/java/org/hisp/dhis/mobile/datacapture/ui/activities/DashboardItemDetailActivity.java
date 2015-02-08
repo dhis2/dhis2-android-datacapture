@@ -18,7 +18,7 @@ import android.view.MenuItem;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItemElement;
@@ -177,7 +177,7 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
         protected DashboardItem readDataFromCursor(Cursor cursor) {
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                DBItemHolder<DashboardItem> dbItem = DashboardItemHandler.fromCursor(cursor);
+                DbRow<DashboardItem> dbItem = DashboardItemHandler.fromCursor(cursor);
                 return dbItem.getItem();
             } else {
                 return null;

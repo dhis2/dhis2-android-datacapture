@@ -10,7 +10,7 @@ import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -27,7 +27,7 @@ public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDe
 
     @Override
     public OnInterpretationDeleteEvent process() {
-        final DBItemHolder<Interpretation> dbItem = readInterpretation();
+        final DbRow<Interpretation> dbItem = readInterpretation();
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnInterpretationDeleteEvent event = new OnInterpretationDeleteEvent();
 
@@ -50,7 +50,7 @@ public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDe
         return event;
     }
 
-    private DBItemHolder<Interpretation> readInterpretation() {
+    private DbRow<Interpretation> readInterpretation() {
         Uri uri = ContentUris.withAppendedId(
                 Interpretations.CONTENT_URI, getEvent().getInterpretationId()
         );
@@ -58,7 +58,7 @@ public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDe
                 uri, InterpretationHandler.PROJECTION, null, null, null
         );
 
-        DBItemHolder<Interpretation> dbItem = null;
+        DbRow<Interpretation> dbItem = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dbItem = InterpretationHandler.fromCursor(cursor);

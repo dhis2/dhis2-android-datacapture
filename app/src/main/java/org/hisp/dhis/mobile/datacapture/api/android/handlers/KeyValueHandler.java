@@ -4,7 +4,7 @@ import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 
@@ -34,8 +34,8 @@ public final class KeyValueHandler {
         return contentValues;
     }
 
-    public static DBItemHolder<KeyValue> fromCursor(Cursor cursor) {
-        DBItemHolder<KeyValue> holder = new DBItemHolder<>();
+    public static DbRow<KeyValue> fromCursor(Cursor cursor) {
+        DbRow<KeyValue> holder = new DbRow<>();
         KeyValue keyValue = new KeyValue();
 
         KeyValue.Type type = KeyValue.Type.valueOf(cursor.getString(TYPE));
@@ -43,7 +43,7 @@ public final class KeyValueHandler {
         keyValue.setType(type);
         keyValue.setValue(cursor.getString(VALUE));
 
-        holder.setDataBaseId(cursor.getInt(DB_ID));
+        holder.setId(cursor.getInt(DB_ID));
         holder.setItem(keyValue);
 
         return holder;

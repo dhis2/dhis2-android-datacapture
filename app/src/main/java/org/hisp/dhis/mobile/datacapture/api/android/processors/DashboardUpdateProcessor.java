@@ -10,7 +10,7 @@ import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -34,13 +34,13 @@ public class DashboardUpdateProcessor extends AbsProcessor<DashboardUpdateEvent,
         context.getContentResolver().update(uri, values, null, null);
     }
 
-    private static DBItemHolder<Dashboard> readDashboard(Context context, int dashboardId) {
+    private static DbRow<Dashboard> readDashboard(Context context, int dashboardId) {
         Uri uri = ContentUris.withAppendedId(Dashboards.CONTENT_URI, dashboardId);
         Cursor cursor = context.getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
 
-        DBItemHolder<Dashboard> dashboard = null;
+        DbRow<Dashboard> dashboard = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dashboard = DashboardHandler.fromCursor(cursor);
@@ -52,13 +52,13 @@ public class DashboardUpdateProcessor extends AbsProcessor<DashboardUpdateEvent,
 
     @Override
     public OnDashboardUpdateEvent process() {
-        final DBItemHolder<Dashboard> dbItem = readDashboard(
+        final DbRow<Dashboard> dbItem = readDashboard(
                 getContext(), getEvent().getDataBaseId());
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnDashboardUpdateEvent event = new OnDashboardUpdateEvent();
 
         // change values in database first, including the state of record
-        updateDashboard(getContext(), dbItem.getDatabaseId(),
+        updateDashboard(getContext(), dbItem.getId(),
                 getEvent().getName(), State.PUTTING);
 
         DHISManager.getInstance().updateDashboardName(new ApiRequestCallback<String>() {
@@ -69,7 +69,7 @@ public class DashboardUpdateProcessor extends AbsProcessor<DashboardUpdateEvent,
 
                 // here updateDashboard is called only for updating
                 // state of Dashboard record in database
-                updateDashboard(getContext(), dbItem.getDatabaseId(),
+                updateDashboard(getContext(), dbItem.getId(),
                         getEvent().getName(), State.GETTING);
             }
 

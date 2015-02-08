@@ -19,7 +19,7 @@ import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.FieldValueChangeEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportFieldHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
@@ -111,7 +111,7 @@ public class ReportGroupFragment extends Fragment
 
         @Override
         protected List<Row> readDataFromCursor(Cursor cursor) {
-            List<DBItemHolder<Field>> fields = new ArrayList<>();
+            List<DbRow<Field>> fields = new ArrayList<>();
             List<Row> rows = new ArrayList<>();
 
             if (cursor != null && cursor.getCount() > 0) {
@@ -123,7 +123,7 @@ public class ReportGroupFragment extends Fragment
             }
 
             OnFieldValueChangedListener listener = new OnFieldValueChangedListener(getContext());
-            for (DBItemHolder<Field> dbItem : fields) {
+            for (DbRow<Field> dbItem : fields) {
                 Field field = dbItem.getItem();
 
                 Row row = null;
@@ -173,7 +173,7 @@ public class ReportGroupFragment extends Fragment
             OptionSet optionSet = null;
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                DBItemHolder<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
+                DbRow<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
                 cursor.close();
 
                 if (dbItem != null && dbItem.getItem() != null &&

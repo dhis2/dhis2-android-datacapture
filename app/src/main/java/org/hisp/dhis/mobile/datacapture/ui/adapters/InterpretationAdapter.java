@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
@@ -71,7 +71,7 @@ public class InterpretationAdapter extends DBBaseAdapter<Interpretation> {
             holder = (ViewHolder) view.getTag();
         }
 
-        handleInterpretation(holder, (DBItemHolder<Interpretation>) getItem(position));
+        handleInterpretation(holder, (DbRow<Interpretation>) getItem(position));
         return view;
     }
 
@@ -80,7 +80,7 @@ public class InterpretationAdapter extends DBBaseAdapter<Interpretation> {
     }
 
     private void handleInterpretation(final ViewHolder holder,
-                                      final DBItemHolder<Interpretation> dbItem) {
+                                      final DbRow<Interpretation> dbItem) {
         Interpretation interpretation = dbItem.getItem();
         if (interpretation == null || interpretation.getType() == null) {
             return;
@@ -204,10 +204,10 @@ public class InterpretationAdapter extends DBBaseAdapter<Interpretation> {
     }
 
     public interface OnItemClickListener {
-        public void onItemClicked(DBItemHolder<Interpretation> interpretation);
-        public void onEditInterpretation(DBItemHolder<Interpretation> interpretation);
-        public void onDeleteInterpretation(DBItemHolder<Interpretation> interpretation);
-        public void onShowCommentsDialog(DBItemHolder<Interpretation> interpretation);
+        public void onItemClicked(DbRow<Interpretation> interpretation);
+        public void onEditInterpretation(DbRow<Interpretation> interpretation);
+        public void onDeleteInterpretation(DbRow<Interpretation> interpretation);
+        public void onShowCommentsDialog(DbRow<Interpretation> interpretation);
     }
 
     private static class ViewHolder {

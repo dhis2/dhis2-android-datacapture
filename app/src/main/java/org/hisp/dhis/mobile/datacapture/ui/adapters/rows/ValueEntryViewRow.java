@@ -9,18 +9,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.ui.views.ValueEntryView;
 import org.hisp.dhis.mobile.datacapture.ui.views.ValueEntryView.OnValueSetListener;
 
 public class ValueEntryViewRow implements Row {
     private static final String EMPTY_FIELD = "";
-    private final DBItemHolder<Field> mField;
+    private final DbRow<Field> mField;
     private final RowTypes mRowType;
     private OnFieldValueSetListener mListener;
     
-    public ValueEntryViewRow(DBItemHolder<Field> field, RowTypes rowType) {
+    public ValueEntryViewRow(DbRow<Field> field, RowTypes rowType) {
         mField = field;
         mRowType = rowType;
 
@@ -111,7 +111,7 @@ public class ValueEntryViewRow implements Row {
             this.listener = listener;
         }
 
-        public void updateViews(DBItemHolder<Field> dbItem,
+        public void updateViews(DbRow<Field> dbItem,
                                 OnFieldValueSetListener fieldListener) {
             Field field = dbItem.getItem();
             textLabel.setText(field.getLabel());
@@ -125,10 +125,10 @@ public class ValueEntryViewRow implements Row {
     }
 
     private static class ValueSetListener implements OnValueSetListener {
-        private DBItemHolder<Field> field;
+        private DbRow<Field> field;
         private OnFieldValueSetListener listener;
 
-        public void setField(DBItemHolder<Field> field) {
+        public void setField(DbRow<Field> field) {
             this.field = field;
         }
 
@@ -142,7 +142,7 @@ public class ValueEntryViewRow implements Row {
             if (newValue != null && !newValue.equals(value)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
-                    listener.onFieldValueSet(field.getDatabaseId(), newValue);
+                    listener.onFieldValueSet(field.getId(), newValue);
                 }
             }
         }

@@ -10,7 +10,7 @@ import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationTextUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -28,7 +28,7 @@ public class InterpretationUpdateTextProcessor extends AbsProcessor<Interpretati
 
     @Override
     public OnInterpretationTextUpdateEvent process() {
-        final DBItemHolder<Interpretation> dbItem = readInterpretation();
+        final DbRow<Interpretation> dbItem = readInterpretation();
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnInterpretationTextUpdateEvent event = new OnInterpretationTextUpdateEvent();
 
@@ -52,7 +52,7 @@ public class InterpretationUpdateTextProcessor extends AbsProcessor<Interpretati
         return event;
     }
 
-    private DBItemHolder<Interpretation> readInterpretation() {
+    private DbRow<Interpretation> readInterpretation() {
         Uri uri = ContentUris.withAppendedId(
                 Interpretations.CONTENT_URI, getEvent().getDbId()
         );
@@ -60,7 +60,7 @@ public class InterpretationUpdateTextProcessor extends AbsProcessor<Interpretati
                 uri, InterpretationHandler.PROJECTION, null, null, null
         );
 
-        DBItemHolder<Interpretation> dbItem = null;
+        DbRow<Interpretation> dbItem = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dbItem = InterpretationHandler.fromCursor(cursor);

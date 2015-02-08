@@ -7,12 +7,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -32,14 +32,14 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
         mEvent = isNull(event, "DashboardDeleteEvent must not be null");
     }
 
-    private DBItemHolder<Dashboard> readDashboard() {
+    private DbRow<Dashboard> readDashboard() {
         Uri uri = ContentUris.withAppendedId(
                 Dashboards.CONTENT_URI, mEvent.getDashboardDbId());
         Cursor cursor = mContext.getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
 
-        DBItemHolder<Dashboard> dashboard = null;
+        DbRow<Dashboard> dashboard = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dashboard = DashboardHandler.fromCursor(cursor);
@@ -57,7 +57,7 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
 
     @Override
     protected OnDashboardDeleteEvent doInBackground(Void... params) {
-        final DBItemHolder<Dashboard> dbItem = readDashboard();
+        final DbRow<Dashboard> dbItem = readDashboard();
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnDashboardDeleteEvent event = new OnDashboardDeleteEvent();
 

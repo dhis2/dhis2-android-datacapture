@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardFragment;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DashboardAdapter extends FragmentPagerAdapter {
     private static final String EMPTY_TITLE = "";
-    private List<DBItemHolder<Dashboard>> mDashboards;
+    private List<DbRow<Dashboard>> mDashboards;
 
     public DashboardAdapter(FragmentManager fm) {
         super(fm);
@@ -45,7 +45,7 @@ public class DashboardAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public DBItemHolder<Dashboard> getDashboard(int position) {
+    public DbRow<Dashboard> getDashboard(int position) {
         if (mDashboards != null && mDashboards.size() > 0) {
             return mDashboards.get(position);
         } else {
@@ -53,7 +53,7 @@ public class DashboardAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void swapData(List<DBItemHolder<Dashboard>> dashboards) {
+    public void swapData(List<DbRow<Dashboard>> dashboards) {
         boolean hasToNotifyAdapter = mDashboards != dashboards;
         mDashboards = dashboards;
 

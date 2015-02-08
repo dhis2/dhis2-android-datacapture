@@ -11,7 +11,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEv
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardItemDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
@@ -29,8 +29,8 @@ public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDele
 
     @Override
     public OnDashboardItemDeleteEvent process() {
-        final DBItemHolder<Dashboard> mDashboard = readDashboard();
-        final DBItemHolder<DashboardItem> mDashboardItem = readDashboardItem();
+        final DbRow<Dashboard> mDashboard = readDashboard();
+        final DbRow<DashboardItem> mDashboardItem = readDashboardItem();
         final ResponseHolder<String> holder = new ResponseHolder<>();
         final OnDashboardItemDeleteEvent event = new OnDashboardItemDeleteEvent();
 
@@ -56,14 +56,14 @@ public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDele
         return event;
     }
 
-    private DBItemHolder<DashboardItem> readDashboardItem() {
+    private DbRow<DashboardItem> readDashboardItem() {
         Uri uri = ContentUris.withAppendedId(
                 DashboardItems.CONTENT_URI, getEvent().getDashboardItemDbId());
         Cursor cursor = getContext().getContentResolver().query(
                 uri, DashboardItemHandler.PROJECTION, null, null, null
         );
 
-        DBItemHolder<DashboardItem> dbItem = null;
+        DbRow<DashboardItem> dbItem = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dbItem = DashboardItemHandler.fromCursor(cursor);
@@ -73,14 +73,14 @@ public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDele
         return dbItem;
     }
 
-    private DBItemHolder<Dashboard> readDashboard() {
+    private DbRow<Dashboard> readDashboard() {
         Uri uri = ContentUris.withAppendedId(
                 Dashboards.CONTENT_URI, getEvent().getDashboardDbId());
         Cursor cursor = getContext().getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
 
-        DBItemHolder<Dashboard> dbItem = null;
+        DbRow<Dashboard> dbItem = null;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             dbItem = DashboardHandler.fromCursor(cursor);

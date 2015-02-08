@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -23,7 +22,7 @@ import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DateHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
@@ -325,7 +324,7 @@ public class AggregateReportFragment extends BaseFragment
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
 
-                DBItemHolder<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
+                DbRow<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
                 Gson gson = new Gson();
                 Type type = new TypeToken<List<OrganisationUnit>>() { }.getType();
                 units = gson.fromJson(dbItem.getItem().getValue(), type);

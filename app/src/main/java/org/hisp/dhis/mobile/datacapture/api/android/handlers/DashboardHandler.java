@@ -8,7 +8,7 @@ import android.net.Uri;
 
 import com.google.gson.Gson;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
@@ -65,7 +65,7 @@ public final class DashboardHandler {
         return values;
     }
 
-    public static DBItemHolder<Dashboard> fromCursor(Cursor cursor) {
+    public static DbRow<Dashboard> fromCursor(Cursor cursor) {
         if (cursor == null) {
             throw new IllegalArgumentException("Cursor object cannot be null");
         }
@@ -84,8 +84,8 @@ public final class DashboardHandler {
         dashboard.setName(cursor.getString(NAME));
         dashboard.setItemCount(cursor.getInt(ITEM_COUNT));
 
-        DBItemHolder<Dashboard> holder = new DBItemHolder<>();
-        holder.setDataBaseId(cursor.getInt(DB_ID));
+        DbRow<Dashboard> holder = new DbRow<>();
+        holder.setId(cursor.getInt(DB_ID));
         holder.setItem(dashboard);
         return holder;
     }
@@ -98,23 +98,23 @@ public final class DashboardHandler {
                 !isEmpty(dashboard.getLastUpdated()));
     }
 
-    public static ContentProviderOperation delete(DBItemHolder<Dashboard> dashboard) {
+    public static ContentProviderOperation delete(DbRow<Dashboard> dashboard) {
         Uri uri = ContentUris.withAppendedId(
-                Dashboards.CONTENT_URI, dashboard.getDatabaseId()
+                Dashboards.CONTENT_URI, dashboard.getId()
         );
         return ContentProviderOperation.newDelete(uri).build();
     }
 
-    public static ContentProviderOperation update(DBItemHolder<Dashboard> oldDashboard,
+    public static ContentProviderOperation update(DbRow<Dashboard> oldDashboard,
                                                   Dashboard newDashboard) {
         return update(oldDashboard, newDashboard, State.GETTING);
     }
 
-    public static ContentProviderOperation update(DBItemHolder<Dashboard> oldDashboard,
+    public static ContentProviderOperation update(DbRow<Dashboard> oldDashboard,
                                                   Dashboard newDashboard, State state) {
         if (isCorrect(newDashboard)) {
             Uri uri = ContentUris.withAppendedId(Dashboards.CONTENT_URI,
-                    oldDashboard.getDatabaseId());
+                    oldDashboard.getId());
             return ContentProviderOperation.newUpdate(uri)
                     .withValues(DashboardHandler.toContentValues(newDashboard))
                     .withValue(Dashboards.STATE, state.toString()).build();

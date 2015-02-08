@@ -7,7 +7,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 
 public class DashboardEditAdapter extends DBBaseAdapter<DashboardItem> {
@@ -35,11 +35,11 @@ public class DashboardEditAdapter extends DBBaseAdapter<DashboardItem> {
             holder = (ViewHolder) view.getTag();
         }
 
-        handleDashboardItem((DBItemHolder<DashboardItem>) getItem(position), holder);
+        handleDashboardItem((DbRow<DashboardItem>) getItem(position), holder);
         return view;
     }
 
-    private void handleDashboardItem(DBItemHolder<DashboardItem> dbItem, ViewHolder holder) {
+    private void handleDashboardItem(DbRow<DashboardItem> dbItem, ViewHolder holder) {
         DashboardItem item = dbItem.getItem();
         if (DashboardItem.TYPE_MAP.equals(item.getType()) && item.getMap() != null) {
             holder.textView.setText(item.getMap().getName());
@@ -66,18 +66,18 @@ public class DashboardEditAdapter extends DBBaseAdapter<DashboardItem> {
     }
 
     public interface OnDeleteClickListener {
-        public void onDeleteButtonClicked(DBItemHolder<DashboardItem> item);
+        public void onDeleteButtonClicked(DbRow<DashboardItem> item);
     }
 
     private static class ClickListener implements View.OnClickListener {
         private OnDeleteClickListener mListener;
-        private DBItemHolder<DashboardItem> mItem;
+        private DbRow<DashboardItem> mItem;
 
         public void setListener(OnDeleteClickListener listener) {
             mListener = listener;
         }
 
-        public void setItem(DBItemHolder<DashboardItem> item) {
+        public void setItem(DbRow<DashboardItem> item) {
             mItem = item;
         }
 

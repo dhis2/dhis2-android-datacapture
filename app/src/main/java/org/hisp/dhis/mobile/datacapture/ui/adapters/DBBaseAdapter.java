@@ -4,12 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
 
-import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 
 import java.util.List;
 
 public abstract class DBBaseAdapter<T> extends BaseAdapter {
-    private List<DBItemHolder<T>> mData;
+    private List<DbRow<T>> mData;
     private LayoutInflater mInflater;
     private Context mContext;
 
@@ -38,15 +38,15 @@ public abstract class DBBaseAdapter<T> extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        DBItemHolder<T> item = (DBItemHolder<T>) getItem(position);
+        DbRow<T> item = (DbRow<T>) getItem(position);
         if (item != null) {
-            return item.getDatabaseId();
+            return item.getId();
         } else {
             return -1;
         }
     }
 
-    public void swapData(List<DBItemHolder<T>> data) {
+    public void swapData(List<DbRow<T>> data) {
         if (mData != data) {
             mData = data;
             notifyDataSetChanged();
