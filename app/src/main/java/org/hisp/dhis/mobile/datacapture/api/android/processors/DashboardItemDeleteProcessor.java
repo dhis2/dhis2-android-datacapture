@@ -19,8 +19,8 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItems;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 
 public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDeleteEvent, OnDashboardItemDeleteEvent> {
     public DashboardItemDeleteProcessor(Context context, DashboardItemDeleteEvent event) {
@@ -58,7 +58,7 @@ public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDele
 
     private DBItemHolder<DashboardItem> readDashboardItem() {
         Uri uri = ContentUris.withAppendedId(
-                DashboardItemColumns.CONTENT_URI, getEvent().getDashboardItemDbId());
+                DashboardItems.CONTENT_URI, getEvent().getDashboardItemDbId());
         Cursor cursor = getContext().getContentResolver().query(
                 uri, DashboardItemHandler.PROJECTION, null, null, null
         );
@@ -75,7 +75,7 @@ public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDele
 
     private DBItemHolder<Dashboard> readDashboard() {
         Uri uri = ContentUris.withAppendedId(
-                DashboardColumns.CONTENT_URI, getEvent().getDashboardDbId());
+                Dashboards.CONTENT_URI, getEvent().getDashboardDbId());
         Cursor cursor = getContext().getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
@@ -92,15 +92,15 @@ public class DashboardItemDeleteProcessor extends AbsProcessor<DashboardItemDele
 
     private void deleteDashboardItem() {
         Uri uri = ContentUris.withAppendedId(
-                DashboardItemColumns.CONTENT_URI, getEvent().getDashboardItemDbId());
+                DashboardItems.CONTENT_URI, getEvent().getDashboardItemDbId());
         getContext().getContentResolver().delete(uri, null, null);
     }
 
     private void updateDashboardItemState(State state) {
         Uri uri = ContentUris.withAppendedId(
-                DashboardItemColumns.CONTENT_URI, getEvent().getDashboardItemDbId());
+                DashboardItems.CONTENT_URI, getEvent().getDashboardItemDbId());
         ContentValues values = new ContentValues();
-        values.put(DashboardItemColumns.STATE, state.toString());
+        values.put(DashboardItems.STATE, state.toString());
         getContext().getContentResolver().update(uri, values, null, null);
     }
 }

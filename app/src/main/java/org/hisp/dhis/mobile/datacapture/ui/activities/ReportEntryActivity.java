@@ -21,7 +21,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.ReportGroupAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
@@ -126,11 +126,11 @@ public class ReportEntryActivity extends ActionBarActivity
     public Loader<CursorHolder<List<DBItemHolder<Group>>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             Report report = getReportFromBundle(args);
-            final String ORG_UNIT = ReportColumns.ORG_UNIT_ID + " = " + "'" + report.getOrgUnit() + "'";
-            final String DATASET = ReportColumns.DATASET_ID + " = " + "'" + report.getDataSet() + "'";
-            final String PERIOD = ReportColumns.PERIOD + " = " + "'" + report.getPeriod() + "'";
+            final String ORG_UNIT = Reports.ORG_UNIT_ID + " = " + "'" + report.getOrgUnit() + "'";
+            final String DATASET = Reports.DATASET_ID + " = " + "'" + report.getDataSet() + "'";
+            final String PERIOD = Reports.PERIOD + " = " + "'" + report.getPeriod() + "'";
             final String SELECTION = ORG_UNIT + " AND " + DATASET + " AND " + PERIOD;
-            return new ReportLoader(this, ReportColumns.CONTENT_URI_WITH_GROUPS,
+            return new ReportLoader(this, Reports.buildUriWithGroups(),
                     ReportGroupHandler.PROJECTION, SELECTION, null, null);
         }
         return null;

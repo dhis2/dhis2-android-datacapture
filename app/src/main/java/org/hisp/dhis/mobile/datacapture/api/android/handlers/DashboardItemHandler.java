@@ -16,7 +16,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItemElement;
 import org.hisp.dhis.mobile.datacapture.api.models.User;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItems;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -28,22 +28,22 @@ import static android.text.TextUtils.isEmpty;
 public final class DashboardItemHandler {
 
     public static final String[] PROJECTION = {
-            DashboardItemColumns.DB_ID,
-            DashboardItemColumns.ID,
-            DashboardItemColumns.CREATED,
-            DashboardItemColumns.LAST_UPDATED,
-            DashboardItemColumns.ACCESS,
-            DashboardItemColumns.TYPE,
-            DashboardItemColumns.CONTENT_COUNT,
-            DashboardItemColumns.MESSAGES,
-            DashboardItemColumns.USERS,
-            DashboardItemColumns.REPORTS,
-            DashboardItemColumns.RESOURCES,
-            DashboardItemColumns.REPORT_TABLES,
-            DashboardItemColumns.CHART,
-            DashboardItemColumns.EVENT_CHART,
-            DashboardItemColumns.REPORT_TABLE,
-            DashboardItemColumns.MAP
+            DashboardItems.DB_ID,
+            DashboardItems.ID,
+            DashboardItems.CREATED,
+            DashboardItems.LAST_UPDATED,
+            DashboardItems.ACCESS,
+            DashboardItems.TYPE,
+            DashboardItems.CONTENT_COUNT,
+            DashboardItems.MESSAGES,
+            DashboardItems.USERS,
+            DashboardItems.REPORTS,
+            DashboardItems.RESOURCES,
+            DashboardItems.REPORT_TABLES,
+            DashboardItems.CHART,
+            DashboardItems.EVENT_CHART,
+            DashboardItems.REPORT_TABLE,
+            DashboardItems.MAP
     };
 
     private static final int DATABASE_ID = 0;
@@ -136,28 +136,28 @@ public final class DashboardItemHandler {
         String reportTable = gson.toJson(dashboardItem.getReportTable());
         String map = gson.toJson(dashboardItem.getMap());
 
-        values.put(DashboardItemColumns.ID, dashboardItem.getId());
-        values.put(DashboardItemColumns.CREATED, created);
-        values.put(DashboardItemColumns.LAST_UPDATED, lastUpdated);
-        values.put(DashboardItemColumns.ACCESS, access);
-        values.put(DashboardItemColumns.TYPE, dashboardItem.getType());
-        values.put(DashboardItemColumns.CONTENT_COUNT, dashboardItem.getContentCount());
-        values.put(DashboardItemColumns.MESSAGES, dashboardItem.isMessages() ? 1 : 0);
-        values.put(DashboardItemColumns.USERS, users);
-        values.put(DashboardItemColumns.REPORTS, reports);
-        values.put(DashboardItemColumns.RESOURCES, resources);
-        values.put(DashboardItemColumns.REPORT_TABLES, reportTables);
-        values.put(DashboardItemColumns.CHART, chart);
-        values.put(DashboardItemColumns.EVENT_CHART, eventChart);
-        values.put(DashboardItemColumns.REPORT_TABLE, reportTable);
-        values.put(DashboardItemColumns.MAP, map);
+        values.put(DashboardItems.ID, dashboardItem.getId());
+        values.put(DashboardItems.CREATED, created);
+        values.put(DashboardItems.LAST_UPDATED, lastUpdated);
+        values.put(DashboardItems.ACCESS, access);
+        values.put(DashboardItems.TYPE, dashboardItem.getType());
+        values.put(DashboardItems.CONTENT_COUNT, dashboardItem.getContentCount());
+        values.put(DashboardItems.MESSAGES, dashboardItem.isMessages() ? 1 : 0);
+        values.put(DashboardItems.USERS, users);
+        values.put(DashboardItems.REPORTS, reports);
+        values.put(DashboardItems.RESOURCES, resources);
+        values.put(DashboardItems.REPORT_TABLES, reportTables);
+        values.put(DashboardItems.CHART, chart);
+        values.put(DashboardItems.EVENT_CHART, eventChart);
+        values.put(DashboardItems.REPORT_TABLE, reportTable);
+        values.put(DashboardItems.MAP, map);
 
         return values;
     }
 
     public static ContentProviderOperation delete(DBItemHolder<DashboardItem> dashboardItem) {
         Uri uri = ContentUris.withAppendedId(
-                DashboardItemColumns.CONTENT_URI, dashboardItem.getDatabaseId()
+                DashboardItems.CONTENT_URI, dashboardItem.getDatabaseId()
         );
         return ContentProviderOperation.newDelete(uri).build();
     }
@@ -166,7 +166,7 @@ public final class DashboardItemHandler {
                                                   DashboardItem newItem) {
         if (isCorrect(newItem)) {
             Uri uri = ContentUris.withAppendedId(
-                    DashboardItemColumns.CONTENT_URI, oldItem.getDatabaseId()
+                    DashboardItems.CONTENT_URI, oldItem.getDatabaseId()
             );
             return ContentProviderOperation.newUpdate(uri)
                     .withValues(toContentValues(newItem)).build();
@@ -178,9 +178,9 @@ public final class DashboardItemHandler {
     public static ContentProviderOperation insert(DBItemHolder<Dashboard> dashboard,
                                                   DashboardItem dashboardItem) {
         if (isCorrect(dashboardItem)) {
-            return ContentProviderOperation.newInsert(DashboardItemColumns.CONTENT_URI)
-                    .withValue(DashboardItemColumns.DASHBOARD_DB_ID, dashboard.getDatabaseId())
-                    .withValue(DashboardItemColumns.STATE, State.GETTING.toString())
+            return ContentProviderOperation.newInsert(DashboardItems.CONTENT_URI)
+                    .withValue(DashboardItems.DASHBOARD_DB_ID, dashboard.getDatabaseId())
+                    .withValue(DashboardItems.STATE, State.GETTING.toString())
                     .withValues(toContentValues(dashboardItem))
                     .build();
         } else {
@@ -193,10 +193,10 @@ public final class DashboardItemHandler {
     public static ContentProviderOperation insertWithBackReference(int dashboardIndex,
                                                                    DashboardItem dashboardItem) {
         if (isCorrect(dashboardItem)) {
-            return ContentProviderOperation.newInsert(DashboardItemColumns.CONTENT_URI)
-                    .withValueBackReference(DashboardItemColumns.DASHBOARD_DB_ID, dashboardIndex)
+            return ContentProviderOperation.newInsert(DashboardItems.CONTENT_URI)
+                    .withValueBackReference(DashboardItems.DASHBOARD_DB_ID, dashboardIndex)
                     .withValues(toContentValues(dashboardItem))
-                    .withValue(DashboardItemColumns.STATE, State.GETTING.toString())
+                    .withValue(DashboardItems.STATE, State.GETTING.toString())
                     .build();
         } else {
             return null;

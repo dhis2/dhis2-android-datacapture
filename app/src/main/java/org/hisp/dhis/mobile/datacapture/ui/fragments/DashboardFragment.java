@@ -24,7 +24,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItems;
 import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardItemDetailActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardItemAdapter;
 
@@ -107,11 +107,11 @@ public class DashboardFragment extends BaseFragment implements LoaderCallbacks<C
     public Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             int dashboardId = getArguments().getInt(DB_ID_EXTRA);
-            String SELECTION = DashboardItemColumns.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
-                    DashboardItemColumns.STATE + " != " + "'" + State.DELETING.toString() + "'" + " AND " +
-                    DashboardItemColumns.TYPE + " != " + "'" + DashboardItem.TYPE_REPORT_TABLES + "'" + " AND " +
-                    DashboardItemColumns.TYPE + " != " + "'" + DashboardItem.TYPE_MESSAGES + "'";
-            return new ItemsLoader(getActivity(), DashboardItemColumns.CONTENT_URI,
+            String SELECTION = DashboardItems.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
+                    DashboardItems.STATE + " != " + "'" + State.DELETING.toString() + "'" + " AND " +
+                    DashboardItems.TYPE + " != " + "'" + DashboardItem.TYPE_REPORT_TABLES + "'" + " AND " +
+                    DashboardItems.TYPE + " != " + "'" + DashboardItem.TYPE_MESSAGES + "'";
+            return new ItemsLoader(getActivity(), DashboardItems.CONTENT_URI,
                     DashboardItemHandler.PROJECTION, SELECTION, null, null);
         }
         return null;

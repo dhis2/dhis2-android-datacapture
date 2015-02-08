@@ -19,7 +19,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class InterpretationSyncProcessor extends AbsProcessor<InterpretationSync
     }
 
     private ArrayList<ContentProviderOperation> updateInterpretations() throws APIException {
-        final String SELECTION = InterpretationColumns.STATE + " = " + "'" + State.GETTING.toString() + "'";
+        final String SELECTION = Interpretations.STATE + " = " + "'" + State.GETTING.toString() + "'";
         List<DBItemHolder<Interpretation>> oldInterpretations = readInterpretations(SELECTION);
         List<Interpretation> newInterpretationList = getInterpretations();
         Map<String, Interpretation> newInterpretations = InterpretationHandler.toMap(newInterpretationList);
@@ -152,7 +152,7 @@ public class InterpretationSyncProcessor extends AbsProcessor<InterpretationSync
         List<DBItemHolder<Interpretation>> dbItems = new ArrayList<>();
 
         Cursor cursor = getContext().getContentResolver().query(
-                InterpretationColumns.CONTENT_URI, InterpretationHandler.PROJECTION, selection, null, null
+                Interpretations.CONTENT_URI, InterpretationHandler.PROJECTION, selection, null, null
         );
 
         if (cursor != null && cursor.getCount() > 0) {

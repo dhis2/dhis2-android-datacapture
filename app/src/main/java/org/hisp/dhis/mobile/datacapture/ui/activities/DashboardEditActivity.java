@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
@@ -33,9 +32,10 @@ import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.models.DashboardItem;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItems;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardEditAdapter;
+import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
     public static Intent prepareIntent(FragmentActivity activity,
                                        DBItemHolder<Dashboard> dbItem) {
         Intent intent = new Intent(activity, DashboardEditActivity.class);
-        intent.putExtra(DashboardColumns.DB_ID, dbItem.getDatabaseId());
+        intent.putExtra(Dashboards.DB_ID, dbItem.getDatabaseId());
         return intent;
     }
 
@@ -163,7 +163,7 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
     public void onClick(DialogInterface dialog, int which) {
         if (DialogInterface.BUTTON_POSITIVE == which) {
             DashboardUpdateEvent event = new DashboardUpdateEvent();
-            int dashboardId = getIntent().getExtras().getInt(DashboardColumns.DB_ID);
+            int dashboardId = getIntent().getExtras().getInt(Dashboards.DB_ID);
             String name = mEditDashboardName.getText().toString();
 
             event.setDataBaseId(dashboardId);
@@ -174,7 +174,7 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
     }
 
     private void deleteDashboard() {
-        int dashboardId = getIntent().getExtras().getInt(DashboardColumns.DB_ID);
+        int dashboardId = getIntent().getExtras().getInt(Dashboards.DB_ID);
         DashboardDeleteEvent event = new DashboardDeleteEvent();
         event.setDashboardDbId(dashboardId);
         BusProvider.getInstance().post(event);
@@ -183,7 +183,7 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
 
     @Override
     public void onDeleteButtonClicked(DBItemHolder<DashboardItem> item) {
-        final int dashboardId = getIntent().getExtras().getInt(DashboardColumns.DB_ID);
+        final int dashboardId = getIntent().getExtras().getInt(Dashboards.DB_ID);
         final int dashboardItemId = item.getDatabaseId();
         final DashboardItemDeleteEvent event = new DashboardItemDeleteEvent();
 
@@ -239,8 +239,8 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
         @Override
         public Loader<CursorHolder<DBItemHolder<Dashboard>>> onCreateLoader(int id, Bundle args) {
             if (DASHBOARD_LOADER_ID == id) {
-                int dashboardId = args.getInt(DashboardColumns.DB_ID);
-                Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, dashboardId);
+                int dashboardId = args.getInt(Dashboards.DB_ID);
+                Uri uri = ContentUris.withAppendedId(Dashboards.CONTENT_URI, dashboardId);
                 return new DashboardLoader(getBaseContext(), uri,
                         DashboardHandler.PROJECTION, null, null, null);
             } else {
@@ -268,12 +268,12 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
         @Override
         public Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> onCreateLoader(int id, Bundle args) {
             if (ITEM_LOADER_ID == id) {
-                int dashboardId = args.getInt(DashboardColumns.DB_ID);
-                final String SELECTION = DashboardItemColumns.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
-                        DashboardItemColumns.STATE + " != " + "'" + State.DELETING.toString() + "'" + " AND " +
-                        DashboardItemColumns.TYPE + " != " + "'" + DashboardItemColumns.REPORT_TABLES + "'" + " AND " +
-                        DashboardItemColumns.TYPE + " != " + "'" + DashboardItemColumns.MESSAGES + "'";
-                return new ItemLoader(getBaseContext(), DashboardItemColumns.CONTENT_URI,
+                int dashboardId = args.getInt(Dashboards.DB_ID);
+                final String SELECTION = DashboardItems.DASHBOARD_DB_ID + " = " + dashboardId + " AND " +
+                        DashboardItems.STATE + " != " + "'" + State.DELETING.toString() + "'" + " AND " +
+                        DashboardItems.TYPE + " != " + "'" + DashboardItems.REPORT_TABLES + "'" + " AND " +
+                        DashboardItems.TYPE + " != " + "'" + DashboardItems.MESSAGES + "'";
+                return new ItemLoader(getBaseContext(), DashboardItems.CONTENT_URI,
                         DashboardItemHandler.PROJECTION, SELECTION, null, null);
             } else {
                 return null;
@@ -290,9 +290,6 @@ public class DashboardEditActivity extends ActionBarActivity implements View.OnC
         }
 
         @Override
-        public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> loader) {
-        }
-    }
-
-    ;
+        public void onLoaderReset(Loader<CursorHolder<List<DBItemHolder<DashboardItem>>>> loader) { }
+    };
 }

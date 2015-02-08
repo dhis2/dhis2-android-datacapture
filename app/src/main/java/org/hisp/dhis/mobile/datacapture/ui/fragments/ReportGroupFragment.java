@@ -25,9 +25,9 @@ import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.FieldAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.AutoCompleteRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.CheckBoxRow;
@@ -52,7 +52,7 @@ public class ReportGroupFragment extends Fragment
         ReportGroupFragment fragment = new ReportGroupFragment();
         Bundle args = new Bundle();
 
-        args.putInt(ReportGroupColumns.DB_ID, groupId);
+        args.putInt(ReportGroups.DB_ID, groupId);
         fragment.setArguments(args);
 
         return fragment;
@@ -80,9 +80,9 @@ public class ReportGroupFragment extends Fragment
     @Override
     public Loader<CursorHolder<List<Row>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            int groupId = args.getInt(ReportGroupColumns.DB_ID);
-            final String SELECTION = ReportFieldColumns.GROUP_DB_ID + " = " + "'" + groupId + "'";
-            return new FieldsLoader(getActivity(), ReportFieldColumns.CONTENT_URI,
+            int groupId = args.getInt(ReportGroups.DB_ID);
+            final String SELECTION = ReportFields.GROUP_DB_ID + " = " + "'" + groupId + "'";
+            return new FieldsLoader(getActivity(), ReportFields.CONTENT_URI,
                     ReportFieldHandler.PROJECTION, SELECTION, null, null);
         } else {
             return null;
@@ -164,10 +164,10 @@ public class ReportGroupFragment extends Fragment
         }
 
         private OptionSet readOptionSet(String optionSetId) {
-            final String SELECTION = KeyValueColumns.KEY + " = " + "'" + optionSetId + "'" + " AND " +
-                    KeyValueColumns.TYPE + " = " + "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
+            final String SELECTION = KeyValues.KEY + " = " + "'" + optionSetId + "'" + " AND " +
+                    KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
             Cursor cursor = getContext().getContentResolver().query(
-                    KeyValueColumns.CONTENT_URI, KeyValueHandler.PROJECTION, SELECTION, null, null
+                    KeyValues.CONTENT_URI, KeyValueHandler.PROJECTION, SELECTION, null, null
             );
 
             OptionSet optionSet = null;

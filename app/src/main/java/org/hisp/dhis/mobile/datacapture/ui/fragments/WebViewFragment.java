@@ -8,11 +8,11 @@ import android.webkit.WebView;
 
 import com.squareup.otto.Subscribe;
 
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItems;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.GetReportTableEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnGotReportTableEvent;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
 
 public class WebViewFragment extends BaseFragment {
     private WebView mWebView;
@@ -21,7 +21,7 @@ public class WebViewFragment extends BaseFragment {
         WebViewFragment fragment = new WebViewFragment();
         Bundle args = new Bundle();
 
-        args.putString(DashboardItemColumns.ID, id);
+        args.putString(DashboardItems.ID, id);
         fragment.setArguments(args);
 
         return fragment;
@@ -34,9 +34,9 @@ public class WebViewFragment extends BaseFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (getArguments() != null && getArguments().getString(DashboardItemColumns.ID) != null) {
+        if (getArguments() != null && getArguments().getString(DashboardItems.ID) != null) {
             GetReportTableEvent event = new GetReportTableEvent();
-            event.setId(getArguments().getString(DashboardItemColumns.ID));
+            event.setId(getArguments().getString(DashboardItems.ID));
             BusProvider.getInstance().post(event);
         }
     }

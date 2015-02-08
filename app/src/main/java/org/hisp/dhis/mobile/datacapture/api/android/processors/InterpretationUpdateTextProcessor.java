@@ -17,7 +17,7 @@ import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
 
 public class InterpretationUpdateTextProcessor extends AbsProcessor<InterpretationUpdateTextEvent, OnInterpretationTextUpdateEvent> {
 
@@ -54,7 +54,7 @@ public class InterpretationUpdateTextProcessor extends AbsProcessor<Interpretati
 
     private DBItemHolder<Interpretation> readInterpretation() {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, getEvent().getDbId()
+                Interpretations.CONTENT_URI, getEvent().getDbId()
         );
         Cursor cursor = getContext().getContentResolver().query(
                 uri, InterpretationHandler.PROJECTION, null, null, null
@@ -72,12 +72,12 @@ public class InterpretationUpdateTextProcessor extends AbsProcessor<Interpretati
 
     private void updateInterpretation(State state) {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, getEvent().getDbId()
+                Interpretations.CONTENT_URI, getEvent().getDbId()
         );
 
         ContentValues values = new ContentValues();
-        values.put(InterpretationColumns.TEXT, getEvent().getText());
-        values.put(InterpretationColumns.STATE, state.toString());
+        values.put(Interpretations.TEXT, getEvent().getText());
+        values.put(Interpretations.STATE, state.toString());
         getContext().getContentResolver().update(uri, values, null, null);
     }
 }

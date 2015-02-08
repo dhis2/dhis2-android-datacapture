@@ -19,7 +19,7 @@ import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 
 import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
 
@@ -34,7 +34,7 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
 
     private DBItemHolder<Dashboard> readDashboard() {
         Uri uri = ContentUris.withAppendedId(
-                DashboardColumns.CONTENT_URI, mEvent.getDashboardDbId());
+                Dashboards.CONTENT_URI, mEvent.getDashboardDbId());
         Cursor cursor = mContext.getContentResolver().query(
                 uri, DashboardHandler.PROJECTION, null, null, null
         );
@@ -51,7 +51,7 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
 
     private void deleteDashboard() {
         Uri uri = ContentUris.withAppendedId(
-                DashboardColumns.CONTENT_URI, mEvent.getDashboardDbId());
+                Dashboards.CONTENT_URI, mEvent.getDashboardDbId());
         mContext.getContentResolver().delete(uri, null, null);
     }
 
@@ -87,9 +87,9 @@ public class DashboardDeleteProcessor extends AsyncTask<Void, Void, OnDashboardD
 
     private void updateDashboardState(State state) {
         Uri uri = ContentUris.withAppendedId(
-                DashboardColumns.CONTENT_URI, mEvent.getDashboardDbId());
+                Dashboards.CONTENT_URI, mEvent.getDashboardDbId());
         ContentValues values = new ContentValues();
-        values.put(DashboardColumns.STATE, state.toString());
+        values.put(Dashboards.STATE, state.toString());
         mContext.getContentResolver().update(uri, values, null, null);
     }
 }

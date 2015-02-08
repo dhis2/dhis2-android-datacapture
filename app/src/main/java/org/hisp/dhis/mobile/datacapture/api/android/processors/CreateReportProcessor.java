@@ -23,10 +23,10 @@ import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFieldColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 
 import java.util.ArrayList;
 
@@ -59,11 +59,11 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
     }
 
     private DataSet readDataSet() {
-        final String KEY = KeyValueColumns.KEY + " = " + "'" + getEvent().getReport().getDataSet() + "'";
-        final String TYPE = KeyValueColumns.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
+        final String KEY = KeyValues.KEY + " = " + "'" + getEvent().getReport().getDataSet() + "'";
+        final String TYPE = KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
         final String SELECTION = KEY + " AND " + TYPE;
 
-        Cursor cursor = getContext().getContentResolver().query(KeyValueColumns.CONTENT_URI,
+        Cursor cursor = getContext().getContentResolver().query(KeyValues.CONTENT_URI,
                 KeyValueHandler.PROJECTION, SELECTION, null, null);
         DataSet dataSet = null;
         if (cursor != null && cursor.getCount() > 0) {
@@ -84,25 +84,25 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         ContentValues reportValues = ReportHandler.toContentValues(getEvent().getReport());
-        ops.add(ContentProviderOperation.newInsert(ReportColumns.CONTENT_URI)
+        ops.add(ContentProviderOperation.newInsert(Reports.CONTENT_URI)
                 .withValues(reportValues)
-                .withValue(ReportColumns.STATE, State.OFFLINE.toString())
+                .withValue(Reports.STATE, State.OFFLINE.toString())
                 .build());
 
         int reportIndex = ops.size() - 1;
         for (Group group : dataSet.getGroups()) {
             ContentValues groupValues = ReportGroupHandler.toContentValues(group);
-            ops.add(ContentProviderOperation.newInsert(ReportGroupColumns.CONTENT_URI)
+            ops.add(ContentProviderOperation.newInsert(ReportGroups.CONTENT_URI)
                     .withValues(groupValues)
-                    .withValueBackReference(ReportGroupColumns.REPORT_DB_ID, reportIndex)
+                    .withValueBackReference(ReportGroups.REPORT_DB_ID, reportIndex)
                     .build());
 
             int groupIndex = ops.size() - 1;
             for (Field field : group.getFields()) {
                 ContentValues fieldValues = ReportFieldHandler.toContentValues(field);
-                ops.add(ContentProviderOperation.newInsert(ReportFieldColumns.CONTENT_URI)
+                ops.add(ContentProviderOperation.newInsert(ReportFields.CONTENT_URI)
                         .withValues(fieldValues)
-                        .withValueBackReference(ReportFieldColumns.GROUP_DB_ID, groupIndex)
+                        .withValueBackReference(ReportFields.GROUP_DB_ID, groupIndex)
                         .build());
             }
         }
@@ -111,12 +111,12 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
     }
 
     private DBItemHolder<Report> readReport() {
-        final String ORG_UNIT = ReportColumns.ORG_UNIT_ID + " = " + "'" + getEvent().getReport().getOrgUnit() + "'";
-        final String DATASET = ReportColumns.DATASET_ID + " = " + "'" + getEvent().getReport().getDataSet() + "'";
-        final String PERIOD = ReportColumns.PERIOD + " = " + "'" + getEvent().getReport().getPeriod() + "'";
+        final String ORG_UNIT = Reports.ORG_UNIT_ID + " = " + "'" + getEvent().getReport().getOrgUnit() + "'";
+        final String DATASET = Reports.DATASET_ID + " = " + "'" + getEvent().getReport().getDataSet() + "'";
+        final String PERIOD = Reports.PERIOD + " = " + "'" + getEvent().getReport().getPeriod() + "'";
         final String SELECTION = ORG_UNIT + " AND " + DATASET + " AND " + PERIOD;
 
-        Cursor cursor = getContext().getContentResolver().query(ReportColumns.CONTENT_URI,
+        Cursor cursor = getContext().getContentResolver().query(Reports.CONTENT_URI,
                 ReportHandler.PROJECTION, SELECTION, null, null);
 
         DBItemHolder<Report> dbItem = null;

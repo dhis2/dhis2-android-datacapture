@@ -12,7 +12,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +23,13 @@ import static android.text.TextUtils.isEmpty;
 public final class DashboardHandler {
 
     public static final String[] PROJECTION = {
-            DashboardColumns.DB_ID,
-            DashboardColumns.ID,
-            DashboardColumns.CREATED,
-            DashboardColumns.LAST_UPDATED,
-            DashboardColumns.ACCESS,
-            DashboardColumns.NAME,
-            DashboardColumns.ITEM_COUNT
+            Dashboards.DB_ID,
+            Dashboards.ID,
+            Dashboards.CREATED,
+            Dashboards.LAST_UPDATED,
+            Dashboards.ACCESS,
+            Dashboards.NAME,
+            Dashboards.ITEM_COUNT
     };
 
     private static final int DB_ID = 0;
@@ -55,12 +55,12 @@ public final class DashboardHandler {
         String lastUpdated = dashboard.getLastUpdated();
         String access = gson.toJson(dashboard.getAccess());
 
-        values.put(DashboardColumns.ID, dashboard.getId());
-        values.put(DashboardColumns.CREATED, created);
-        values.put(DashboardColumns.LAST_UPDATED, lastUpdated);
-        values.put(DashboardColumns.ACCESS, access);
-        values.put(DashboardColumns.NAME, dashboard.getName());
-        values.put(DashboardColumns.ITEM_COUNT, dashboard.getItemCount());
+        values.put(Dashboards.ID, dashboard.getId());
+        values.put(Dashboards.CREATED, created);
+        values.put(Dashboards.LAST_UPDATED, lastUpdated);
+        values.put(Dashboards.ACCESS, access);
+        values.put(Dashboards.NAME, dashboard.getName());
+        values.put(Dashboards.ITEM_COUNT, dashboard.getItemCount());
 
         return values;
     }
@@ -100,7 +100,7 @@ public final class DashboardHandler {
 
     public static ContentProviderOperation delete(DBItemHolder<Dashboard> dashboard) {
         Uri uri = ContentUris.withAppendedId(
-                DashboardColumns.CONTENT_URI, dashboard.getDatabaseId()
+                Dashboards.CONTENT_URI, dashboard.getDatabaseId()
         );
         return ContentProviderOperation.newDelete(uri).build();
     }
@@ -113,11 +113,11 @@ public final class DashboardHandler {
     public static ContentProviderOperation update(DBItemHolder<Dashboard> oldDashboard,
                                                   Dashboard newDashboard, State state) {
         if (isCorrect(newDashboard)) {
-            Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI,
+            Uri uri = ContentUris.withAppendedId(Dashboards.CONTENT_URI,
                     oldDashboard.getDatabaseId());
             return ContentProviderOperation.newUpdate(uri)
                     .withValues(DashboardHandler.toContentValues(newDashboard))
-                    .withValue(DashboardColumns.STATE, state.toString()).build();
+                    .withValue(Dashboards.STATE, state.toString()).build();
         } else {
             return null;
         }
@@ -125,8 +125,8 @@ public final class DashboardHandler {
 
     public static ContentProviderOperation insert(Dashboard dashboard) {
         if (isCorrect(dashboard)) {
-            return ContentProviderOperation.newInsert(DashboardColumns.CONTENT_URI)
-                    .withValue(DashboardColumns.STATE, State.GETTING.toString())
+            return ContentProviderOperation.newInsert(Dashboards.CONTENT_URI)
+                    .withValue(Dashboards.STATE, State.GETTING.toString())
                     .withValues(DashboardHandler.toContentValues(dashboard))
                     .build();
         } else {

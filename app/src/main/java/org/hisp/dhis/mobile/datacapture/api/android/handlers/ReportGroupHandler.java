@@ -5,13 +5,13 @@ import android.database.Cursor;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 
 public final class ReportGroupHandler {
     public static final String[] PROJECTION = new String[] {
-            ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.DB_ID,
-            ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.LABEL,
-            ReportGroupColumns.TABLE_NAME + "." + ReportGroupColumns.DATA_ELEMENT_COUNT,
+            ReportGroups.TABLE_NAME + "." + ReportGroups.DB_ID,
+            ReportGroups.TABLE_NAME + "." + ReportGroups.LABEL,
+            ReportGroups.TABLE_NAME + "." + ReportGroups.DATA_ELEMENT_COUNT,
     };
 
     private static final int DB_ID = 0;
@@ -20,8 +20,8 @@ public final class ReportGroupHandler {
 
     public static ContentValues toContentValues(Group group) {
         ContentValues values = new ContentValues();
-        values.put(ReportGroupColumns.LABEL, group.getLabel());
-        values.put(ReportGroupColumns.DATA_ELEMENT_COUNT, group.getDataElementCount());
+        values.put(ReportGroups.LABEL, group.getLabel());
+        values.put(ReportGroups.DATA_ELEMENT_COUNT, group.getDataElementCount());
         return values;
     }
 

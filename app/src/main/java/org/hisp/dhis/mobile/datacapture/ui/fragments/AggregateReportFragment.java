@@ -30,7 +30,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
 import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 import org.hisp.dhis.mobile.datacapture.ui.activities.ReportEntryActivity;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment.OnDialogItemClickListener;
@@ -167,9 +167,9 @@ public class AggregateReportFragment extends BaseFragment
     public Loader<CursorHolder<List<OrganisationUnit>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             final String ORH_UNITS_KEY = KeyValue.Type.ORG_UNITS_WITH_DATASETS.toString();
-            String SELECTION = KeyValueColumns.KEY + " = " + "'" + ORH_UNITS_KEY + "'" + " AND " +
-                    KeyValueColumns.TYPE + " = " + "'" + ORH_UNITS_KEY + "'";
-            return new UnitsLoader(getActivity(), KeyValueColumns.CONTENT_URI,
+            String SELECTION = KeyValues.KEY + " = " + "'" + ORH_UNITS_KEY + "'" + " AND " +
+                    KeyValues.TYPE + " = " + "'" + ORH_UNITS_KEY + "'";
+            return new UnitsLoader(getActivity(), KeyValues.CONTENT_URI,
                     KeyValueHandler.PROJECTION, SELECTION, null, null);
         }
         return null;

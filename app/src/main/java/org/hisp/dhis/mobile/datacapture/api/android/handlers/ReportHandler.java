@@ -5,16 +5,15 @@ import android.database.Cursor;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroupColumns;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
 
 public final class ReportHandler {
     public static final String[] PROJECTION = new String[] {
-            ReportColumns.TABLE_NAME + "." + ReportColumns.DB_ID,
-            ReportColumns.TABLE_NAME + "." + ReportColumns.ORG_UNIT_ID,
-            ReportColumns.TABLE_NAME + "." + ReportColumns.DATASET_ID,
-            ReportColumns.TABLE_NAME + "." + ReportColumns.PERIOD,
-            ReportColumns.TABLE_NAME + "." + ReportColumns.COMPLETE_DATE,
+            Reports.TABLE_NAME + "." + Reports.DB_ID,
+            Reports.TABLE_NAME + "." + Reports.ORG_UNIT_ID,
+            Reports.TABLE_NAME + "." + Reports.DATASET_ID,
+            Reports.TABLE_NAME + "." + Reports.PERIOD,
+            Reports.TABLE_NAME + "." + Reports.COMPLETE_DATE,
     };
 
     private static final int DB_ID = 0;
@@ -25,10 +24,10 @@ public final class ReportHandler {
 
     public static ContentValues toContentValues(Report report) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(ReportColumns.ORG_UNIT_ID, report.getOrgUnit());
-        contentValues.put(ReportColumns.DATASET_ID, report.getDataSet());
-        contentValues.put(ReportColumns.PERIOD, report.getPeriod());
-        contentValues.put(ReportColumns.COMPLETE_DATE, report.getCompleteDate());
+        contentValues.put(Reports.ORG_UNIT_ID, report.getOrgUnit());
+        contentValues.put(Reports.DATASET_ID, report.getDataSet());
+        contentValues.put(Reports.PERIOD, report.getPeriod());
+        contentValues.put(Reports.COMPLETE_DATE, report.getCompleteDate());
         return contentValues;
     }
 

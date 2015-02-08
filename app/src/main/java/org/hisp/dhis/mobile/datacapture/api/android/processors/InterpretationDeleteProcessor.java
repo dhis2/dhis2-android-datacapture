@@ -17,7 +17,7 @@ import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
 
 public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDeleteEvent, OnInterpretationDeleteEvent> {
 
@@ -52,7 +52,7 @@ public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDe
 
     private DBItemHolder<Interpretation> readInterpretation() {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, getEvent().getInterpretationId()
+                Interpretations.CONTENT_URI, getEvent().getInterpretationId()
         );
         Cursor cursor = getContext().getContentResolver().query(
                 uri, InterpretationHandler.PROJECTION, null, null, null
@@ -70,7 +70,7 @@ public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDe
 
     private void deleteInterpretation() {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, getEvent().getInterpretationId()
+                Interpretations.CONTENT_URI, getEvent().getInterpretationId()
         );
 
         getContext().getContentResolver().delete(uri, null, null);
@@ -78,11 +78,11 @@ public class InterpretationDeleteProcessor extends AbsProcessor<InterpretationDe
 
     private void updateInterpretationState(State state) {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, getEvent().getInterpretationId()
+                Interpretations.CONTENT_URI, getEvent().getInterpretationId()
         );
 
         ContentValues values = new ContentValues();
-        values.put(InterpretationColumns.STATE, state.toString());
+        values.put(Interpretations.STATE, state.toString());
         getContext().getContentResolver().update(uri, values, null, null);
     }
 }

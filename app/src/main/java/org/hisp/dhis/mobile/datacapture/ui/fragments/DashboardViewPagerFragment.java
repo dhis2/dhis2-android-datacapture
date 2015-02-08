@@ -32,7 +32,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardEditActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
@@ -143,9 +143,9 @@ public class DashboardViewPagerFragment extends BaseFragment
     @Override
     public Loader<CursorHolder<List<DBItemHolder<Dashboard>>>> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {
-            final String SELECTION = DBContract.DashboardColumns.STATE + " != " + '"' + State.DELETING + '"';
+            final String SELECTION = Dashboards.STATE + " != " + '"' + State.DELETING + '"';
             return new DashboardListLoader(
-                    getActivity(), DBContract.DashboardColumns.CONTENT_URI,
+                    getActivity(), Dashboards.CONTENT_URI,
                     DashboardHandler.PROJECTION, SELECTION, null, null
             );
         } else {

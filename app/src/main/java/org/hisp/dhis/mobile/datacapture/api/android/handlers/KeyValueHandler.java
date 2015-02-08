@@ -6,14 +6,14 @@ import android.database.Cursor;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DBItemHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 
 public final class KeyValueHandler {
     public static final String[] PROJECTION = new String[]{
-            KeyValueColumns.DB_ID,
-            KeyValueColumns.KEY,
-            KeyValueColumns.TYPE,
-            KeyValueColumns.VALUE
+            KeyValues.DB_ID,
+            KeyValues.KEY,
+            KeyValues.TYPE,
+            KeyValues.VALUE
     };
 
     private static final int DB_ID = 0;
@@ -27,9 +27,9 @@ public final class KeyValueHandler {
     public static ContentValues toContentValues(KeyValue keyValue) {
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(KeyValueColumns.KEY, keyValue.getKey());
-        contentValues.put(KeyValueColumns.TYPE, keyValue.getType().toString());
-        contentValues.put(KeyValueColumns.VALUE, keyValue.getValue());
+        contentValues.put(KeyValues.KEY, keyValue.getKey());
+        contentValues.put(KeyValues.TYPE, keyValue.getType().toString());
+        contentValues.put(KeyValues.VALUE, keyValue.getValue());
 
         return contentValues;
     }
@@ -50,7 +50,7 @@ public final class KeyValueHandler {
     }
 
     public static ContentProviderOperation insert(KeyValue value) {
-        return ContentProviderOperation.newInsert(KeyValueColumns.CONTENT_URI)
+        return ContentProviderOperation.newInsert(KeyValues.CONTENT_URI)
                 .withValues(toContentValues(value))
                 .build();
     }

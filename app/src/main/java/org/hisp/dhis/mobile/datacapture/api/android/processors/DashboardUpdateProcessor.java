@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
-import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardUpdateEvent;
@@ -19,12 +17,37 @@ import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 
 public class DashboardUpdateProcessor extends AbsProcessor<DashboardUpdateEvent, OnDashboardUpdateEvent> {
 
     public DashboardUpdateProcessor(Context context, DashboardUpdateEvent event) {
         super(context, event);
+    }
+
+    private static void updateDashboard(Context context, int dashboardId,
+                                        String dashboardName, State state) {
+        Uri uri = ContentUris.withAppendedId(Dashboards.CONTENT_URI, dashboardId);
+        ContentValues values = new ContentValues();
+        values.put(Dashboards.NAME, dashboardName);
+        values.put(Dashboards.STATE, state.toString());
+        context.getContentResolver().update(uri, values, null, null);
+    }
+
+    private static DBItemHolder<Dashboard> readDashboard(Context context, int dashboardId) {
+        Uri uri = ContentUris.withAppendedId(Dashboards.CONTENT_URI, dashboardId);
+        Cursor cursor = context.getContentResolver().query(
+                uri, DashboardHandler.PROJECTION, null, null, null
+        );
+
+        DBItemHolder<Dashboard> dashboard = null;
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            dashboard = DashboardHandler.fromCursor(cursor);
+            cursor.close();
+        }
+
+        return dashboard;
     }
 
     @Override
@@ -58,30 +81,5 @@ public class DashboardUpdateProcessor extends AbsProcessor<DashboardUpdateEvent,
 
         event.setResponseHolder(holder);
         return event;
-    }
-
-    private static void updateDashboard(Context context, int dashboardId,
-                                        String dashboardName, State state) {
-        Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, dashboardId);
-        ContentValues values = new ContentValues();
-        values.put(DashboardColumns.NAME, dashboardName);
-        values.put(DashboardColumns.STATE, state.toString());
-        context.getContentResolver().update(uri, values, null, null);
-    }
-
-    private static DBItemHolder<Dashboard> readDashboard(Context context, int dashboardId) {
-        Uri uri = ContentUris.withAppendedId(DashboardColumns.CONTENT_URI, dashboardId);
-        Cursor cursor = context.getContentResolver().query(
-                uri, DashboardHandler.PROJECTION, null, null, null
-        );
-
-        DBItemHolder<Dashboard> dashboard = null;
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            dashboard = DashboardHandler.fromCursor(cursor);
-            cursor.close();
-        }
-
-        return dashboard;
     }
 }

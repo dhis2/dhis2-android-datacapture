@@ -51,6 +51,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
         db.execSQL(DBSchema.DROP_OPTION_SET_TABLE);
         db.execSQL(DBSchema.DROP_OPTION_TABLE);
+
+        onCreate(db);
     }
 
     /**

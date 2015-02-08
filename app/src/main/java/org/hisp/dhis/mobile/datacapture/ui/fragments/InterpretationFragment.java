@@ -28,7 +28,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.InterpretationAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.CommentsDialogFragment;
 import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
@@ -112,8 +112,8 @@ public class InterpretationFragment extends BaseFragment
     @Override
     public Loader<CursorHolder<List<DBItemHolder<Interpretation>>>> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {
-            final String SELECTION = InterpretationColumns.STATE + " != " + "'" + State.DELETING.toString() + "'";
-            return new InterpretationLoader(getActivity(), InterpretationColumns.CONTENT_URI,
+            final String SELECTION = Interpretations.STATE + " != " + "'" + State.DELETING.toString() + "'";
+            return new InterpretationLoader(getActivity(), Interpretations.CONTENT_URI,
                     InterpretationHandler.PROJECTION, SELECTION, null, null);
         }
 

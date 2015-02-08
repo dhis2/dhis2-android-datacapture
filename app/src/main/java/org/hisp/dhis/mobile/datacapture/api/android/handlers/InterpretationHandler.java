@@ -20,7 +20,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.InterpretationDataSet;
 import org.hisp.dhis.mobile.datacapture.api.models.InterpretationDataSetPeriod;
 import org.hisp.dhis.mobile.datacapture.api.models.InterpretationOrganizationUnit;
 import org.hisp.dhis.mobile.datacapture.api.models.User;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.InterpretationColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -32,24 +32,24 @@ import static android.text.TextUtils.isEmpty;
 
 public final class InterpretationHandler {
     public static final String[] PROJECTION = {
-            InterpretationColumns.DB_ID,
-            InterpretationColumns.ID,
-            InterpretationColumns.CREATED,
-            InterpretationColumns.LAST_UPDATED,
-            InterpretationColumns.ACCESS,
-            InterpretationColumns.TYPE,
-            InterpretationColumns.NAME,
-            InterpretationColumns.DISPLAY_NAME,
-            InterpretationColumns.TEXT,
-            InterpretationColumns.EXTERNAL_ACCESS,
-            InterpretationColumns.MAP,
-            InterpretationColumns.CHART,
-            InterpretationColumns.REPORT_TABLE,
-            InterpretationColumns.DATASET,
-            InterpretationColumns.ORGANIZATION_UNIT,
-            InterpretationColumns.PERIOD,
-            InterpretationColumns.USER,
-            InterpretationColumns.COMMENTS
+            Interpretations.DB_ID,
+            Interpretations.ID,
+            Interpretations.CREATED,
+            Interpretations.LAST_UPDATED,
+            Interpretations.ACCESS,
+            Interpretations.TYPE,
+            Interpretations.NAME,
+            Interpretations.DISPLAY_NAME,
+            Interpretations.TEXT,
+            Interpretations.EXTERNAL_ACCESS,
+            Interpretations.MAP,
+            Interpretations.CHART,
+            Interpretations.REPORT_TABLE,
+            Interpretations.DATASET,
+            Interpretations.ORGANIZATION_UNIT,
+            Interpretations.PERIOD,
+            Interpretations.USER,
+            Interpretations.COMMENTS
     };
 
 
@@ -85,23 +85,23 @@ public final class InterpretationHandler {
         ContentValues values = new ContentValues();
         Gson gson = new Gson();
 
-        values.put(InterpretationColumns.ID, interpretation.getId());
-        values.put(InterpretationColumns.CREATED, interpretation.getCreated());
-        values.put(InterpretationColumns.LAST_UPDATED, interpretation.getLastUpdated());
-        values.put(InterpretationColumns.ACCESS, gson.toJson(interpretation.getAccess()));
-        values.put(InterpretationColumns.TYPE, interpretation.getType());
-        values.put(InterpretationColumns.NAME, interpretation.getName());
-        values.put(InterpretationColumns.DISPLAY_NAME, interpretation.getDisplayName());
-        values.put(InterpretationColumns.TEXT, interpretation.getText());
-        values.put(InterpretationColumns.EXTERNAL_ACCESS, interpretation.isExternalAccess() ? 1 : 0);
-        values.put(InterpretationColumns.MAP, gson.toJson(interpretation.getMap()));
-        values.put(InterpretationColumns.CHART, gson.toJson(interpretation.getChart()));
-        values.put(InterpretationColumns.REPORT_TABLE, gson.toJson(interpretation.getReportTable()));
-        values.put(InterpretationColumns.DATASET, gson.toJson(interpretation.getDataSet()));
-        values.put(InterpretationColumns.ORGANIZATION_UNIT, gson.toJson(interpretation.getOrganisationUnit()));
-        values.put(InterpretationColumns.PERIOD, gson.toJson(interpretation.getPeriod()));
-        values.put(InterpretationColumns.USER, gson.toJson(interpretation.getUser()));
-        values.put(InterpretationColumns.COMMENTS, gson.toJson(interpretation.getComments()));
+        values.put(Interpretations.ID, interpretation.getId());
+        values.put(Interpretations.CREATED, interpretation.getCreated());
+        values.put(Interpretations.LAST_UPDATED, interpretation.getLastUpdated());
+        values.put(Interpretations.ACCESS, gson.toJson(interpretation.getAccess()));
+        values.put(Interpretations.TYPE, interpretation.getType());
+        values.put(Interpretations.NAME, interpretation.getName());
+        values.put(Interpretations.DISPLAY_NAME, interpretation.getDisplayName());
+        values.put(Interpretations.TEXT, interpretation.getText());
+        values.put(Interpretations.EXTERNAL_ACCESS, interpretation.isExternalAccess() ? 1 : 0);
+        values.put(Interpretations.MAP, gson.toJson(interpretation.getMap()));
+        values.put(Interpretations.CHART, gson.toJson(interpretation.getChart()));
+        values.put(Interpretations.REPORT_TABLE, gson.toJson(interpretation.getReportTable()));
+        values.put(Interpretations.DATASET, gson.toJson(interpretation.getDataSet()));
+        values.put(Interpretations.ORGANIZATION_UNIT, gson.toJson(interpretation.getOrganisationUnit()));
+        values.put(Interpretations.PERIOD, gson.toJson(interpretation.getPeriod()));
+        values.put(Interpretations.USER, gson.toJson(interpretation.getUser()));
+        values.put(Interpretations.COMMENTS, gson.toJson(interpretation.getComments()));
 
         return values;
     }
@@ -170,7 +170,7 @@ public final class InterpretationHandler {
 
     public static ContentProviderOperation delete(DBItemHolder<Interpretation> dbItem) {
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, dbItem.getDatabaseId()
+                Interpretations.CONTENT_URI, dbItem.getDatabaseId()
         );
         return ContentProviderOperation.newDelete(uri).build();
     }
@@ -182,11 +182,11 @@ public final class InterpretationHandler {
         }
 
         Uri uri = ContentUris.withAppendedId(
-                InterpretationColumns.CONTENT_URI, dbItem.getDatabaseId()
+                Interpretations.CONTENT_URI, dbItem.getDatabaseId()
         );
         return ContentProviderOperation.newUpdate(uri)
                 .withValues(InterpretationHandler.toContentValues(interpretation))
-                .withValue(InterpretationColumns.STATE, State.GETTING.toString())
+                .withValue(Interpretations.STATE, State.GETTING.toString())
                 .build();
     }
 
@@ -194,9 +194,9 @@ public final class InterpretationHandler {
         if (!isCorrect(interpretation)) {
             return null;
         }
-        return ContentProviderOperation.newInsert(InterpretationColumns.CONTENT_URI)
+        return ContentProviderOperation.newInsert(Interpretations.CONTENT_URI)
                 .withValues(InterpretationHandler.toContentValues(interpretation))
-                .withValue(InterpretationColumns.STATE, State.GETTING.toString())
+                .withValue(Interpretations.STATE, State.GETTING.toString())
                 .build();
     }
 }

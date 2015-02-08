@@ -24,7 +24,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
 import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValueColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,10 +104,10 @@ public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatas
     private void saveOrgUnits(DataSetHolder holder) {
         // we need to remove old org.units before saving new ones
         final String ORG_UNITS_KEY = KeyValue.Type.ORG_UNITS_WITH_DATASETS.toString();
-        final String SELECTION = KeyValueColumns.KEY + " = " + "'" + ORG_UNITS_KEY + "'" + " AND "
-                + KeyValueColumns.TYPE + " = " + "'" + ORG_UNITS_KEY + "'";
+        final String SELECTION = KeyValues.KEY + " = " + "'" + ORG_UNITS_KEY + "'" + " AND "
+                + KeyValues.TYPE + " = " + "'" + ORG_UNITS_KEY + "'";
         getContext().getContentResolver().delete(
-                KeyValueColumns.CONTENT_URI, SELECTION, null
+                KeyValues.CONTENT_URI, SELECTION, null
         );
 
         List<OrganisationUnit> units = prepareOrgUnits(holder);
@@ -123,13 +123,13 @@ public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatas
         keyValue.setValue(gson.toJson(units));
 
         ContentValues values = KeyValueHandler.toContentValues(keyValue);
-        getContext().getContentResolver().insert(KeyValueColumns.CONTENT_URI, values);
+        getContext().getContentResolver().insert(KeyValues.CONTENT_URI, values);
     }
 
     private void saveDatasets(DataSetHolder holder) {
         // remove old datasets before inserting new ones
-        final String SELECTION = KeyValueColumns.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
-        getContext().getContentResolver().delete(KeyValueColumns.CONTENT_URI, SELECTION, null);
+        final String SELECTION = KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
+        getContext().getContentResolver().delete(KeyValues.CONTENT_URI, SELECTION, null);
 
         List<DataSet> dataSets = holder.getDataSets();
         if (dataSets == null) {
@@ -156,10 +156,10 @@ public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatas
     }
 
     private void saveOptionSets(List<OptionSet> optionSets) {
-        final String SELECTION = KeyValueColumns.TYPE + " = " +
+        final String SELECTION = KeyValues.TYPE + " = " +
                 "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
 
-        getContext().getContentResolver().delete(KeyValueColumns.CONTENT_URI, SELECTION, null);
+        getContext().getContentResolver().delete(KeyValues.CONTENT_URI, SELECTION, null);
 
         if (optionSets == null) {
             return;

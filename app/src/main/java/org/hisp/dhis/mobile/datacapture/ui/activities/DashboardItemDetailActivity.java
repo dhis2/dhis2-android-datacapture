@@ -25,7 +25,7 @@ import org.hisp.dhis.mobile.datacapture.api.models.DashboardItemElement;
 import org.hisp.dhis.mobile.datacapture.api.models.User;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItemColumns;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.DashboardItems;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.ImageViewFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.ListViewFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.WebViewFragment;
@@ -41,7 +41,7 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
 
     public static Intent prepareIntent(FragmentActivity activity, int dashboardId) {
         Intent intent = new Intent(activity, DashboardItemDetailActivity.class);
-        intent.putExtra(DashboardItemColumns.DB_ID, dashboardId);
+        intent.putExtra(DashboardItems.DB_ID, dashboardId);
         return intent;
     }
 
@@ -84,8 +84,8 @@ public class DashboardItemDetailActivity extends ActionBarActivity implements Lo
     @Override
     public Loader<CursorHolder<DashboardItem>> onCreateLoader(int loaderId, Bundle args) {
         if (LOADER_ID == loaderId) {
-            int id = args.getInt(DashboardItemColumns.DB_ID);
-            Uri uri = ContentUris.withAppendedId(DashboardItemColumns.CONTENT_URI, id);
+            int id = args.getInt(DashboardItems.DB_ID);
+            Uri uri = ContentUris.withAppendedId(DashboardItems.CONTENT_URI, id);
             return new ItemLoader(getBaseContext(), uri, DashboardItemHandler.PROJECTION, null, null, null);
         } else {
             return null;
