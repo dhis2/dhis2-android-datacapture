@@ -34,7 +34,6 @@ import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Dashboards;
 import org.hisp.dhis.mobile.datacapture.ui.activities.DashboardEditActivity;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.DashboardAdapter;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
 import org.hisp.dhis.mobile.datacapture.ui.views.FloatingActionButton;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 

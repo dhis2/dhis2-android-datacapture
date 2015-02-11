@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.ui.dialogs;
+package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;

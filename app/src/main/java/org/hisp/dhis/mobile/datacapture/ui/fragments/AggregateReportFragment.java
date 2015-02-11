@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -22,8 +23,8 @@ import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DateHolder;
+import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
 import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
@@ -31,9 +32,7 @@ import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 import org.hisp.dhis.mobile.datacapture.ui.activities.ReportEntryActivity;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.ListViewDialogFragment.OnDialogItemClickListener;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.PeriodDialogFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.ListViewDialogFragment.OnDialogItemClickListener;
 import org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton;
 import org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
@@ -56,7 +55,7 @@ public class AggregateReportFragment extends BaseFragment
     private CardTextViewButton mPeriodButton;
     private CardDetailedButton mButton;
 
-    private ListViewDialogFragment mOrgUnitDialog;
+    //private ListViewDialogFragment mOrgUnitDialog;
     private ListViewDialogFragment mDataSetDialog;
     private PeriodDialogFragment mPeriodDialog;
 
@@ -79,7 +78,7 @@ public class AggregateReportFragment extends BaseFragment
         mPeriodButton = (CardTextViewButton) view.findViewById(R.id.period_button);
         mButton = (CardDetailedButton) view.findViewById(R.id.data_entry_button);
 
-        mOrgUnitDialog = new ListViewDialogFragment();
+        //mOrgUnitDialog = new ListViewDialogFragment();
         mDataSetDialog = new ListViewDialogFragment();
         mPeriodDialog = new PeriodDialogFragment();
 
@@ -93,7 +92,7 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mOrgUnitButton.setEnabled(false);
+        //mOrgUnitButton.setEnabled(false);
         mDataSetButton.setEnabled(false);
         mPeriodButton.setEnabled(false);
         mButton.hide(false);
@@ -137,7 +136,9 @@ public class AggregateReportFragment extends BaseFragment
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.org_unit_button: {
-                mOrgUnitDialog.show(getChildFragmentManager());
+                DialogFragment fragment = AbsListViewDialogFragment.newInstance(null);
+                fragment.show(getChildFragmentManager(), "SOME TAG");
+                //mOrgUnitDialog.show(getChildFragmentManager());
                 break;
             }
             case R.id.dataset_button: {
@@ -216,13 +217,13 @@ public class AggregateReportFragment extends BaseFragment
         }
 
         mOrgUnitButton.setEnabled(true);
-        mOrgUnitDialog.swapData(labels);
+        /* mOrgUnitDialog.swapData(labels);
         mOrgUnitDialog.setOnItemClickListener(new OnDialogItemClickListener() {
             @Override
             public void onItemClickListener(int position) {
                 onUnitSelected(units.get(position));
             }
-        });
+        }); */
     }
 
     private void onUnitSelected(OrganisationUnit unit) {
@@ -326,7 +327,8 @@ public class AggregateReportFragment extends BaseFragment
 
                 DbRow<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
                 Gson gson = new Gson();
-                Type type = new TypeToken<List<OrganisationUnit>>() { }.getType();
+                Type type = new TypeToken<List<OrganisationUnit>>() {
+                }.getType();
                 units = gson.fromJson(dbItem.getItem().getValue(), type);
             }
 

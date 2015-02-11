@@ -1,18 +1,12 @@
 package org.hisp.dhis.mobile.datacapture.api.android.processors;
 
-import android.content.ContentProviderOperation;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationApplicationException;
-import android.os.RemoteException;
-
-import com.google.gson.Gson;
 
 import org.hisp.dhis.mobile.datacapture.api.APIException;
-import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
+import org.hisp.dhis.mobile.datacapture.api.android.handlers.OptionSetHandler;
+import org.hisp.dhis.mobile.datacapture.api.android.handlers.OrganizationUnitHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
@@ -25,13 +19,13 @@ import org.hisp.dhis.mobile.datacapture.api.network.ApiRequestCallback;
 import org.hisp.dhis.mobile.datacapture.api.network.Response;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatasetSyncEvent> {
+public final class DatasetSyncProcessor extends AbsProcessor<DashboardSyncEvent, OnDatasetSyncEvent> {
 
     public DatasetSyncProcessor(Context context) {
         super(context);
@@ -53,133 +47,76 @@ public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatas
     }
 
     private void updateDataSets() throws APIException {
+        OrganizationUnitHandler unitHandler =
+                new OrganizationUnitHandler(getContext());
+        OptionSetHandler optionSetHandler =
+                new OptionSetHandler(getContext());
+
         // network operations should be done first, in order to make sure that
         // we have all data in hands before starting processing it
-        DataSetHolder holder = getDatasets();
-        List<OptionSet> optionSets = getOptionSets(holder);
+        DataSetHolder dataSetHolder = getDatasets();
+        // We need to save OptionSets first,
+        // since some fields of DataSets can reference them in DB
+        List<OptionSet> optionSets = getOptionSets(dataSetHolder);
+        optionSetHandler.bulkInsert(optionSets);
 
-        // Put options from full sized datasets into short versions
-        // inside of organization units
-        saveOrgUnits(holder);
-        saveDatasets(holder);
-        saveOptionSets(optionSets);
+        List<OrganisationUnit> units = prepareUnits(dataSetHolder);
+        unitHandler.bulkInsert(units);
     }
 
-    private List<OrganisationUnit> prepareOrgUnits(DataSetHolder holder) {
-        Map<String, DataSet> dataSets = toMap(holder.getDataSets());
-        List<OrganisationUnit> units = holder.getOrganisationUnits();
-
-        if (units == null) {
-            return units;
+    private List<OrganisationUnit> prepareUnits(DataSetHolder dataSetHolder) {
+        if (dataSetHolder == null ||
+                dataSetHolder.getOrganisationUnits() == null ||
+                dataSetHolder.getDataSets() == null) {
+            return new ArrayList<>();
         }
 
-        for (OrganisationUnit orgUnit : units) {
-            List<DataSet> shortDataSets = orgUnit.getDataSets();
-
-            if (shortDataSets == null) {
-                continue;
-            }
-
-            for (DataSet shortDataSet : shortDataSets) {
+        Collection<OrganisationUnit> units = dataSetHolder
+                .getOrganisationUnits().values();
+        Map<String, DataSet> dataSets = dataSetHolder.getDataSets();
+        for (OrganisationUnit unit: units) {
+            List<DataSet> fullDataSets = new ArrayList<>();
+            for (DataSet shortDataSet: unit.getDataSets()) {
                 DataSet fullDataSet = dataSets.get(shortDataSet.getId());
-                shortDataSet.setOptions(fullDataSet.getOptions());
+                fullDataSets.add(fullDataSet);
             }
+            unit.setDataSets(fullDataSets);
         }
 
-        return units;
+        return new ArrayList<>(units);
     }
 
-    private Map<String, DataSet> toMap(List<DataSet> dataSets) {
-        Map<String, DataSet> dataSetMap = new HashMap<>();
-        if (dataSets != null && dataSets.size() > 0) {
-            for (DataSet dataSet : dataSets) {
-                dataSetMap.put(dataSet.getId(), dataSet);
-            }
-        }
-        return dataSetMap;
-    }
+    private List<OptionSet> getOptionSets(DataSetHolder holder) throws APIException {
+        List<OptionSet> optionSets = new ArrayList<>();
+        Set<String> optionSetIds = new HashSet<>();
 
-    private void saveOrgUnits(DataSetHolder holder) {
-        // we need to remove old org.units before saving new ones
-        final String ORG_UNITS_KEY = KeyValue.Type.ORG_UNITS_WITH_DATASETS.toString();
-        final String SELECTION = KeyValues.KEY + " = " + "'" + ORG_UNITS_KEY + "'" + " AND "
-                + KeyValues.TYPE + " = " + "'" + ORG_UNITS_KEY + "'";
-        getContext().getContentResolver().delete(
-                KeyValues.CONTENT_URI, SELECTION, null
-        );
-
-        List<OrganisationUnit> units = prepareOrgUnits(holder);
-        if (units == null) {
-            return;
+        if (holder.getDataSets() == null ||
+                !(holder.getDataSets().size() > 0)) {
+            return optionSets;
         }
 
-        Gson gson = new Gson();
-        KeyValue keyValue = new KeyValue();
-
-        keyValue.setKey(KeyValue.Type.ORG_UNITS_WITH_DATASETS.toString());
-        keyValue.setType(KeyValue.Type.ORG_UNITS_WITH_DATASETS);
-        keyValue.setValue(gson.toJson(units));
-
-        ContentValues values = KeyValueHandler.toContentValues(keyValue);
-        getContext().getContentResolver().insert(KeyValues.CONTENT_URI, values);
-    }
-
-    private void saveDatasets(DataSetHolder holder) {
-        // remove old datasets before inserting new ones
-        final String SELECTION = KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
-        getContext().getContentResolver().delete(KeyValues.CONTENT_URI, SELECTION, null);
-
-        List<DataSet> dataSets = holder.getDataSets();
-        if (dataSets == null) {
-            return;
-        }
-
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        Gson gson = new Gson();
+        Collection<DataSet> dataSets = holder.getDataSets().values();
         for (DataSet dataSet : dataSets) {
-            KeyValue keyValue = new KeyValue();
-            keyValue.setKey(dataSet.getId());
-            keyValue.setType(KeyValue.Type.DATASET);
-            keyValue.setValue(gson.toJson(dataSet));
-            ops.add(KeyValueHandler.insert(keyValue));
+
+            Collection<Group> groups = dataSet.getGroups();
+            for (Group group : groups) {
+
+                Collection<Field> fields = group.getFields();
+                for (Field field : fields) {
+
+                    if (field.getOptionSet() != null) {
+                        optionSetIds.add(field.getOptionSet());
+                    }
+                }
+            }
         }
 
-        try {
-            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (OperationApplicationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveOptionSets(List<OptionSet> optionSets) {
-        final String SELECTION = KeyValues.TYPE + " = " +
-                "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
-
-        getContext().getContentResolver().delete(KeyValues.CONTENT_URI, SELECTION, null);
-
-        if (optionSets == null) {
-            return;
+        for (String optionSetId : optionSetIds) {
+            OptionSet optionSet = getOptionSet(optionSetId);
+            optionSets.add(optionSet);
         }
 
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        Gson gson = new Gson();
-        for (OptionSet optionSet : optionSets) {
-            KeyValue keyValue = new KeyValue();
-            keyValue.setKey(optionSet.getId());
-            keyValue.setType(KeyValue.Type.DATASET_OPTION_SET);
-            keyValue.setValue(gson.toJson(optionSet));
-            ops.add(KeyValueHandler.insert(keyValue));
-        }
-
-        try {
-            getContext().getContentResolver().applyBatch(DBContract.AUTHORITY, ops);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (OperationApplicationException e) {
-            e.printStackTrace();
-        }
+        return optionSets;
     }
 
     private DataSetHolder getDatasets() throws APIException {
@@ -203,37 +140,6 @@ public class DatasetSyncProcessor extends AbsProcessor<DatasetSyncEvent, OnDatas
         } else {
             return holder.getItem();
         }
-    }
-
-    private List<OptionSet> getOptionSets(DataSetHolder holder) throws APIException {
-        List<OptionSet> optionSets = new ArrayList<>();
-        Set<Field> fieldsWithOptionSets = findOptionSetFields(holder);
-
-        for (Field field : fieldsWithOptionSets) {
-            OptionSet optionSet = getOptionSet(field.getOptionSet());
-            optionSets.add(optionSet);
-        }
-
-        return optionSets;
-    }
-
-    // This method searches for option sets in each field
-    // of each group of each dataset
-    private Set<Field> findOptionSetFields(DataSetHolder holder) {
-        Set<Field> fields = new HashSet<>();
-
-        if (holder.getDataSets() != null && holder.getDataSets().size() > 0) {
-            for (DataSet dataSet : holder.getDataSets()) {
-                for (Group group : dataSet.getGroups()) {
-                    for (Field field : group.getFields()) {
-                        if (field.getOptionSet() != null) {
-                            fields.add(field);
-                        }
-                    }
-                }
-            }
-        }
-        return fields;
     }
 
     private OptionSet getOptionSet(String optionSetId) throws APIException {

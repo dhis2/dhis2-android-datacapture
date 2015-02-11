@@ -166,10 +166,10 @@ public interface DBSchema {
             " REFERENCES " + DataSets.TABLE_NAME + "(" + DataSets.DB_ID + ")" +
             " ON DELETE CASCADE " + ")";
 
-    public static final String DROP_GROUP_TABLE = "DROP TABLE OF EXISTS " + Groups.TABLE_NAME;
+    public static final String DROP_GROUP_TABLE = "DROP TABLE IF EXISTS " + Groups.TABLE_NAME;
 
 
-    public static final String CREATE_FIELD_TABLE = "CREATE TABLE" + Fields.TABLE_NAME + "(" +
+    public static final String CREATE_FIELD_TABLE = "CREATE TABLE " + Fields.TABLE_NAME + "(" +
             Fields.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             Fields.LABEL + " TEXT," +
             Fields.TYPE + " TEXT NOT NULL," +
@@ -194,7 +194,8 @@ public interface DBSchema {
             OptionSets.CREATED + " TEXT NOT NULL," +
             OptionSets.LAST_UPDATED + " TEXT NOT NULL," +
             OptionSets.NAME + " TEXT," +
-            OptionSets.DISPLAY_NAME + " TEXT" + ")";
+            OptionSets.DISPLAY_NAME + " TEXT," +
+            " UNIQUE " + "(" + OptionSets.ID + ")" + " ON CONFLICT REPLACE " + ")";
 
     public static final String DROP_OPTION_SET_TABLE = "DROP TABLE IF EXISTS " + OptionSets.TABLE_NAME;
 

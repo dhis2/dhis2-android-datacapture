@@ -11,70 +11,80 @@ import org.hisp.dhis.mobile.datacapture.R;
 
 import java.util.List;
 
-public class SimpleAdapter extends BaseAdapter {
-    private List<String> mItems;
-	private LayoutInflater mInflater;
+public class SimpleAdapter<T> extends BaseAdapter {
+    private List<T> mItems;
+    private LayoutInflater mInflater;
+    private ExtractStringCallback<T> mCallback;
 
-	public SimpleAdapter(Context context) {
-		mInflater = LayoutInflater.from(context);
-	}
+    public SimpleAdapter(Context context) {
+        mInflater = LayoutInflater.from(context);
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		TextViewHolder holder;
-		View view;
+    public void setCallback(ExtractStringCallback<T> callback) {
+        mCallback = callback;
+    }
 
-		if (convertView == null) {
-			View root = mInflater.inflate(R.layout.dialog_fragment_listview_item, parent, false);
-			TextView textView = (TextView) root.findViewById(R.id.textview_item);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        TextViewHolder holder;
+        View view;
 
-			holder = new TextViewHolder(textView);
-			root.setTag(holder);
-			view = root;
-		} else {
-			view = convertView;
-			holder = (TextViewHolder) view.getTag();
-		}
+        if (convertView == null) {
+            View root = mInflater.inflate(R.layout.dialog_fragment_listview_item, parent, false);
+            TextView textView = (TextView) root.findViewById(R.id.textview_item);
 
-		holder.textView.setText(mItems.get(position));
-		return view;
-	}
+            holder = new TextViewHolder(textView);
+            root.setTag(holder);
+            view = root;
+        } else {
+            view = convertView;
+            holder = (TextViewHolder) view.getTag();
+        }
 
-	@Override
-	public int getCount() {
+        String label = mCallback.getString(mItems.get(position));
+        holder.textView.setText(label);
+        return view;
+    }
+
+    @Override
+    public int getCount() {
         if (mItems != null) {
             return mItems.size();
         } else {
             return 0;
         }
-	}
+    }
 
-	@Override
-	public Object getItem(int pos) {
+    @Override
+    public Object getItem(int pos) {
         if (mItems != null && mItems.size() > 0) {
             return mItems.get(pos);
         } else {
             return 0;
         }
-	}
+    }
 
-	@Override
-	public long getItemId(int pos) {
-		return pos;
-	}
+    @Override
+    public long getItemId(int pos) {
+        return pos;
+    }
 
-    public void swapData(List<String> items) {
+    public void swapData(List<T> items) {
         if (mItems != items) {
             mItems = items;
             notifyDataSetChanged();
         }
     }
 
-	private class TextViewHolder {
-		final TextView textView;
+    public static interface ExtractStringCallback<T> {
+        public String getString(T object);
+    }
 
-		public TextViewHolder(TextView textView) {
-			this.textView = textView;
-		}
-	}
+    private class TextViewHolder {
+        final TextView textView;
+
+        public TextViewHolder(TextView textView) {
+            this.textView = textView;
+        }
+    }
 }

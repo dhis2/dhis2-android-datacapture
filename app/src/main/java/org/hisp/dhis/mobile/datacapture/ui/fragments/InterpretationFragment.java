@@ -30,8 +30,6 @@ import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.InterpretationAdapter;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.CommentsDialogFragment;
-import org.hisp.dhis.mobile.datacapture.ui.dialogs.EditDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;

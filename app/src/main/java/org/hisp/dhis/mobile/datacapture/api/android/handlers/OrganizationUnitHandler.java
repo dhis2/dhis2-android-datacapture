@@ -72,17 +72,17 @@ public class OrganizationUnitHandler {
         return query(cursor, true);
     }
 
-    public List<DbRow<OrganisationUnit>> query(Cursor cursor, boolean closeCursor) {
+    public static List<DbRow<OrganisationUnit>> query(Cursor cursor, boolean closeCursor) {
         List<DbRow<OrganisationUnit>> rows = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            DataSetHandler dataSetHandler = new DataSetHandler(mContext);
+            // DataSetHandler dataSetHandler = new DataSetHandler(mContext);
 
             do {
                 DbRow<OrganisationUnit> row = fromCursor(cursor);
-                List<DataSet> dataSets = dataSetHandler
-                        .queryForOrganizationUnit(row.getId());
-                row.getItem().setDataSets(dataSets);
+                // List<DataSet> dataSets = dataSetHandler
+                        // .queryForOrganizationUnit(row.getId());
+                // row.getItem().setDataSets(dataSets);
                 rows.add(row);
             } while (cursor.moveToNext());
 
@@ -93,12 +93,17 @@ public class OrganizationUnitHandler {
         return rows;
     }
 
-    public void cleanUpAndInsert(List<OrganisationUnit> units) {
-        // remove old OrganizationUnits wisely!
-        // bulk insert new OrganizationUnits
+    public void bulkInsert(List<OrganisationUnit> units) {
+        deleteAll();
+        insert(units);
     }
 
-    private void bulkInsert(List<OrganisationUnit> units) {
+    private void deleteAll() {
+        mContext.getContentResolver().delete(
+                OrganizationUnits.CONTENT_URI, null, null);
+    }
+
+    private void insert(List<OrganisationUnit> units) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         if (units != null && units.size() > 0) {
             for (OrganisationUnit unit: units) {
