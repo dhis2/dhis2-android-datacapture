@@ -17,15 +17,12 @@ import com.google.gson.Gson;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.FieldValueChangeEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportFieldHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
-import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
 import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.FieldAdapter;
@@ -164,7 +161,7 @@ public class ReportGroupFragment extends Fragment
         }
 
         private OptionSet readOptionSet(String optionSetId) {
-            final String SELECTION = KeyValues.KEY + " = " + "'" + optionSetId + "'" + " AND " +
+            /* final String SELECTION = KeyValues.KEY + " = " + "'" + optionSetId + "'" + " AND " +
                     KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
             Cursor cursor = getContext().getContentResolver().query(
                     KeyValues.CONTENT_URI, KeyValueHandler.PROJECTION, SELECTION, null, null
@@ -182,9 +179,10 @@ public class ReportGroupFragment extends Fragment
                     String jOptionSet = dbItem.getItem().getValue();
                     optionSet = gson.fromJson(jOptionSet, OptionSet.class);
                 }
-            }
+            } */
 
-            return optionSet;
+            //return optionSet;
+            return null;
         }
     }
 

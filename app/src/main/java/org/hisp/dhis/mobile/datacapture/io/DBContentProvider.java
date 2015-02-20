@@ -18,7 +18,6 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSets;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Fields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Groups;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionSets;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Options;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
@@ -44,9 +43,6 @@ public class DBContentProvider extends ContentProvider {
 
     private static final int INTERPRETATIONS = 800;
     private static final int INTERPRETATIONS_ID = 801;
-
-    private static final int KEY_VALUES = 1000;
-    private static final int KEY_VALUE_ID = 1001;
 
     private static final int REPORTS = 1100;
     private static final int REPORT_ID = 1101;
@@ -93,8 +89,6 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, DashboardItems.DASHBOARD_ITEM_ID, DASHBOARD_ITEM_ID);
         matcher.addURI(DBContract.AUTHORITY, Interpretations.INTERPRETATIONS, INTERPRETATIONS);
         matcher.addURI(DBContract.AUTHORITY, Interpretations.INTERPRETATION_ID, INTERPRETATIONS_ID);
-        matcher.addURI(DBContract.AUTHORITY, KeyValues.KEY_VALUES, KEY_VALUES);
-        matcher.addURI(DBContract.AUTHORITY, KeyValues.KEY_VALUE_ID, KEY_VALUE_ID);
         matcher.addURI(DBContract.AUTHORITY, Reports.REPORTS, REPORTS);
         matcher.addURI(DBContract.AUTHORITY, Reports.REPORT_ID, REPORT_ID);
         matcher.addURI(DBContract.AUTHORITY, Reports.REPORT_WITH_GROUPS, REPORT_WITH_GROUPS);
@@ -141,10 +135,6 @@ public class DBContentProvider extends ContentProvider {
                 return Interpretations.CONTENT_TYPE;
             case INTERPRETATIONS_ID:
                 return Interpretations.CONTENT_ITEM_TYPE;
-            case KEY_VALUES:
-                return KeyValues.CONTENT_TYPE;
-            case KEY_VALUE_ID:
-                return KeyValues.CONTENT_ITEM_TYPE;
             case REPORTS:
                 return Reports.CONTENT_TYPE;
             case REPORT_ID:
@@ -221,15 +211,6 @@ public class DBContentProvider extends ContentProvider {
             case INTERPRETATIONS_ID: {
                 String id = String.valueOf(parseId(uri));
                 return queryId(uri, Interpretations.TABLE_NAME, Interpretations.DB_ID,
-                        projection, selection, selectionArgs, sortOrder, id);
-            }
-            case KEY_VALUES: {
-                return query(uri, KeyValues.TABLE_NAME, projection,
-                        selection, selectionArgs, sortOrder);
-            }
-            case KEY_VALUE_ID: {
-                String id = String.valueOf(parseId(uri));
-                return queryId(uri, KeyValues.TABLE_NAME, KeyValues.DB_ID,
                         projection, selection, selectionArgs, sortOrder, id);
             }
             case REPORTS: {
@@ -372,8 +353,6 @@ public class DBContentProvider extends ContentProvider {
                 return insert(DashboardItems.TABLE_NAME, values, uri);
             case INTERPRETATIONS:
                 return insert(Interpretations.TABLE_NAME, values, uri);
-            case KEY_VALUES:
-                return insert(KeyValues.TABLE_NAME, values, uri);
             case REPORTS:
                 return insert(Reports.TABLE_NAME, values, uri);
             case REPORT_GROUPS:
@@ -421,13 +400,6 @@ public class DBContentProvider extends ContentProvider {
             case INTERPRETATIONS_ID: {
                 return deleteId(uri, Interpretations.TABLE_NAME,
                         Interpretations.DB_ID, selection, selectionArgs);
-            }
-            case KEY_VALUES: {
-                return delete(uri, KeyValues.TABLE_NAME, selection, selectionArgs);
-            }
-            case KEY_VALUE_ID: {
-                return deleteId(uri, KeyValues.TABLE_NAME,
-                        KeyValues.DB_ID, selection, selectionArgs);
             }
             case REPORTS: {
                 return delete(uri, Reports.TABLE_NAME, selection, selectionArgs);
@@ -525,14 +497,6 @@ public class DBContentProvider extends ContentProvider {
             case INTERPRETATIONS_ID: {
                 return updateId(uri, Interpretations.TABLE_NAME,
                         Interpretations.DB_ID, selection, selectionArgs, values);
-            }
-            case KEY_VALUES: {
-                return update(uri, KeyValues.TABLE_NAME,
-                        selection, selectionArgs, values);
-            }
-            case KEY_VALUE_ID: {
-                return updateId(uri, KeyValues.TABLE_NAME,
-                        KeyValues.DB_ID, selection, selectionArgs, values);
             }
             case REPORTS: {
                 return update(uri, Reports.TABLE_NAME,

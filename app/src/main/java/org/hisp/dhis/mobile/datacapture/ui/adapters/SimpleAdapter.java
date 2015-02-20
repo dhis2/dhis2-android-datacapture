@@ -57,10 +57,14 @@ public class SimpleAdapter<T> extends BaseAdapter {
 
     @Override
     public Object getItem(int pos) {
+        return getItemSafely(pos);
+    }
+
+    public T getItemSafely(int pos) {
         if (mItems != null && mItems.size() > 0) {
             return mItems.get(pos);
         } else {
-            return 0;
+            return null;
         }
     }
 

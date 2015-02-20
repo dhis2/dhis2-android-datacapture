@@ -7,26 +7,21 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.os.RemoteException;
 
-import com.google.gson.Gson;
-
 import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnCreateReportEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportFieldHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportGroupHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
-import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
 
 import java.util.ArrayList;
 
@@ -59,7 +54,7 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
     }
 
     private DataSet readDataSet() {
-        final String KEY = KeyValues.KEY + " = " + "'" + getEvent().getReport().getDataSet() + "'";
+        /* final String KEY = KeyValues.KEY + " = " + "'" + getEvent().getReport().getDataSet() + "'";
         final String TYPE = KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET.toString() + "'";
         final String SELECTION = KEY + " AND " + TYPE;
 
@@ -77,7 +72,8 @@ public class CreateReportProcessor extends AbsProcessor<CreateReportEvent, OnCre
                 dataSet = gson.fromJson(jDataSet, DataSet.class);
             }
         }
-        return dataSet;
+        return dataSet;*/
+        return null;
     }
 
     private ArrayList<ContentProviderOperation> insertReport(DataSet dataSet) {

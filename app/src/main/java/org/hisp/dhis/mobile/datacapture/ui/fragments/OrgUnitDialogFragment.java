@@ -3,6 +3,7 @@ package org.hisp.dhis.mobile.datacapture.ui.fragments;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -22,17 +23,17 @@ import org.hisp.dhis.mobile.datacapture.ui.adapters.SimpleAdapter;
 
 import java.util.List;
 
-public class AbsListViewDialogFragment extends DialogFragment
+public class OrgUnitDialogFragment extends DialogFragment
         implements AdapterView.OnItemClickListener, LoaderCallbacks<List<DbRow<OrganisationUnit>>> {
-    private static final String TAG = AbsListViewDialogFragment.class.getName();
+    private static final String TAG = OrgUnitDialogFragment.class.getName();
     private static final int LOADER_ID = 243756345;
 
     private ListView mListView;
     private SimpleAdapter<DbRow<OrganisationUnit>> mAdapter;
-    private OnDialogItemClickListener mListener;
+    private OnOrgUnitSetListener mListener;
 
-    public static AbsListViewDialogFragment newInstance(OnDialogItemClickListener listener) {
-        AbsListViewDialogFragment fragment = new AbsListViewDialogFragment();
+    public static OrgUnitDialogFragment newInstance(OnOrgUnitSetListener listener) {
+        OrgUnitDialogFragment fragment = new OrgUnitDialogFragment();
         fragment.setOnClickListener(listener);
         return fragment;
     }
@@ -69,13 +70,23 @@ public class AbsListViewDialogFragment extends DialogFragment
     public void onItemClick(AdapterView<?> parent, View view,
                             int position, long id) {
         if (mListener != null) {
-            mListener.onItemClickListener(position);
-            dismiss();
+            DbRow<OrganisationUnit> row = mAdapter.getItemSafely(position);
+            if (row != null) {
+                mListener.onUnitSelected(
+                        row.getId(), row.getItem().getId(),
+                        row.getItem().getLabel()
+                );
+            }
         }
+        dismiss();
     }
 
-    public void setOnClickListener(OnDialogItemClickListener listener) {
+    public void setOnClickListener(OnOrgUnitSetListener listener) {
         mListener = listener;
+    }
+
+    public void show(FragmentManager manager) {
+        show(manager, TAG);
     }
 
     @Override
@@ -97,7 +108,6 @@ public class AbsListViewDialogFragment extends DialogFragment
 
     @Override
     public void onLoaderReset(Loader<List<DbRow<OrganisationUnit>>> loader) {
-
     }
 
     static class OrgUnitTransform implements Transformation<List<DbRow<OrganisationUnit>>> {
@@ -116,7 +126,8 @@ public class AbsListViewDialogFragment extends DialogFragment
         }
     }
 
-    public interface OnDialogItemClickListener {
-        public void onItemClickListener(int position);
+    public interface OnOrgUnitSetListener {
+        public void onUnitSelected(int dbId, String orgUnitId,
+                                   String orgUnitLabel);
     }
 }

@@ -6,7 +6,6 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSets;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Fields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Groups;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Interpretations;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionSets;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Options;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
@@ -78,15 +77,6 @@ public interface DBSchema {
             Interpretations.COMMENTS + " TEXT" + ")";
 
     public static final String DROP_INTERPRETATIONS_TABLE = "DROP TABLE IF EXISTS " + Interpretations.TABLE_NAME;
-
-    public static final String CREATE_KEY_VALUE_TABLE = "CREATE TABLE " + KeyValues.TABLE_NAME + "(" +
-            KeyValues.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-            KeyValues.KEY + " TEXT NOT NULL," +
-            KeyValues.TYPE + " TEXT NOT NULL," +
-            KeyValues.VALUE + " TEXT" + ")";
-
-    public static final String DROP_KEY_VALUE_TABLE = "DROP TABLE IF EXISTS " + KeyValues.TABLE_NAME;
-
 
     public static final String CREATE_REPORTS_TABLE = "CREATE TABLE " + Reports.TABLE_NAME + "(" +
             Reports.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +

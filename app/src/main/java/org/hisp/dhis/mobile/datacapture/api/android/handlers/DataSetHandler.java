@@ -27,6 +27,9 @@ public class DataSetHandler {
             DataSets.PERIOD_TYPE,
     };
 
+    public static final String SELECTION_BY_ORG_UNIT = DataSets.ORGANIZATION_UNIT_DB_ID +
+            " = " + " ? ";
+
     private static final int DB_ID = 0;
     private static final int ID = 1;
     private static final int LABEL = 2;
@@ -95,7 +98,7 @@ public class DataSetHandler {
         return query(cursor, true);
     }
 
-    public List<DbRow<DataSet>> query(Cursor cursor, boolean closeCursor) {
+    public static List<DbRow<DataSet>> query(Cursor cursor, boolean closeCursor) {
         List<DbRow<DataSet>> rows = new ArrayList<>();
 
         if (cursor != null && cursor.getCount() > 0) {
@@ -112,6 +115,19 @@ public class DataSetHandler {
         }
 
         return rows;
+    }
+
+    public static DbRow<DataSet> querySingleItem(Cursor cursor, boolean closeCursor) {
+        DbRow<DataSet> row = null;
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            row = fromCursor(cursor);
+
+            if (closeCursor) {
+                cursor.close();
+            }
+        }
+        return row;
     }
 
     public static void insertWithReference(List<ContentProviderOperation> ops,

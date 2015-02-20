@@ -1,11 +1,10 @@
 package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -15,49 +14,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.KeyValueHandler;
+import org.hisp.dhis.mobile.datacapture.api.android.handlers.OrganizationUnitHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DateHolder;
-import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
-import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
-import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
-import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
-import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
-import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
-import org.hisp.dhis.mobile.datacapture.io.DBContract.KeyValues;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
+import org.hisp.dhis.mobile.datacapture.io.loaders.CursorLoaderBuilder;
+import org.hisp.dhis.mobile.datacapture.io.loaders.Transformation;
 import org.hisp.dhis.mobile.datacapture.ui.activities.ReportEntryActivity;
-import org.hisp.dhis.mobile.datacapture.ui.fragments.ListViewDialogFragment.OnDialogItemClickListener;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.DataSetDialogFragment.OnDatasetSetListener;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.OrgUnitDialogFragment.OnOrgUnitSetListener;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.PeriodDialogFragment.OnPeriodSetListener;
 import org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton;
 import org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
-import org.hisp.dhis.mobile.datacapture.utils.ObjectHolder;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
-        implements View.OnClickListener, LoaderCallbacks<CursorHolder<List<OrganisationUnit>>> {
+        implements View.OnClickListener, LoaderCallbacks<Boolean>,
+        OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener{
     private static final String STATE = "state:AggregateReportFragment";
     private static final int LOADER_ID = 345784834;
 
     private SmoothProgressBar mProgressBar;
+
     private CardTextViewButton mOrgUnitButton;
     private CardTextViewButton mDataSetButton;
     private CardTextViewButton mPeriodButton;
     private CardDetailedButton mButton;
-
-    //private ListViewDialogFragment mOrgUnitDialog;
-    private ListViewDialogFragment mDataSetDialog;
-    private PeriodDialogFragment mPeriodDialog;
 
     private FragmentState mState;
 
@@ -78,10 +66,6 @@ public class AggregateReportFragment extends BaseFragment
         mPeriodButton = (CardTextViewButton) view.findViewById(R.id.period_button);
         mButton = (CardDetailedButton) view.findViewById(R.id.data_entry_button);
 
-        //mOrgUnitDialog = new ListViewDialogFragment();
-        mDataSetDialog = new ListViewDialogFragment();
-        mPeriodDialog = new PeriodDialogFragment();
-
         mOrgUnitButton.setOnClickListener(this);
         mDataSetButton.setOnClickListener(this);
         mPeriodButton.setOnClickListener(this);
@@ -92,15 +76,14 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        //mOrgUnitButton.setEnabled(false);
+        mOrgUnitButton.setEnabled(false);
         mDataSetButton.setEnabled(false);
         mPeriodButton.setEnabled(false);
         mButton.hide(false);
 
         if (savedInstanceState != null &&
-                savedInstanceState.getInt(STATE, -1) > 0) {
-            int id = savedInstanceState.getInt(STATE, -1);
-            mState = (FragmentState) ObjectHolder.getInstance().pop(id);
+                savedInstanceState.getParcelable(STATE) != null) {
+            mState = savedInstanceState.getParcelable(STATE);
         }
 
         if (mState == null) {
@@ -108,12 +91,6 @@ public class AggregateReportFragment extends BaseFragment
         }
 
         mProgressBar.setVisibility(mState.isSyncInProcess() ? View.VISIBLE : View.INVISIBLE);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
     }
 
     @Override
@@ -129,24 +106,29 @@ public class AggregateReportFragment extends BaseFragment
             BusProvider.getInstance().post(new DatasetSyncEvent());
             return true;
         }
-        return false;
+
+        return super.onOptionsItemSelected(menuItem);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.org_unit_button: {
-                DialogFragment fragment = AbsListViewDialogFragment.newInstance(null);
-                fragment.show(getChildFragmentManager(), "SOME TAG");
-                //mOrgUnitDialog.show(getChildFragmentManager());
+                OrgUnitDialogFragment fragment = OrgUnitDialogFragment
+                        .newInstance(this);
+                fragment.show(getChildFragmentManager());
                 break;
             }
             case R.id.dataset_button: {
-                mDataSetDialog.show(getChildFragmentManager());
+                DataSetDialogFragment fragment = DataSetDialogFragment
+                        .newInstance(this, mState.getOrgUnitDBId());
+                fragment.show(getChildFragmentManager());
                 break;
             }
             case R.id.period_button: {
-                mPeriodDialog.show(getChildFragmentManager());
+                PeriodDialogFragment fragment = PeriodDialogFragment
+                        .newInstance(this, mState.getDataSetDBId());
+                fragment.show(getChildFragmentManager());
                 break;
             }
             case R.id.data_entry_button: {
@@ -158,51 +140,14 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public void onSaveInstanceState(Bundle out) {
-        mState.setSyncInProcess(mProgressBar.isShown());
-        out.putInt(STATE, ObjectHolder.getInstance().put(mState));
+        out.putParcelable(STATE, mState);
         super.onSaveInstanceState(out);
     }
 
     @Override
-    public Loader<CursorHolder<List<OrganisationUnit>>> onCreateLoader(int id, Bundle args) {
-        if (LOADER_ID == id) {
-            final String ORH_UNITS_KEY = KeyValue.Type.ORG_UNITS_WITH_DATASETS.toString();
-            String SELECTION = KeyValues.KEY + " = " + "'" + ORH_UNITS_KEY + "'" + " AND " +
-                    KeyValues.TYPE + " = " + "'" + ORH_UNITS_KEY + "'";
-            return new UnitsLoader(getActivity(), KeyValues.CONTENT_URI,
-                    KeyValueHandler.PROJECTION, SELECTION, null, null);
-        }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<CursorHolder<List<OrganisationUnit>>> loader,
-                               CursorHolder<List<OrganisationUnit>> data) {
-        if (loader != null && LOADER_ID == loader.getId() &&
-                data != null && data.getData() != null) {
-            handleUnits(data.getData());
-
-            // restoring from saved state
-            OrganisationUnit unit = mState.getOrganisationUnit();
-            DataSet dataSet = mState.getDataSet();
-            DateHolder period = mState.getPeriod();
-
-            if (unit != null) {
-                onUnitSelected(unit);
-
-                if (dataSet != null) {
-                    onDataSetSelected(dataSet);
-
-                    if (period != null) {
-                        onPeriodSelected(period);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<CursorHolder<List<OrganisationUnit>>> loader) {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
     }
 
     @Subscribe
@@ -210,68 +155,31 @@ public class AggregateReportFragment extends BaseFragment
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
-    private void handleUnits(final List<OrganisationUnit> units) {
-        List<String> labels = new ArrayList<>();
-        for (OrganisationUnit unit : units) {
-            labels.add(unit.getLabel());
-        }
+    @Override
+    public void onUnitSelected(int dbId, String orgUnitId,
+                                String orgUnitLabel) {
+        mOrgUnitButton.setText(orgUnitLabel);
+        mDataSetButton.setEnabled(true);
 
-        mOrgUnitButton.setEnabled(true);
-        /* mOrgUnitDialog.swapData(labels);
-        mOrgUnitDialog.setOnItemClickListener(new OnDialogItemClickListener() {
-            @Override
-            public void onItemClickListener(int position) {
-                onUnitSelected(units.get(position));
-            }
-        }); */
-    }
-
-    private void onUnitSelected(OrganisationUnit unit) {
-        mOrgUnitButton.setText(unit.getLabel());
-        mState.setOrganisationUnit(unit);
-        mState.setDataSet(null);
-        mState.setPeriod(null);
-        handleDataSets(unit.getDataSets());
+        mState.setOrgUnit(dbId, orgUnitId, orgUnitLabel);
+        mState.resetDataSet();
+        mState.resetPeriod();
         handleViews(0);
     }
 
-    private void handleDataSets(final List<DataSet> dataSets) {
-        List<String> labels = new ArrayList<>();
-        for (DataSet dataSet : dataSets) {
-            labels.add(dataSet.getLabel());
-        }
+    @Override
+    public void onDataSetSelected(int dbId, String dataSetId,
+                                   String dataSetLabel) {
+        mDataSetButton.setText(dataSetLabel);
+        mPeriodButton.setEnabled(true);
 
-        mDataSetButton.setEnabled(true);
-        mDataSetDialog.swapData(labels);
-        mDataSetDialog.setOnItemClickListener(new OnDialogItemClickListener() {
-            @Override
-            public void onItemClickListener(int position) {
-                onDataSetSelected(dataSets.get(position));
-            }
-        });
-    }
-
-    private void onDataSetSelected(DataSet dataSet) {
-        mDataSetButton.setText(dataSet.getLabel());
-        mState.setDataSet(dataSet);
-        mState.setPeriod(null);
-        handlePeriod(dataSet);
+        mState.setDataSet(dbId, dataSetId, dataSetLabel);
+        mState.resetPeriod();
         handleViews(1);
     }
 
-    private void handlePeriod(DataSet dataSet) {
-        mPeriodButton.setEnabled(true);
-        mPeriodDialog.setPeriodType(dataSet.getOptions().getPeriodType(),
-                dataSet.getOptions().isAllowFuturePeriods());
-        mPeriodDialog.setOnItemClickListener(new PeriodDialogFragment.OnDialogItemClickListener() {
-            @Override
-            public void onItemClickListener(DateHolder date) {
-                onPeriodSelected(date);
-            }
-        });
-    }
-
-    private void onPeriodSelected(DateHolder dateHolder) {
+    @Override
+    public void onPeriodSelected(DateHolder dateHolder) {
         mPeriodButton.setText(dateHolder.getLabel());
         mState.setPeriod(dateHolder);
         handleButton();
@@ -279,12 +187,12 @@ public class AggregateReportFragment extends BaseFragment
     }
 
     private void handleButton() {
-        String orgUnit = getString(R.string.organization_unit) + ": " +
-                mState.getOrganisationUnit().getLabel();
-        String dataSet = getString(R.string.dataset) + ": " +
-                mState.getDataSet().getLabel();
-        String period = getString(R.string.period) + ": " +
-                mState.getPeriod().getLabel();
+        String orgUnit = getString(R.string.organization_unit) +
+                ": " + mState.getOrgUnitLabel();
+        String dataSet = getString(R.string.dataset) +
+                ": " + mState.getDataSetLabel();
+        String period = getString(R.string.period) +
+                ": " + mState.getPeriod().getLabel();
         mButton.setFirstLineText(orgUnit);
         mButton.setSecondLineText(dataSet);
         mButton.setThirdLineText(period);
@@ -303,8 +211,8 @@ public class AggregateReportFragment extends BaseFragment
     }
 
     private void startReportEntryActivity() {
-        String orgUnitId = mState.getOrganisationUnit().getId();
-        String dataSetId = mState.getDataSet().getId();
+        String orgUnitId = mState.getOrgUnitId();
+        String dataSetId = mState.getDataSetId();
         String period = mState.getPeriod().getDate();
         Intent intent = ReportEntryActivity.newIntent(
                 getActivity(), orgUnitId, dataSetId, period
@@ -312,66 +220,225 @@ public class AggregateReportFragment extends BaseFragment
         startActivity(intent);
     }
 
-    static class UnitsLoader extends AbsCursorLoader<List<OrganisationUnit>> {
-        public UnitsLoader(Context context, Uri uri, String[] projection,
-                           String selection, String[] selectionArgs, String sortOrder) {
-            super(context, uri, projection, selection, selectionArgs, sortOrder);
+    @Override
+    public Loader<Boolean> onCreateLoader(int id, Bundle bundle) {
+        if (id == LOADER_ID) {
+            return CursorLoaderBuilder.forUri(OrganizationUnits.CONTENT_URI)
+                    .projection(OrganizationUnitHandler.PROJECTION)
+                    .transformation(new OrgUnitTransformation())
+                    .build(getActivity());
         }
+        return null;
+    }
 
-        @Override
-        protected List<OrganisationUnit> readDataFromCursor(Cursor cursor) {
-            List<OrganisationUnit> units = null;
-
-            if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                DbRow<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
-                Gson gson = new Gson();
-                Type type = new TypeToken<List<OrganisationUnit>>() {
-                }.getType();
-                units = gson.fromJson(dbItem.getItem().getValue(), type);
+    @Override
+    public void onLoadFinished(Loader<Boolean> booleanLoader,
+                               Boolean hasUnits) {
+        if (booleanLoader != null &&
+                booleanLoader.getId() == LOADER_ID) {
+            if (!hasUnits) {
+                return;
             }
 
-            return units;
+            mOrgUnitButton.setEnabled(true);
+            FragmentState backedUpState = new FragmentState(mState);
+            if (!backedUpState.isOrgUnitEmpty()) {
+                onUnitSelected(
+                        backedUpState.getOrgUnitDBId(),
+                        backedUpState.getOrgUnitId(),
+                        backedUpState.getOrgUnitLabel()
+                );
+
+                if (!backedUpState.isDataSetEmpty()) {
+                    onDataSetSelected(
+                            backedUpState.getDataSetDBId(),
+                            backedUpState.getDataSetId(),
+                            backedUpState.getDataSetLabel()
+                    );
+
+                    if (!backedUpState.isPeriodEmpty()) {
+                        onPeriodSelected(backedUpState.getPeriod());
+                    }
+                }
+            }
         }
     }
 
-    static class FragmentState {
-        private boolean isSyncInProcess;
-        private OrganisationUnit organisationUnit;
-        private DataSet dataSet;
-        private DateHolder period;
+    @Override
+    public void onLoaderReset(Loader<Boolean> booleanLoader) { }
+
+    static class OrgUnitTransformation implements Transformation<Boolean> {
+
+        @Override
+        public Boolean transform(Cursor cursor) {
+            return (cursor != null && cursor.getCount() > 0);
+        }
+    }
+
+    static class FragmentState implements Parcelable {
+        private static final String TAG = FragmentState.class.getName();
+        private static final int DEFAULT_INDEX = -1;
+        private boolean syncInProcess;
+
+        private String orgUnitLabel;
+        private String orgUnitId;
+        private int orgUnitDBId;
+
+        private String dataSetLabel;
+        private String dataSetId;
+        private int dataSetDBId;
+
+        private String periodLabel;
+        private String periodDate;
+
+        public FragmentState() {
+        }
+
+        public FragmentState(FragmentState state) {
+            if (state != null) {
+                setSyncInProcess(state.isSyncInProcess());
+                setOrgUnit(state.getOrgUnitDBId(), state.getOrgUnitId(),
+                        state.getOrgUnitLabel());
+                setDataSet(state.getDataSetDBId(), state.getDataSetId(),
+                        state.getDataSetLabel());
+                setPeriod(state.getPeriod());
+            }
+        }
+
+        public static final Parcelable.Creator<FragmentState> CREATOR
+                = new Parcelable.Creator<FragmentState>() {
+
+            public FragmentState createFromParcel(Parcel in) {
+                return new FragmentState(in);
+            }
+
+            public FragmentState[] newArray(int size) {
+                return new FragmentState[size];
+            }
+        };
+
+        private FragmentState(Parcel in) {
+            syncInProcess = in.readInt() == 1;
+
+            orgUnitLabel = in.readString();
+            orgUnitId = in.readString();
+            orgUnitDBId = in.readInt();
+
+            dataSetLabel = in.readString();
+            dataSetId = in.readString();
+            dataSetDBId = in.readInt();
+
+            periodLabel = in.readString();
+            periodDate = in.readString();
+        }
+
+        @Override
+        public int describeContents() {
+            return TAG.length();
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int flags) {
+            parcel.writeInt(syncInProcess ? 1 : 0);
+
+            parcel.writeString(orgUnitLabel);
+            parcel.writeString(orgUnitId);
+            parcel.writeInt(orgUnitDBId);
+
+            parcel.writeString(dataSetLabel);
+            parcel.writeString(dataSetId);
+            parcel.writeInt(dataSetDBId);
+
+            parcel.writeString(periodLabel);
+            parcel.writeString(periodDate);
+        }
 
         public boolean isSyncInProcess() {
-            return isSyncInProcess;
+            return syncInProcess;
         }
 
-        public void setSyncInProcess(boolean isSyncInProcess) {
-            this.isSyncInProcess = isSyncInProcess;
+        public void setSyncInProcess(boolean syncInProcess) {
+            this.syncInProcess = syncInProcess;
         }
 
-        public DataSet getDataSet() {
-            return dataSet;
+        public void setOrgUnit(int orgUnitDBId, String orgUnitId,
+                               String orgUnitLabel) {
+            this.orgUnitDBId = orgUnitDBId;
+            this.orgUnitId = orgUnitId;
+            this.orgUnitLabel = orgUnitLabel;
         }
 
-        public void setDataSet(DataSet dataSet) {
-            this.dataSet = dataSet;
+        public void resetOrgUnit() {
+            orgUnitDBId = DEFAULT_INDEX;
+            orgUnitId = null;
+            orgUnitLabel = null;
         }
 
-        public OrganisationUnit getOrganisationUnit() {
-            return organisationUnit;
+        public boolean isOrgUnitEmpty() {
+            return (orgUnitDBId == DEFAULT_INDEX ||
+                    orgUnitId == null || orgUnitLabel == null);
         }
 
-        public void setOrganisationUnit(OrganisationUnit organisationUnit) {
-            this.organisationUnit = organisationUnit;
+        public String getOrgUnitLabel() {
+            return orgUnitLabel;
+        }
+
+        public String getOrgUnitId() {
+            return orgUnitId;
+        }
+
+        public int getOrgUnitDBId() {
+            return orgUnitDBId;
+        }
+
+        public void setDataSet(int dataSetDBId, String dataSetId,
+                               String dataSetLabel) {
+            this.dataSetDBId = dataSetDBId;
+            this.dataSetId = dataSetId;
+            this.dataSetLabel = dataSetLabel;
+        }
+
+        public void resetDataSet() {
+            dataSetDBId = DEFAULT_INDEX;
+            dataSetId = null;
+            dataSetLabel = null;
+        }
+
+        public boolean isDataSetEmpty() {
+            return (dataSetDBId == DEFAULT_INDEX ||
+                    dataSetId == null || dataSetLabel == null);
+        }
+
+        public String getDataSetLabel() {
+            return dataSetLabel;
+        }
+
+        public String getDataSetId() {
+            return dataSetId;
+        }
+
+        public int getDataSetDBId() {
+            return dataSetDBId;
         }
 
         public DateHolder getPeriod() {
-            return period;
+            return new DateHolder(periodDate, periodLabel);
         }
 
-        public void setPeriod(DateHolder period) {
-            this.period = period;
+        public void setPeriod(DateHolder dateHolder) {
+            if (dateHolder != null) {
+                periodLabel = dateHolder.getLabel();
+                periodDate = dateHolder.getDate();
+            }
+        }
+
+        public void resetPeriod() {
+            periodLabel = null;
+            periodDate = null;
+        }
+
+        public boolean isPeriodEmpty() {
+            return (periodLabel == null || periodDate == null);
         }
     }
 }

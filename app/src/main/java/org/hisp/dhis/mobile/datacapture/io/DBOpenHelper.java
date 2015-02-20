@@ -18,7 +18,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.CREATE_DASHBOARD_TABLE);
         db.execSQL(DBSchema.CREATE_DASHBOARD_ITEMS_TABLE);
         db.execSQL(DBSchema.CREATE_INTERPRETATIONS_TABLE);
-        db.execSQL(DBSchema.CREATE_KEY_VALUE_TABLE);
 
         db.execSQL(DBSchema.CREATE_REPORTS_TABLE);
         db.execSQL(DBSchema.CREATE_REPORT_GROUP_TABLE);
@@ -38,7 +37,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         db.execSQL(DBSchema.DROP_DASHBOARD_TABLE);
         db.execSQL(DBSchema.DROP_DASHBOARD_ITEMS_TABLE);
         db.execSQL(DBSchema.DROP_INTERPRETATIONS_TABLE);
-        db.execSQL(DBSchema.DROP_KEY_VALUE_TABLE);
 
         db.execSQL(DBSchema.DROP_REPORTS_TABLE);
         db.execSQL(DBSchema.DROP_REPORT_GROUP_TABLE);

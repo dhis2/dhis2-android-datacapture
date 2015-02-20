@@ -1,11 +1,8 @@
 package org.hisp.dhis.mobile.datacapture.io;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-
-import org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue;
 
 public class DBContract {
     public static final String AUTHORITY = "org.hisp.dhis.mobile.datacapture.io.DBContentProvider";
@@ -66,14 +63,6 @@ public class DBContract {
         public static final String USER = "user";
         public static final String COMMENTS = "comments";
         public static final String STATE = "state";
-    }
-
-    static interface KeyValueColumns {
-        public static final String TABLE_NAME = "keyValuesTable";
-        public static final String DB_ID = BaseColumns._ID;
-        public static final String KEY = "key";
-        public static final String TYPE = "type";
-        public static final String VALUE = "value";
     }
 
     static interface ReportColumns {
@@ -208,18 +197,6 @@ public class DBContract {
                 "/org.hisp.dhis.mobile.datacapture.api.models.Interpretation";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Interpretation";
-        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
-    }
-
-    public static class KeyValues implements KeyValueColumns {
-        public static final String PATH = KeyValueColumns.TABLE_NAME;
-        public static final String KEY_VALUES = PATH;
-        public static final String KEY_VALUE_ID = PATH + "/#";
-
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
-                "/org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue";
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
-                "/org.hisp.dhis.mobile.datacapture.api.android.models.KeyValue";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
     }
 
