@@ -3,7 +3,7 @@ package org.hisp.dhis.mobile.datacapture.io.loaders;
 import android.content.Context;
 import android.net.Uri;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public class TransformationCursorBuilder<T> {
     private Uri mUri;

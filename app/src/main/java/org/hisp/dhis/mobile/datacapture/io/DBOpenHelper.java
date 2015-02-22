@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "dhis2.db";
     private static final String ENABLE_FOREIGN_KEYS = "PRAGMA foreign_keys = ON;";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     public DBOpenHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);

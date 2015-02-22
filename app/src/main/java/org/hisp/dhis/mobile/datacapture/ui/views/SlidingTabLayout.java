@@ -27,6 +27,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -78,6 +79,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
     private final SlidingTabStrip mTabStrip;
+    private boolean mDistributedEvenly;
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -104,7 +106,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     /**
      * Set the custom {@link org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout.TabColorizer} to be used.
      *
-     * If you only require simple custmisation then you can use
+     * If you only require simple customisation then you can use
      * {@link #setSelectedIndicatorColors(int...)} and {@link #setDividerColors(int...)} to achieve
      * similar effects.
      */
@@ -194,6 +196,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
         return textView;
     }
 
+    public void setDistributedEvenly(boolean distributedEvenly) {
+        mDistributedEvenly = distributedEvenly;
+    }
+
     private void populateTabStrip() {
         final PagerAdapter adapter = mViewPager.getAdapter();
         final OnClickListener tabClickListener = new TabClickListener();
@@ -215,6 +221,12 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
             if (tabTitleView == null && TextView.class.isInstance(tabView)) {
                 tabTitleView = (TextView) tabView;
+            }
+
+            if (mDistributedEvenly && tabView != null) {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                tabView.setLayoutParams(params);
             }
 
             tabTitleView.setText(adapter.getPageTitle(i));

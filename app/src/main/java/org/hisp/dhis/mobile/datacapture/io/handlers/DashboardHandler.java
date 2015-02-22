@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.api.android.handlers;
+package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentUris;

@@ -1,5 +1,6 @@
-package org.hisp.dhis.mobile.datacapture.ui.fragments;
+package org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -13,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.OrganizationUnitHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.OrganizationUnitHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
@@ -113,7 +114,7 @@ public class OrgUnitDialogFragment extends DialogFragment
     static class OrgUnitTransform implements Transformation<List<DbRow<OrganisationUnit>>> {
 
         @Override
-        public List<DbRow<OrganisationUnit>> transform(Cursor cursor) {
+        public List<DbRow<OrganisationUnit>> transform(Context context, Cursor cursor) {
             return OrganizationUnitHandler.query(cursor, false);
         }
     }

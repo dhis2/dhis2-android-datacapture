@@ -10,7 +10,7 @@ import android.util.Log;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationsSyncEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.InterpretationHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;

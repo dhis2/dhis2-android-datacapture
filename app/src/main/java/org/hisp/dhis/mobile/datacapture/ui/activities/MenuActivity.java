@@ -18,11 +18,12 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.ui.fragments.AggregateReportFragment;
-import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.DashboardViewPagerFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.InterpretationFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.ReportViewPagerFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.ReportsFragment;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.StubFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate.AggregateReportFragment;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationItem;
 import org.hisp.dhis.mobile.datacapture.ui.navigation.NavigationMenuItem;
@@ -144,8 +145,8 @@ public class MenuActivity extends ActionBarActivity {
         items.add(new NavigationSection(inflater, DATA_ENTRY_SECTION, R.string.data_entry_section));
         items.add(new NavigationMenuItem(inflater, AGGREGATE_REPORT_MENU_ITEM,
                 R.string.aggregate_report, R.drawable.ic_aggregate_report));
-        items.add(new NavigationMenuItem(inflater, SINGLE_EVENT_MENU_ITEM,
-                R.string.single_event, R.drawable.ic_single_event));
+        /* items.add(new NavigationMenuItem(inflater, SINGLE_EVENT_MENU_ITEM,
+                R.string.single_event, R.drawable.ic_single_event)); */
         items.add(new NavigationMenuItem(inflater, REPORTS_MENU_ITEM,
                 R.string.reports, R.drawable.ic_reports));
 
@@ -192,8 +193,8 @@ public class MenuActivity extends ActionBarActivity {
             number = INTERPRETATIONS_MENU_ITEM;
         } else if (id == AGGREGATE_REPORT_MENU_ITEM) {
             number = AGGREGATE_REPORT_MENU_ITEM;
-        } else if (id == SINGLE_EVENT_MENU_ITEM) {
-            number = SINGLE_EVENT_MENU_ITEM;
+        // } else if (id == SINGLE_EVENT_MENU_ITEM) {
+        //    number = SINGLE_EVENT_MENU_ITEM;
         } else if (id == REPORTS_MENU_ITEM) {
             number = REPORTS_MENU_ITEM;
         } else if (id == MY_ACCOUNT_MENU_ITEM) {
@@ -220,6 +221,8 @@ public class MenuActivity extends ActionBarActivity {
             fragment = new DashboardViewPagerFragment();
         } else if (id == INTERPRETATIONS_MENU_ITEM) {
             fragment = new InterpretationFragment();
+        } else if (id == REPORTS_MENU_ITEM) {
+            fragment = new ReportViewPagerFragment();
         } else {
             fragment = new StubFragment();
         }

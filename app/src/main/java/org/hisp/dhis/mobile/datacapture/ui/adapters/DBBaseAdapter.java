@@ -53,6 +53,10 @@ public abstract class DBBaseAdapter<T> extends BaseAdapter {
         }
     }
 
+    public List<DbRow<T>> getItems() {
+        return mData;
+    }
+
     public Context getContext() {
         return mContext;
     }

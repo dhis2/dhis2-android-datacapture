@@ -2,7 +2,6 @@ package org.hisp.dhis.mobile.datacapture.ui.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -13,18 +12,17 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.FieldValueChangeEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportFieldHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
-import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
-import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
+import org.hisp.dhis.mobile.datacapture.io.handlers.OptionSetHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.ReportFieldHandler;
+import org.hisp.dhis.mobile.datacapture.io.loaders.CursorLoaderBuilder;
+import org.hisp.dhis.mobile.datacapture.io.loaders.Transformation;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.FieldAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.AutoCompleteRow;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.CheckBoxRow;
@@ -40,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReportGroupFragment extends Fragment
-        implements LoaderCallbacks<CursorHolder<List<Row>>> {
+        implements LoaderCallbacks<List<Row>> {
     private static final int LOADER_ID = 438915134;
     private ListView mListView;
     private FieldAdapter mAdapter;
@@ -48,23 +46,20 @@ public class ReportGroupFragment extends Fragment
     public static ReportGroupFragment newInstance(int groupId) {
         ReportGroupFragment fragment = new ReportGroupFragment();
         Bundle args = new Bundle();
-
         args.putInt(ReportGroups.DB_ID, groupId);
         fragment.setArguments(args);
-
         return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_group_report, container, false);
-        mListView = (ListView) root.findViewById(R.id.list);
-        return root;
+        return inflater.inflate(R.layout.fragment_group_report, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mAdapter = new FieldAdapter(getActivity());
+        mListView = (ListView) view.findViewById(R.id.list);
         mListView.setAdapter(mAdapter);
     }
 
@@ -75,57 +70,50 @@ public class ReportGroupFragment extends Fragment
     }
 
     @Override
-    public Loader<CursorHolder<List<Row>>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<Row>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            int groupId = args.getInt(ReportGroups.DB_ID);
-            final String SELECTION = ReportFields.GROUP_DB_ID + " = " + "'" + groupId + "'";
-            return new FieldsLoader(getActivity(), ReportFields.CONTENT_URI,
-                    ReportFieldHandler.PROJECTION, SELECTION, null, null);
+            String groupId = args.getInt(ReportGroups.DB_ID) + "";
+            return CursorLoaderBuilder.forUri(ReportFields.CONTENT_URI)
+                    .projection(ReportFieldHandler.PROJECTION)
+                    .selection(ReportFieldHandler.SELECTION)
+                    .selectionArgs(new String[]{groupId})
+                    .transformation(new Transformer())
+                    .build(getActivity().getBaseContext());
         } else {
             return null;
         }
     }
 
     @Override
-    public void onLoadFinished(Loader<CursorHolder<List<Row>>> loader,
-                               CursorHolder<List<Row>> data) {
-        if (loader != null && loader.getId() == LOADER_ID &&
-                data != null && data.getData() != null) {
-            List<Row> rows = data.getData();
-            mAdapter.swapData(rows);
+    public void onLoadFinished(Loader<List<Row>> loader,
+                               List<Row> data) {
+        if (loader != null && loader.getId() == LOADER_ID
+                && data != null) {
+            mAdapter.swapData(data);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<CursorHolder<List<Row>>> loader) { }
+    public void onLoaderReset(Loader<List<Row>> loader) {
+    }
 
-    static class FieldsLoader extends AbsCursorLoader<List<Row>> {
-
-        public FieldsLoader(Context context, Uri uri, String[] projection,
-                            String selection, String[] selectionArgs, String sortOrder) {
-            super(context, uri, projection, selection, selectionArgs, sortOrder);
-        }
+    private static class Transformer implements Transformation<List<Row>> {
 
         @Override
-        protected List<Row> readDataFromCursor(Cursor cursor) {
-            List<DbRow<Field>> fields = new ArrayList<>();
+        public List<Row> transform(Context context, Cursor cursor) {
+            List<DbRow<Field>> fields = ReportFieldHandler.map(cursor, false);
             List<Row> rows = new ArrayList<>();
 
-            if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToFirst();
+            OnValueChangedListener listener = new OnValueChangedListener(context);
+            OptionSetHandler optionSetHandler = new OptionSetHandler(context);
 
-                do {
-                    fields.add(ReportFieldHandler.fromCursor(cursor));
-                } while (cursor.moveToNext());
-            }
-
-            OnFieldValueChangedListener listener = new OnFieldValueChangedListener(getContext());
             for (DbRow<Field> dbItem : fields) {
                 Field field = dbItem.getItem();
 
                 Row row = null;
                 if (field.getOptionSet() != null) {
-                    OptionSet optionSet = readOptionSet(field.getOptionSet());
+                    OptionSet optionSet = readOptionSet(optionSetHandler,
+                            field.getOptionSet());
                     row = new AutoCompleteRow(dbItem, optionSet);
                 } else if (RowTypes.TEXT.name().equals(field.getType())) {
                     row = new ValueEntryViewRow(dbItem, RowTypes.TEXT);
@@ -156,40 +144,23 @@ public class ReportGroupFragment extends Fragment
                     rows.add(row);
                 }
             }
-
             return rows;
         }
 
-        private OptionSet readOptionSet(String optionSetId) {
-            /* final String SELECTION = KeyValues.KEY + " = " + "'" + optionSetId + "'" + " AND " +
-                    KeyValues.TYPE + " = " + "'" + KeyValue.Type.DATASET_OPTION_SET.toString() + "'";
-            Cursor cursor = getContext().getContentResolver().query(
-                    KeyValues.CONTENT_URI, KeyValueHandler.PROJECTION, SELECTION, null, null
-            );
-
+        private OptionSet readOptionSet(OptionSetHandler handler, String optionSetId) {
+            DbRow<OptionSet> optionSetDbRow = handler.query(optionSetId, true);
             OptionSet optionSet = null;
-            if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                DbRow<KeyValue> dbItem = KeyValueHandler.fromCursor(cursor);
-                cursor.close();
-
-                if (dbItem != null && dbItem.getItem() != null &&
-                        dbItem.getItem().getValue() != null) {
-                    Gson gson = new Gson();
-                    String jOptionSet = dbItem.getItem().getValue();
-                    optionSet = gson.fromJson(jOptionSet, OptionSet.class);
-                }
-            } */
-
-            //return optionSet;
-            return null;
+            if (optionSetDbRow != null) {
+                optionSet = optionSetDbRow.getItem();
+            }
+            return optionSet;
         }
     }
 
-    private static class OnFieldValueChangedListener implements OnFieldValueSetListener {
+    private static class OnValueChangedListener implements OnFieldValueSetListener {
         private Context context;
 
-        public OnFieldValueChangedListener(Context context) {
+        public OnValueChangedListener(Context context) {
             this.context = context;
         }
 

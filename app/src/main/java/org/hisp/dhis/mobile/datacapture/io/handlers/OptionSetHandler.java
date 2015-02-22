@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.api.android.handlers;
+package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentUris;
@@ -14,11 +14,12 @@ import org.hisp.dhis.mobile.datacapture.api.models.Option;
 import org.hisp.dhis.mobile.datacapture.api.models.OptionSet;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OptionSets;
+import org.hisp.dhis.mobile.datacapture.utils.DbUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public final class OptionSetHandler {
     public static final String[] PROJECTION = new String[] {
@@ -29,6 +30,8 @@ public final class OptionSetHandler {
             OptionSets.NAME,
             OptionSets.DISPLAY_NAME
     };
+
+    public static final String SELECTION = OptionSets.ID + " = " + " ? ";
 
     private static final int DB_ID = 0;
     private static final int ID = 1;
@@ -102,6 +105,7 @@ public final class OptionSetHandler {
         }
     }
 
+    // TODO PERFORM CLEAN UP OF OPTION SETS
     public void bulkInsert(List<OptionSet> optionSets) {
         if (optionSets == null || !(optionSets.size() > 0)) {
             return;
@@ -126,12 +130,21 @@ public final class OptionSetHandler {
         return ContentProviderOperation.newDelete(uri).build();
     }
 
-    public DbRow<OptionSet> query(String selection) {
+    public DbRow<OptionSet> query(String optionSetId, boolean withOptions) {
         Cursor cursor = mContext.getContentResolver().query(
-                OptionSets.CONTENT_URI, PROJECTION, selection, null, null
+                OptionSets.CONTENT_URI, PROJECTION, SELECTION,
+                new String[]{ optionSetId }, null
         );
 
-        return query(cursor, true);
+        DbRow<OptionSet> optionSet = query(cursor, true);
+        if (withOptions) {
+            OptionHandler handler = new OptionHandler(mContext);
+            List<Option> options = DbUtils.stripRows(
+                    handler.query(optionSet.getId()));
+            optionSet.getItem().setOptions(options);
+        }
+
+        return optionSet;
     }
 
     public DbRow<OptionSet> query(Cursor cursor, boolean closeCursor) {

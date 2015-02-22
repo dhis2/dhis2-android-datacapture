@@ -11,7 +11,8 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.OnFieldValueChangedEv
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
+
 
 public class FieldChangeValueProcessor extends AsyncTask<Void, Void, OnFieldValueChangedEvent> {
     private Context mContext;

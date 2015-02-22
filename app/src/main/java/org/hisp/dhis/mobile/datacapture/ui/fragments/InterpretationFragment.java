@@ -23,7 +23,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteE
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnInterpretationsSyncEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.InterpretationHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.InterpretationHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Interpretation;
 import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;

@@ -81,15 +81,18 @@ public interface DBSchema {
     public static final String CREATE_REPORTS_TABLE = "CREATE TABLE " + Reports.TABLE_NAME + "(" +
             Reports.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             Reports.ORG_UNIT_ID + " TEXT NOT NULL," +
+            Reports.ORG_UNIT_LABEL + " TEXT," +
             Reports.DATASET_ID + " TEXT NOT NULL," +
+            Reports.DATASET_LABEL + " TEXT," +
             Reports.PERIOD + " TEXT NOT NULL," +
+            Reports.PERIOD_LABEL + " TEXT," +
             Reports.COMPLETE_DATE + " TEXT," +
             Reports.STATE + " TEXT NOT NULL," +
             " UNIQUE " + "(" +
-            Reports.ORG_UNIT_ID + "," +
-            Reports.DATASET_ID + "," +
-            Reports.PERIOD +
-            ")" +
+                    Reports.ORG_UNIT_ID + "," +
+                    Reports.DATASET_ID + "," +
+                    Reports.PERIOD +
+                ")" +
             ")";
 
     public static final String DROP_REPORTS_TABLE = "DROP TABLE IF EXISTS " + Reports.TABLE_NAME;
@@ -116,6 +119,9 @@ public interface DBSchema {
             ReportFields.GROUP_DB_ID + " INTEGER NOT NULL," +
             " FOREIGN KEY " + "(" + ReportFields.GROUP_DB_ID + ")" +
             " REFERENCES " + ReportGroups.TABLE_NAME + "(" + ReportGroups.DB_ID + ")" +
+            " ON DELETE CASCADE " +
+            " FOREIGN KEY " + "(" + ReportFields.OPTION_SET + ")" +
+            " REFERENCES " + OptionSets.TABLE_NAME + "(" + OptionSets.ID + ")" +
             " ON DELETE CASCADE " + ")";
 
     public static final String DROP_REPORT_FIELDS_TABLE = "DROP TABLE IF EXISTS " + ReportFields.TABLE_NAME;
@@ -188,7 +194,6 @@ public interface DBSchema {
             " UNIQUE " + "(" + OptionSets.ID + ")" + " ON CONFLICT REPLACE " + ")";
 
     public static final String DROP_OPTION_SET_TABLE = "DROP TABLE IF EXISTS " + OptionSets.TABLE_NAME;
-
 
     public static final String CREATE_OPTION_TABLE = "CREATE TABLE " + Options.TABLE_NAME + "(" +
             Options.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +

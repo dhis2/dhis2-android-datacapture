@@ -1,11 +1,17 @@
-package org.hisp.dhis.mobile.datacapture.api.android.handlers;
+package org.hisp.dhis.mobile.datacapture.io.handlers;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.database.Cursor;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public final class ReportFieldHandler {
     public static final String[] PROJECTION = new String[]{
@@ -18,6 +24,8 @@ public final class ReportFieldHandler {
             ReportFields.VALUE
     };
 
+    public static final String SELECTION = ReportFields.GROUP_DB_ID + " = " + " ? ";
+
     private static final int DB_ID = 0;
     private static final int LABEL = 1;
     private static final int TYPE = 2;
@@ -26,7 +34,10 @@ public final class ReportFieldHandler {
     private static final int OPTION_SET = 5;
     private static final int VALUE = 6;
 
-    public static ContentValues toContentValues(Field field) {
+    private ReportFieldHandler() {
+    }
+
+    private static ContentValues toContentValues(Field field) {
         ContentValues values = new ContentValues();
         values.put(ReportFields.LABEL, field.getLabel());
         values.put(ReportFields.TYPE, field.getType());
@@ -37,7 +48,7 @@ public final class ReportFieldHandler {
         return values;
     }
 
-    public static DbRow<Field> fromCursor(Cursor cursor) {
+    private static DbRow<Field> fromCursor(Cursor cursor) {
         Field field = new Field();
         field.setLabel(cursor.getString(LABEL));
         field.setType(cursor.getString(TYPE));
@@ -50,5 +61,38 @@ public final class ReportFieldHandler {
         holder.setId(cursor.getInt(DB_ID));
         holder.setItem(field);
         return holder;
+    }
+
+    public static List<DbRow<Field>> map(Cursor cursor, boolean closeCursor) {
+        List<DbRow<Field>> fields = new ArrayList<>();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            do {
+                fields.add(fromCursor(cursor));
+            } while (cursor.moveToNext());
+
+            if (closeCursor) {
+                cursor.close();
+            }
+        }
+
+        return fields;
+    }
+
+    public static void insertWithReference(List<ContentProviderOperation> ops,
+                                           int groupIndex, List<Field> fields) {
+        isNull(ops, "List<ContentProviderOperation> must not be null");
+
+        if (fields != null && fields.size() > 0) {
+            for (Field field : fields) {
+                ops.add(ContentProviderOperation
+                        .newInsert(ReportFields.CONTENT_URI)
+                        .withValueBackReference(ReportFields.GROUP_DB_ID, groupIndex)
+                        .withValues(toContentValues(field))
+                        .build());
+            }
+        }
     }
 }

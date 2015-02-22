@@ -16,7 +16,7 @@ import android.widget.Toast;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardItemDeleteEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardItemHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.DashboardItemHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Access;

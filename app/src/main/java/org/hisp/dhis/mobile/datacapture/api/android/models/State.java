@@ -5,7 +5,4 @@ public enum State {
     PUTTING,
     POSTING,
     DELETING,
-
-    OFFLINE,
-    POSTED,
 }

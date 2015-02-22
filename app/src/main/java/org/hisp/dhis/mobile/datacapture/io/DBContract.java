@@ -69,8 +69,11 @@ public class DBContract {
         public static final String TABLE_NAME = "reportTable";
         public static final String DB_ID = BaseColumns._ID;
         public static final String ORG_UNIT_ID = "orgUnitId";
+        public static final String ORG_UNIT_LABEL = "orgUnitLabel";
         public static final String DATASET_ID = "dataSetId";
+        public static final String DATASET_LABEL = "dataSetLabel";
         public static final String PERIOD = "period";
+        public static final String PERIOD_LABEL = "periodLabel";
         public static final String COMPLETE_DATE = "completeDate";
         public static final String STATE = "state";
     }
@@ -91,10 +94,11 @@ public class DBContract {
         public static final String TYPE = "type";
         public static final String DATA_ELEMENT = "dataElement";
         public static final String CATEGORY_OPTION_COMBO = "categoryOptionCombo";
-        public static final String OPTION_SET = "optionSet";
         public static final String VALUE = "value";
         // ForeignKey to ReportGroupColumns(_id)
         public static final String GROUP_DB_ID = "reportGroupId";
+        // ForeignKey to OptionSetColumns(_id)
+        public static final String OPTION_SET = "optionSet";
     }
 
     static interface OrganizationUnitColumns {

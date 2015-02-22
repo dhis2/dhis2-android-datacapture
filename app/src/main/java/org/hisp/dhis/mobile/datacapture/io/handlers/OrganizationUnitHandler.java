@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.api.android.handlers;
+package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.os.RemoteException;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
-import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
 import org.hisp.dhis.mobile.datacapture.api.models.OrganisationUnit;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
@@ -16,7 +15,7 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public class OrganizationUnitHandler {
     public static final String[] PROJECTION = new String[]{
@@ -81,7 +80,7 @@ public class OrganizationUnitHandler {
             do {
                 DbRow<OrganisationUnit> row = fromCursor(cursor);
                 // List<DataSet> dataSets = dataSetHandler
-                        // .queryForOrganizationUnit(row.getId());
+                // .queryForOrganizationUnit(row.getId());
                 // row.getItem().setDataSets(dataSets);
                 rows.add(row);
             } while (cursor.moveToNext());
@@ -106,7 +105,7 @@ public class OrganizationUnitHandler {
     private void insert(List<OrganisationUnit> units) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         if (units != null && units.size() > 0) {
-            for (OrganisationUnit unit: units) {
+            for (OrganisationUnit unit : units) {
                 insert(ops, unit);
             }
         }

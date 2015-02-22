@@ -1,6 +1,7 @@
-package org.hisp.dhis.mobile.datacapture.ui.fragments;
+package org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate;
 
 import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ import android.widget.ListView;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.date.CustomDateIterator;
 import org.hisp.dhis.mobile.datacapture.api.android.date.DateIteratorFactory;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.DataSetHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.DataSetHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DateHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
@@ -27,6 +28,7 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSets;
 import org.hisp.dhis.mobile.datacapture.io.loaders.CursorLoaderBuilder;
 import org.hisp.dhis.mobile.datacapture.io.loaders.Transformation;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.SimpleAdapter;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.ListViewDialogFragment;
 
 import java.util.List;
 
@@ -172,7 +174,7 @@ public class PeriodDialogFragment extends DialogFragment
     static class TransformDataSet implements Transformation<DbRow<DataSet>> {
 
         @Override
-        public DbRow<DataSet> transform(Cursor cursor) {
+        public DbRow<DataSet> transform(Context context, Cursor cursor) {
             return DataSetHandler.querySingleItem(cursor, false);
         }
     }

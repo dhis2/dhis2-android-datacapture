@@ -1,10 +1,9 @@
-package org.hisp.dhis.mobile.datacapture.ui.fragments;
+package org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -19,15 +18,16 @@ import com.squareup.otto.Subscribe;
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DatasetSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.OrganizationUnitHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DateHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
+import org.hisp.dhis.mobile.datacapture.io.handlers.OrganizationUnitHandler;
 import org.hisp.dhis.mobile.datacapture.io.loaders.CursorLoaderBuilder;
 import org.hisp.dhis.mobile.datacapture.io.loaders.Transformation;
 import org.hisp.dhis.mobile.datacapture.ui.activities.ReportEntryActivity;
-import org.hisp.dhis.mobile.datacapture.ui.fragments.DataSetDialogFragment.OnDatasetSetListener;
-import org.hisp.dhis.mobile.datacapture.ui.fragments.OrgUnitDialogFragment.OnOrgUnitSetListener;
-import org.hisp.dhis.mobile.datacapture.ui.fragments.PeriodDialogFragment.OnPeriodSetListener;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.BaseFragment;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate.DataSetDialogFragment.OnDatasetSetListener;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate.OrgUnitDialogFragment.OnOrgUnitSetListener;
+import org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate.PeriodDialogFragment.OnPeriodSetListener;
 import org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton;
 import org.hisp.dhis.mobile.datacapture.ui.views.CardTextViewButton;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
@@ -36,7 +36,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
         implements View.OnClickListener, LoaderCallbacks<Boolean>,
-        OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener{
+        OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener {
     private static final String STATE = "state:AggregateReportFragment";
     private static final int LOADER_ID = 345784834;
 
@@ -47,7 +47,7 @@ public class AggregateReportFragment extends BaseFragment
     private CardTextViewButton mPeriodButton;
     private CardDetailedButton mButton;
 
-    private FragmentState mState;
+    private AggregateReportFragmentState mState;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class AggregateReportFragment extends BaseFragment
         }
 
         if (mState == null) {
-            mState = new FragmentState();
+            mState = new AggregateReportFragmentState();
         }
 
         mProgressBar.setVisibility(mState.isSyncInProcess() ? View.VISIBLE : View.INVISIBLE);
@@ -157,7 +157,7 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public void onUnitSelected(int dbId, String orgUnitId,
-                                String orgUnitLabel) {
+                               String orgUnitLabel) {
         mOrgUnitButton.setText(orgUnitLabel);
         mDataSetButton.setEnabled(true);
 
@@ -169,7 +169,7 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public void onDataSetSelected(int dbId, String dataSetId,
-                                   String dataSetLabel) {
+                                  String dataSetLabel) {
         mDataSetButton.setText(dataSetLabel);
         mPeriodButton.setEnabled(true);
 
@@ -212,10 +212,19 @@ public class AggregateReportFragment extends BaseFragment
 
     private void startReportEntryActivity() {
         String orgUnitId = mState.getOrgUnitId();
+        String orgUnitLabel = mState.getOrgUnitLabel();
+
         String dataSetId = mState.getDataSetId();
+        String dataSetLabel = mState.getDataSetLabel();
+
         String period = mState.getPeriod().getDate();
+        String periodLabel = mState.getPeriod().getLabel();
+
         Intent intent = ReportEntryActivity.newIntent(
-                getActivity(), orgUnitId, dataSetId, period
+                getActivity(),
+                orgUnitId, orgUnitLabel,
+                dataSetId, dataSetLabel,
+                period, periodLabel
         );
         startActivity(intent);
     }
@@ -241,7 +250,7 @@ public class AggregateReportFragment extends BaseFragment
             }
 
             mOrgUnitButton.setEnabled(true);
-            FragmentState backedUpState = new FragmentState(mState);
+            AggregateReportFragmentState backedUpState = new AggregateReportFragmentState(mState);
             if (!backedUpState.isOrgUnitEmpty()) {
                 onUnitSelected(
                         backedUpState.getOrgUnitDBId(),
@@ -265,180 +274,14 @@ public class AggregateReportFragment extends BaseFragment
     }
 
     @Override
-    public void onLoaderReset(Loader<Boolean> booleanLoader) { }
+    public void onLoaderReset(Loader<Boolean> booleanLoader) {
+    }
 
     static class OrgUnitTransformation implements Transformation<Boolean> {
 
         @Override
-        public Boolean transform(Cursor cursor) {
+        public Boolean transform(Context context, Cursor cursor) {
             return (cursor != null && cursor.getCount() > 0);
-        }
-    }
-
-    static class FragmentState implements Parcelable {
-        private static final String TAG = FragmentState.class.getName();
-        private static final int DEFAULT_INDEX = -1;
-        private boolean syncInProcess;
-
-        private String orgUnitLabel;
-        private String orgUnitId;
-        private int orgUnitDBId;
-
-        private String dataSetLabel;
-        private String dataSetId;
-        private int dataSetDBId;
-
-        private String periodLabel;
-        private String periodDate;
-
-        public FragmentState() {
-        }
-
-        public FragmentState(FragmentState state) {
-            if (state != null) {
-                setSyncInProcess(state.isSyncInProcess());
-                setOrgUnit(state.getOrgUnitDBId(), state.getOrgUnitId(),
-                        state.getOrgUnitLabel());
-                setDataSet(state.getDataSetDBId(), state.getDataSetId(),
-                        state.getDataSetLabel());
-                setPeriod(state.getPeriod());
-            }
-        }
-
-        public static final Parcelable.Creator<FragmentState> CREATOR
-                = new Parcelable.Creator<FragmentState>() {
-
-            public FragmentState createFromParcel(Parcel in) {
-                return new FragmentState(in);
-            }
-
-            public FragmentState[] newArray(int size) {
-                return new FragmentState[size];
-            }
-        };
-
-        private FragmentState(Parcel in) {
-            syncInProcess = in.readInt() == 1;
-
-            orgUnitLabel = in.readString();
-            orgUnitId = in.readString();
-            orgUnitDBId = in.readInt();
-
-            dataSetLabel = in.readString();
-            dataSetId = in.readString();
-            dataSetDBId = in.readInt();
-
-            periodLabel = in.readString();
-            periodDate = in.readString();
-        }
-
-        @Override
-        public int describeContents() {
-            return TAG.length();
-        }
-
-        @Override
-        public void writeToParcel(Parcel parcel, int flags) {
-            parcel.writeInt(syncInProcess ? 1 : 0);
-
-            parcel.writeString(orgUnitLabel);
-            parcel.writeString(orgUnitId);
-            parcel.writeInt(orgUnitDBId);
-
-            parcel.writeString(dataSetLabel);
-            parcel.writeString(dataSetId);
-            parcel.writeInt(dataSetDBId);
-
-            parcel.writeString(periodLabel);
-            parcel.writeString(periodDate);
-        }
-
-        public boolean isSyncInProcess() {
-            return syncInProcess;
-        }
-
-        public void setSyncInProcess(boolean syncInProcess) {
-            this.syncInProcess = syncInProcess;
-        }
-
-        public void setOrgUnit(int orgUnitDBId, String orgUnitId,
-                               String orgUnitLabel) {
-            this.orgUnitDBId = orgUnitDBId;
-            this.orgUnitId = orgUnitId;
-            this.orgUnitLabel = orgUnitLabel;
-        }
-
-        public void resetOrgUnit() {
-            orgUnitDBId = DEFAULT_INDEX;
-            orgUnitId = null;
-            orgUnitLabel = null;
-        }
-
-        public boolean isOrgUnitEmpty() {
-            return (orgUnitDBId == DEFAULT_INDEX ||
-                    orgUnitId == null || orgUnitLabel == null);
-        }
-
-        public String getOrgUnitLabel() {
-            return orgUnitLabel;
-        }
-
-        public String getOrgUnitId() {
-            return orgUnitId;
-        }
-
-        public int getOrgUnitDBId() {
-            return orgUnitDBId;
-        }
-
-        public void setDataSet(int dataSetDBId, String dataSetId,
-                               String dataSetLabel) {
-            this.dataSetDBId = dataSetDBId;
-            this.dataSetId = dataSetId;
-            this.dataSetLabel = dataSetLabel;
-        }
-
-        public void resetDataSet() {
-            dataSetDBId = DEFAULT_INDEX;
-            dataSetId = null;
-            dataSetLabel = null;
-        }
-
-        public boolean isDataSetEmpty() {
-            return (dataSetDBId == DEFAULT_INDEX ||
-                    dataSetId == null || dataSetLabel == null);
-        }
-
-        public String getDataSetLabel() {
-            return dataSetLabel;
-        }
-
-        public String getDataSetId() {
-            return dataSetId;
-        }
-
-        public int getDataSetDBId() {
-            return dataSetDBId;
-        }
-
-        public DateHolder getPeriod() {
-            return new DateHolder(periodDate, periodLabel);
-        }
-
-        public void setPeriod(DateHolder dateHolder) {
-            if (dateHolder != null) {
-                periodLabel = dateHolder.getLabel();
-                periodDate = dateHolder.getDate();
-            }
-        }
-
-        public void resetPeriod() {
-            periodLabel = null;
-            periodDate = null;
-        }
-
-        public boolean isPeriodEmpty() {
-            return (periodLabel == null || periodDate == null);
         }
     }
 }

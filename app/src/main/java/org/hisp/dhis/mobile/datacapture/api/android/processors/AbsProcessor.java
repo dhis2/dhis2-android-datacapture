@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public abstract class AbsProcessor<InEventType, OutEventType> extends AsyncTask<Void, Void, OutEventType>
         implements Processor<OutEventType> {

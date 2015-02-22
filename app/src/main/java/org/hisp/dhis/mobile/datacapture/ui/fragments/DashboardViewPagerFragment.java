@@ -25,7 +25,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardsSyncedEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;
 import org.hisp.dhis.mobile.datacapture.api.models.Dashboard;

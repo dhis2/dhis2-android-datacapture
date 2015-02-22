@@ -1,5 +1,6 @@
-package org.hisp.dhis.mobile.datacapture.ui.fragments;
+package org.hisp.dhis.mobile.datacapture.ui.fragments.aggregate;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -13,7 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.DataSetHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.DataSetHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSets;
@@ -120,7 +121,7 @@ public class DataSetDialogFragment extends DialogFragment
     static class DataSetTransform implements Transformation<List<DbRow<DataSet>>> {
 
         @Override
-        public List<DbRow<DataSet>> transform(Cursor cursor) {
+        public List<DbRow<DataSet>> transform(Context context, Cursor cursor) {
             return DataSetHandler.query(cursor, false);
         }
     }

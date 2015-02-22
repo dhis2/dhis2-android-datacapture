@@ -20,7 +20,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationDeleteE
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.InterpretationUpdateTextEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.LoginUserEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.processors.CreateReportProcessor;
+import org.hisp.dhis.mobile.datacapture.api.android.processors.ReportCreateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardCreateProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardDeleteProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.DashboardItemDeleteProcessor;
@@ -34,7 +34,7 @@ import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationSyn
 import org.hisp.dhis.mobile.datacapture.api.android.processors.InterpretationUpdateTextProcessor;
 import org.hisp.dhis.mobile.datacapture.api.android.processors.LoginUserProcessor;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public final class DHISService {
     private static final String TAG = DHISService.class.getSimpleName();
@@ -101,7 +101,7 @@ public final class DHISService {
 
     @Subscribe
     public void onCreateReportEvent(CreateReportEvent event) {
-        executeTask(new CreateReportProcessor(mContext, event));
+        executeTask(new ReportCreateProcessor(mContext, event));
     }
 
     @Subscribe

@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.api.android.handlers;
+package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
@@ -9,9 +9,11 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Option;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Options;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
+
 
 public final class OptionHandler {
     public static final String[] PROJECTION = new String[]{
@@ -21,6 +23,8 @@ public final class OptionHandler {
             Options.LAST_UPDATED,
             Options.NAME
     };
+
+    public static final String SELECTION = Options.OPTION_SET_DB_ID + " = " + " ? ";
 
     private static final int DB_ID = 0;
     private static final int ID = 1;
@@ -59,25 +63,31 @@ public final class OptionHandler {
         return row;
     }
 
-    public DbRow<Option> query(Cursor cursor, boolean closeCursor) {
-        DbRow<Option> row = null;
+    public List<DbRow<Option>> query(int optionSetId) {
+        Cursor cursor = mContext.getContentResolver().query(
+                Options.CONTENT_URI, PROJECTION, SELECTION,
+                new String[]{ optionSetId + "" }, null
+        );
+
+        return map(cursor, true);
+    }
+
+    public static List<DbRow<Option>> map(Cursor cursor, boolean closeCursor) {
+        List<DbRow<Option>> options = new ArrayList<>();
+
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            row = fromCursor(cursor);
+
+            do {
+                options.add(fromCursor(cursor));
+            } while(cursor.moveToNext());
 
             if (closeCursor) {
                 cursor.close();
             }
         }
-        return row;
-    }
 
-    public DbRow<Option> query(String selection) {
-        Cursor cursor = mContext.getContentResolver().query(
-                Options.CONTENT_URI, PROJECTION, selection, null, null
-        );
-
-        return query(cursor, true);
+        return options;
     }
 
     public static void insertWithReference(List<ContentProviderOperation> ops,

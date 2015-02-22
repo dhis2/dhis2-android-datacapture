@@ -7,6 +7,7 @@
     <color name="graphite_grey">#FFCBCBCB</color>
     <color name="navy_blue">#FF1F70C3</color>
     <color name="dark_navy_blue">#FF1D5288</color>
+    <color name="red">#FFF44336</color>
     <color name="transparent">#00000000</color>
 
     <color name="button_login_state_enabled_false">#FF223F5C</color>

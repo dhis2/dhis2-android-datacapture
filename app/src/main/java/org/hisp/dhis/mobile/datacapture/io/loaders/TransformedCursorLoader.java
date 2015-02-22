@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 /**
  * Static library support version of the framework's {@link android.content.CursorLoader}.
@@ -88,7 +88,7 @@ public class TransformedCursorLoader<T> extends AsyncTaskLoader<T> {
             cursor.getCount();
         }
 
-        T newResult = mTransformation.transform(cursor);
+        T newResult = mTransformation.transform(getContext(), cursor);
         isNull(newResult, "Transformed result must not be null");
 
         if (mCursorsForResults.get(newResult) != null) {
@@ -174,10 +174,20 @@ public class TransformedCursorLoader<T> extends AsyncTaskLoader<T> {
     @Override
     public void dump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
         super.dump(prefix, fd, writer, args);
-        writer.print(prefix); writer.print("mUri="); writer.println(mUri);
-        writer.print(prefix); writer.print("mProjection="); writer.println(Arrays.toString(mProjection));
-        writer.print(prefix); writer.print("mSelection="); writer.println(mSelection);
-        writer.print(prefix); writer.print("mSelectionArgs="); writer.println(Arrays.toString(mSelectionArgs));
-        writer.print(prefix); writer.print("mSortOrder="); writer.println(mSortOrder);
+        writer.print(prefix);
+        writer.print("mUri=");
+        writer.println(mUri);
+        writer.print(prefix);
+        writer.print("mProjection=");
+        writer.println(Arrays.toString(mProjection));
+        writer.print(prefix);
+        writer.print("mSelection=");
+        writer.println(mSelection);
+        writer.print(prefix);
+        writer.print("mSelectionArgs=");
+        writer.println(Arrays.toString(mSelectionArgs));
+        writer.print(prefix);
+        writer.print("mSortOrder=");
+        writer.println(mSortOrder);
     }
 }

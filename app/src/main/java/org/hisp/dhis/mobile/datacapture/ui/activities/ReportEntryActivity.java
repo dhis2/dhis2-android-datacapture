@@ -3,7 +3,6 @@ package org.hisp.dhis.mobile.datacapture.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -14,26 +13,22 @@ import android.view.MenuItem;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.ReportGroupHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
-import org.hisp.dhis.mobile.datacapture.io.AbsCursorLoader;
-import org.hisp.dhis.mobile.datacapture.io.CursorHolder;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
+import org.hisp.dhis.mobile.datacapture.io.handlers.ReportGroupHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.ReportHandler;
+import org.hisp.dhis.mobile.datacapture.io.loaders.CursorLoaderBuilder;
+import org.hisp.dhis.mobile.datacapture.io.loaders.Transformation;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.ReportGroupAdapter;
 import org.hisp.dhis.mobile.datacapture.ui.views.SlidingTabLayout;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReportEntryActivity extends ActionBarActivity
-        implements LoaderCallbacks<CursorHolder<List<DbRow<Group>>>> {
-    private static final String ORG_UNIT_ID_EXTRA = "extra:orgUnitId";
-    private static final String PERIOD_EXTRA = "extra:Period";
-    private static final String DATASET_ID_EXTRA = "extra:dataSetId";
-
+        implements LoaderCallbacks<List<DbRow<Group>>> {
     private static final int LOADER_ID = 89254134;
 
     private SlidingTabLayout mSlidingTabLayout;
@@ -41,11 +36,16 @@ public class ReportEntryActivity extends ActionBarActivity
     private ReportGroupAdapter mAdapter;
 
     public static Intent newIntent(FragmentActivity activity,
-                                   String orgUnitId, String dataSetId, String period) {
+                                   String orgUnitId, String orgUnitLabel,
+                                   String dataSetId, String dataSetLabel,
+                                   String period, String periodLabel) {
         Intent intent = new Intent(activity, ReportEntryActivity.class);
-        intent.putExtra(ORG_UNIT_ID_EXTRA, orgUnitId);
-        intent.putExtra(DATASET_ID_EXTRA, dataSetId);
-        intent.putExtra(PERIOD_EXTRA, period);
+        intent.putExtra(Reports.ORG_UNIT_ID, orgUnitId);
+        intent.putExtra(Reports.ORG_UNIT_LABEL, orgUnitLabel);
+        intent.putExtra(Reports.DATASET_ID, dataSetId);
+        intent.putExtra(Reports.DATASET_LABEL, dataSetLabel);
+        intent.putExtra(Reports.PERIOD, period);
+        intent.putExtra(Reports.PERIOD_LABEL, periodLabel);
         return intent;
     }
 
@@ -53,13 +53,19 @@ public class ReportEntryActivity extends ActionBarActivity
         Report report = new Report();
 
         if (extras != null) {
-            String orgUnitId = extras.getString(ORG_UNIT_ID_EXTRA);
-            String dataSetId = extras.getString(DATASET_ID_EXTRA);
-            String periodExtra = extras.getString(PERIOD_EXTRA);
+            String orgUnitId = extras.getString(Reports.ORG_UNIT_ID);
+            String orgUnitLabel = extras.getString(Reports.ORG_UNIT_LABEL);
+            String dataSetId = extras.getString(Reports.DATASET_ID);
+            String dataSetLabel = extras.getString(Reports.DATASET_LABEL);
+            String periodExtra = extras.getString(Reports.PERIOD);
+            String periodLabel = extras.getString(Reports.PERIOD_LABEL);
 
             report.setOrgUnit(orgUnitId);
+            report.setOrgUnitLabel(orgUnitLabel);
             report.setDataSet(dataSetId);
+            report.setDataSetLabel(dataSetLabel);
             report.setPeriod(periodExtra);
+            report.setPeriodLabel(periodLabel);
         }
 
         return report;
@@ -122,51 +128,38 @@ public class ReportEntryActivity extends ActionBarActivity
     }
 
     @Override
-    public Loader<CursorHolder<List<DbRow<Group>>>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<DbRow<Group>>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             Report report = getReportFromBundle(args);
-            final String ORG_UNIT = Reports.ORG_UNIT_ID + " = " + "'" + report.getOrgUnit() + "'";
-            final String DATASET = Reports.DATASET_ID + " = " + "'" + report.getDataSet() + "'";
-            final String PERIOD = Reports.PERIOD + " = " + "'" + report.getPeriod() + "'";
-            final String SELECTION = ORG_UNIT + " AND " + DATASET + " AND " + PERIOD;
-            return new ReportLoader(this, Reports.buildUriWithGroups(),
-                    ReportGroupHandler.PROJECTION, SELECTION, null, null);
+            return CursorLoaderBuilder.forUri(Reports.buildUriWithGroups())
+                    .projection(ReportGroupHandler.PROJECTION)
+                    .selection(ReportHandler.REPORT_ID_SELECTION)
+                    .selectionArgs(new String[]{report.getOrgUnit(),
+                            report.getDataSet(), report.getPeriod()})
+                    .transformation(new Transformer())
+                    .build(getBaseContext());
         }
         return null;
     }
 
     @Override
-    public void onLoadFinished(Loader<CursorHolder<List<DbRow<Group>>>> loader,
-                               CursorHolder<List<DbRow<Group>>> data) {
+    public void onLoadFinished(Loader<List<DbRow<Group>>> loader,
+                               List<DbRow<Group>> data) {
         if (loader != null && LOADER_ID == loader.getId() && data != null) {
-            mAdapter.swapData(data.getData());
+            mAdapter.swapData(data);
             mSlidingTabLayout.setViewPager(mViewPager);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<CursorHolder<List<DbRow<Group>>>> loader) {
+    public void onLoaderReset(Loader<List<DbRow<Group>>> loader) {
     }
 
-    static class ReportLoader extends AbsCursorLoader<List<DbRow<Group>>> {
-
-        public ReportLoader(Context context, Uri uri, String[] projection,
-                            String selection, String[] selectionArgs, String sortOrder) {
-            super(context, uri, projection, selection, selectionArgs, sortOrder);
-        }
+    private static class Transformer implements Transformation<List<DbRow<Group>>> {
 
         @Override
-        protected List<DbRow<Group>> readDataFromCursor(Cursor cursor) {
-            List<DbRow<Group>> dbItems = new ArrayList<>();
-            if (cursor != null && cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                do {
-                    DbRow<Group> group = ReportGroupHandler.fromCursor(cursor);
-                    dbItems.add(group);
-                } while (cursor.moveToNext());
-            }
-
-            return dbItems;
+        public List<DbRow<Group>> transform(Context context, Cursor cursor) {
+            return ReportGroupHandler.query(cursor, false);
         }
     }
 }

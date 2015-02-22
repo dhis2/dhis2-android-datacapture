@@ -5,8 +5,8 @@ import android.content.Context;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardSyncEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDatasetSyncEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.OptionSetHandler;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.OrganizationUnitHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.OptionSetHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.OrganizationUnitHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.managers.DHISManager;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
@@ -78,6 +78,7 @@ public final class DatasetSyncProcessor extends AbsProcessor<DashboardSyncEvent,
             List<DataSet> fullDataSets = new ArrayList<>();
             for (DataSet shortDataSet: unit.getDataSets()) {
                 DataSet fullDataSet = dataSets.get(shortDataSet.getId());
+                fullDataSet.setId(shortDataSet.getId());
                 fullDataSets.add(fullDataSet);
             }
             unit.setDataSets(fullDataSets);

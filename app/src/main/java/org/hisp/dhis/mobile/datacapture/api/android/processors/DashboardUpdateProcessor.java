@@ -9,7 +9,7 @@ import android.net.Uri;
 import org.hisp.dhis.mobile.datacapture.api.APIException;
 import org.hisp.dhis.mobile.datacapture.api.android.events.DashboardUpdateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnDashboardUpdateEvent;
-import org.hisp.dhis.mobile.datacapture.api.android.handlers.DashboardHandler;
+import org.hisp.dhis.mobile.datacapture.io.handlers.DashboardHandler;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ResponseHolder;
 import org.hisp.dhis.mobile.datacapture.api.android.models.State;

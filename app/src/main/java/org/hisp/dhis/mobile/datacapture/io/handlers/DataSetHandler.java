@@ -1,4 +1,4 @@
-package org.hisp.dhis.mobile.datacapture.api.android.handlers;
+package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
@@ -8,13 +8,15 @@ import android.database.Cursor;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSetOptions;
+import org.hisp.dhis.mobile.datacapture.api.models.Field;
+import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.DataSets;
 import org.hisp.dhis.mobile.datacapture.utils.DbUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hisp.dhis.mobile.datacapture.utils.Utils.isNull;
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
 
 public class DataSetHandler {
     public static final String[] PROJECTION = new String[]{
@@ -29,6 +31,7 @@ public class DataSetHandler {
 
     public static final String SELECTION_BY_ORG_UNIT = DataSets.ORGANIZATION_UNIT_DB_ID +
             " = " + " ? ";
+    public static final String DATASET_SELECTION = DataSets.ID + " = " + " ? ";
 
     private static final int DB_ID = 0;
     private static final int ID = 1;
@@ -98,6 +101,29 @@ public class DataSetHandler {
         return query(cursor, true);
     }
 
+    public DbRow<DataSet> queryById(String dataSetId, boolean readRelatedData) {
+        Cursor cursor = mContext.getContentResolver().query(
+                DataSets.CONTENT_URI, PROJECTION, DATASET_SELECTION,
+                new String[]{dataSetId}, null
+        );
+
+        DbRow<DataSet> dataSet = querySingleItem(cursor, true);
+        if (readRelatedData) {
+            GroupHandler groupHandler = new GroupHandler(mContext);
+            FieldHandler fieldHandler = new FieldHandler(mContext);
+
+            List<DbRow<Group>> groupRows = groupHandler.query(dataSet.getId());
+            for (DbRow<Group> group : groupRows) {
+                List<DbRow<Field>> fieldRows = fieldHandler.query(group.getId());
+                group.getItem().setFields(DbUtils.stripRows(fieldRows));
+            }
+            List<Group> groups = DbUtils.stripRows(groupRows);
+            dataSet.getItem().setGroups(groups);
+        }
+
+        return dataSet;
+    }
+
     public static List<DbRow<DataSet>> query(Cursor cursor, boolean closeCursor) {
         List<DbRow<DataSet>> rows = new ArrayList<>();
 
@@ -105,9 +131,8 @@ public class DataSetHandler {
             cursor.moveToFirst();
 
             do {
-                DbRow<DataSet> row = fromCursor(cursor);
-                rows.add(row);
-            } while(cursor.moveToNext());
+                rows.add(fromCursor(cursor));
+            } while (cursor.moveToNext());
 
             if (closeCursor) {
                 cursor.close();
@@ -135,7 +160,7 @@ public class DataSetHandler {
         isNull(ops, "List<ContentProviderOperation> must not be null");
 
         if (dataSets != null && dataSets.size() > 0) {
-            for (DataSet dataSet: dataSets) {
+            for (DataSet dataSet : dataSets) {
                 ops.add(ContentProviderOperation
                         .newInsert(DataSets.CONTENT_URI)
                         .withValueBackReference(
