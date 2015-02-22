@@ -161,7 +161,7 @@ public final class ReportHandler {
         ops.add(ContentProviderOperation
                 .newInsert(Reports.CONTENT_URI)
                 .withValues(toContentValues(report))
-                .withValue(Reports.STATE, ReportState.PENDING.toString())
+                .withValue(Reports.STATE, ReportState.OFFLINE.toString())
                 .build());
 
         int index = ops.size() - 1;
