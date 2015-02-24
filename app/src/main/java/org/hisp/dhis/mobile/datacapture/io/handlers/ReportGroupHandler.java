@@ -6,8 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
+import org.hisp.dhis.mobile.datacapture.api.models.Field;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
+import org.hisp.dhis.mobile.datacapture.utils.DbUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,9 @@ public final class ReportGroupHandler {
             ReportGroups.TABLE_NAME + "." + ReportGroups.LABEL,
             ReportGroups.TABLE_NAME + "." + ReportGroups.DATA_ELEMENT_COUNT,
     };
+
+    public static final String SELECTION_ID_REPORT =
+            ReportGroups.REPORT_DB_ID + " = " + " ? ";
 
     private static final int DB_ID = 0;
     private static final int LABEL = 1;
@@ -49,14 +54,26 @@ public final class ReportGroupHandler {
         return holder;
     }
 
+    public List<DbRow<Group>> query(int reportId) {
+        ReportFieldHandler fieldHandler = new ReportFieldHandler(mContext);
+        String[] selectionArgs = new String[]{reportId + ""};
+        List<DbRow<Group>> groupRows = query(SELECTION_ID_REPORT, selectionArgs);
+        for (DbRow<Group> row : groupRows) {
+            List<Field> fields = DbUtils.stripRows(
+                    fieldHandler.query(row.getId()));
+            row.getItem().setFields(fields);
+        }
+        return groupRows;
+    }
+
     public List<DbRow<Group>> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
                 ReportGroups.CONTENT_URI, PROJECTION, selection, selectionArgs, null
         );
-        return query(cursor, true);
+        return map(cursor, true);
     }
 
-    public static List<DbRow<Group>> query(Cursor cursor, boolean closeCursor) {
+    public static List<DbRow<Group>> map(Cursor cursor, boolean closeCursor) {
         List<DbRow<Group>> groups = new ArrayList<>();
 
         if (cursor != null && cursor.getCount() > 0) {

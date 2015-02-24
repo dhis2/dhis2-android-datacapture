@@ -2,6 +2,7 @@ package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
@@ -24,7 +25,8 @@ public final class ReportFieldHandler {
             ReportFields.VALUE
     };
 
-    public static final String SELECTION = ReportFields.GROUP_DB_ID + " = " + " ? ";
+    public static final String SELECTION =
+            ReportFields.GROUP_DB_ID + " = " + " ? ";
 
     private static final int DB_ID = 0;
     private static final int LABEL = 1;
@@ -34,7 +36,10 @@ public final class ReportFieldHandler {
     private static final int OPTION_SET = 5;
     private static final int VALUE = 6;
 
-    private ReportFieldHandler() {
+    private Context mContext;
+
+    public ReportFieldHandler(Context context) {
+        mContext = isNull(context, "Context object must not be null");
     }
 
     private static ContentValues toContentValues(Field field) {
@@ -94,5 +99,13 @@ public final class ReportFieldHandler {
                         .build());
             }
         }
+    }
+
+    public List<DbRow<Field>> query(int groupId) {
+        String[] selectionArgs = new String[] { groupId + "" };
+        Cursor cursor = mContext.getContentResolver().query(
+                ReportFields.CONTENT_URI, PROJECTION, SELECTION, selectionArgs, null
+        );
+        return map(cursor, true);
     }
 }

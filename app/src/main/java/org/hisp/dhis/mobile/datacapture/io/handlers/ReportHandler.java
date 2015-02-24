@@ -1,18 +1,23 @@
 package org.hisp.dhis.mobile.datacapture.io.handlers;
 
 import android.content.ContentProviderOperation;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.RemoteException;
 
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.android.models.ReportState;
 import org.hisp.dhis.mobile.datacapture.api.models.DataSet;
+import org.hisp.dhis.mobile.datacapture.api.models.Field;
+import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
 import org.hisp.dhis.mobile.datacapture.io.DBContract;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
+import org.hisp.dhis.mobile.datacapture.utils.DbUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,16 +88,30 @@ public final class ReportHandler {
         return holder;
     }
 
-    public DbRow<Report> query(String orgUnitId, String dataSetId, String period) {
+    public DbRow<Report> query(String orgUnitId, String dataSetId,
+                               String period, boolean withRelated) {
         String[] selectionArgs = new String[]{orgUnitId, dataSetId, period};
         Cursor cursor = mContext.getContentResolver().query(
                 Reports.CONTENT_URI, PROJECTION, REPORT_ID_SELECTION, selectionArgs, null
         );
-        return mapSingleItem(cursor, true);
+
+        DbRow<Report> row = mapSingleItem(cursor, true);
+        if (withRelated) {
+            ReportGroupHandler groupHandler =
+                    new ReportGroupHandler(mContext);
+            List<Group> groups = DbUtils.stripRows(
+                    groupHandler.query(row.getId()));
+            List<Field> fields = new ArrayList<>();
+            for (Group group : groups) {
+                fields.addAll(group.getFields());
+            }
+            row.getItem().setDataValues(fields);
+        }
+        return row;
     }
 
     public List<DbRow<Report>> query(ReportState state) {
-        String[] selectionArgs = new String[] { state.toString() };
+        String[] selectionArgs = new String[]{state.toString()};
         Cursor cursor = mContext.getContentResolver().query(
                 Reports.CONTENT_URI, PROJECTION, REPORT_STATE_SELECTION, selectionArgs, null
         );
@@ -136,6 +155,28 @@ public final class ReportHandler {
             }
         }
         return row;
+    }
+
+    public void update(DbRow<Report> report, ReportState state) {
+        isNull(report, "Report object must not be null");
+        isNull(state, "State must mot be null");
+
+        Uri uri = ContentUris.withAppendedId(
+                Reports.CONTENT_URI, report.getId());
+        ContentValues values = new ContentValues();
+        values.put(Reports.STATE, state.toString());
+
+        mContext.getContentResolver().update(uri, values, null, null);
+    }
+
+    public void delete(Report report) {
+        isNull(report, "Report object must not be null");
+
+        mContext.getContentResolver().delete(Reports.CONTENT_URI,
+                REPORT_ID_SELECTION, new String[]{
+                        report.getOrgUnit(), report.getDataSet(), report.getPeriod()
+                }
+        );
     }
 
     public void insert(Report report, DataSet dataSet) {

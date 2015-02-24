@@ -8,11 +8,18 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+
+import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.mobile.datacapture.R;
-import org.hisp.dhis.mobile.datacapture.api.android.events.CreateReportEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.OnReportCreateEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.ReportCreateEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.ReportDeleteEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.ReportPostEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Group;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
@@ -27,13 +34,21 @@ import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
 
 import java.util.List;
 
-public class ReportEntryActivity extends ActionBarActivity
-        implements LoaderCallbacks<List<DbRow<Group>>> {
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+
+public class ReportEntryActivity extends BaseActivity
+        implements LoaderCallbacks<List<DbRow<Group>>>, View.OnClickListener {
     private static final int LOADER_ID = 89254134;
+    private static final String IS_PROGRESS_BAR_VISIBLE = "extra:isProgressBarVisible";
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private ReportGroupAdapter mAdapter;
+
+    private Button mDeleteButton;
+    private Button mPostButton;
+
+    private SmoothProgressBar mProgressBar;
 
     public static Intent newIntent(FragmentActivity activity,
                                    String orgUnitId, String orgUnitLabel,
@@ -76,13 +91,23 @@ public class ReportEntryActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_entry);
 
-        // Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar);
-        // setSupportActionBar(actionBar);
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // getSupportActionBar().setHomeButtonEnabled(true);
+        Toolbar actionBar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(actionBar);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mProgressBar = (SmoothProgressBar) findViewById(R.id.progress_bar);
+        mDeleteButton = (Button) findViewById(R.id.delete_report);
+        mPostButton = (Button) findViewById(R.id.post_report);
+
+        mProgressBar.setVisibility(View.GONE);
+        mDeleteButton.setVisibility(View.GONE);
+        mPostButton.setVisibility(View.GONE);
+
+        mDeleteButton.setOnClickListener(this);
+        mPostButton.setOnClickListener(this);
 
         mAdapter = new ReportGroupAdapter(getSupportFragmentManager());
 
@@ -111,10 +136,26 @@ public class ReportEntryActivity extends ActionBarActivity
         super.onPostCreate(savedInstanceState);
         getSupportLoaderManager().initLoader(LOADER_ID, getIntent().getExtras(), this);
         if (savedInstanceState == null) {
-            CreateReportEvent event = new CreateReportEvent();
+            ReportCreateEvent event = new ReportCreateEvent();
             event.setReport(getReportFromBundle(getIntent().getExtras()));
             BusProvider.getInstance().post(event);
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            boolean isProgressBarVisible = savedInstanceState
+                    .getBoolean(IS_PROGRESS_BAR_VISIBLE);
+            if (isProgressBarVisible) {
+                mProgressBar.setVisibility(View.VISIBLE);
+            } else {
+                mProgressBar.setVisibility(View.GONE);
+            }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean(IS_PROGRESS_BAR_VISIBLE,
+                mProgressBar.getVisibility() == View.VISIBLE);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -155,11 +196,38 @@ public class ReportEntryActivity extends ActionBarActivity
     public void onLoaderReset(Loader<List<DbRow<Group>>> loader) {
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.delete_report: {
+                ReportDeleteEvent event = new ReportDeleteEvent();
+                event.setReport(getReportFromBundle(getIntent().getExtras()));
+                BusProvider.getInstance().post(event);
+                finish();
+                break;
+            }
+            case R.id.post_report: {
+                ReportPostEvent event = new ReportPostEvent();
+                event.setReport(getReportFromBundle(getIntent().getExtras()));
+                BusProvider.getInstance().post(event);
+                finish();
+                break;
+            }
+        }
+    }
+
+    @Subscribe
+    public void onReportCreateEvent(OnReportCreateEvent event) {
+        mProgressBar.setVisibility(View.GONE);
+        mDeleteButton.setVisibility(View.VISIBLE);
+        mPostButton.setVisibility(View.VISIBLE);
+    }
+
     private static class Transformer implements Transformation<List<DbRow<Group>>> {
 
         @Override
         public List<DbRow<Group>> transform(Context context, Cursor cursor) {
-            return ReportGroupHandler.query(cursor, false);
+            return ReportGroupHandler.map(cursor, false);
         }
     }
 }

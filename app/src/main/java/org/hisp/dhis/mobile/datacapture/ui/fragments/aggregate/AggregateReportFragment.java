@@ -245,11 +245,11 @@ public class AggregateReportFragment extends BaseFragment
                                Boolean hasUnits) {
         if (booleanLoader != null &&
                 booleanLoader.getId() == LOADER_ID) {
+            mOrgUnitButton.setEnabled(hasUnits);
             if (!hasUnits) {
                 return;
             }
 
-            mOrgUnitButton.setEnabled(true);
             AggregateReportFragmentState backedUpState = new AggregateReportFragmentState(mState);
             if (!backedUpState.isOrgUnitEmpty()) {
                 onUnitSelected(
