@@ -61,6 +61,12 @@ public class ReportCreateProcessor extends AbsProcessor<ReportCreateEvent, OnRep
 
 
     private DataSet getReportFromServer() throws APIException {
+        try {
+            Thread.sleep(7000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         final Report info = getEvent().getReport();
         final ResponseHolder<DataSet> holder = new ResponseHolder<>();
 

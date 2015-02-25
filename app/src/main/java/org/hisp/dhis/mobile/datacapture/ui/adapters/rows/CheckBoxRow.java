@@ -12,9 +12,11 @@ import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 import org.hisp.dhis.mobile.datacapture.api.models.Field;
 
+import static android.text.TextUtils.isEmpty;
+
 public class CheckBoxRow implements Row {
     private static final String TRUE = "true";
-    private static final String EMPTY_FIELD = "";
+    private static final String EMPTY_FIELD = null;
 
     private DbRow<Field> mField;
     private OnFieldValueSetListener mListener;
@@ -80,12 +82,17 @@ public class CheckBoxRow implements Row {
 
         private void setValue(String newValue) {
             String currentValue = field.getItem().getValue();
-            if (newValue != null && !newValue.equals(currentValue)) {
+            if (!isValueSame(currentValue, newValue)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
                     listener.onFieldValueSet(field.getId(), newValue);
                 }
             }
+        }
+
+        public static boolean isValueSame(String oldValue,
+                                          String newValue) {
+            return (oldValue == null ? newValue == null : oldValue.equals(newValue));
         }
     }
 
@@ -110,10 +117,14 @@ public class CheckBoxRow implements Row {
             checkBox.setOnCheckedChangeListener(listener);
 
             String value = field.getItem().getValue();
-            if (TRUE.equals(value)) {
+            if (TRUE.equalsIgnoreCase(value)) {
                 checkBox.setChecked(true);
-            } else if (EMPTY_FIELD.equals(value)) {
+                return;
+            }
+
+            if (isEmpty(value)) {
                 checkBox.setChecked(false);
+                return;
             }
         }
     }

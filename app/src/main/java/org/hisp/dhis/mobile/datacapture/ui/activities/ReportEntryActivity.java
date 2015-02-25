@@ -102,10 +102,6 @@ public class ReportEntryActivity extends BaseActivity
         mDeleteButton = (Button) findViewById(R.id.delete_report);
         mPostButton = (Button) findViewById(R.id.post_report);
 
-        mProgressBar.setVisibility(View.GONE);
-        mDeleteButton.setVisibility(View.GONE);
-        mPostButton.setVisibility(View.GONE);
-
         mDeleteButton.setOnClickListener(this);
         mPostButton.setOnClickListener(this);
 
@@ -139,14 +135,14 @@ public class ReportEntryActivity extends BaseActivity
             ReportCreateEvent event = new ReportCreateEvent();
             event.setReport(getReportFromBundle(getIntent().getExtras()));
             BusProvider.getInstance().post(event);
-            mProgressBar.setVisibility(View.VISIBLE);
+            showProgressBar();
         } else {
             boolean isProgressBarVisible = savedInstanceState
                     .getBoolean(IS_PROGRESS_BAR_VISIBLE);
             if (isProgressBarVisible) {
-                mProgressBar.setVisibility(View.VISIBLE);
+                showProgressBar();
             } else {
-                mProgressBar.setVisibility(View.GONE);
+                hideProgressBar();
             }
         }
     }
@@ -218,6 +214,16 @@ public class ReportEntryActivity extends BaseActivity
 
     @Subscribe
     public void onReportCreateEvent(OnReportCreateEvent event) {
+        hideProgressBar();
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        mDeleteButton.setVisibility(View.GONE);
+        mPostButton.setVisibility(View.GONE);
+    }
+
+    private void hideProgressBar() {
         mProgressBar.setVisibility(View.GONE);
         mDeleteButton.setVisibility(View.VISIBLE);
         mPostButton.setVisibility(View.VISIBLE);
