@@ -33,8 +33,11 @@ import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.Row;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.RowTypes;
 import org.hisp.dhis.mobile.datacapture.ui.adapters.rows.ValueEntryViewRow;
 import org.hisp.dhis.mobile.datacapture.utils.BusProvider;
+import org.hisp.dhis.mobile.datacapture.utils.DbUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ReportGroupFragment extends Fragment
@@ -107,6 +110,7 @@ public class ReportGroupFragment extends Fragment
             OnValueChangedListener listener = new OnValueChangedListener(context);
             OptionSetHandler optionSetHandler = new OptionSetHandler(context);
 
+            Collections.sort(fields, new FieldComparator());
             for (DbRow<Field> dbItem : fields) {
                 Field field = dbItem.getItem();
 
@@ -148,12 +152,30 @@ public class ReportGroupFragment extends Fragment
         }
 
         private OptionSet readOptionSet(OptionSetHandler handler, String optionSetId) {
-            DbRow<OptionSet> optionSetDbRow = handler.query(optionSetId, true);
-            OptionSet optionSet = null;
-            if (optionSetDbRow != null) {
-                optionSet = optionSetDbRow.getItem();
+            return DbUtils.stripRow(handler.query(optionSetId, true));
+        }
+    }
+
+    private static final class FieldComparator implements Comparator<DbRow<Field>> {
+
+        @Override
+        public int compare(DbRow<Field> first, DbRow<Field> second) {
+            if (first == null || second == null ||
+                    first.getItem() == null || second.getItem() == null) {
+                return 0;
             }
-            return optionSet;
+
+            String elementFirst = first.getItem().getDataElement();
+            String elementSecond = second.getItem().getDataElement();
+            if (equal(elementFirst, elementSecond)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+
+        private static boolean equal(String first, String second) {
+            return (first == null ? second == null : first.equals(second));
         }
     }
 

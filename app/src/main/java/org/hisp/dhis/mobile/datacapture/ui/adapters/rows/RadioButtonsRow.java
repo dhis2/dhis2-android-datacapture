@@ -4,8 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TextView;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
@@ -23,7 +23,7 @@ public class RadioButtonsRow implements Row {
     private final DbRow<Field> mField;
     private final RowTypes mType;
     private OnFieldValueSetListener mListener;
-    
+
     public RadioButtonsRow(DbRow<Field> field, RowTypes type) {
         if (!RowTypes.GENDER.equals(type) && !RowTypes.BOOLEAN.equals(type)) {
             throw new IllegalArgumentException("Unsupported row type");
@@ -37,7 +37,7 @@ public class RadioButtonsRow implements Row {
     public View getView(LayoutInflater inflater, View convertView, ViewGroup container) {
         View view;
         BooleanRowHolder holder;
-        
+
         if (convertView == null) {
             View root = inflater.inflate(
                     R.layout.listview_row_radio_buttons, container, false);
@@ -84,7 +84,7 @@ public class RadioButtonsRow implements Row {
     public int getViewType() {
         return mType.ordinal();
     }
-    
+
     private static class BooleanRowHolder {
         final TextView textLabel;
         final CompoundButton firstButton;
@@ -92,7 +92,7 @@ public class RadioButtonsRow implements Row {
         final CompoundButton thirdButton;
         final CheckedChangeListener listener;
         final RowTypes type;
-        
+
         public BooleanRowHolder(RowTypes type, TextView textLabel, CompoundButton firstButton,
                                 CompoundButton secondButton, CompoundButton thirdButton,
                                 CheckedChangeListener listener) {
@@ -199,7 +199,7 @@ public class RadioButtonsRow implements Row {
 
         private void setValue(String newValue) {
             String currentValue = field.getItem().getValue();
-            if (newValue != null && !newValue.equals(currentValue)) {
+            if (!newValue.equals(currentValue)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
                     listener.onFieldValueSet(field.getId(), newValue);
@@ -207,7 +207,7 @@ public class RadioButtonsRow implements Row {
             }
         }
     }
-    
+
 }
 
 

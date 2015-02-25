@@ -16,7 +16,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class CheckBoxRow implements Row {
     private static final String TRUE = "true";
-    private static final String EMPTY_FIELD = null;
+    private static final String EMPTY_FIELD = "";
 
     private DbRow<Field> mField;
     private OnFieldValueSetListener mListener;
@@ -82,17 +82,12 @@ public class CheckBoxRow implements Row {
 
         private void setValue(String newValue) {
             String currentValue = field.getItem().getValue();
-            if (!isValueSame(currentValue, newValue)) {
+            if (!newValue.equals(currentValue)) {
                 field.getItem().setValue(newValue);
                 if (listener != null) {
                     listener.onFieldValueSet(field.getId(), newValue);
                 }
             }
-        }
-
-        public static boolean isValueSame(String oldValue,
-                                          String newValue) {
-            return (oldValue == null ? newValue == null : oldValue.equals(newValue));
         }
     }
 

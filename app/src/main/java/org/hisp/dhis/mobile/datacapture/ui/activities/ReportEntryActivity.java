@@ -184,13 +184,18 @@ public class ReportEntryActivity extends BaseActivity
                                List<DbRow<Group>> data) {
         if (loader != null && LOADER_ID == loader.getId() && data != null) {
             mAdapter.swapData(data);
-            mSlidingTabLayout.setViewPager(mViewPager);
+
+            if (data.size() > 1) {
+                mSlidingTabLayout.setVisibility(View.VISIBLE);
+                mSlidingTabLayout.setViewPager(mViewPager);
+            } else {
+                mSlidingTabLayout.setVisibility(View.GONE);
+            }
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<DbRow<Group>>> loader) {
-    }
+    public void onLoaderReset(Loader<List<DbRow<Group>>> loader) { }
 
     @Override
     public void onClick(View view) {
