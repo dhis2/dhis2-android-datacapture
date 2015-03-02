@@ -24,6 +24,7 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.UserAccountFields;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -75,6 +76,9 @@ public class DBContentProvider extends ContentProvider {
     private static final int DATASET_ID = 1901;
     //private static final int DATASET_ID_WITH_GROUPS = 1902;
 
+    private static final int USER_ACCOUNT_FIELDS = 2000;
+    private static final int USER_ACCOUNT_FIELD_ID = 2001;
+
     private static final UriMatcher URI_MATCHER = buildMatcher();
 
     private DBOpenHelper mDBHelper;
@@ -109,6 +113,8 @@ public class DBContentProvider extends ContentProvider {
         matcher.addURI(DBContract.AUTHORITY, OrganizationUnits.ORGANIZATION_UNITS_WITH_DATASETS, ORGANIZATION_UNITS_WITH_DATASETS);
         matcher.addURI(DBContract.AUTHORITY, DataSets.DATASETS, DATASETS);
         matcher.addURI(DBContract.AUTHORITY, DataSets.DATASET_ID, DATASET_ID);
+        matcher.addURI(DBContract.AUTHORITY, UserAccountFields.FIELDS, USER_ACCOUNT_FIELDS);
+        matcher.addURI(DBContract.AUTHORITY, UserAccountFields.FIELD_ID, USER_ACCOUNT_FIELD_ID);
 
         return matcher;
     }
@@ -175,6 +181,10 @@ public class DBContentProvider extends ContentProvider {
                 return DataSets.CONTENT_TYPE;
             case DATASET_ID:
                 return DataSets.CONTENT_ITEM_TYPE;
+            case USER_ACCOUNT_FIELDS:
+                return UserAccountFields.CONTENT_TYPE;
+            case USER_ACCOUNT_FIELD_ID:
+                return UserAccountFields.CONTENT_ITEM_TYPE;
 
             default:
                 throw new IllegalArgumentException("No corresponding Uri type was found");
@@ -321,6 +331,17 @@ public class DBContentProvider extends ContentProvider {
                         DataSets.DB_ID, projection, selection,
                         selectionArgs, sortOrder, id);
             }
+
+            case USER_ACCOUNT_FIELDS: {
+                return query(uri, UserAccountFields.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
+            }
+            case USER_ACCOUNT_FIELD_ID: {
+                String id = String.valueOf(parseId(uri));
+                return queryId(uri, UserAccountFields.TABLE_NAME,
+                        UserAccountFields.DB_ID, projection, selection,
+                        selectionArgs, sortOrder, id);
+            }
             /* case DATASET_ID_WITH_GROUPS: {
                 String table = DataSetColumns.TABLE_NAME +
                         " FULL OUTER JOIN " + GroupColumns.TABLE_NAME +
@@ -371,6 +392,9 @@ public class DBContentProvider extends ContentProvider {
                 return insert(OrganizationUnits.TABLE_NAME, values, uri);
             case DATASETS:
                 return insert(DataSets.TABLE_NAME, values, uri);
+            case USER_ACCOUNT_FIELDS: {
+                return insert(UserAccountFields.TABLE_NAME, values, uri);
+            }
             default:
                 throw new IllegalArgumentException("Unsupported URI for insertion: " + uri);
         }
@@ -463,6 +487,13 @@ public class DBContentProvider extends ContentProvider {
             case DATASET_ID: {
                 return deleteId(uri, DataSets.TABLE_NAME,
                         DataSets.DB_ID, selection, selectionArgs);
+            }
+            case USER_ACCOUNT_FIELDS: {
+                return delete(uri, UserAccountFields.TABLE_NAME, selection, selectionArgs);
+            }
+            case USER_ACCOUNT_FIELD_ID: {
+                return deleteId(uri, UserAccountFields.TABLE_NAME,
+                        UserAccountFields.DB_ID, selection, selectionArgs);
             }
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -569,6 +600,14 @@ public class DBContentProvider extends ContentProvider {
             case DATASET_ID: {
                 return updateId(uri, DataSets.TABLE_NAME,
                         DataSets.DB_ID, selection, selectionArgs, values);
+            }
+            case USER_ACCOUNT_FIELDS: {
+                return update(uri, UserAccountFields.TABLE_NAME,
+                        selection, selectionArgs, values);
+            }
+            case USER_ACCOUNT_FIELD_ID: {
+                return updateId(uri, UserAccountFields.TABLE_NAME,
+                        UserAccountFields.DB_ID, selection, selectionArgs, values);
             }
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);

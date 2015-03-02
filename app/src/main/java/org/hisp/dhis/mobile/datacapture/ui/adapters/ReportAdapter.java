@@ -10,53 +10,45 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.ReportState;
 import org.hisp.dhis.mobile.datacapture.ui.fragments.ReportsFragment;
 
 public class ReportAdapter extends FragmentPagerAdapter {
-    public static final int OFFLINE_REPORTS = 0;
+    public static final int DRAFT_REPORTS = 0;
     public static final int PENDING_REPORTS = 1;
-    public static final int SENT_REPORTS = 2;
+    private static final int TAB_COUNT = 2;
 
-    private static final String EMPTY_TITLE = "";
-    private final String offlineString;
+    private final String draftsString;
     private final String pendingString;
-    private final String sentString;
 
     public ReportAdapter(FragmentManager fm, Context context) {
         super(fm);
-        offlineString = context.getString(R.string.offline);
+        draftsString = context.getString(R.string.drafts);
         pendingString = context.getString(R.string.pending);
-        sentString = context.getString(R.string.sent);
     }
 
     @Override
     public Fragment getItem(int position) {
-        if (position == OFFLINE_REPORTS) {
-            return ReportsFragment.newInstance(ReportState.OFFLINE);
+        switch (position) {
+            case DRAFT_REPORTS:
+                return ReportsFragment.newInstance(ReportState.OFFLINE);
+            case PENDING_REPORTS:
+                return ReportsFragment.newInstance(ReportState.PENDING);
+            default:
+                throw new IllegalArgumentException("No such ReportFragment");
         }
-        if (position == PENDING_REPORTS) {
-            return ReportsFragment.newInstance(ReportState.PENDING);
-        }
-        if (position == SENT_REPORTS) {
-            return ReportsFragment.newInstance(ReportState.SENT);
-        }
-        return null;
     }
 
     @Override
     public int getCount() {
-        return ReportState.values().length;
+        return TAB_COUNT;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        if (position == OFFLINE_REPORTS) {
-            return offlineString;
+        switch (position) {
+            case DRAFT_REPORTS:
+                return draftsString;
+            case PENDING_REPORTS:
+                return pendingString;
+            default:
+                throw new IllegalArgumentException("No such ReportFragment");
         }
-        if (position == PENDING_REPORTS) {
-            return pendingString;
-        }
-        if (position == SENT_REPORTS) {
-            return sentString;
-        }
-
-        return EMPTY_TITLE;
     }
 }

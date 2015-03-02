@@ -179,6 +179,15 @@ public final class ReportHandler {
         );
     }
 
+    public void delete(DbRow<Report> report) {
+        isNull(report, "Report object must not be null");
+
+        Uri uri = ContentUris.withAppendedId(
+                Reports.CONTENT_URI, report.getId()
+        );
+        mContext.getContentResolver().delete(uri, null, null);
+    }
+
     public void insert(Report report, DataSet dataSet) {
         isNull(report, "Report object must not be null");
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();

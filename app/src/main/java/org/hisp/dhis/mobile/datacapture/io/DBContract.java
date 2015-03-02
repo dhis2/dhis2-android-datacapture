@@ -156,6 +156,15 @@ public class DBContract {
         public static final String DISPLAY_NAME = "displayName";
     }
 
+    static interface UserAccountFieldColumns {
+        public static final String TABLE_NAME = "userAccountFields";
+
+        public static final String DB_ID = BaseColumns._ID;
+        public static final String DATA_ELEMENT = "";
+        public static final String TYPE = "";
+        public static final String VALUE = "";
+    }
+
     static interface OptionColumns {
         public static final String TABLE_NAME = "optionTable";
         public static final String DB_ID = BaseColumns._ID;
@@ -351,6 +360,18 @@ public class DBContract {
                 "/org.hisp.dhis.mobile.datacapture.api.models.Option";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
                 "/org.hisp.dhis.mobile.datacapture.api.models.Option";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
+    }
+
+    public static class UserAccountFields implements UserAccountFieldColumns {
+        public static final String PATH = TABLE_NAME;
+        public static final String FIELDS = PATH;
+        public static final String FIELD_ID = PATH + "/#";
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Field";
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                "/org.hisp.dhis.mobile.datacapture.api.models.Field";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH);
     }
 }

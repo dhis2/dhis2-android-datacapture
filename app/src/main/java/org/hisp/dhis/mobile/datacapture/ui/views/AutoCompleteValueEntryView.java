@@ -1,15 +1,12 @@
 package org.hisp.dhis.mobile.datacapture.ui.views;
 
 import android.content.Context;
-import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -260,10 +257,10 @@ public class AutoCompleteValueEntryView extends LinearLayout implements View.OnC
             if (mOptions != null) {
                 if (EMPTY_FIELD.equals(value) || mOptions.contains(value)) {
                     mTextView.setText(value);
+                    hideEntryView();
                     if (mListener != null) {
                         mListener.onValueSet(value);
                     }
-                    hideEntryView();
                 } else {
                     mAutoComplete.setError("Incorrect value");
                 }

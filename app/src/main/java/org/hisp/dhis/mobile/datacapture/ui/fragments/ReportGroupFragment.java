@@ -76,6 +76,7 @@ public class ReportGroupFragment extends Fragment
     public Loader<List<Row>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             String groupId = args.getInt(ReportGroups.DB_ID) + "";
+            System.out.println("GroupID: " + groupId);
             return CursorLoaderBuilder.forUri(ReportFields.CONTENT_URI)
                     .projection(ReportFieldHandler.PROJECTION)
                     .selection(ReportFieldHandler.SELECTION)

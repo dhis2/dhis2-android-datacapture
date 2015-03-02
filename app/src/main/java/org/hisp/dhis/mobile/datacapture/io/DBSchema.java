@@ -12,6 +12,7 @@ import org.hisp.dhis.mobile.datacapture.io.DBContract.OrganizationUnits;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportFields;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.ReportGroups;
 import org.hisp.dhis.mobile.datacapture.io.DBContract.Reports;
+import org.hisp.dhis.mobile.datacapture.io.DBContract.UserAccountFields;
 
 public interface DBSchema {
 
@@ -89,10 +90,10 @@ public interface DBSchema {
             Reports.COMPLETE_DATE + " TEXT," +
             Reports.STATE + " TEXT NOT NULL," +
             " UNIQUE " + "(" +
-                    Reports.ORG_UNIT_ID + "," +
-                    Reports.DATASET_ID + "," +
-                    Reports.PERIOD +
-                ")" +
+            Reports.ORG_UNIT_ID + "," +
+            Reports.DATASET_ID + "," +
+            Reports.PERIOD +
+            ")" +
             ")";
 
     public static final String DROP_REPORTS_TABLE = "DROP TABLE IF EXISTS " + Reports.TABLE_NAME;
@@ -207,4 +208,13 @@ public interface DBSchema {
             " ON DELETE CASCADE " + ")";
 
     public static final String DROP_OPTION_TABLE = "DROP TABLE IF EXISTS " + Options.TABLE_NAME;
+
+    public static final String CREATE_USER_ACCOUNT_FIELDS_TABLE = "CREATE TABLE " + "(" + UserAccountFields.TABLE_NAME +
+            UserAccountFields.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+            UserAccountFields.DATA_ELEMENT + " TEXT NOT NULL," +
+            UserAccountFields.TYPE + " TEXT NOT NULL," +
+            UserAccountFields.VALUE + " TEXT," +
+            " UNIQUE " + "(" + UserAccountFields.DATA_ELEMENT + ")" + " ON CONFLICT REPLACE" + ")";
+
+    public static final String DROP_USER_ACCOUNT_FIELDS_TABLE = "DROP TABLE IF EXISTS " + UserAccountFields.TABLE_NAME;
 }

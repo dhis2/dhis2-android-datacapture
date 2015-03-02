@@ -33,7 +33,7 @@ public class ReportPostProcessor extends AbsProcessor<ReportPostEvent, OnReportP
         final DbRow<Report> dbReport = handler.query(
                 sReport.getOrgUnit(), sReport.getDataSet(), sReport.getPeriod(), true
         );
-        handler.update(dbReport, ReportState.PENDING);
+        handler.update(dbReport, ReportState.POSTING);
 
         final ResponseHolder<ImportSummaries> holder = new ResponseHolder<>();
         DHISManager.getInstance().postReport(new ApiRequestCallback<ImportSummaries>() {
@@ -43,9 +43,9 @@ public class ReportPostProcessor extends AbsProcessor<ReportPostEvent, OnReportP
                 holder.setItem(summaries);
                 ImportSummaries.DataValueCount count = summaries.getDataValueCount();
                 String output = "Imported: " + count.getImported() +
-                        "Updated: " + count.getUpdated() +
-                        "Deleted: " + count.getImported() +
-                        "Ignored: " + count.getIgnored();
+                        " Updated: " + count.getUpdated() +
+                        " Deleted: " + count.getImported() +
+                        " Ignored: " + count.getIgnored();
                 Log.d(TAG, output);
             }
 
@@ -57,10 +57,13 @@ public class ReportPostProcessor extends AbsProcessor<ReportPostEvent, OnReportP
         }, dbReport.getItem());
 
 
-        if (holder.getException() == null) {
-            handler.update(dbReport, ReportState.SENT);
+        if (holder.getException() != null) {
+            handler.update(dbReport, ReportState.PENDING);
+        } else {
+            handler.delete(dbReport);
         }
 
+        event.setResponseHolder(holder);
         return event;
     }
 }

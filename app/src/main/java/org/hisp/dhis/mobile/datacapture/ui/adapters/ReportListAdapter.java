@@ -6,16 +6,19 @@ import android.view.ViewGroup;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
+import org.hisp.dhis.mobile.datacapture.api.android.models.ReportState;
 import org.hisp.dhis.mobile.datacapture.api.models.Report;
-import org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButton;
+import org.hisp.dhis.mobile.datacapture.ui.views.CardDetailedButtonOverflow;
 
 import java.util.List;
 
 public class ReportListAdapter extends DBBaseAdapter<Report> {
     private OnItemClickListener mListener;
+    private ReportState mState;
 
     public ReportListAdapter(Context context) {
         super(context);
+        //mState = isNull(state, "ReportState object must not be null");
     }
 
     @Override
@@ -29,14 +32,16 @@ public class ReportListAdapter extends DBBaseAdapter<Report> {
                     getContext().getString(R.string.dataset),
                     getContext().getString(R.string.period)
             );
-            view = new CardDetailedButton(getContext());
-            view.setTag(holder);
+            CardDetailedButtonOverflow card = new CardDetailedButtonOverflow(getContext());
+            card.addMenuItem(12, 12, R.string.delete);
+            card.setTag(holder);
+            view = card;
         } else {
             view = convertView;
             holder = (StringHolder) view.getTag();
         }
 
-        handleView((CardDetailedButton) view, holder, getItem(position));
+        handleView((CardDetailedButtonOverflow) view, holder, getItem(position));
         return view;
     }
 
@@ -49,7 +54,7 @@ public class ReportListAdapter extends DBBaseAdapter<Report> {
         return report;
     }
 
-    private void handleView(final CardDetailedButton button,
+    private void handleView(final CardDetailedButtonOverflow button,
                             final StringHolder holder,
                             final DbRow<Report> dbRow) {
         if (dbRow != null && dbRow.getItem() != null) {

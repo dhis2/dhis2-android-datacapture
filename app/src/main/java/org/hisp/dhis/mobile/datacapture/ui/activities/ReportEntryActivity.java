@@ -17,6 +17,7 @@ import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.mobile.datacapture.R;
 import org.hisp.dhis.mobile.datacapture.api.android.events.OnReportCreateEvent;
+import org.hisp.dhis.mobile.datacapture.api.android.events.OnReportSaveEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.ReportCreateEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.ReportDeleteEvent;
 import org.hisp.dhis.mobile.datacapture.api.android.events.ReportPostEvent;
@@ -46,7 +47,7 @@ public class ReportEntryActivity extends BaseActivity
     private ReportGroupAdapter mAdapter;
 
     private Button mDeleteButton;
-    private Button mPostButton;
+    private Button mSendButton;
 
     private SmoothProgressBar mProgressBar;
 
@@ -100,10 +101,10 @@ public class ReportEntryActivity extends BaseActivity
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mProgressBar = (SmoothProgressBar) findViewById(R.id.progress_bar);
         mDeleteButton = (Button) findViewById(R.id.delete_report);
-        mPostButton = (Button) findViewById(R.id.post_report);
+        mSendButton = (Button) findViewById(R.id.send_report);
 
         mDeleteButton.setOnClickListener(this);
-        mPostButton.setOnClickListener(this);
+        mSendButton.setOnClickListener(this);
 
         mAdapter = new ReportGroupAdapter(getSupportFragmentManager());
 
@@ -155,6 +156,12 @@ public class ReportEntryActivity extends BaseActivity
     }
 
     @Override
+    public void onBackPressed() {
+        BusProvider.getInstance().post(new OnReportSaveEvent());
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -195,7 +202,8 @@ public class ReportEntryActivity extends BaseActivity
     }
 
     @Override
-    public void onLoaderReset(Loader<List<DbRow<Group>>> loader) { }
+    public void onLoaderReset(Loader<List<DbRow<Group>>> loader) {
+    }
 
     @Override
     public void onClick(View view) {
@@ -207,7 +215,7 @@ public class ReportEntryActivity extends BaseActivity
                 finish();
                 break;
             }
-            case R.id.post_report: {
+            case R.id.send_report: {
                 ReportPostEvent event = new ReportPostEvent();
                 event.setReport(getReportFromBundle(getIntent().getExtras()));
                 BusProvider.getInstance().post(event);
@@ -225,13 +233,13 @@ public class ReportEntryActivity extends BaseActivity
     private void showProgressBar() {
         mProgressBar.setVisibility(View.VISIBLE);
         mDeleteButton.setVisibility(View.GONE);
-        mPostButton.setVisibility(View.GONE);
+        mSendButton.setVisibility(View.GONE);
     }
 
     private void hideProgressBar() {
         mProgressBar.setVisibility(View.GONE);
         mDeleteButton.setVisibility(View.VISIBLE);
-        mPostButton.setVisibility(View.VISIBLE);
+        mSendButton.setVisibility(View.VISIBLE);
     }
 
     private static class Transformer implements Transformation<List<DbRow<Group>>> {

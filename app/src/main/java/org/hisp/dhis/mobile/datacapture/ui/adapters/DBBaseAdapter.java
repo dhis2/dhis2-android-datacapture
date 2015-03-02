@@ -8,14 +8,16 @@ import org.hisp.dhis.mobile.datacapture.api.android.models.DbRow;
 
 import java.util.List;
 
+import static org.hisp.dhis.mobile.datacapture.api.utils.Preconditions.isNull;
+
 public abstract class DBBaseAdapter<T> extends BaseAdapter {
     private List<DbRow<T>> mData;
     private LayoutInflater mInflater;
     private Context mContext;
 
     public DBBaseAdapter(Context context) {
+        mContext = isNull(context, "Context object must not be null");
         mInflater = LayoutInflater.from(context);
-        mContext = context;
     }
 
     @Override

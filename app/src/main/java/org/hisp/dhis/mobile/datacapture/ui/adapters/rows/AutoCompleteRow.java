@@ -112,9 +112,10 @@ public class AutoCompleteRow implements Row {
             listener.setField(field);
             listener.setListener(onFieldValueSetListener);
 
-            autoComplete.setText(mField.getItem().getValue());
-            autoComplete.swapData(mOptions);
+            System.out.println("updateViews(): " + mField.getItem().getValue());
             autoComplete.setOnValueSetListener(listener);
+            autoComplete.swapData(mOptions);
+            autoComplete.setText(mField.getItem().getValue());
             autoComplete.resetView();
         }
     }
