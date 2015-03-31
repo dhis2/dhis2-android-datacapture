@@ -209,7 +209,7 @@ public interface DBSchema {
 
     public static final String DROP_OPTION_TABLE = "DROP TABLE IF EXISTS " + Options.TABLE_NAME;
 
-    public static final String CREATE_USER_ACCOUNT_FIELDS_TABLE = "CREATE TABLE " + "(" + UserAccountFields.TABLE_NAME +
+    public static final String CREATE_USER_ACCOUNT_FIELDS_TABLE = "CREATE TABLE " + UserAccountFields.TABLE_NAME + "(" +
             UserAccountFields.DB_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             UserAccountFields.DATA_ELEMENT + " TEXT NOT NULL," +
             UserAccountFields.TYPE + " TEXT NOT NULL," +

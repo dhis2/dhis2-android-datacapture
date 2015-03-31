@@ -160,9 +160,9 @@ public class DBContract {
         public static final String TABLE_NAME = "userAccountFields";
 
         public static final String DB_ID = BaseColumns._ID;
-        public static final String DATA_ELEMENT = "";
-        public static final String TYPE = "";
-        public static final String VALUE = "";
+        public static final String DATA_ELEMENT = "dataElement";
+        public static final String TYPE = "type";
+        public static final String VALUE = "value";
     }
 
     static interface OptionColumns {

@@ -36,9 +36,9 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         setUpViews();
 
-        mServerUrl.setText("https://apps.dhis2.org/demo");
-        mUsername.setText("admin");
-        mPassword.setText("district");
+        mServerUrl.setText("https://dhis2.co/cmpe/");
+        mUsername.setText("Long");
+        mPassword.setText("Long1234");
     }
 
     @Override
