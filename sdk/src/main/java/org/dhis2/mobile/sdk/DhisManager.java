@@ -133,7 +133,8 @@ public class DhisManager extends NetworkManager {
     public void syncMetaData() throws APIException {
         IController<Object> metaDataController = new MetaDataController(
                 mContext, this, mOrgUnitHandler, mDataSetHandler,
-                mUnitDataSetHandler, mCategoryComboHandler, mSessionHandler
+                mUnitDataSetHandler, mCategoryComboHandler, null, null,
+                null, null, null, mSessionHandler
         );
         runController(metaDataController);
     }
