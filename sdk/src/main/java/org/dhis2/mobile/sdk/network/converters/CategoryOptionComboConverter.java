@@ -36,16 +36,19 @@ import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public final class CategoryOptionComboConverter extends AbsJsonConverter<String, List<CategoryOptionCombo>> {
+import javax.inject.Inject;
+
+public final class CategoryOptionComboConverter implements IJsonConverter<String, List<CategoryOptionCombo>> {
+    private Gson mGson;
 
     public CategoryOptionComboConverter(Gson gson) {
-        super(gson);
+        mGson = gson;
     }
 
     @Override
     public List<CategoryOptionCombo> deserialize(String source) {
         Type type = new TypeToken<List<CategoryOptionCombo>>() { }.getType();
-        return getGson().fromJson(source, type);
+        return mGson.fromJson(source, type);
     }
 
     @Override

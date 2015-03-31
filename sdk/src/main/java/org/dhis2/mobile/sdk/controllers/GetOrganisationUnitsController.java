@@ -32,7 +32,7 @@ import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.tasks.GetAssignedOrganisationUnits;
+import org.dhis2.mobile.sdk.network.tasks.GetAssignedOrganisationUnitsTask;
 import org.dhis2.mobile.sdk.network.tasks.GetOrganisationUnitsTask;
 import org.dhis2.mobile.sdk.persistence.handlers.OrganisationUnitHandler;
 import org.dhis2.mobile.sdk.persistence.handlers.UnitDataSetHandler;
@@ -109,7 +109,7 @@ public final class GetOrganisationUnitsController implements IController<List<Or
     }
 
     private Map<String, OrganisationUnit> getNewBaseOrganisationUnits() throws APIException {
-        List<OrganisationUnit> units = (new GetAssignedOrganisationUnits(
+        List<OrganisationUnit> units = (new GetAssignedOrganisationUnitsTask(
                 mDhisManager, mSession.getServerUri(), mSession.getCredentials()
         )).run();
 

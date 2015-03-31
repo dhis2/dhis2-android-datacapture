@@ -40,11 +40,15 @@ import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public final class OrgUnitsConverter extends AbsJsonConverter<String, List<OrganisationUnit>> {
+import javax.inject.Inject;
+
+public final class OrgUnitsConverter implements IJsonConverter<String, List<OrganisationUnit>> {
     private static final String ORGANISATION_UNITS = "organisationUnits";
 
+    private final Gson mGson;
+
     public OrgUnitsConverter(Gson gson) {
-        super(gson);
+        mGson = gson;
     }
 
     @Override
@@ -52,7 +56,7 @@ public final class OrgUnitsConverter extends AbsJsonConverter<String, List<Organ
         JsonObject jObject = (new JsonParser()).parse(source).getAsJsonObject();
         JsonArray jOrgUnits = jObject.getAsJsonArray(ORGANISATION_UNITS);
         Type type = new TypeToken<List<OrganisationUnit>>() { }.getType();
-        return getGson().fromJson(jOrgUnits, type);
+        return mGson.fromJson(jOrgUnits, type);
     }
 
     @Override

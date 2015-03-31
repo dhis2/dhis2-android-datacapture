@@ -39,11 +39,15 @@ import org.dhis2.mobile.sdk.entities.DataSet;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public final class DataSetsConverter extends AbsJsonConverter<String, List<DataSet>> {
+import javax.inject.Inject;
+
+public final class DataSetsConverter implements IJsonConverter<String, List<DataSet>> {
     private static final String DATA_SETS = "dataSets";
 
+    private final Gson mGson;
+
     public DataSetsConverter(Gson gson) {
-        super(gson);
+        mGson = gson;
     }
 
     @Override
@@ -51,7 +55,7 @@ public final class DataSetsConverter extends AbsJsonConverter<String, List<DataS
         JsonObject jObject = (new JsonParser()).parse(source).getAsJsonObject();
         JsonArray jDataSets = jObject.getAsJsonArray(DATA_SETS);
         Type type = new TypeToken<List<DataSet>>() { }.getType();
-        return getGson().fromJson(jDataSets, type);
+        return mGson.fromJson(jDataSets, type);
     }
 
     @Override

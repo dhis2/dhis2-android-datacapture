@@ -39,7 +39,8 @@ import org.dhis2.mobile.sdk.network.http.RestMethod;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 
 public final class HttpManager implements IHttpManager {
@@ -48,14 +49,11 @@ public final class HttpManager implements IHttpManager {
     private static final String TEXT_TYPE = "text/plain";
     private static final MediaType TEXT = MediaType.parse(TEXT_TYPE + ";" + "charset=utf-8");
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final long TIME_OUT = 1500;
 
-    private OkHttpClient mOkClient;
+    private final OkHttpClient mOkClient;
 
-    public HttpManager() {
-        mOkClient = new OkHttpClient();
-        mOkClient.setFollowSslRedirects(true);
-        mOkClient.setConnectTimeout(TIME_OUT, TimeUnit.MILLISECONDS);
+    public HttpManager(OkHttpClient okHttpClient) {
+        mOkClient = okHttpClient;
     }
 
     private static com.squareup.okhttp.Request buildOkRequest(Request request) {
@@ -138,7 +136,6 @@ public final class HttpManager implements IHttpManager {
     public Response request(Request request) throws IOException {
         com.squareup.okhttp.Request okRequest = buildOkRequest(request);
         com.squareup.okhttp.Response okResponse = mOkClient.newCall(okRequest).execute();
-
         return buildResponse(okResponse);
     }
 }

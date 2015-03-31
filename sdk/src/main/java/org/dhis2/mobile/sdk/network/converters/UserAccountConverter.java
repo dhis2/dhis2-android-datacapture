@@ -32,19 +32,22 @@ import com.google.gson.Gson;
 
 import org.dhis2.mobile.sdk.entities.UserAccount;
 
-public class UserAccountConverter extends AbsJsonConverter<UserAccount, UserAccount> {
+import javax.inject.Inject;
+
+public class UserAccountConverter implements IJsonConverter<UserAccount, UserAccount> {
+    private final Gson mGson;
 
     public UserAccountConverter(Gson gson) {
-        super(gson);
+        mGson = gson;
     }
 
     @Override
     public UserAccount deserialize(String source) {
-        return getGson().fromJson(source, UserAccount.class);
+        return mGson.fromJson(source, UserAccount.class);
     }
 
     @Override
     public String serialize(UserAccount object) {
-        return getGson().toJson(object, UserAccount.class);
+        return mGson.toJson(object, UserAccount.class);
     }
 }

@@ -39,6 +39,7 @@ import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 public final class ApiRequest<I, T> {
     private static final String TAG = ApiRequest.class.getSimpleName();
+
     private final Request mRequest;
     private final IHttpManager mHttpManager;
     private final ILogManager mLogManager;

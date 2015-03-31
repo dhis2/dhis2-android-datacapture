@@ -32,20 +32,28 @@ import android.net.Uri;
 
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
+import org.dhis2.mobile.sdk.network.converters.IJsonConverter;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.managers.INetworkManager;
+import org.dhis2.mobile.sdk.network.managers.IBase64Manager;
+import org.dhis2.mobile.sdk.network.managers.IHttpManager;
+import org.dhis2.mobile.sdk.network.managers.ILogManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetAssignedOrganisationUnits implements ITask<List<OrganisationUnit>> {
+import javax.inject.Inject;
+
+public final class GetAssignedOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
     private final ApiRequest<String, List<OrganisationUnit>> mRequest;
 
-    public GetAssignedOrganisationUnits(INetworkManager manager,
-                                        Uri serverUri, Credentials credentials) {
-        String base64Credentials = manager.getBase64Manager()
+    @Inject
+    public GetAssignedOrganisationUnitsTask(IBase64Manager base64Manager,
+                                            IHttpManager httpManager, ILogManager logManager,
+                                            IJsonConverter<String, List<OrganisationUnit>> converter,
+                                            Uri serverUri, Credentials credentials) {
+        String base64Credentials = base64Manager
                 .toBase64(credentials);
         String url = serverUri.buildUpon()
                 .appendEncodedPath("api/me/")
@@ -56,15 +64,13 @@ public final class GetAssignedOrganisationUnits implements ITask<List<Organisati
                 .header("Accept", "application/json")
                 .build();
 
-        mRequest = new ApiRequest<>(
-                request, manager.getHttpManager(), manager.getLogManager(),
-                manager.getJsonManager().getOrgUnitsConverter()
-        );
+        mRequest = new ApiRequest<>(request, httpManager,
+                logManager, converter);
     }
 
     private static String buildQueryParams() {
         return "organisationUnits" + "[" +
-                    "id,created,lastUpdated,name,displayName,level" +
+                "id,created,lastUpdated,name,displayName,level" +
                 "]";
     }
 
