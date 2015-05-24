@@ -1,4 +1,2 @@
 # dhis2-android-datacapture
-Data capture for DHIS 2
-
-App for capture of routine data.
+Android application for DHIS 2 for capture and validation of routine data.
