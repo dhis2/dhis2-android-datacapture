@@ -2,7 +2,8 @@
 <resources>
 
     <!-- START general application resources -->
-    <string name="app_name">DHIS2</string>
+    <string name="data_capture">Data Capture</string>
+    <string name="app_name">DHIS2 Data Capture</string>
     <string name="title_activity_launcher">LauncherActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_menu">MenuActivity</string>

@@ -40,8 +40,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 
 public final class HttpManager implements IHttpManager {
     private static final String JSON_TYPE = "application/json";

@@ -98,7 +98,7 @@ public final class DbContract {
     }
 
     public static interface ComboCategoriesColumns {
-        public static final String TABLE_NAME = "";
+        public static final String TABLE_NAME = "comboCategoriesTable";
         public static final String ID = BaseColumns._ID;
         public static final String CATEGORY_COMBO_ID = "categoryComboId";
         public static final String CATEGORY_ID = "categoryId";
@@ -114,7 +114,7 @@ public final class DbContract {
     }
 
     public static interface CategoryToOptionsColumns {
-        public static final String TABLE_NAME = "";
+        public static final String TABLE_NAME = "categoryToOptionsTable";
         public static final String ID = BaseColumns._ID;
         public static final String CATEGORY_ID = "categoryId";
         public static final String CATEGORY_OPTION_ID = "categoryOptionId";

@@ -88,7 +88,7 @@ public class MenuActivity extends BaseActivity {
         ButterKnife.inject(this);
 
         setSupportActionBar(mToolbar);
-        setTitle(R.string.app_name);
+        setTitle(R.string.data_capture);
 
         List<NavigationItem> items = buildNavigationItems();
         mNavigationListView.setAdapter(new NavigationAdapter(items));

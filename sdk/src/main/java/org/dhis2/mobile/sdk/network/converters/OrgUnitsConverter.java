@@ -30,7 +30,6 @@ package org.dhis2.mobile.sdk.network.converters;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -39,8 +38,6 @@ import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 
 import java.lang.reflect.Type;
 import java.util.List;
-
-import javax.inject.Inject;
 
 public final class OrgUnitsConverter implements IJsonConverter<String, List<OrganisationUnit>> {
     private static final String ORGANISATION_UNITS = "organisationUnits";
@@ -55,7 +52,7 @@ public final class OrgUnitsConverter implements IJsonConverter<String, List<Orga
     public List<OrganisationUnit> deserialize(String source) {
         JsonObject jObject = (new JsonParser()).parse(source).getAsJsonObject();
         JsonArray jOrgUnits = jObject.getAsJsonArray(ORGANISATION_UNITS);
-        Type type = new TypeToken<List<OrganisationUnit>>() { }.getType();
+        Type type = new TypeToken<List<OrganisationUnit>>() {}.getType();
         return mGson.fromJson(jOrgUnits, type);
     }
 

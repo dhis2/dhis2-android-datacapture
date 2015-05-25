@@ -30,6 +30,8 @@ package org.dhis2.mobile.sdk.network.managers;
 
 import android.net.Uri;
 
+import com.squareup.okhttp.OkHttpClient;
+
 import org.dhis2.mobile.sdk.network.models.Credentials;
 
 public class NetworkManager implements INetworkManager {
@@ -42,7 +44,7 @@ public class NetworkManager implements INetworkManager {
     private Credentials mCredentials;
 
     public NetworkManager() {
-        mHttpManager = new HttpManager();
+        mHttpManager = new HttpManager(new OkHttpClient());
         mJsonManager = new JsonManager();
         mBase64Manager = new Base64Manager();
         mLogManager = new LogManager();

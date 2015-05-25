@@ -109,10 +109,10 @@ public final class MetaDataController implements IController<Object> {
         // first we need to fetch all metadata from server
         List<OrganisationUnit> units = getOrganisationUnits();
         List<DataSet> dataSets = getDataSets(units);
-        List<CategoryCombo> catCombos = getCategoryCombos(dataSets);
-        List<Category> cats = getCats(catCombos);
-        List<CategoryOption> catOptions = getCatOptions(
-                new ArrayList<CategoryOptionCombo>(), cats);
+        //List<CategoryCombo> catCombos = getCategoryCombos(dataSets);
+        //List<Category> cats = getCats(catCombos);
+        //List<CategoryOption> catOptions = getCatOptions(
+        //        new ArrayList<CategoryOptionCombo>(), cats);
 
         /*
         List<CategoryOptionCombo> catOptCombos = getCatOptCombos(catCombos);
@@ -121,15 +121,15 @@ public final class MetaDataController implements IController<Object> {
         Queue<ContentProviderOperation> ops = new LinkedList<>();
         ops.addAll(mOrgUnitHandler.sync(units));
         ops.addAll(mDataSetHandler.sync(dataSets));
-        ops.addAll(mCategoryComboHandler.sync(catCombos));
-        ops.addAll(mCategoryHandler.sync(cats));
-        ops.addAll(mCatOptionHandler.sync(catOptions));
+        //ops.addAll(mCategoryComboHandler.sync(catCombos));
+        //ops.addAll(mCategoryHandler.sync(cats));
+        //ops.addAll(mCatOptionHandler.sync(catOptions));
 
         // Handling relationships
         ops.addAll(mUnitDataSetHandler.sync(units));
-        ops.addAll(mDataSetCatComboHandler.sync(dataSets));
-        ops.addAll(mComboCategoryHandler.sync(catCombos));
-        ops.addAll(mCategoryToOptionHandler.sync(cats));
+        //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
+        //ops.addAll(mComboCategoryHandler.sync(catCombos));
+        //ops.addAll(mCategoryToOptionHandler.sync(cats));
 
         try {
             mContext.getContentResolver().applyBatch(

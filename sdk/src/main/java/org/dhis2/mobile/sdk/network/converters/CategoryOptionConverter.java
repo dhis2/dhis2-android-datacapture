@@ -36,8 +36,6 @@ import org.dhis2.mobile.sdk.entities.CategoryOption;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.inject.Inject;
-
 public final class CategoryOptionConverter implements IJsonConverter<String, List<CategoryOption>> {
     private final Gson mGson;
 

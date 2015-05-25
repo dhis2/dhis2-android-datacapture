@@ -36,8 +36,6 @@ import org.dhis2.mobile.sdk.entities.Category;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.inject.Inject;
-
 public final class CategoryConverter implements IJsonConverter<String, List<Category>> {
     private final Gson mGson;
 
@@ -47,8 +45,7 @@ public final class CategoryConverter implements IJsonConverter<String, List<Cate
 
     @Override
     public List<Category> deserialize(String source) {
-        Type type = new TypeToken<List<Category>>() {
-        }.getType();
+        Type type = new TypeToken<List<Category>>() {}.getType();
         return mGson.fromJson(source, type);
     }
 

@@ -40,6 +40,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
@@ -118,6 +119,8 @@ public class AggregateReportFragment extends BaseFragment
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.refresh) {
             getDhisService().syncMetaData();
+            Toast.makeText(getActivity(), "Syncing meta data",
+                    Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -233,7 +236,7 @@ public class AggregateReportFragment extends BaseFragment
                 break;
             }
             case R.id.data_entry_button: {
-                startReportEntryActivity();
+                // startReportEntryActivity();
                 break;
             }
         }

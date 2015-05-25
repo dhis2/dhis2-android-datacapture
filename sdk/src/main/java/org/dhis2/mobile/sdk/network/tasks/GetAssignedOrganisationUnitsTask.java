@@ -30,30 +30,22 @@ package org.dhis2.mobile.sdk.network.tasks;
 
 import android.net.Uri;
 
+import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.converters.IJsonConverter;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.managers.IBase64Manager;
-import org.dhis2.mobile.sdk.network.managers.IHttpManager;
-import org.dhis2.mobile.sdk.network.managers.ILogManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 public final class GetAssignedOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
     private final ApiRequest<String, List<OrganisationUnit>> mRequest;
 
-    @Inject
-    public GetAssignedOrganisationUnitsTask(IBase64Manager base64Manager,
-                                            IHttpManager httpManager, ILogManager logManager,
-                                            IJsonConverter<String, List<OrganisationUnit>> converter,
-                                            Uri serverUri, Credentials credentials) {
-        String base64Credentials = base64Manager
+    public GetAssignedOrganisationUnitsTask(DhisManager dhisManager, Uri serverUri,
+                                            Credentials credentials) {
+        String base64Credentials = dhisManager.getBase64Manager()
                 .toBase64(credentials);
         String url = serverUri.buildUpon()
                 .appendEncodedPath("api/me/")
@@ -64,8 +56,8 @@ public final class GetAssignedOrganisationUnitsTask implements ITask<List<Organi
                 .header("Accept", "application/json")
                 .build();
 
-        mRequest = new ApiRequest<>(request, httpManager,
-                logManager, converter);
+        mRequest = new ApiRequest<>(request, dhisManager.getHttpManager(),
+                dhisManager.getLogManager(), dhisManager.getJsonManager().getOrgUnitsConverter());
     }
 
     private static String buildQueryParams() {

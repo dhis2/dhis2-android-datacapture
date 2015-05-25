@@ -36,8 +36,6 @@ import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.inject.Inject;
-
 public final class CategoryOptionComboConverter implements IJsonConverter<String, List<CategoryOptionCombo>> {
     private Gson mGson;
 

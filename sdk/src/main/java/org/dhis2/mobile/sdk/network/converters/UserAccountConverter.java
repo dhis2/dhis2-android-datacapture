@@ -32,8 +32,6 @@ import com.google.gson.Gson;
 
 import org.dhis2.mobile.sdk.entities.UserAccount;
 
-import javax.inject.Inject;
-
 public class UserAccountConverter implements IJsonConverter<UserAccount, UserAccount> {
     private final Gson mGson;
 

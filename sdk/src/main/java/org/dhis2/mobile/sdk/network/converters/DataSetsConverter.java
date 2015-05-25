@@ -39,8 +39,6 @@ import org.dhis2.mobile.sdk.entities.DataSet;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.inject.Inject;
-
 public final class DataSetsConverter implements IJsonConverter<String, List<DataSet>> {
     private static final String DATA_SETS = "dataSets";
 
