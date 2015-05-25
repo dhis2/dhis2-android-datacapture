@@ -32,7 +32,7 @@ import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetDataSetsTask;
-import org.dhis2.mobile.sdk.persistence.handlers.DataSetHandler;
+import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -45,16 +45,13 @@ import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 
 public final class GetDataSetsController implements IController<List<DataSet>> {
     private final DhisManager mDhisManager;
-    private final DataSetHandler mDataSetHandler;
     private final Session mSession;
     private final List<String> mDataSetIds;
 
     public GetDataSetsController(DhisManager dhisManager,
-                                 DataSetHandler dataSetHandler,
                                  Session session,
                                  List<String> dataSetIds) {
         mDhisManager = dhisManager;
-        mDataSetHandler = dataSetHandler;
         mSession = session;
         mDataSetIds = dataSetIds;
     }
@@ -121,6 +118,6 @@ public final class GetDataSetsController implements IController<List<DataSet>> {
     }
 
     private Map<String, DataSet> getOldFullDataSets() {
-        return toMap(mDataSetHandler.query());
+        return toMap(DbManager.with(DataSet.class).query());
     }
 }

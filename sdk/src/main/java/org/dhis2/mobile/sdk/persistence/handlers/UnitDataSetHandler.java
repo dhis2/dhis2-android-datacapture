@@ -29,39 +29,41 @@
 package org.dhis2.mobile.sdk.persistence.handlers;
 
 import android.content.ContentProviderOperation;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
 import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.entities.UnitDataSetRelation;
 import org.dhis2.mobile.sdk.network.managers.ILogManager;
 import org.dhis2.mobile.sdk.persistence.database.DbContract.UnitDataSets;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import static org.dhis2.mobile.sdk.persistence.database.DbContract.OrganisationUnits.buildUriWithDataSets;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public class UnitDataSetHandler {
+final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     private static final String TAG = UnitDataSetHandler.class.getSimpleName();
 
     private static final String[] PROJECTION = new String[]{
+            UnitDataSets.ID,
             UnitDataSets.ORGANISATION_UNIT_ID,
             UnitDataSets.DATA_SET_ID
     };
 
-    private static final int ORGANISATION_UNIT_ID = 0;
-    private static final int DATA_SET_ID = 1;
+    private static final int ID = 0;
+    private static final int ORGANISATION_UNIT_ID = 1;
+    private static final int DATA_SET_ID = 2;
 
     private final Context mContext;
     private final ILogManager mLogManager;
 
-    public UnitDataSetHandler(Context context,
-                              ILogManager logManager) {
+    public UnitDataSetHandler(Context context, ILogManager logManager) {
         mContext = context;
         mLogManager = logManager;
     }
@@ -76,103 +78,136 @@ public class UnitDataSetHandler {
         return values;
     }
 
-    private static Entry fromCursor(Cursor cursor) {
+    private static UnitDataSetRelation fromCursor(Cursor cursor) {
         isNull(cursor, "Cursor object must not be null");
-        Entry entry = new Entry();
-        entry.setOrgUnit(cursor.getString(ORGANISATION_UNIT_ID));
-        entry.setDataSet(cursor.getString(DATA_SET_ID));
-        return entry;
+        UnitDataSetRelation relation = new UnitDataSetRelation();
+        relation.setId(cursor.getInt(ID));
+        relation.setOrgUnitId(cursor.getString(ORGANISATION_UNIT_ID));
+        relation.setDataSetId(cursor.getString(DATA_SET_ID));
+        return relation;
     }
 
-    private static List<Entry> map(Cursor cursor, boolean close) {
-        List<Entry> entries = new ArrayList<>();
+    @Override
+    public List<UnitDataSetRelation> map(Cursor cursor, boolean close) {
+        List<UnitDataSetRelation> relations = new ArrayList<>();
 
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
 
-            do {
-                entries.add(fromCursor(cursor));
-            } while (cursor.moveToNext());
-
-            if (close) {
+                do {
+                    relations.add(fromCursor(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null && close) {
                 cursor.close();
             }
         }
-        return entries;
+        return relations;
     }
 
-    private void insert(List<ContentProviderOperation> ops,
-                        String orgUnitId, String dataSetId) {
-        isNull(orgUnitId, "OrganisationUnit ID must not be null");
-        isNull(dataSetId, "DataSet ID must not be null");
-
-        mLogManager.LOGD(TAG, "Inserting dataset " + "[" + dataSetId + "]"
-                + " for organisation unit " + "[" + orgUnitId + "]");
-        ops.add(ContentProviderOperation
-                .newInsert(buildUriWithDataSets(orgUnitId))
-                .withValues(toContentValues(orgUnitId, dataSetId))
-                .build());
+    @Override
+    public UnitDataSetRelation mapSingleItem(Cursor cursor, boolean closeCursor) {
+        throw new UnsupportedOperationException("Unsupported method");
     }
 
-    public List<DataSet> queryDataSets(String orgUnitId) {
-        isNull(orgUnitId, "OrganisationUnit ID must not be null");
+    @Override
+    public String[] getProjection() {
+        return PROJECTION;
+    }
 
+    @Override
+    public ContentProviderOperation insert(UnitDataSetRelation relation) {
+        isNull(relation, "UnitDataSetRelation object must not be null");
+
+        mLogManager.LOGD(TAG, "Inserting dataset " + "[" + relation.getDataSetId() + "]"
+                + " for organisation unit " + "[" + relation.getOrgUnitId() + "]");
+        return ContentProviderOperation
+                .newInsert(buildUriWithDataSets(relation.getOrgUnitId()))
+                .withValues(toContentValues(relation.getOrgUnitId(), relation.getDataSetId()))
+                .build();
+    }
+
+    @Override
+    public ContentProviderOperation update(UnitDataSetRelation object) {
+        throw new UnsupportedOperationException("Unsupported method");
+    }
+
+    @Override
+    public ContentProviderOperation delete(UnitDataSetRelation relation) {
+        isNull(relation, "UnitDataSetRelation object must not be null");
+
+        mLogManager.LOGD(TAG, "Deleting dataset " + "[" + relation.getDataSetId() + "]"
+                + " from organisation unit " + "[" + relation.getOrgUnitId() + "]");
+        return ContentProviderOperation
+                .newDelete(ContentUris.withAppendedId(UnitDataSets.CONTENT_URI, relation.getId()))
+                .withValues(toContentValues(relation.getOrgUnitId(), relation.getDataSetId()))
+                .build();
+    }
+
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        isNull(id, "Object ID must not be null");
+
+        if (clazz == DataSet.class) {
+            Cursor cursor = mContext.getContentResolver().query(
+                    buildUriWithDataSets((String) id), DbManager.with(DataSet.class).getProjection(), null, null, null
+            );
+
+            return (List<T>) DbManager.with(DataSet.class).map(cursor, true);
+        } else {
+            throw new UnsupportedOperationException("Unsupported model class");
+        }
+    }
+
+    @Override
+    public List<UnitDataSetRelation> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
-                buildUriWithDataSets(orgUnitId), DataSetHandler.PROJECTION, null, null, null
-        );
-        return DataSetHandler.map(cursor, true);
-    }
-
-    public List<Entry> queryRelationShip() {
-        Cursor cursor = mContext.getContentResolver().query(
-                UnitDataSets.CONTENT_URI, PROJECTION, null, null, null
+                UnitDataSets.CONTENT_URI, PROJECTION, selection, selectionArgs, null
         );
         return map(cursor, true);
     }
 
-    private Set<String> buildRelationShipSet(List<Entry> entries) {
-        Set<String> set = new HashSet<>();
-        for (Entry entry : entries) {
-            set.add(entry.getOrgUnit() + entry.getDataSet());
-        }
-        return set;
+    @Override
+    public List<UnitDataSetRelation> query() {
+        return query(null, null);
     }
 
-    public List<ContentProviderOperation> sync(List<OrganisationUnit> units) {
-        isNull(units, "List<OrganisationUnit> object must not be null");
+    @Override
+    public List<ContentProviderOperation> sync(List<UnitDataSetRelation> newRelationsList) {
+        isNull(newRelationsList, "List<UnitDataSetRelation> object must not be null");
 
-        Set<String> set = buildRelationShipSet(queryRelationShip());
         List<ContentProviderOperation> ops = new ArrayList<>();
-        for (OrganisationUnit unit : units) {
-            for (DataSet dataSet : unit.getDataSets()) {
-                if (!set.contains(unit.getId() + dataSet.getId())) {
-                    insert(ops, unit.getId(), dataSet.getId());
-                }
+        Map<String, UnitDataSetRelation> oldRelations = toMap(query());
+        Map<String, UnitDataSetRelation> newRelations = toMap(newRelationsList);
+        for (String oldRelationKey : oldRelations.keySet()) {
+            UnitDataSetRelation oldRelation = oldRelations.get(oldRelationKey);
+            UnitDataSetRelation newRelation = newRelations.get(oldRelationKey);
+
+            if (newRelation == null) {
+                ops.add(delete(oldRelation));
+                continue;
             }
+
+            newRelations.remove(oldRelationKey);
         }
+
+        for (String newRelationKey : newRelations.keySet()) {
+            ops.add(insert(newRelations.get(newRelationKey)));
+        }
+
         return ops;
     }
 
-    private static class Entry {
-        private String orgUnit;
-        private String dataSet;
-
-        public String getOrgUnit() {
-            return orgUnit;
+    private static Map<String, UnitDataSetRelation> toMap(List<UnitDataSetRelation> relations) {
+        Map<String, UnitDataSetRelation> relationMap = new HashMap<>();
+        if (relations != null && !relations.isEmpty()) {
+            for (UnitDataSetRelation relation : relations) {
+                relationMap.put(relation.getOrgUnitId() + relation.getDataSetId(), relation);
+            }
         }
-
-        public void setOrgUnit(String orgUnit) {
-            this.orgUnit = orgUnit;
-        }
-
-        public String getDataSet() {
-            return dataSet;
-        }
-
-        public void setDataSet(String dataSet) {
-            this.dataSet = dataSet;
-        }
-
+        return relationMap;
     }
 }
 

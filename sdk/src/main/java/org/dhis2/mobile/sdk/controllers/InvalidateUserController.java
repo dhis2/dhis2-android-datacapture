@@ -29,7 +29,7 @@
 package org.dhis2.mobile.sdk.controllers;
 
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.handlers.SessionHandler;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 

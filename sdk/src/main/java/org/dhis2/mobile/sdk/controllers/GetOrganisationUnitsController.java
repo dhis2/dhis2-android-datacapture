@@ -34,8 +34,7 @@ import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetAssignedOrganisationUnitsTask;
 import org.dhis2.mobile.sdk.network.tasks.GetOrganisationUnitsTask;
-import org.dhis2.mobile.sdk.persistence.handlers.OrganisationUnitHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.UnitDataSetHandler;
+import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -49,17 +48,10 @@ import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 
 public final class GetOrganisationUnitsController implements IController<List<OrganisationUnit>> {
     private final DhisManager mDhisManager;
-    private final OrganisationUnitHandler mOrgUnitHandler;
-    private final UnitDataSetHandler mUnitDataSetHandler;
     private final Session mSession;
 
-    public GetOrganisationUnitsController(DhisManager dhisManager,
-                                          OrganisationUnitHandler orgUnitHandler,
-                                          UnitDataSetHandler unitDataSetHandler,
-                                          Session session) {
+    public GetOrganisationUnitsController(DhisManager dhisManager, Session session) {
         mDhisManager = dhisManager;
-        mOrgUnitHandler = orgUnitHandler;
-        mUnitDataSetHandler = unitDataSetHandler;
         mSession = session;
     }
 
@@ -137,10 +129,12 @@ public final class GetOrganisationUnitsController implements IController<List<Or
 
     private Map<String, OrganisationUnit> getOldFullOrganisationUnits() {
         Map<String, OrganisationUnit> map = new HashMap<>();
-        List<OrganisationUnit> orgUnits = mOrgUnitHandler.query();
+        List<OrganisationUnit> orgUnits = DbManager.with(OrganisationUnit.class).query();
         for (OrganisationUnit orgUnit : orgUnits) {
-            List<DataSet> dataSets = mUnitDataSetHandler
-                    .queryDataSets(orgUnit.getId());
+            /* List<DataSet> dataSets = mUnitDataSetHandler
+                    .queryDataSets(orgUnit.getId()); */
+            List<DataSet> dataSets = DbManager.with(OrganisationUnit.class)
+                    .queryRelatedModels(DataSet.class, orgUnit.getId());
             orgUnit.setDataSets(dataSets);
             map.put(orgUnit.getId(), orgUnit);
         }

@@ -46,8 +46,8 @@ import java.util.Map;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public final class OrganisationUnitHandler {
-    public static final String[] PROJECTION = new String[]{
+final class OrganisationUnitHandler implements IModelHandler<OrganisationUnit> {
+    private static final String[] PROJECTION = new String[]{
             OrganisationUnits.ID,
             OrganisationUnits.CREATED,
             OrganisationUnits.LAST_UPDATED,
@@ -94,69 +94,101 @@ public final class OrganisationUnitHandler {
         return unit;
     }
 
-    public static List<OrganisationUnit> map(Cursor cursor, boolean closeCursor) {
+    @Override
+    public List<OrganisationUnit> map(Cursor cursor, boolean closeCursor) {
         List<OrganisationUnit> units = new ArrayList<>();
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            do {
-                units.add(fromCursor(cursor));
-            } while (cursor.moveToNext());
-
-            if (closeCursor) {
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    units.add(fromCursor(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null && closeCursor) {
                 cursor.close();
             }
         }
         return units;
     }
 
-    private static void insert(List<ContentProviderOperation> ops,
-                               OrganisationUnit unit) {
+    @Override
+    public OrganisationUnit mapSingleItem(Cursor cursor, boolean closeCursor) {
+        OrganisationUnit organisationUnit = null;
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                organisationUnit = fromCursor(cursor);
+            }
+        } finally {
+            if (cursor != null && closeCursor) {
+                cursor.close();
+            }
+        }
+        return organisationUnit;
+    }
+
+    @Override
+    public String[] getProjection() {
+        return PROJECTION;
+    }
+
+    @Override
+    public ContentProviderOperation insert(OrganisationUnit unit) {
         isNull(unit, "OrganizationUnit must not be null");
 
         Log.d(TAG, "Inserting " + unit.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newInsert(OrganisationUnits.CONTENT_URI)
                 .withValues(toContentValues(unit))
-                .build());
+                .build();
     }
 
-    private static void update(List<ContentProviderOperation> ops,
-                               OrganisationUnit unit) {
+    @Override
+    public ContentProviderOperation update(OrganisationUnit unit) {
         isNull(unit, "OrganizationUnit must not be null");
 
         Log.d(TAG, "Updating " + unit.getName());
         Uri uri = OrganisationUnits.CONTENT_URI.buildUpon()
                 .appendPath(unit.getId()).build();
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newUpdate(uri)
                 .withValues(toContentValues(unit))
-                .build());
+                .build();
     }
 
-    private static void delete(List<ContentProviderOperation> ops,
-                               OrganisationUnit unit) {
+    @Override
+    public ContentProviderOperation delete(OrganisationUnit unit) {
         isNull(unit, "OrganizationUnit must not be null");
 
         Log.d(TAG, "Deleting " + unit.getName());
         Uri uri = OrganisationUnits.CONTENT_URI.buildUpon()
                 .appendPath(unit.getId()).build();
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newDelete(uri)
-                .build());
+                .build();
     }
 
-    public List<OrganisationUnit> query() {
-        return query(null);
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        return null;
     }
 
-    public List<OrganisationUnit> query(String selection) {
+    @Override
+    public List<OrganisationUnit> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
-                OrganisationUnits.CONTENT_URI, PROJECTION, selection, null, null
+                OrganisationUnits.CONTENT_URI, PROJECTION, selection, selectionArgs, null
         );
 
         return map(cursor, true);
     }
 
+    @Override
+    public List<OrganisationUnit> query() {
+        return query(null, null);
+    }
+
+    @Override
     public List<ContentProviderOperation> sync(List<OrganisationUnit> units) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         Map<String, OrganisationUnit> newUnits = toMap(units);
@@ -166,7 +198,7 @@ public final class OrganisationUnitHandler {
             OrganisationUnit oldUnit = oldUnits.get(oldOrgUnitKey);
 
             if (newUnit == null) {
-                delete(ops, oldUnit);
+                ops.add(delete(oldUnit));
                 continue;
             }
 
@@ -174,7 +206,7 @@ public final class OrganisationUnitHandler {
             DateTime oldLastUpdated = DateTime.parse(oldUnit.getLastUpdated());
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
-                update(ops, newUnit);
+                ops.add(update(newUnit));
             }
 
             newUnits.remove(oldOrgUnitKey);
@@ -182,7 +214,7 @@ public final class OrganisationUnitHandler {
 
         for (String newOrgUnitKey : newUnits.keySet()) {
             OrganisationUnit orgUnit = newUnits.get(newOrgUnitKey);
-            insert(ops, orgUnit);
+            ops.add(insert(orgUnit));
         }
 
         return ops;

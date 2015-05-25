@@ -49,7 +49,7 @@ import org.dhis2.mobile.api.date.DateIteratorFactory;
 import org.dhis2.mobile.api.models.DateHolder;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.persistence.database.DbContract.DataSets;
-import org.dhis2.mobile.sdk.persistence.handlers.DataSetHandler;
+import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
 import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
@@ -164,7 +164,7 @@ public class PeriodDialogFragment extends DialogFragment
             Uri uri = DataSets.CONTENT_URI.buildUpon()
                     .appendPath(dataSetId).build();
             return CursorLoaderBuilder.forUri(uri)
-                    .projection(DataSetHandler.PROJECTION)
+                    .projection(DbManager.with(DataSet.class).getProjection())
                     .transformation(new TransformDataSet())
                     .build(getActivity());
         }
@@ -199,7 +199,7 @@ public class PeriodDialogFragment extends DialogFragment
 
         @Override
         public DataSet transform(Context context, Cursor cursor) {
-            return DataSetHandler.mapSingleItem(cursor, false);
+            return DbManager.with(DataSet.class).mapSingleItem(cursor, false);
         }
     }
 

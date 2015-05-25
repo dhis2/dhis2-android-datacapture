@@ -42,11 +42,9 @@ import org.dhis2.mobile.sdk.network.http.Response;
 import org.dhis2.mobile.sdk.network.managers.NetworkManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.persistence.handlers.CategoryComboHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.DataSetHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.OrganisationUnitHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.SessionHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.UnitDataSetHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.UserAccountHandler;
+import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
+import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 
 import java.net.HttpURLConnection;
@@ -55,18 +53,14 @@ import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 public class DhisManager extends NetworkManager {
     private final Context mContext;
-    private OrganisationUnitHandler mOrgUnitHandler;
-    private DataSetHandler mDataSetHandler;
-    private UnitDataSetHandler mUnitDataSetHandler;
     private CategoryComboHandler mCategoryComboHandler;
     private SessionHandler mSessionHandler;
     private UserAccountHandler mUserAccountHandler;
 
     public DhisManager(Context context) {
+        DbManager.init(context);
+
         mContext = isNull(context, "Context object must not be null");
-        mOrgUnitHandler = new OrganisationUnitHandler(context);
-        mDataSetHandler = new DataSetHandler(context, getLogManager());
-        mUnitDataSetHandler = new UnitDataSetHandler(context, getLogManager());
         mCategoryComboHandler = new CategoryComboHandler(context, getLogManager());
         mSessionHandler = new SessionHandler(context);
         mUserAccountHandler = new UserAccountHandler(context);
@@ -132,8 +126,7 @@ public class DhisManager extends NetworkManager {
 
     public void syncMetaData() throws APIException {
         IController<Object> metaDataController = new MetaDataController(
-                mContext, this, mOrgUnitHandler, mDataSetHandler,
-                mUnitDataSetHandler, mCategoryComboHandler, null, null,
+                this, mCategoryComboHandler, null, null,
                 null, null, null, mSessionHandler
         );
         runController(metaDataController);

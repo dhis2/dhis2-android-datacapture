@@ -26,11 +26,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.handlers;
+package org.dhis2.mobile.sdk.persistence.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.dhis2.mobile.sdk.persistence.preferences.IPreferenceHandler;
 import org.joda.time.DateTime;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;

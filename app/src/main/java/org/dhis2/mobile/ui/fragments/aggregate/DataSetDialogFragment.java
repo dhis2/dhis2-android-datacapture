@@ -45,7 +45,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.persistence.database.DbContract;
 import org.dhis2.mobile.sdk.persistence.database.DbContract.UnitDataSets;
-import org.dhis2.mobile.sdk.persistence.handlers.DataSetHandler;
+import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
 import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
@@ -120,7 +120,7 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
             String orgUnitId = bundle.getString(UnitDataSets.ORGANISATION_UNIT_ID);
             Uri uri = DbContract.OrganisationUnits.buildUriWithDataSets(orgUnitId);
             return CursorLoaderBuilder.forUri(uri)
-                    .projection(DataSetHandler.PROJECTION)
+                    .projection(DbManager.with(DataSet.class).getProjection())
                     .transformation(new DataSetTransform())
                     .build(getActivity());
         }
@@ -153,7 +153,7 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
 
         @Override
         public List<DataSet> transform(Context context, Cursor cursor) {
-            return DataSetHandler.map(cursor, false);
+            return DbManager.with(DataSet.class).map(cursor, false);
         }
     }
 

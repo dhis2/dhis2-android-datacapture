@@ -46,8 +46,8 @@ import java.util.Map;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public class DataSetHandler {
-    public static final String[] PROJECTION = new String[]{
+class DataSetHandler implements IModelHandler<DataSet> {
+    private static final String[] PROJECTION = new String[]{
             DataSets.TABLE_NAME + "." + DataSets.ID,
             DataSets.TABLE_NAME + "." + DataSets.CREATED,
             DataSets.TABLE_NAME + "." + DataSets.LAST_UPDATED,
@@ -108,7 +108,8 @@ public class DataSetHandler {
         return dataSet;
     }
 
-    public static List<DataSet> map(Cursor cursor, boolean close) {
+    @Override
+    public List<DataSet> map(Cursor cursor, boolean close) {
         List<DataSet> dataSets = new ArrayList<>();
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -124,14 +125,60 @@ public class DataSetHandler {
         return dataSets;
     }
 
-    public static DataSet mapSingleItem(Cursor cursor, boolean close) {
+    @Override
+    public String[] getProjection() {
+        return PROJECTION;
+    }
+
+    @Override
+    public ContentProviderOperation insert(DataSet dataSet) {
+        isNull(dataSet, "DataSet object must not be null");
+
+        mLogManager.LOGD(TAG, "Inserting " + dataSet.getName());
+        return ContentProviderOperation
+                .newInsert(DataSets.CONTENT_URI)
+                .withValues(toContentValues(dataSet))
+                .build();
+    }
+
+    @Override
+    public ContentProviderOperation update(DataSet dataSet) {
+        isNull(dataSet, "DataSet object must not be null");
+
+        mLogManager.LOGD(TAG, "Updating " + dataSet.getName());
+        return ContentProviderOperation
+                .newUpdate(DataSets.CONTENT_URI)
+                .withValues(toContentValues(dataSet))
+                .build();
+    }
+
+    @Override
+    public ContentProviderOperation delete(DataSet dataSet) {
+        isNull(dataSet, "DataSet object must not be null");
+
+        mLogManager.LOGD(TAG, "Deleting " + dataSet.getName());
+        Uri uri = DataSets.CONTENT_URI.buildUpon()
+                .appendPath(dataSet.getId()).build();
+        return ContentProviderOperation
+                .newDelete(uri)
+                .build();
+    }
+
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        return null;
+    }
+
+    @Override
+    public DataSet mapSingleItem(Cursor cursor, boolean close) {
         DataSet dataSet = null;
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-
-            dataSet = fromCursor(cursor);
-
-            if (close) {
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                dataSet = fromCursor(cursor);
+            }
+        } finally {
+            if (cursor != null && close) {
                 cursor.close();
             }
         }
@@ -139,40 +186,7 @@ public class DataSetHandler {
         return dataSet;
     }
 
-    private void insert(List<ContentProviderOperation> ops,
-                        DataSet dataSet) {
-        isNull(dataSet, "DataSet object must not be null");
-
-        mLogManager.LOGD(TAG, "Inserting " + dataSet.getName());
-        ops.add(ContentProviderOperation
-                .newInsert(DataSets.CONTENT_URI)
-                .withValues(toContentValues(dataSet))
-                .build());
-    }
-
-    private void update(List<ContentProviderOperation> ops,
-                        DataSet dataSet) {
-        isNull(dataSet, "DataSet object must not be null");
-
-        mLogManager.LOGD(TAG, "Updating " + dataSet.getName());
-        ops.add(ContentProviderOperation
-                .newUpdate(DataSets.CONTENT_URI)
-                .withValues(toContentValues(dataSet))
-                .build());
-    }
-
-    private void delete(List<ContentProviderOperation> ops,
-                        DataSet dataSet) {
-        isNull(dataSet, "DataSet object must not be null");
-
-        mLogManager.LOGD(TAG, "Deleting " + dataSet.getName());
-        Uri uri = DataSets.CONTENT_URI.buildUpon()
-                .appendPath(dataSet.getId()).build();
-        ops.add(ContentProviderOperation
-                .newDelete(uri)
-                .build());
-    }
-
+    @Override
     public List<DataSet> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
                 DataSets.CONTENT_URI, PROJECTION, selection, selectionArgs, null
@@ -181,10 +195,12 @@ public class DataSetHandler {
         return map(cursor, true);
     }
 
+    @Override
     public List<DataSet> query() {
         return query(null, null);
     }
 
+    @Override
     public List<ContentProviderOperation> sync(List<DataSet> dataSets) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         Map<String, DataSet> newDataSets = toMap(dataSets);
@@ -194,7 +210,7 @@ public class DataSetHandler {
             DataSet oldDataSet = oldDataSets.get(oldDataSetKey);
 
             if (newDataSet == null) {
-                delete(ops, oldDataSet);
+                ops.add(delete(oldDataSet));
                 continue;
             }
 
@@ -202,7 +218,7 @@ public class DataSetHandler {
             DateTime oldLastUpdated = DateTime.parse(oldDataSet.getLastUpdated());
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
-                update(ops, newDataSet);
+                ops.add(update(newDataSet));
             }
 
             newDataSets.remove(oldDataSetKey);
@@ -210,7 +226,7 @@ public class DataSetHandler {
 
         for (String newDataSetKey : newDataSets.keySet()) {
             DataSet dataSet = newDataSets.get(newDataSetKey);
-            insert(ops, dataSet);
+            ops.add(insert(dataSet));
         }
 
         return ops;

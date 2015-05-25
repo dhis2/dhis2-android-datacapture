@@ -40,6 +40,7 @@ import org.dhis2.mobile.sdk.entities.CategoryOption;
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.entities.UnitDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.persistence.database.DbContract;
 import org.dhis2.mobile.sdk.persistence.handlers.CategoryComboHandler;
@@ -48,10 +49,8 @@ import org.dhis2.mobile.sdk.persistence.handlers.CategoryOptionHandler;
 import org.dhis2.mobile.sdk.persistence.handlers.CategoryToOptionsHandler;
 import org.dhis2.mobile.sdk.persistence.handlers.ComboCategoryHandler;
 import org.dhis2.mobile.sdk.persistence.handlers.DataSetCategoryComboHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.DataSetHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.OrganisationUnitHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.SessionHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.UnitDataSetHandler;
+import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 
 import java.util.ArrayList;
@@ -64,11 +63,7 @@ import java.util.Set;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
 
 public final class MetaDataController implements IController<Object> {
-    private final Context mContext;
     private final DhisManager mDhisManager;
-    private final OrganisationUnitHandler mOrgUnitHandler;
-    private final DataSetHandler mDataSetHandler;
-    private final UnitDataSetHandler mUnitDataSetHandler;
     private final CategoryComboHandler mCategoryComboHandler;
     private final DataSetCategoryComboHandler mDataSetCatComboHandler;
     private final CategoryHandler mCategoryHandler;
@@ -77,11 +72,7 @@ public final class MetaDataController implements IController<Object> {
     private final CategoryToOptionsHandler mCategoryToOptionHandler;
     private final Session mSession;
 
-    public MetaDataController(Context context,
-                              DhisManager dhisManager,
-                              OrganisationUnitHandler orgUnitHandler,
-                              DataSetHandler dataSetHandler,
-                              UnitDataSetHandler unitDataSetHandler,
+    public MetaDataController(DhisManager dhisManager,
                               CategoryComboHandler categoryComboHandler,
 
                               DataSetCategoryComboHandler dataSetCatComboHandler,
@@ -90,11 +81,7 @@ public final class MetaDataController implements IController<Object> {
                               CategoryOptionHandler catOptionHandler,
                               CategoryToOptionsHandler categoryToOptionsHandler,
                               SessionHandler sessionHandler) {
-        mContext = context;
         mDhisManager = dhisManager;
-        mOrgUnitHandler = orgUnitHandler;
-        mDataSetHandler = dataSetHandler;
-        mUnitDataSetHandler = unitDataSetHandler;
         mCategoryComboHandler = categoryComboHandler;
         mDataSetCatComboHandler = dataSetCatComboHandler;
         mCategoryHandler = categoryHandler;
@@ -119,34 +106,29 @@ public final class MetaDataController implements IController<Object> {
         */
 
         Queue<ContentProviderOperation> ops = new LinkedList<>();
-        ops.addAll(mOrgUnitHandler.sync(units));
-        ops.addAll(mDataSetHandler.sync(dataSets));
+        ops.addAll(DbManager.with(OrganisationUnit.class).sync(units));
+        ops.addAll(DbManager.with(DataSet.class).sync(dataSets));
         //ops.addAll(mCategoryComboHandler.sync(catCombos));
         //ops.addAll(mCategoryHandler.sync(cats));
         //ops.addAll(mCatOptionHandler.sync(catOptions));
 
         // Handling relationships
-        ops.addAll(mUnitDataSetHandler.sync(units));
+        ops.addAll(DbManager.with(UnitDataSetRelation.class)
+                .sync(buildUnitDataSetRelations(units)));
         //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
         //ops.addAll(mComboCategoryHandler.sync(catCombos));
         //ops.addAll(mCategoryToOptionHandler.sync(cats));
 
-        try {
-            mContext.getContentResolver().applyBatch(
-                    DbContract.AUTHORITY, new ArrayList<>(ops)
-            );
-        } catch (RemoteException e) {
-            throw APIException.unexpectedError(null, e);
-        } catch (OperationApplicationException e) {
-            throw APIException.unexpectedError(null, e);
-        }
+        DbManager.applyBatch(new ArrayList<>(ops));
+        DbManager.notifyChange(OrganisationUnit.class);
+        DbManager.notifyChange(DataSet.class);
 
         return new Object();
     }
 
     private List<OrganisationUnit> getOrganisationUnits() throws APIException {
         return (new GetOrganisationUnitsController(
-                mDhisManager, mOrgUnitHandler, mUnitDataSetHandler, mSession
+                mDhisManager, mSession
         )).run();
     }
 
@@ -159,8 +141,29 @@ public final class MetaDataController implements IController<Object> {
             }
         }
         return (new GetDataSetsController(
-                mDhisManager, mDataSetHandler, mSession, new ArrayList<>(dataSetIds)
+                mDhisManager, mSession, new ArrayList<>(dataSetIds)
         )).run();
+    }
+
+    private List<UnitDataSetRelation> buildUnitDataSetRelations(List<OrganisationUnit> units) {
+        List<UnitDataSetRelation> relations = new ArrayList<>();
+        if (units == null || units.isEmpty()) {
+            return relations;
+        }
+
+        for (OrganisationUnit orgUnit : units) {
+            if (orgUnit.getDataSets() == null || orgUnit.getDataSets().isEmpty()) {
+                continue;
+            }
+
+            for (DataSet dataSet : orgUnit.getDataSets()) {
+                UnitDataSetRelation relation = new UnitDataSetRelation();
+                relation.setOrgUnitId(orgUnit.getId());
+                relation.setDataSetId(dataSet.getId());
+                relations.add(relation);
+            }
+        }
+        return relations;
     }
 
     private List<CategoryCombo> getCategoryCombos(List<DataSet> dataSets) throws APIException {
