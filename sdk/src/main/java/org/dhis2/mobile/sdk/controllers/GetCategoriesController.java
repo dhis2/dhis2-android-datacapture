@@ -28,11 +28,12 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.Category;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetCategoriesTask;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -44,15 +45,12 @@ import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 
 public class GetCategoriesController implements IController<List<Category>> {
     private final DhisManager mDhisManager;
-    private final CategoryHandler mCategoryHandler;
     private final Session mSession;
     private final List<String> mCategoryIds;
 
     public GetCategoriesController(DhisManager dhisManager,
-                                   CategoryHandler categoryHandler,
                                    Session session, List<String> ids) {
         mDhisManager = dhisManager;
-        mCategoryHandler = categoryHandler;
         mSession = session;
         mCategoryIds = ids;
     }
@@ -116,6 +114,6 @@ public class GetCategoriesController implements IController<List<Category>> {
     }
 
     private Map<String, Category> getOldFullCategories() {
-        return toMap(mCategoryHandler.query());
+        return toMap(new Select().from(Category.class).queryList());
     }
 }

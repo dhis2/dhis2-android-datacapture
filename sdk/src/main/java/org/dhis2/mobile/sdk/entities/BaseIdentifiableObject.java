@@ -26,64 +26,50 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.handlers;
+package org.dhis2.mobile.sdk.entities;
 
-import android.content.ContentProviderOperation;
-import android.database.Cursor;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
+public abstract class BaseIdentifiableObject extends BaseModel {
+    @Column @PrimaryKey String id;
+    @Column String created;
+    @Column String lastUpdated;
+    @Column String name;
 
-import java.util.ArrayList;
-import java.util.List;
-
-final class CategoryOptionComboHandler implements IModelHandler<CategoryOptionCombo> {
-    @Override
-    public List<CategoryOptionCombo> map(Cursor cursor, boolean closeCursor) {
-        return null;
+    public BaseIdentifiableObject() {
     }
 
-    @Override
-    public CategoryOptionCombo mapSingleItem(Cursor cursor, boolean closeCursor) {
-        return null;
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public String[] getProjection() {
-        return new String[0];
+    public void setId(String id) {
+        this.id = id;
     }
 
-    @Override
-    public ContentProviderOperation insert(CategoryOptionCombo object) {
-        return null;
+    public String getCreated() {
+        return created;
     }
 
-    @Override
-    public ContentProviderOperation update(CategoryOptionCombo object) {
-        return null;
+    public void setCreated(String created) {
+        this.created = created;
     }
 
-    @Override
-    public ContentProviderOperation delete(CategoryOptionCombo object) {
-        return null;
+    public String getLastUpdated() {
+        return lastUpdated;
     }
 
-    @Override
-    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
-        return null;
+    public void setLastUpdated(String lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
-    @Override
-    public List<CategoryOptionCombo> query(String selection, String[] selectionArgs) {
-        return null;
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public List<CategoryOptionCombo> query() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<ContentProviderOperation> sync(List<CategoryOptionCombo> items) {
-        return null;
+    public void setName(String name) {
+        this.name = name;
     }
 }

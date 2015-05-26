@@ -28,11 +28,12 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetDataSetsTask;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -118,6 +119,6 @@ public final class GetDataSetsController implements IController<List<DataSet>> {
     }
 
     private Map<String, DataSet> getOldFullDataSets() {
-        return toMap(DbManager.with(DataSet.class).query());
+        return toMap(new Select().from(DataSet.class).queryList());
     }
 }

@@ -39,13 +39,6 @@ import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryComboHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryOptionHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryToOptionsHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.ComboCategoryHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.DataSetCategoryComboHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 
@@ -60,30 +53,11 @@ import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
 
 public final class MetaDataController implements IController<Object> {
     private final DhisManager mDhisManager;
-    private final CategoryComboHandler mCategoryComboHandler;
-    private final DataSetCategoryComboHandler mDataSetCatComboHandler;
-    private final CategoryHandler mCategoryHandler;
-    private final ComboCategoryHandler mComboCategoryHandler;
-    private final CategoryOptionHandler mCatOptionHandler;
-    private final CategoryToOptionsHandler mCategoryToOptionHandler;
     private final Session mSession;
 
     public MetaDataController(DhisManager dhisManager,
-                              CategoryComboHandler categoryComboHandler,
-
-                              DataSetCategoryComboHandler dataSetCatComboHandler,
-                              CategoryHandler categoryHandler,
-                              ComboCategoryHandler comboCatHandler,
-                              CategoryOptionHandler catOptionHandler,
-                              CategoryToOptionsHandler categoryToOptionsHandler,
                               SessionHandler sessionHandler) {
         mDhisManager = dhisManager;
-        mCategoryComboHandler = categoryComboHandler;
-        mDataSetCatComboHandler = dataSetCatComboHandler;
-        mCategoryHandler = categoryHandler;
-        mComboCategoryHandler = comboCatHandler;
-        mCatOptionHandler = catOptionHandler;
-        mCategoryToOptionHandler = categoryToOptionsHandler;
         mSession = sessionHandler.get();
     }
 
@@ -102,22 +76,22 @@ public final class MetaDataController implements IController<Object> {
         */
 
         Queue<ContentProviderOperation> ops = new LinkedList<>();
-        ops.addAll(DbManager.with(OrganisationUnit.class).sync(units));
-        ops.addAll(DbManager.with(DataSet.class).sync(dataSets));
+        // ops.addAll(DbManager.with(OrganisationUnit.class).sync(units));
+        // ops.addAll(DbManager.with(DataSet.class).sync(dataSets));
         //ops.addAll(mCategoryComboHandler.sync(catCombos));
         //ops.addAll(mCategoryHandler.sync(cats));
         //ops.addAll(mCatOptionHandler.sync(catOptions));
 
         // Handling relationships
-        ops.addAll(DbManager.with(UnitToDataSetRelation.class)
-                .sync(buildUnitDataSetRelations(units)));
+        // ops.addAll(DbManager.with(UnitToDataSetRelation.class)
+        //        .sync(buildUnitDataSetRelations(units)));
         //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
         //ops.addAll(mComboCategoryHandler.sync(catCombos));
         //ops.addAll(mCategoryToOptionHandler.sync(cats));
 
-        DbManager.applyBatch(new ArrayList<>(ops));
-        DbManager.notifyChange(OrganisationUnit.class);
-        DbManager.notifyChange(DataSet.class);
+        // DbManager.applyBatch(new ArrayList<>(ops));
+        // DbManager.notifyChange(OrganisationUnit.class);
+        // DbManager.notifyChange(DataSet.class);
 
         return new Object();
     }
@@ -153,10 +127,10 @@ public final class MetaDataController implements IController<Object> {
             }
 
             for (DataSet dataSet : orgUnit.getDataSets()) {
-                UnitToDataSetRelation relation = new UnitToDataSetRelation();
-                relation.setOrgUnitId(orgUnit.getId());
-                relation.setDataSetId(dataSet.getId());
-                relations.add(relation);
+                // UnitToDataSetRelation relation = new UnitToDataSetRelation();
+                // relation.setOrgUnitId(orgUnit.getId());
+                // relation.setDataSetId(dataSet.getId());
+                // relations.add(relation);
             }
         }
         return relations;
@@ -165,8 +139,7 @@ public final class MetaDataController implements IController<Object> {
     private List<CategoryCombo> getCategoryCombos(List<DataSet> dataSets) throws APIException {
         Set<String> categoryComboIds = new HashSet<>(toIds(dataSets));
         return (new GetCategoryCombosController(
-                mDhisManager, mCategoryComboHandler,
-                mSession, new ArrayList<>(categoryComboIds)
+                mDhisManager, mSession, new ArrayList<>(categoryComboIds)
         )).run();
     }
 
@@ -179,7 +152,7 @@ public final class MetaDataController implements IController<Object> {
         }
 
         return (new GetCategoriesController(
-                mDhisManager, null, mSession, new ArrayList<>(ids)
+                mDhisManager, mSession, new ArrayList<>(ids)
         )).run();
     }
 

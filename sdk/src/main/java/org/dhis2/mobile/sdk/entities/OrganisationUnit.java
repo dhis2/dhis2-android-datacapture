@@ -28,14 +28,20 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.Table;
+
+import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+
 import java.util.List;
 
-public final class OrganisationUnit extends BaseIdentifiableEntity {
-    private String displayName;
-    private int level;
-    private OrganisationUnit parent;
-    private List<OrganisationUnit> children;
-    private List<DataSet> dataSets;
+@Table(databaseName = DhisDatabase.NAME)
+public final class OrganisationUnit extends BaseIdentifiableObject {
+    @Column String displayName;
+    @Column int level;
+    @Column OrganisationUnit parent;
+    List<OrganisationUnit> children;
+    List<DataSet> dataSets;
 
     public OrganisationUnit() {
     }

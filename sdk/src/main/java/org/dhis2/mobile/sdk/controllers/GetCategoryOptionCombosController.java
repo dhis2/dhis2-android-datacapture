@@ -28,11 +28,12 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetCategoryOptionComboTask;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryOptionComboHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -40,19 +41,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 
 public final class GetCategoryOptionCombosController implements IController<List<CategoryOptionCombo>> {
     private final DhisManager mDhisManager;
-    private final CategoryOptionComboHandler mCocHandler;
     private final Session mSession;
     private final List<String> mCocIds;
 
     public GetCategoryOptionCombosController(DhisManager dhisManager,
-                                             CategoryOptionComboHandler cocHandler,
                                              Session session, List<String> ids) {
         mDhisManager = dhisManager;
-        mCocHandler = cocHandler;
         mSession = session;
         mCocIds = ids;
     }
@@ -116,6 +115,6 @@ public final class GetCategoryOptionCombosController implements IController<List
     }
 
     private Map<String, CategoryOptionCombo> getOldFullCocs() {
-        return toMap(mCocHandler.query());
+        return toMap(new Select().from(CategoryOptionCombo.class).queryList());
     }
 }

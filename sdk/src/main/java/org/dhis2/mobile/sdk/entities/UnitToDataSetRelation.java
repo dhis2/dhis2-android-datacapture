@@ -29,35 +29,49 @@
 
 package org.dhis2.mobile.sdk.entities;
 
-/**
- * Created by araz on 25.05.2015.
- */
-public final class UnitToDataSetRelation {
-    private int id;
-    private String orgUnitId;
-    private String dataSetId;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
+
+import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+
+@Table(databaseName = DhisDatabase.NAME)
+public final class UnitToDataSetRelation extends BaseModel {
+    @PrimaryKey(autoincrement = true) private int id;
+
+    @Column @ForeignKey(
+            references = {
+                    @ForeignKeyReference(columnName = "orgUnitId", columnType = String.class, foreignColumnName = "id"),
+            }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
+    ) private OrganisationUnit organisationUnit;
+
+    @Column @ForeignKey(
+            references = {
+                    @ForeignKeyReference(columnName = "dataSetId", columnType = String.class, foreignColumnName = "id"),
+            }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
+    ) private DataSet dataSet;
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public OrganisationUnit getOrganisationUnit() {
+        return organisationUnit;
     }
 
-    public String getOrgUnitId() {
-        return orgUnitId;
+    public void setOrganisationUnit(OrganisationUnit organisationUnit) {
+        this.organisationUnit = organisationUnit;
     }
 
-    public void setOrgUnitId(String orgUnitId) {
-        this.orgUnitId = orgUnitId;
+    public DataSet getDataSet() {
+        return dataSet;
     }
 
-    public String getDataSetId() {
-        return dataSetId;
-    }
-
-    public void setDataSetId(String dataSetId) {
-        this.dataSetId = dataSetId;
+    public void setDataSet(DataSet dataSet) {
+        this.dataSet = dataSet;
     }
 }

@@ -30,11 +30,8 @@
     package="org.dhis2.mobile.sdk"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application android:allowBackup="true">
-        <provider
-            android:name=".persistence.database.DbContentProvider"
-            android:authorities="org.dhis2.mobile.sdk.persistence.database.DbContentProvider"
-            android:exported="false" />
-    </application>
+    <application
+        android:name=".DhisApplication"
+        android:allowBackup="true"/>
 
 </manifest>

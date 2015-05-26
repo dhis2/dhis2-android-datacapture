@@ -28,18 +28,24 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.Table;
+
+import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+
 import java.util.List;
 
-public final class DataSet extends BaseIdentifiableEntity {
-    private String displayName;
-    private int version;
-    private int expiryDays;
-    private boolean allowFuturePeriods;
-    private String periodType;
+@Table(databaseName = DhisDatabase.NAME)
+public final class DataSet extends BaseIdentifiableObject {
+    @Column String displayName;
+    @Column int version;
+    @Column int expiryDays;
+    @Column boolean allowFuturePeriods;
+    @Column String periodType;
 
-    private List<OrganisationUnit> organisationUnits;
-    private CategoryCombo categoryCombo;
-    private List<Object> sections;
+    List<OrganisationUnit> organisationUnits;
+    CategoryCombo categoryCombo;
+    List<Object> sections;
 
     public DataSet() {
     }

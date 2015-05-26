@@ -27,25 +27,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.handlers;
+package org.dhis2.mobile.sdk.persistence.database;
 
-import android.content.ContentProviderOperation;
-import android.database.Cursor;
+import com.raizlabs.android.dbflow.annotation.Database;
 
-import java.util.List;
-
-/**
- * Created by araz on 01.05.2015.
- */
-public interface IModelHandler<T> {
-    List<T> map(Cursor cursor, boolean closeCursor);
-    T mapSingleItem(Cursor cursor, boolean closeCursor);
-    String[] getProjection();
-    ContentProviderOperation insert(T object);
-    ContentProviderOperation update(T object);
-    ContentProviderOperation delete(T object);
-    <T> List<T> queryRelatedModels(Class<T> clazz, Object id);
-    List<T> query(String selection, String[] selectionArgs);
-    List<T> query();
-    List<ContentProviderOperation> sync(List<T> items);
+@Database(name = DhisDatabase.NAME, version = DhisDatabase.VERSION)
+public final class DhisDatabase {
+    public static final String NAME = "DataCapture";
+    public static final int VERSION = 2;
 }

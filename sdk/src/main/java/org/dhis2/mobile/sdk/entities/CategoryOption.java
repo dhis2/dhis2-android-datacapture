@@ -28,8 +28,14 @@
 
 package org.dhis2.mobile.sdk.entities;
 
-public final class CategoryOption extends BaseIdentifiableEntity {
-    private String displayName;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.Table;
+
+import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+
+@Table(databaseName = DhisDatabase.NAME)
+public final class CategoryOption extends BaseIdentifiableObject {
+    @Column String displayName;
 
     public CategoryOption() {
     }

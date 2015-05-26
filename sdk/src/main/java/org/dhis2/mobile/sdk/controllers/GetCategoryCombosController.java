@@ -28,11 +28,12 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.CategoryCombo;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetCategoryCombosTask;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryComboHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -44,15 +45,12 @@ import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 
 public final class GetCategoryCombosController implements IController<List<CategoryCombo>> {
     private final DhisManager mDhisManager;
-    private final CategoryComboHandler mCategoryComboHandler;
     private final Session mSession;
     private final List<String> mCategoryCombos;
 
     public GetCategoryCombosController(DhisManager dhisManager,
-                                       CategoryComboHandler categoryComboHandler,
                                        Session session, List<String> categoryCombos) {
         mDhisManager = dhisManager;
-        mCategoryComboHandler = categoryComboHandler;
         mSession = session;
         mCategoryCombos = categoryCombos;
     }
@@ -117,6 +115,6 @@ public final class GetCategoryCombosController implements IController<List<Categ
     }
 
     private Map<String, CategoryCombo> getOldFullCategoryCombos() {
-        return toMap(mCategoryComboHandler.query());
+        return toMap(new Select().from(CategoryCombo.class).queryList());
     }
 }

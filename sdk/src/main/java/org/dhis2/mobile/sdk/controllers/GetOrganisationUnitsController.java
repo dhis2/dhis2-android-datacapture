@@ -28,13 +28,15 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetAssignedOrganisationUnitsTask;
 import org.dhis2.mobile.sdk.network.tasks.GetOrganisationUnitsTask;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.models.Session;
 import org.joda.time.DateTime;
 
@@ -129,13 +131,17 @@ public final class GetOrganisationUnitsController implements IController<List<Or
 
     private Map<String, OrganisationUnit> getOldFullOrganisationUnits() {
         Map<String, OrganisationUnit> map = new HashMap<>();
-        List<OrganisationUnit> orgUnits = DbManager.with(OrganisationUnit.class).query();
+        //List<OrganisationUnit> orgUnits = DbManager.with(OrganisationUnit.class).query();
+        List<OrganisationUnit> orgUnits = new Select().from(OrganisationUnit.class).queryList();
         for (OrganisationUnit orgUnit : orgUnits) {
             /* List<DataSet> dataSets = mUnitDataSetHandler
                     .queryDataSets(orgUnit.getId()); */
-            List<DataSet> dataSets = DbManager.with(OrganisationUnit.class)
-                    .queryRelatedModels(DataSet.class, orgUnit.getId());
-            orgUnit.setDataSets(dataSets);
+            /* List<DataSet> dataSets = DbManager.with(OrganisationUnit.class)
+                    .queryRelatedModels(DataSet.class, orgUnit.getId()); */
+            /* new Select().from(UnitToDataSetRelation.class)
+                    .where() */
+
+            //orgUnit.setDataSets(dataSets);
             map.put(orgUnit.getId(), orgUnit);
         }
         return map;

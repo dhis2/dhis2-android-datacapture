@@ -41,8 +41,6 @@ import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.Response;
 import org.dhis2.mobile.sdk.network.managers.NetworkManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
-import org.dhis2.mobile.sdk.persistence.handlers.CategoryComboHandler;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 import org.dhis2.mobile.sdk.persistence.models.Session;
@@ -53,15 +51,11 @@ import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 public class DhisManager extends NetworkManager {
     private final Context mContext;
-    private CategoryComboHandler mCategoryComboHandler;
     private SessionHandler mSessionHandler;
     private UserAccountHandler mUserAccountHandler;
 
     public DhisManager(Context context) {
-        DbManager.init(context);
-
         mContext = isNull(context, "Context object must not be null");
-        mCategoryComboHandler = new CategoryComboHandler(context, getLogManager());
         mSessionHandler = new SessionHandler(context);
         mUserAccountHandler = new UserAccountHandler(context);
         // fetch meta data from disk
@@ -126,8 +120,7 @@ public class DhisManager extends NetworkManager {
 
     public void syncMetaData() throws APIException {
         IController<Object> metaDataController = new MetaDataController(
-                this, mCategoryComboHandler, null, null,
-                null, null, null, mSessionHandler
+                this, null, null, mSessionHandler
         );
         runController(metaDataController);
     }
