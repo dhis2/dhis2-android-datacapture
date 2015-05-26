@@ -32,7 +32,7 @@ package org.dhis2.mobile.sdk.entities;
 /**
  * Created by araz on 25.05.2015.
  */
-public final class UnitDataSetRelation {
+public final class UnitToDataSetRelation {
     private int id;
     private String orgUnitId;
     private String dataSetId;

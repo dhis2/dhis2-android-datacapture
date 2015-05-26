@@ -121,7 +121,7 @@ public class ComboCategoryHandler {
         Cursor cursor = mContext.getContentResolver().query(
                 buildUriWithCategories(categoryCombo), CategoryHandler.PROJECTION, null, null, null
         );
-        return CategoryHandler.map(cursor, true);
+        return DbManager.with(Category.class).map(cursor, true);
     }
 
     public List<Entry> queryRelationShip() {

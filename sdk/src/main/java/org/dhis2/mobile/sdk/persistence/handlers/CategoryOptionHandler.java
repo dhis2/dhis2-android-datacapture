@@ -46,8 +46,8 @@ import java.util.Map;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public final class CategoryOptionHandler {
-    public static final String[] PROJECTION = {
+final class CategoryOptionHandler implements IModelHandler<CategoryOption> {
+    private static final String[] PROJECTION = {
             CategoryOptions.TABLE_NAME + "." + CategoryOptions.ID,
             CategoryOptions.TABLE_NAME + "." + CategoryOptions.CREATED,
             CategoryOptions.TABLE_NAME + "." + CategoryOptions.LAST_UPDATED,
@@ -93,60 +93,82 @@ public final class CategoryOptionHandler {
         return categoryOption;
     }
 
-    public static List<CategoryOption> map(Cursor cursor, boolean close) {
+    @Override
+    public List<CategoryOption> map(Cursor cursor, boolean close) {
         List<CategoryOption> options = new ArrayList<>();
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
 
-            do {
-                options.add(fromCursor(cursor));
-            } while (cursor.moveToNext());
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
 
-            if (close) {
+                do {
+                    options.add(fromCursor(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null && close) {
                 cursor.close();
             }
         }
+
         return options;
     }
 
-    private void insert(List<ContentProviderOperation> ops,
-                        CategoryOption catOption) {
+    @Override
+    public CategoryOption mapSingleItem(Cursor cursor, boolean closeCursor) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] getProjection() {
+        return PROJECTION;
+    }
+
+    @Override
+    public ContentProviderOperation insert(CategoryOption catOption) {
         isNull(catOption, "CategoryOption object must not be null");
 
         mLogManager.LOGD(TAG, "Inserting " + catOption.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newInsert(CategoryOptions.CONTENT_URI)
                 .withValues(toContentValues(catOption))
-                .build());
+                .build();
     }
 
-    private void update(List<ContentProviderOperation> ops,
-                        CategoryOption catOption) {
+    @Override
+    public ContentProviderOperation update(CategoryOption catOption) {
         isNull(catOption, "CategoryOption object must not be null");
 
         mLogManager.LOGD(TAG, "Updating " + catOption.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newUpdate(CategoryOptions.CONTENT_URI)
                 .withValues(toContentValues(catOption))
-                .build());
+                .build();
     }
 
-    private void delete(List<ContentProviderOperation> ops,
-                        CategoryOption catOption) {
+    @Override
+    public ContentProviderOperation delete(CategoryOption catOption) {
         isNull(catOption, "CategoryOption object must not be null");
 
         mLogManager.LOGD(TAG, "Deleting " + catOption.getName());
         Uri uri = CategoryOptions.CONTENT_URI.buildUpon()
                 .appendPath(catOption.getId()).build();
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newDelete(uri)
-                .build());
+                .build();
     }
 
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        return null;
+    }
+
+    @Override
     public List<CategoryOption> query() {
         return query(null, null);
     }
 
+    @Override
     public List<CategoryOption> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
                 CategoryOptions.CONTENT_URI, PROJECTION, selection, selectionArgs, null
@@ -155,7 +177,7 @@ public final class CategoryOptionHandler {
         return map(cursor, true);
     }
 
-
+    @Override
     public List<ContentProviderOperation> sync(List<CategoryOption> categories) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         Map<String, CategoryOption> newCatOptions = toMap(categories);
@@ -165,7 +187,7 @@ public final class CategoryOptionHandler {
             CategoryOption oldCatOption = oldCatOptions.get(oldCatOptionKey);
 
             if (newCatOption == null) {
-                delete(ops, oldCatOption);
+                ops.add(delete(oldCatOption));
                 continue;
             }
 
@@ -173,7 +195,7 @@ public final class CategoryOptionHandler {
             DateTime oldLastUpdated = DateTime.parse(oldCatOption.getLastUpdated());
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
-                update(ops, newCatOption);
+                ops.add(update(newCatOption));
             }
 
             newCatOptions.remove(oldCatOptionKey);
@@ -181,7 +203,7 @@ public final class CategoryOptionHandler {
 
         for (String newCatOptionKey : newCatOptions.keySet()) {
             CategoryOption catOption = newCatOptions.get(newCatOptionKey);
-            insert(ops, catOption);
+            ops.add(insert(catOption));
         }
 
         return ops;

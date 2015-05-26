@@ -29,16 +29,18 @@
 
 package org.dhis2.mobile.sdk.persistence.handlers;
 
-import android.app.Application;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.os.RemoteException;
 
+import org.dhis2.mobile.sdk.entities.Category;
+import org.dhis2.mobile.sdk.entities.CategoryCombo;
+import org.dhis2.mobile.sdk.entities.CategoryOption;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.entities.UnitDataSetRelation;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.managers.LogManager;
 import org.dhis2.mobile.sdk.persistence.database.DbContract;
 
@@ -55,7 +57,11 @@ public final class DbManager {
 
     private OrganisationUnitHandler mUnitHandler;
     private DataSetHandler mDataSetHandler;
-    private UnitDataSetHandler mUnitDataSetHandler;
+    private UnitDataSetRelationHandler mUnitDataSetHandler;
+
+    private CategoryComboHandler mCategoryComboHandler;
+    private CategoryHandler mCategoryHandler;
+    private CategoryOptionHandler mCategoryOptionHandler;
 
     private DbManager(Context context) {
         mContext = isNull(context, "Context object must not be null");
@@ -91,11 +97,26 @@ public final class DbManager {
                 getInstance().mDataSetHandler = new DataSetHandler(getInstance().getContext(), new LogManager());
             }
             return (IModelHandler<T>) getInstance().mDataSetHandler;
-        } else if (clazz == UnitDataSetRelation.class) {
+        } else if (clazz == UnitToDataSetRelation.class) {
             if (getInstance().mUnitDataSetHandler == null) {
-                getInstance().mUnitDataSetHandler = new UnitDataSetHandler(getInstance().getContext(), new LogManager());
+                getInstance().mUnitDataSetHandler = new UnitDataSetRelationHandler(getInstance().getContext(), new LogManager());
             }
             return (IModelHandler<T>) getInstance().mUnitDataSetHandler;
+        } else if (clazz == CategoryCombo.class) {
+            if (getInstance().mCategoryComboHandler == null) {
+                getInstance().mCategoryComboHandler = new CategoryComboHandler(getInstance().getContext(), new LogManager());
+            }
+            return (IModelHandler<T>) getInstance().mCategoryComboHandler;
+        } else if (clazz == Category.class) {
+            if (getInstance().mCategoryHandler == null) {
+                getInstance().mCategoryHandler = new CategoryHandler(getInstance().getContext(), new LogManager());
+            }
+            return (IModelHandler<T>) getInstance().mCategoryHandler;
+        } else if (clazz == CategoryOption.class) {
+            if (getInstance().mCategoryOptionHandler == null) {
+                getInstance().mCategoryOptionHandler = new CategoryOptionHandler(getInstance().getContext(), new LogManager());
+            }
+            return (IModelHandler<T>) getInstance().mCategoryOptionHandler;
         } else {
             throw new IllegalArgumentException("Unsupported type");
         }
@@ -110,8 +131,14 @@ public final class DbManager {
             resolver.notifyChange(DbContract.OrganisationUnits.CONTENT_URI, null);
         } else if (clazz == DataSet.class) {
             resolver.notifyChange(DbContract.DataSets.CONTENT_URI, null);
-        } else if (clazz == UnitDataSetRelation.class) {
+        } else if (clazz == UnitToDataSetRelation.class) {
             resolver.notifyChange(DbContract.UnitDataSets.CONTENT_URI, null);
+        } else if (clazz == CategoryComboHandler.class) {
+            resolver.notifyChange(DbContract.CategoryCombos.CONTENT_URI, null);
+        } else if (clazz == CategoryHandler.class) {
+            resolver.notifyChange(DbContract.Categories.CONTENT_URI, null);
+        } else if (clazz == CategoryOption.class) {
+            resolver.notifyChange(DbContract.CategoryOptions.CONTENT_URI, null);
         } else {
             throw new IllegalArgumentException("Unsupported type");
         }

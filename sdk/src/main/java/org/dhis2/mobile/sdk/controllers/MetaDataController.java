@@ -29,9 +29,6 @@
 package org.dhis2.mobile.sdk.controllers;
 
 import android.content.ContentProviderOperation;
-import android.content.Context;
-import android.content.OperationApplicationException;
-import android.os.RemoteException;
 
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.Category;
@@ -40,9 +37,8 @@ import org.dhis2.mobile.sdk.entities.CategoryOption;
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.entities.UnitDataSetRelation;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.database.DbContract;
 import org.dhis2.mobile.sdk.persistence.handlers.CategoryComboHandler;
 import org.dhis2.mobile.sdk.persistence.handlers.CategoryHandler;
 import org.dhis2.mobile.sdk.persistence.handlers.CategoryOptionHandler;
@@ -113,7 +109,7 @@ public final class MetaDataController implements IController<Object> {
         //ops.addAll(mCatOptionHandler.sync(catOptions));
 
         // Handling relationships
-        ops.addAll(DbManager.with(UnitDataSetRelation.class)
+        ops.addAll(DbManager.with(UnitToDataSetRelation.class)
                 .sync(buildUnitDataSetRelations(units)));
         //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
         //ops.addAll(mComboCategoryHandler.sync(catCombos));
@@ -145,8 +141,8 @@ public final class MetaDataController implements IController<Object> {
         )).run();
     }
 
-    private List<UnitDataSetRelation> buildUnitDataSetRelations(List<OrganisationUnit> units) {
-        List<UnitDataSetRelation> relations = new ArrayList<>();
+    private List<UnitToDataSetRelation> buildUnitDataSetRelations(List<OrganisationUnit> units) {
+        List<UnitToDataSetRelation> relations = new ArrayList<>();
         if (units == null || units.isEmpty()) {
             return relations;
         }
@@ -157,7 +153,7 @@ public final class MetaDataController implements IController<Object> {
             }
 
             for (DataSet dataSet : orgUnit.getDataSets()) {
-                UnitDataSetRelation relation = new UnitDataSetRelation();
+                UnitToDataSetRelation relation = new UnitToDataSetRelation();
                 relation.setOrgUnitId(orgUnit.getId());
                 relation.setDataSetId(dataSet.getId());
                 relations.add(relation);

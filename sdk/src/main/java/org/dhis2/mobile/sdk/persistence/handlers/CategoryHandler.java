@@ -46,7 +46,7 @@ import java.util.Map;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public final class CategoryHandler {
+final class CategoryHandler implements IModelHandler<Category> {
     public static final String[] PROJECTION = {
             Categories.ID,
             Categories.CREATED,
@@ -105,16 +105,20 @@ public final class CategoryHandler {
         return category;
     }
 
-    public static List<Category> map(Cursor cursor, boolean close) {
+    @Override
+    public List<Category> map(Cursor cursor, boolean close) {
         List<Category> categories = new ArrayList<>();
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
 
-            do {
-                categories.add(fromCursor(cursor));
-            } while (cursor.moveToNext());
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
 
-            if (close) {
+                do {
+                    categories.add(fromCursor(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null && close) {
                 cursor.close();
             }
         }
@@ -122,44 +126,61 @@ public final class CategoryHandler {
         return categories;
     }
 
-    private void insert(List<ContentProviderOperation> ops,
-                        Category category) {
+    @Override
+    public Category mapSingleItem(Cursor cursor, boolean closeCursor) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] getProjection() {
+        return PROJECTION;
+    }
+
+    @Override
+    public ContentProviderOperation insert(Category category) {
         isNull(category, "Category object must not be null");
 
         mLogManager.LOGD(TAG, "Inserting " + category.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newInsert(Categories.CONTENT_URI)
                 .withValues(toContentValues(category))
-                .build());
+                .build();
     }
 
-    private void update(List<ContentProviderOperation> ops,
-                        Category category) {
+    @Override
+    public ContentProviderOperation update(Category category) {
         isNull(category, "Category object must not be null");
 
         mLogManager.LOGD(TAG, "Updating " + category.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newUpdate(Categories.CONTENT_URI)
                 .withValues(toContentValues(category))
-                .build());
+                .build();
     }
 
-    private void delete(List<ContentProviderOperation> ops,
-                        Category category) {
+    @Override
+    public ContentProviderOperation delete(Category category) {
         isNull(category, "Category object must not be null");
 
         mLogManager.LOGD(TAG, "Deleting " + category.getName());
         Uri uri = Categories.CONTENT_URI.buildUpon()
                 .appendPath(category.getId()).build();
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newDelete(uri)
-                .build());
+                .build();
     }
 
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        return null;
+    }
+
+    @Override
     public List<Category> query() {
         return query(null, null);
     }
 
+    @Override
     public List<Category> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
                 Categories.CONTENT_URI, PROJECTION, selection, selectionArgs, null
@@ -167,6 +188,7 @@ public final class CategoryHandler {
         return map(cursor, true);
     }
 
+    @Override
     public List<ContentProviderOperation> sync(List<Category> categories) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         Map<String, Category> newCats = toMap(categories);
@@ -176,7 +198,7 @@ public final class CategoryHandler {
             Category oldCat = oldCats.get(oldCatKey);
 
             if (newCat == null) {
-                delete(ops, oldCat);
+                ops.add(delete(oldCat));
                 continue;
             }
 
@@ -184,7 +206,7 @@ public final class CategoryHandler {
             DateTime oldLastUpdated = DateTime.parse(oldCat.getLastUpdated());
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
-                update(ops, newCat);
+                ops.add(update(newCat));
             }
 
             newCats.remove(oldCatKey);
@@ -192,7 +214,7 @@ public final class CategoryHandler {
 
         for (String newCatKey : newCats.keySet()) {
             Category category = newCats.get(newCatKey);
-            insert(ops, category);
+            ops.add(insert(category));
         }
 
         return ops;

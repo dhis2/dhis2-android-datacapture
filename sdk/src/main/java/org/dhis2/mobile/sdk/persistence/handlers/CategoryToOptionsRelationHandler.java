@@ -46,8 +46,8 @@ import java.util.Set;
 import static org.dhis2.mobile.sdk.persistence.database.DbContract.Categories.buildUriWithOptions;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public class CategoryToOptionsHandler {
-    private static final String TAG = CategoryToOptionsHandler.class.getSimpleName();
+final class CategoryToOptionsRelationHandler {
+    private static final String TAG = CategoryToOptionsRelationHandler.class.getSimpleName();
 
     private static final String[] PROJECTION = new String[]{
             CategoryToOptions.CATEGORY_ID,
@@ -60,8 +60,8 @@ public class CategoryToOptionsHandler {
     private final Context mContext;
     private final ILogManager mLogManager;
 
-    public CategoryToOptionsHandler(Context context,
-                                    ILogManager logManager) {
+    public CategoryToOptionsRelationHandler(Context context,
+                                            ILogManager logManager) {
         mContext = context;
         mLogManager = logManager;
     }
@@ -119,9 +119,10 @@ public class CategoryToOptionsHandler {
         isNull(category, "Category ID must not be null");
 
         Cursor cursor = mContext.getContentResolver().query(
-                buildUriWithOptions(category), CategoryOptionHandler.PROJECTION, null, null, null
+                buildUriWithOptions(category), DbManager.with(CategoryOption.class)
+                        .getProjection(), null, null, null
         );
-        return CategoryOptionHandler.map(cursor, true);
+        return DbManager.with(CategoryOption.class).map(cursor, true);
     }
 
     public List<Entry> queryRelationShip() {

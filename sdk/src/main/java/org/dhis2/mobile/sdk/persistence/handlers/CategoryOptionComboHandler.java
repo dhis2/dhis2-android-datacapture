@@ -28,13 +28,62 @@
 
 package org.dhis2.mobile.sdk.persistence.handlers;
 
+import android.content.ContentProviderOperation;
+import android.database.Cursor;
+
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CategoryOptionComboHandler {
+final class CategoryOptionComboHandler implements IModelHandler<CategoryOptionCombo> {
+    @Override
+    public List<CategoryOptionCombo> map(Cursor cursor, boolean closeCursor) {
+        return null;
+    }
+
+    @Override
+    public CategoryOptionCombo mapSingleItem(Cursor cursor, boolean closeCursor) {
+        return null;
+    }
+
+    @Override
+    public String[] getProjection() {
+        return new String[0];
+    }
+
+    @Override
+    public ContentProviderOperation insert(CategoryOptionCombo object) {
+        return null;
+    }
+
+    @Override
+    public ContentProviderOperation update(CategoryOptionCombo object) {
+        return null;
+    }
+
+    @Override
+    public ContentProviderOperation delete(CategoryOptionCombo object) {
+        return null;
+    }
+
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        return null;
+    }
+
+    @Override
+    public List<CategoryOptionCombo> query(String selection, String[] selectionArgs) {
+        return null;
+    }
+
+    @Override
     public List<CategoryOptionCombo> query() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<ContentProviderOperation> sync(List<CategoryOptionCombo> items) {
+        return null;
     }
 }

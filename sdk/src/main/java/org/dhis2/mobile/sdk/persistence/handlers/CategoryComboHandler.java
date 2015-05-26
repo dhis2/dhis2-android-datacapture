@@ -46,8 +46,8 @@ import java.util.Map;
 import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public final class CategoryComboHandler {
-    public static final String[] PROJECTION = {
+final class CategoryComboHandler implements IModelHandler<CategoryCombo> {
+    private static final String[] PROJECTION = {
             CategoryCombos.TABLE_NAME + "." + CategoryCombos.ID,
             CategoryCombos.TABLE_NAME + "." + CategoryCombos.CREATED,
             CategoryCombos.TABLE_NAME + "." + CategoryCombos.LAST_UPDATED,
@@ -70,8 +70,7 @@ public final class CategoryComboHandler {
     private final Context mContext;
     private final ILogManager mLogManager;
 
-    public CategoryComboHandler(Context context,
-                                ILogManager logManager) {
+    public CategoryComboHandler(Context context, ILogManager logManager) {
         mContext = isNull(context, "Context object must not be null");
         mLogManager = isNull(logManager, "ILogManager object must not be null");
     }
@@ -100,60 +99,82 @@ public final class CategoryComboHandler {
         return categoryCombo;
     }
 
-    public static List<CategoryCombo> map(Cursor cursor, boolean close) {
+    @Override
+    public List<CategoryCombo> map(Cursor cursor, boolean close) {
         List<CategoryCombo> categoryCombos = new ArrayList<>();
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
 
-            do {
-                categoryCombos.add(fromCursor(cursor));
-            } while (cursor.moveToNext());
+        try {
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
 
-            if (close) {
+                do {
+                    categoryCombos.add(fromCursor(cursor));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null && close) {
                 cursor.close();
             }
         }
+
         return categoryCombos;
     }
 
-    private void insert(List<ContentProviderOperation> ops,
-                        CategoryCombo categoryCombo) {
+    @Override
+    public CategoryCombo mapSingleItem(Cursor cursor, boolean closeCursor) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] getProjection() {
+        return PROJECTION;
+    }
+
+    @Override
+    public ContentProviderOperation insert(CategoryCombo categoryCombo) {
         isNull(categoryCombo, "CategoryCombo object must not be null");
 
         mLogManager.LOGD(TAG, "Inserting " + categoryCombo.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newInsert(CategoryCombos.CONTENT_URI)
                 .withValues(toContentValues(categoryCombo))
-                .build());
+                .build();
     }
 
-    private void update(List<ContentProviderOperation> ops,
-                        CategoryCombo categoryCombo) {
+    @Override
+    public ContentProviderOperation update(CategoryCombo categoryCombo) {
         isNull(categoryCombo, "CategoryCombo object must not be null");
 
         mLogManager.LOGD(TAG, "Updating " + categoryCombo.getName());
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newUpdate(CategoryCombos.CONTENT_URI)
                 .withValues(toContentValues(categoryCombo))
-                .build());
+                .build();
     }
 
-    private void delete(List<ContentProviderOperation> ops,
-                        CategoryCombo categoryCombo) {
+    @Override
+    public ContentProviderOperation delete(CategoryCombo categoryCombo) {
         isNull(categoryCombo, "CategoryCombo object must not be null");
 
         mLogManager.LOGD(TAG, "Deleting " + categoryCombo.getName());
         Uri uri = CategoryCombos.CONTENT_URI.buildUpon()
                 .appendPath(categoryCombo.getId()).build();
-        ops.add(ContentProviderOperation
+        return ContentProviderOperation
                 .newDelete(uri)
-                .build());
+                .build();
     }
 
+    @Override
+    public <T> List<T> queryRelatedModels(Class<T> clazz, Object id) {
+        return null;
+    }
+
+    @Override
     public List<CategoryCombo> query() {
         return query(null, null);
     }
 
+    @Override
     public List<CategoryCombo> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
                 CategoryCombos.CONTENT_URI, PROJECTION, selection, selectionArgs, null
@@ -161,6 +182,7 @@ public final class CategoryComboHandler {
         return map(cursor, true);
     }
 
+    @Override
     public List<ContentProviderOperation> sync(List<CategoryCombo> categoryCombos) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         Map<String, CategoryCombo> newCatCombos = toMap(categoryCombos);
@@ -170,7 +192,7 @@ public final class CategoryComboHandler {
             CategoryCombo oldCatCombo = oldCatCombos.get(oldCatComboKey);
 
             if (newCatCombo == null) {
-                delete(ops, oldCatCombo);
+                ops.add(delete(oldCatCombo));
                 continue;
             }
 
@@ -178,7 +200,7 @@ public final class CategoryComboHandler {
             DateTime oldLastUpdated = DateTime.parse(oldCatCombo.getLastUpdated());
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
-                update(ops, newCatCombo);
+                ops.add(update(newCatCombo));
             }
 
             newCatCombos.remove(oldCatComboKey);
@@ -186,7 +208,7 @@ public final class CategoryComboHandler {
 
         for (String newCatComboKey : newCatCombos.keySet()) {
             CategoryCombo categoryCombo = newCatCombos.get(newCatComboKey);
-            insert(ops, categoryCombo);
+            ops.add(insert(categoryCombo));
         }
 
         return ops;

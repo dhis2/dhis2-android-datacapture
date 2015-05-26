@@ -35,7 +35,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.UnitDataSetRelation;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.managers.ILogManager;
 import org.dhis2.mobile.sdk.persistence.database.DbContract.UnitDataSets;
 
@@ -47,8 +47,8 @@ import java.util.Map;
 import static org.dhis2.mobile.sdk.persistence.database.DbContract.OrganisationUnits.buildUriWithDataSets;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
-    private static final String TAG = UnitDataSetHandler.class.getSimpleName();
+final class UnitDataSetRelationHandler implements IModelHandler<UnitToDataSetRelation> {
+    private static final String TAG = UnitDataSetRelationHandler.class.getSimpleName();
 
     private static final String[] PROJECTION = new String[]{
             UnitDataSets.ID,
@@ -63,7 +63,7 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     private final Context mContext;
     private final ILogManager mLogManager;
 
-    public UnitDataSetHandler(Context context, ILogManager logManager) {
+    public UnitDataSetRelationHandler(Context context, ILogManager logManager) {
         mContext = context;
         mLogManager = logManager;
     }
@@ -78,9 +78,9 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
         return values;
     }
 
-    private static UnitDataSetRelation fromCursor(Cursor cursor) {
+    private static UnitToDataSetRelation fromCursor(Cursor cursor) {
         isNull(cursor, "Cursor object must not be null");
-        UnitDataSetRelation relation = new UnitDataSetRelation();
+        UnitToDataSetRelation relation = new UnitToDataSetRelation();
         relation.setId(cursor.getInt(ID));
         relation.setOrgUnitId(cursor.getString(ORGANISATION_UNIT_ID));
         relation.setDataSetId(cursor.getString(DATA_SET_ID));
@@ -88,8 +88,8 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     }
 
     @Override
-    public List<UnitDataSetRelation> map(Cursor cursor, boolean close) {
-        List<UnitDataSetRelation> relations = new ArrayList<>();
+    public List<UnitToDataSetRelation> map(Cursor cursor, boolean close) {
+        List<UnitToDataSetRelation> relations = new ArrayList<>();
 
         try {
             if (cursor != null && cursor.getCount() > 0) {
@@ -108,7 +108,7 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     }
 
     @Override
-    public UnitDataSetRelation mapSingleItem(Cursor cursor, boolean closeCursor) {
+    public UnitToDataSetRelation mapSingleItem(Cursor cursor, boolean closeCursor) {
         throw new UnsupportedOperationException("Unsupported method");
     }
 
@@ -118,7 +118,7 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     }
 
     @Override
-    public ContentProviderOperation insert(UnitDataSetRelation relation) {
+    public ContentProviderOperation insert(UnitToDataSetRelation relation) {
         isNull(relation, "UnitDataSetRelation object must not be null");
 
         mLogManager.LOGD(TAG, "Inserting dataset " + "[" + relation.getDataSetId() + "]"
@@ -130,12 +130,12 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     }
 
     @Override
-    public ContentProviderOperation update(UnitDataSetRelation object) {
+    public ContentProviderOperation update(UnitToDataSetRelation object) {
         throw new UnsupportedOperationException("Unsupported method");
     }
 
     @Override
-    public ContentProviderOperation delete(UnitDataSetRelation relation) {
+    public ContentProviderOperation delete(UnitToDataSetRelation relation) {
         isNull(relation, "UnitDataSetRelation object must not be null");
 
         mLogManager.LOGD(TAG, "Deleting dataset " + "[" + relation.getDataSetId() + "]"
@@ -162,7 +162,7 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     }
 
     @Override
-    public List<UnitDataSetRelation> query(String selection, String[] selectionArgs) {
+    public List<UnitToDataSetRelation> query(String selection, String[] selectionArgs) {
         Cursor cursor = mContext.getContentResolver().query(
                 UnitDataSets.CONTENT_URI, PROJECTION, selection, selectionArgs, null
         );
@@ -170,20 +170,20 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
     }
 
     @Override
-    public List<UnitDataSetRelation> query() {
+    public List<UnitToDataSetRelation> query() {
         return query(null, null);
     }
 
     @Override
-    public List<ContentProviderOperation> sync(List<UnitDataSetRelation> newRelationsList) {
+    public List<ContentProviderOperation> sync(List<UnitToDataSetRelation> newRelationsList) {
         isNull(newRelationsList, "List<UnitDataSetRelation> object must not be null");
 
         List<ContentProviderOperation> ops = new ArrayList<>();
-        Map<String, UnitDataSetRelation> oldRelations = toMap(query());
-        Map<String, UnitDataSetRelation> newRelations = toMap(newRelationsList);
+        Map<String, UnitToDataSetRelation> oldRelations = toMap(query());
+        Map<String, UnitToDataSetRelation> newRelations = toMap(newRelationsList);
         for (String oldRelationKey : oldRelations.keySet()) {
-            UnitDataSetRelation oldRelation = oldRelations.get(oldRelationKey);
-            UnitDataSetRelation newRelation = newRelations.get(oldRelationKey);
+            UnitToDataSetRelation oldRelation = oldRelations.get(oldRelationKey);
+            UnitToDataSetRelation newRelation = newRelations.get(oldRelationKey);
 
             if (newRelation == null) {
                 ops.add(delete(oldRelation));
@@ -200,10 +200,10 @@ final class UnitDataSetHandler implements IModelHandler<UnitDataSetRelation> {
         return ops;
     }
 
-    private static Map<String, UnitDataSetRelation> toMap(List<UnitDataSetRelation> relations) {
-        Map<String, UnitDataSetRelation> relationMap = new HashMap<>();
+    private static Map<String, UnitToDataSetRelation> toMap(List<UnitToDataSetRelation> relations) {
+        Map<String, UnitToDataSetRelation> relationMap = new HashMap<>();
         if (relations != null && !relations.isEmpty()) {
-            for (UnitDataSetRelation relation : relations) {
+            for (UnitToDataSetRelation relation : relations) {
                 relationMap.put(relation.getOrgUnitId() + relation.getDataSetId(), relation);
             }
         }
