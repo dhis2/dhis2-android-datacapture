@@ -34,7 +34,7 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 
-import org.dhis2.mobile.DhisApplication;
+import org.dhis2.mobile.DataCaptureApplication;
 import org.dhis2.mobile.DhisService;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.DhisManager;
@@ -56,11 +56,11 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     protected DhisService getDhisService() {
-        return ((DhisApplication) getApplication()).getDhisService();
+        return ((DataCaptureApplication) getApplication()).getDhisService();
     }
 
     protected DhisManager getDhisManager() {
-        return ((DhisApplication) getApplication()).getDhisManager();
+        return ((DataCaptureApplication) getApplication()).getDhisManager();
     }
 
     protected void showMessage(CharSequence message) {

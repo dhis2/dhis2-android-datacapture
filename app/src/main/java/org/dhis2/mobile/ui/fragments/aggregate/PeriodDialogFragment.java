@@ -48,8 +48,6 @@ import org.dhis2.mobile.api.date.CustomDateIterator;
 import org.dhis2.mobile.api.date.DateIteratorFactory;
 import org.dhis2.mobile.api.models.DateHolder;
 import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.persistence.database.DbContract.DataSets;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
 import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
@@ -75,7 +73,7 @@ public class PeriodDialogFragment extends DialogFragment
                                                    String dataSetId) {
         PeriodDialogFragment fragment = new PeriodDialogFragment();
         Bundle args = new Bundle();
-        args.putString(DataSets.ID, dataSetId);
+        // args.putString(DataSets.ID, dataSetId);
         fragment.setArguments(args);
         fragment.setOnItemClickListener(listener);
         return fragment;
@@ -160,13 +158,13 @@ public class PeriodDialogFragment extends DialogFragment
     @Override
     public Loader<DataSet> onCreateLoader(int id, Bundle bundle) {
         if (id == LOADER_ID && bundle != null) {
-            String dataSetId = bundle.getString(DataSets.ID);
+            /* String dataSetId = bundle.getString(DataSets.ID);
             Uri uri = DataSets.CONTENT_URI.buildUpon()
                     .appendPath(dataSetId).build();
             return CursorLoaderBuilder.forUri(uri)
                     .projection(DbManager.with(DataSet.class).getProjection())
                     .transformation(new TransformDataSet())
-                    .build(getActivity());
+                    .build(getActivity()); */
         }
         return null;
     }
@@ -199,7 +197,8 @@ public class PeriodDialogFragment extends DialogFragment
 
         @Override
         public DataSet transform(Context context, Cursor cursor) {
-            return DbManager.with(DataSet.class).mapSingleItem(cursor, false);
+            //return DbManager.with(DataSet.class).mapSingleItem(cursor, false);
+            return null;
         }
     }
 

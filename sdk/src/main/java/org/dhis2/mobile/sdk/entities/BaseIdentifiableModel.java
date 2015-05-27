@@ -26,46 +26,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.utils;
+package org.dhis2.mobile.sdk.entities;
 
-import org.dhis2.mobile.sdk.entities.BaseIdentifiableObject;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.joda.time.DateTime;
 
-public final class DbUtils {
+public abstract class BaseIdentifiableModel extends BaseModel implements TimeStampedModel {
+    @Column @PrimaryKey String id;
+    @Column DateTime created;
+    @Column DateTime lastUpdated;
+    @Column String name;
 
-    private DbUtils() {
-        // no instances
+    public BaseIdentifiableModel() {
     }
 
-    public static <T extends BaseIdentifiableObject> Map<String, T> toMap(List<T> objects) {
-        Map<String, T> map = new HashMap<>();
-        if (objects != null && objects.size() > 0) {
-            for (T object : objects) {
-                map.put(object.getId(), object);
-            }
-        }
-        return map;
+    @Override
+    public DateTime getCreated() {
+        return created;
     }
 
-    public static <T extends BaseIdentifiableObject> List<String> toIds(List<T> objects) {
-        List<String> ids = new ArrayList<>();
-        if (objects != null && objects.size() > 0) {
-            for (T object : objects) {
-                ids.add(object.getId());
-            }
-        }
-        return ids;
+    @Override
+    public void setCreated(DateTime created) {
+        this.created = created;
     }
 
-    public static <T extends BaseIdentifiableObject> void print(List<T> items) {
-        if (items != null && items.size() > 0) {
-            for (BaseIdentifiableObject item : items) {
-                System.out.println("Name: " + item.getName());
-            }
-        }
+    @Override
+    public DateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    @Override
+    public void setLastUpdated(DateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

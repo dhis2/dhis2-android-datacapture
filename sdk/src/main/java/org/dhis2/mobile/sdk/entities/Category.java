@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class Category extends BaseIdentifiableObject {
+public final class Category extends BaseIdentifiableModel {
     @Column String dataDimension;
     @Column String dataDimensionType;
     @Column String dimension;

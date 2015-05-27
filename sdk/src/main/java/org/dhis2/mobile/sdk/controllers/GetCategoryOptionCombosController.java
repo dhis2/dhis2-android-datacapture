@@ -41,8 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
-import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
+import static org.dhis2.mobile.sdk.persistence.DbUtils.toMap;
 
 public final class GetCategoryOptionCombosController implements IController<List<CategoryOptionCombo>> {
     private final DhisManager mDhisManager;

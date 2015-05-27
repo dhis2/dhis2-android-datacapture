@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class CategoryCombo extends BaseIdentifiableObject {
+public final class CategoryCombo extends BaseIdentifiableModel {
     @Column String displayName;
     @Column String dimensionType;
     @Column boolean skipTotal;

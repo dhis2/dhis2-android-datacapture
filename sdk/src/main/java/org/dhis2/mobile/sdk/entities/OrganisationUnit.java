@@ -36,10 +36,10 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class OrganisationUnit extends BaseIdentifiableObject {
+public final class OrganisationUnit extends BaseIdentifiableModel {
     @Column String displayName;
     @Column int level;
-    @Column OrganisationUnit parent;
+    OrganisationUnit parent;
     List<OrganisationUnit> children;
     List<DataSet> dataSets;
 

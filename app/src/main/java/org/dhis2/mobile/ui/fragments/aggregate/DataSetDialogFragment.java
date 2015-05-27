@@ -43,9 +43,6 @@ import android.widget.ListView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.persistence.database.DbContract;
-import org.dhis2.mobile.sdk.persistence.database.DbContract.UnitDataSets;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
 import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
@@ -67,7 +64,7 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
                                                     String orgUnitId) {
         DataSetDialogFragment fragment = new DataSetDialogFragment();
         Bundle args = new Bundle();
-        args.putString(UnitDataSets.ORGANISATION_UNIT_ID, orgUnitId);
+        // args.putString(UnitDataSets.ORGANISATION_UNIT_ID, orgUnitId);
         fragment.setOnClickListener(listener);
         fragment.setArguments(args);
         return fragment;
@@ -117,12 +114,12 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
     @Override
     public Loader<List<DataSet>> onCreateLoader(int id, Bundle bundle) {
         if (LOADER_ID == id && bundle != null) {
-            String orgUnitId = bundle.getString(UnitDataSets.ORGANISATION_UNIT_ID);
+            /* String orgUnitId = bundle.getString(UnitDataSets.ORGANISATION_UNIT_ID);
             Uri uri = DbContract.OrganisationUnits.buildUriWithDataSets(orgUnitId);
             return CursorLoaderBuilder.forUri(uri)
                     .projection(DbManager.with(DataSet.class).getProjection())
                     .transformation(new DataSetTransform())
-                    .build(getActivity());
+                    .build(getActivity()); */
         }
         return null;
     }
@@ -153,7 +150,8 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
 
         @Override
         public List<DataSet> transform(Context context, Cursor cursor) {
-            return DbManager.with(DataSet.class).map(cursor, false);
+            //return DbManager.with(DataSet.class).map(cursor, false);
+            return null;
         }
     }
 

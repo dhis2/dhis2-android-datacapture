@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
+import static org.dhis2.mobile.sdk.persistence.DbUtils.toMap;
 
 public final class GetDataSetsController implements IController<List<DataSet>> {
     private final DhisManager mDhisManager;

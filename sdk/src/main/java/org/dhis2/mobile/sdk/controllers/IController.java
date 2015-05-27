@@ -31,5 +31,5 @@ package org.dhis2.mobile.sdk.controllers;
 import org.dhis2.mobile.sdk.network.APIException;
 
 public interface IController<T> {
-    public T run() throws APIException;
+    T run() throws APIException;
 }

@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class CategoryOptionCombo extends BaseIdentifiableObject {
+public final class CategoryOptionCombo extends BaseIdentifiableModel {
     @Column String displayName;
     List<CategoryOption> categoryOptions;
 

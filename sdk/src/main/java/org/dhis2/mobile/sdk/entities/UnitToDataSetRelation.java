@@ -36,42 +36,62 @@ import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.raizlabs.android.dbflow.structure.container.ForeignKeyContainer;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
+import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
+
 @Table(databaseName = DhisDatabase.NAME)
-public final class UnitToDataSetRelation extends BaseModel {
-    @PrimaryKey(autoincrement = true) private int id;
+public final class UnitToDataSetRelation extends BaseModel implements RelationModel {
+    private static final String ORG_UNIT_KEY = "orgUnitId";
+    private static final String DATA_SET_KEY = "dataSetId";
+
+    @Column @PrimaryKey(autoincrement = true) int id;
 
     @Column @ForeignKey(
             references = {
-                    @ForeignKeyReference(columnName = "orgUnitId", columnType = String.class, foreignColumnName = "id"),
+                    @ForeignKeyReference(columnName = ORG_UNIT_KEY, columnType = String.class, foreignColumnName = "id"),
             }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
-    ) private OrganisationUnit organisationUnit;
+    ) final ForeignKeyContainer<OrganisationUnit> organisationUnit;
 
     @Column @ForeignKey(
             references = {
-                    @ForeignKeyReference(columnName = "dataSetId", columnType = String.class, foreignColumnName = "id"),
+                    @ForeignKeyReference(columnName = DATA_SET_KEY, columnType = String.class, foreignColumnName = "id"),
             }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
-    ) private DataSet dataSet;
+    ) final ForeignKeyContainer<DataSet> dataSet;
+
+    @Override
+    public String getFirstKey() {
+        return (String) organisationUnit.getValue(ORG_UNIT_KEY);
+    }
+
+    @Override
+    public String getSecondKey() {
+        return (String) dataSet.getValue(DATA_SET_KEY);
+    }
 
     public int getId() {
         return id;
     }
 
-    public OrganisationUnit getOrganisationUnit() {
-        return organisationUnit;
+    public UnitToDataSetRelation(OrganisationUnit unit, DataSet dataSet) {
+        isNull(unit, "OrganisationUnit object must not be null");
+        isNull(dataSet, "DataSet object must not be null");
+
+        this.organisationUnit = new ForeignKeyContainer<>(OrganisationUnit.class);
+        this.dataSet = new ForeignKeyContainer<>(DataSet.class);
+
+        this.organisationUnit.setModel(unit);
+        this.dataSet.setModel(dataSet);
+
     }
 
-    public void setOrganisationUnit(OrganisationUnit organisationUnit) {
-        this.organisationUnit = organisationUnit;
+    public OrganisationUnit getOrganisationUnit() {
+        return organisationUnit != null ? organisationUnit.toModel() : null;
     }
 
     public DataSet getDataSet() {
-        return dataSet;
-    }
-
-    public void setDataSet(DataSet dataSet) {
-        this.dataSet = dataSet;
+        return dataSet != null ? dataSet.toModel() : null;
     }
 }

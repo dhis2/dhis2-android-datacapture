@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
+import static org.dhis2.mobile.sdk.persistence.DbUtils.toMap;
 
 public class GetCategoriesController implements IController<List<Category>> {
     private final DhisManager mDhisManager;

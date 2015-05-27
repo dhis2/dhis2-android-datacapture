@@ -28,12 +28,14 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
+import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation$Table;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.GetAssignedOrganisationUnitsTask;
 import org.dhis2.mobile.sdk.network.tasks.GetOrganisationUnitsTask;
@@ -45,8 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
-import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
+import static org.dhis2.mobile.sdk.persistence.DbUtils.toIds;
+import static org.dhis2.mobile.sdk.persistence.DbUtils.toMap;
 
 public final class GetOrganisationUnitsController implements IController<List<OrganisationUnit>> {
     private final DhisManager mDhisManager;
@@ -74,8 +76,8 @@ public final class GetOrganisationUnitsController implements IController<List<Or
                 continue;
             }
 
-            DateTime newLastUpdated = DateTime.parse(newOrgUnit.getLastUpdated());
-            DateTime oldLastUpdated = DateTime.parse(oldOrgUnit.getLastUpdated());
+            DateTime newLastUpdated = newOrgUnit.getLastUpdated();
+            DateTime oldLastUpdated = oldOrgUnit.getLastUpdated();
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
                 // we need to update current version
@@ -131,19 +133,29 @@ public final class GetOrganisationUnitsController implements IController<List<Or
 
     private Map<String, OrganisationUnit> getOldFullOrganisationUnits() {
         Map<String, OrganisationUnit> map = new HashMap<>();
-        //List<OrganisationUnit> orgUnits = DbManager.with(OrganisationUnit.class).query();
-        List<OrganisationUnit> orgUnits = new Select().from(OrganisationUnit.class).queryList();
+        List<OrganisationUnit> orgUnits = new Select()
+                .from(OrganisationUnit.class)
+                .queryList();
         for (OrganisationUnit orgUnit : orgUnits) {
-            /* List<DataSet> dataSets = mUnitDataSetHandler
-                    .queryDataSets(orgUnit.getId()); */
-            /* List<DataSet> dataSets = DbManager.with(OrganisationUnit.class)
-                    .queryRelatedModels(DataSet.class, orgUnit.getId()); */
-            /* new Select().from(UnitToDataSetRelation.class)
-                    .where() */
-
-            //orgUnit.setDataSets(dataSets);
+            orgUnit.setDataSets(getDataSetsForOrgUnit(orgUnit.getId()));
             map.put(orgUnit.getId(), orgUnit);
         }
         return map;
+    }
+
+    private static List<DataSet> getDataSetsForOrgUnit(String id) {
+        List<UnitToDataSetRelation> relations = new Select()
+                .from(UnitToDataSetRelation.class)
+                .where(Condition
+                        .column(UnitToDataSetRelation$Table.ORGANISATIONUNIT_ORGUNITID)
+                        .is(id))
+                .queryList();
+        List<DataSet> dataSets = new ArrayList<>();
+        if (relations != null && !relations.isEmpty()) {
+            for (UnitToDataSetRelation relation : relations) {
+                dataSets.add(relation.getDataSet());
+            }
+        }
+        return dataSets;
     }
 }

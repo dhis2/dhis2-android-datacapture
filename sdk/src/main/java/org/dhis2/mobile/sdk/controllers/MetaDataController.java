@@ -28,7 +28,7 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
-import android.content.ContentProviderOperation;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.Category;
@@ -39,8 +39,10 @@ import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
+import org.dhis2.mobile.sdk.persistence.DbHelper;
+import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 import org.dhis2.mobile.sdk.persistence.models.Session;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,7 +51,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
+import static org.dhis2.mobile.sdk.persistence.DbUtils.toIds;
 
 public final class MetaDataController implements IController<Object> {
     private final DhisManager mDhisManager;
@@ -64,8 +66,8 @@ public final class MetaDataController implements IController<Object> {
     @Override
     public Object run() throws APIException {
         // first we need to fetch all metadata from server
-        List<OrganisationUnit> units = getOrganisationUnits();
-        List<DataSet> dataSets = getDataSets(units);
+        List<OrganisationUnit> newUnits = getOrganisationUnits();
+        List<DataSet> newDataSets = getDataSets(newUnits);
         //List<CategoryCombo> catCombos = getCategoryCombos(dataSets);
         //List<Category> cats = getCats(catCombos);
         //List<CategoryOption> catOptions = getCatOptions(
@@ -75,16 +77,23 @@ public final class MetaDataController implements IController<Object> {
         List<CategoryOptionCombo> catOptCombos = getCatOptCombos(catCombos);
         */
 
-        Queue<ContentProviderOperation> ops = new LinkedList<>();
-        // ops.addAll(DbManager.with(OrganisationUnit.class).sync(units));
-        // ops.addAll(DbManager.with(DataSet.class).sync(dataSets));
+        Queue<DbOperation> ops = new LinkedList<>();
+        ops.addAll(DbHelper.syncBaseIdentifiableModels(
+                new Select().from(OrganisationUnit.class).queryList(), newUnits
+        ));
+        ops.addAll(DbHelper.syncBaseIdentifiableModels(
+                new Select().from(DataSet.class).queryList(), newDataSets
+        ));
         //ops.addAll(mCategoryComboHandler.sync(catCombos));
         //ops.addAll(mCategoryHandler.sync(cats));
         //ops.addAll(mCatOptionHandler.sync(catOptions));
 
         // Handling relationships
-        // ops.addAll(DbManager.with(UnitToDataSetRelation.class)
-        //        .sync(buildUnitDataSetRelations(units)));
+        ops.addAll(DbHelper.syncRelationModels(
+                new Select().from(UnitToDataSetRelation.class).queryList(),
+                buildUnitDataSetRelations(newUnits)
+        ));
+
         //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
         //ops.addAll(mComboCategoryHandler.sync(catCombos));
         //ops.addAll(mCategoryToOptionHandler.sync(cats));
@@ -93,8 +102,10 @@ public final class MetaDataController implements IController<Object> {
         // DbManager.notifyChange(OrganisationUnit.class);
         // DbManager.notifyChange(DataSet.class);
 
+        DbHelper.applyBatch(ops);
         return new Object();
     }
+
 
     private List<OrganisationUnit> getOrganisationUnits() throws APIException {
         return (new GetOrganisationUnitsController(
@@ -127,10 +138,7 @@ public final class MetaDataController implements IController<Object> {
             }
 
             for (DataSet dataSet : orgUnit.getDataSets()) {
-                // UnitToDataSetRelation relation = new UnitToDataSetRelation();
-                // relation.setOrgUnitId(orgUnit.getId());
-                // relation.setDataSetId(dataSet.getId());
-                // relations.add(relation);
+                relations.add(new UnitToDataSetRelation(orgUnit, dataSet));
             }
         }
         return relations;

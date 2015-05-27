@@ -30,10 +30,11 @@ package org.dhis2.mobile;
 
 import android.app.Application;
 
+import org.dhis2.mobile.sdk.DhisApplication;
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.utils.EventBus;
 
-public class DhisApplication extends Application {
+public class DataCaptureApplication extends DhisApplication {
     private DhisService mDhisService;
     private DhisManager mDhisManager;
 

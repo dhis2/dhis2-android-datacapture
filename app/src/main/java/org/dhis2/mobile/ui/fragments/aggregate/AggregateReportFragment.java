@@ -48,8 +48,6 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.api.models.DateHolder;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.database.DbContract.OrganisationUnits;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
 import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
 import org.dhis2.mobile.ui.activities.ReportEntryActivity;
@@ -252,10 +250,11 @@ public class AggregateReportFragment extends BaseFragment
     @Override
     public Loader<Boolean> onCreateLoader(int id, Bundle bundle) {
         if (id == LOADER_ID) {
-            return CursorLoaderBuilder.forUri(OrganisationUnits.CONTENT_URI)
+            /* return CursorLoaderBuilder.forUri(OrganisationUnits.CONTENT_URI)
                     .projection(DbManager.with(OrganisationUnit.class).getProjection())
                     .transformation(new OrgUnitTransformation())
                     .build(getActivity());
+                    */
         }
         return null;
     }

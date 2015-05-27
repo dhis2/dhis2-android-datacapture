@@ -28,7 +28,7 @@
 
 package org.dhis2.mobile.sdk.entities;
 
-public final class UserAccount extends BaseIdentifiableObject {
+public final class UserAccount extends BaseIdentifiableModel {
     private String displayName;
     private String firstName;
     private String surname;

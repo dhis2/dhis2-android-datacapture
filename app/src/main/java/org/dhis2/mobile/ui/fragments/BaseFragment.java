@@ -30,7 +30,7 @@ package org.dhis2.mobile.ui.fragments;
 
 import android.support.v4.app.Fragment;
 
-import org.dhis2.mobile.DhisApplication;
+import org.dhis2.mobile.DataCaptureApplication;
 import org.dhis2.mobile.DhisService;
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.utils.EventBus;
@@ -52,7 +52,7 @@ public class BaseFragment extends Fragment {
     protected DhisService getDhisService() {
         DhisService dhisService = null;
         if (isAdded() && getActivity() != null) {
-            dhisService = ((DhisApplication) getActivity().getApplication()).getDhisService();
+            dhisService = ((DataCaptureApplication) getActivity().getApplication()).getDhisService();
         }
         return dhisService;
     }
@@ -60,7 +60,7 @@ public class BaseFragment extends Fragment {
     protected DhisManager getDhisManager() {
         DhisManager dhisManager = null;
         if (isAdded() && getActivity() != null) {
-            dhisManager = ((DhisApplication) getActivity().getApplication()).getDhisManager();
+            dhisManager = ((DataCaptureApplication) getActivity().getApplication()).getDhisManager();
         }
         return dhisManager;
     }

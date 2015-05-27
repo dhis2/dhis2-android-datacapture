@@ -26,50 +26,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.entities;
+package org.dhis2.mobile.sdk.persistence;
 
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import org.dhis2.mobile.sdk.entities.BaseIdentifiableModel;
 
-public abstract class BaseIdentifiableObject extends BaseModel {
-    @Column @PrimaryKey String id;
-    @Column String created;
-    @Column String lastUpdated;
-    @Column String name;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    public BaseIdentifiableObject() {
+public final class DbUtils {
+
+    private DbUtils() {
+        // no instances
     }
 
-    public String getId() {
-        return id;
+    public static <T extends BaseIdentifiableModel> Map<String, T> toMap(List<T> objects) {
+        Map<String, T> map = new HashMap<>();
+        if (objects != null && objects.size() > 0) {
+            for (T object : objects) {
+                map.put(object.getId(), object);
+            }
+        }
+        return map;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public static <T extends BaseIdentifiableModel> List<String> toIds(List<T> objects) {
+        List<String> ids = new ArrayList<>();
+        if (objects != null && objects.size() > 0) {
+            for (T object : objects) {
+                ids.add(object.getId());
+            }
+        }
+        return ids;
     }
 
-    public String getCreated() {
-        return created;
-    }
-
-    public void setCreated(String created) {
-        this.created = created;
-    }
-
-    public String getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(String lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public static <T extends BaseIdentifiableModel> void print(List<T> items) {
+        if (items != null && items.size() > 0) {
+            for (BaseIdentifiableModel item : items) {
+                System.out.println("Name: " + item.getName());
+            }
+        }
     }
 }

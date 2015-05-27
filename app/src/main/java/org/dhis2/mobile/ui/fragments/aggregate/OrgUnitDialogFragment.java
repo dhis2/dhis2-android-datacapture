@@ -42,8 +42,6 @@ import android.widget.ListView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.persistence.database.DbContract.OrganisationUnits;
-import org.dhis2.mobile.sdk.persistence.handlers.DbManager;
 import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
 import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
@@ -119,10 +117,10 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
     @Override
     public Loader<List<OrganisationUnit>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            return CursorLoaderBuilder.forUri(OrganisationUnits.CONTENT_URI)
+            /* return CursorLoaderBuilder.forUri(OrganisationUnits.CONTENT_URI)
                     .projection(DbManager.with(OrganisationUnit.class).getProjection())
                     .transformation(new OrgUnitTransform())
-                    .build(getActivity());
+                    .build(getActivity()); */
         }
         return null;
     }
@@ -145,7 +143,8 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
 
         @Override
         public List<OrganisationUnit> transform(Context context, Cursor cursor) {
-            return DbManager.with(OrganisationUnit.class).map(cursor, false);
+            //return DbManager.with(OrganisationUnit.class).map(cursor, false);
+            return null;
         }
     }
 
