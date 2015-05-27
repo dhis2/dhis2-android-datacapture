@@ -20,6 +20,11 @@ android {
     lintOptions {
         disable 'RtlSymmetry', 'RtlHardcoded'
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 dependencies {

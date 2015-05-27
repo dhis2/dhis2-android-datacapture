@@ -28,6 +28,8 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
 
@@ -35,15 +37,17 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 @Table(databaseName = DhisDatabase.NAME)
 public final class CategoryOption extends BaseIdentifiableModel {
-    @Column String displayName;
+    @JsonProperty("displayName") @Column String displayName;
 
     public CategoryOption() {
     }
 
+    @JsonIgnore
     public String getDisplayName() {
         return displayName;
     }
 
+    @JsonIgnore
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }

@@ -72,8 +72,8 @@ public final class GetDataSetsController implements IController<List<DataSet>> {
                 continue;
             }
 
-            DateTime newLastUpdated = DateTime.parse(newDataSet.getLastUpdated());
-            DateTime oldLastUpdated = DateTime.parse(oldDataSet.getLastUpdated());
+            DateTime newLastUpdated = newDataSet.getLastUpdated();
+            DateTime oldLastUpdated = oldDataSet.getLastUpdated();
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
                 // we need to update current version

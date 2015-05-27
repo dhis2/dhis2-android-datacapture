@@ -28,29 +28,31 @@
 
 package org.dhis2.mobile.sdk.network.converters;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 public final class CategoryOptionComboConverter implements IJsonConverter<String, List<CategoryOptionCombo>> {
-    private Gson mGson;
+    private static final String ROOT_NODE = "categoryOptionCombos";
+    private final ObjectMapper mMapper;
 
-    public CategoryOptionComboConverter(Gson gson) {
-        mGson = gson;
+    public CategoryOptionComboConverter(ObjectMapper mapper) {
+        mMapper = mapper;
     }
 
     @Override
-    public List<CategoryOptionCombo> deserialize(String source) {
-        Type type = new TypeToken<List<CategoryOptionCombo>>() { }.getType();
-        return mGson.fromJson(source, type);
+    public List<CategoryOptionCombo> deserialize(String source) throws Throwable {
+        JsonNode rootNode = mMapper.readTree(source);
+        return mMapper.convertValue(rootNode.get(ROOT_NODE),
+                new TypeReference<List<CategoryOptionCombo>>() { });
     }
 
     @Override
-    public String serialize(String object) {
+    public String serialize(String object) throws Throwable {
         return object;
     }
 }

@@ -28,84 +28,102 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.Table;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME)
+@ModelContainer @Table(databaseName = DhisDatabase.NAME)
 public final class DataSet extends BaseIdentifiableModel {
-    @Column String displayName;
-    @Column int version;
-    @Column int expiryDays;
-    @Column boolean allowFuturePeriods;
-    @Column String periodType;
+    @JsonProperty("displayName") @Column String displayName;
+    @JsonProperty("version") @Column int version;
+    @JsonProperty("expiryDays") @Column int expiryDays;
+    @JsonProperty("allowFuturePeriods") @Column boolean allowFuturePeriods;
+    @JsonProperty("periodType") @Column String periodType;
 
-    List<OrganisationUnit> organisationUnits;
-    CategoryCombo categoryCombo;
-    List<Object> sections;
+    @JsonProperty("organisationUnits") List<OrganisationUnit> organisationUnits;
+    @JsonProperty("categoryCombo") CategoryCombo categoryCombo;
+    @JsonProperty("sections") List<Object> sections;
 
     public DataSet() {
     }
 
+    @JsonIgnore
     public List<OrganisationUnit> getOrganisationUnits() {
         return organisationUnits;
     }
 
+    @JsonIgnore
     public void setOrganisationUnits(List<OrganisationUnit> organisationUnits) {
         this.organisationUnits = organisationUnits;
     }
 
+    @JsonIgnore
     public CategoryCombo getCategoryCombo() {
         return categoryCombo;
     }
 
+    @JsonIgnore
     public void setCategoryCombo(CategoryCombo categoryCombo) {
         this.categoryCombo = categoryCombo;
     }
 
+    @JsonIgnore
     public void setSections(List<Object> sections) {
         this.sections = sections;
     }
 
+    @JsonIgnore
     public String getDisplayName() {
         return displayName;
     }
 
+    @JsonIgnore
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
+    @JsonIgnore
     public int getVersion() {
         return version;
     }
 
+    @JsonIgnore
     public void setVersion(int version) {
         this.version = version;
     }
 
+    @JsonIgnore
     public int getExpiryDays() {
         return expiryDays;
     }
 
+    @JsonIgnore
     public void setExpiryDays(int expiryDays) {
         this.expiryDays = expiryDays;
     }
 
+    @JsonIgnore
     public boolean isAllowFuturePeriods() {
         return allowFuturePeriods;
     }
 
+    @JsonIgnore
     public void setAllowFuturePeriods(boolean allowFuturePeriods) {
         this.allowFuturePeriods = allowFuturePeriods;
     }
 
+    @JsonIgnore
     public String getPeriodType() {
         return periodType;
     }
 
+    @JsonIgnore
     public void setPeriodType(String periodType) {
         this.periodType = periodType;
     }

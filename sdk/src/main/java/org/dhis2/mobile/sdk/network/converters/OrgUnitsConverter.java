@@ -28,36 +28,31 @@
 
 package org.dhis2.mobile.sdk.network.converters;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 public final class OrgUnitsConverter implements IJsonConverter<String, List<OrganisationUnit>> {
-    private static final String ORGANISATION_UNITS = "organisationUnits";
+    private static final String ROOT_NODE = "organisationUnits";
+    private final ObjectMapper mMapper;
 
-    private final Gson mGson;
-
-    public OrgUnitsConverter(Gson gson) {
-        mGson = gson;
+    public OrgUnitsConverter(ObjectMapper mapper) {
+        mMapper = mapper;
     }
 
     @Override
-    public List<OrganisationUnit> deserialize(String source) {
-        JsonObject jObject = (new JsonParser()).parse(source).getAsJsonObject();
-        JsonArray jOrgUnits = jObject.getAsJsonArray(ORGANISATION_UNITS);
-        Type type = new TypeToken<List<OrganisationUnit>>() {}.getType();
-        return mGson.fromJson(jOrgUnits, type);
+    public List<OrganisationUnit> deserialize(String source) throws Throwable {
+        JsonNode rootNode = mMapper.readTree(source);
+        return mMapper.convertValue(rootNode.get(ROOT_NODE),
+                new TypeReference<List<OrganisationUnit>>() { });
     }
 
     @Override
-    public String serialize(String object) {
+    public String serialize(String object) throws Throwable {
         return object;
     }
 }

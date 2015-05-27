@@ -28,60 +28,73 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.Table;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME)
+@ModelContainer @Table(databaseName = DhisDatabase.NAME)
 public final class OrganisationUnit extends BaseIdentifiableModel {
-    @Column String displayName;
-    @Column int level;
-    OrganisationUnit parent;
-    List<OrganisationUnit> children;
-    List<DataSet> dataSets;
+    @JsonProperty("displayName") @Column String displayName;
+    @JsonProperty("level") @Column int level;
+    @JsonProperty("parent") OrganisationUnit parent;
+    @JsonProperty("children") List<OrganisationUnit> children;
+    @JsonProperty("dataSets") List<DataSet> dataSets;
 
     public OrganisationUnit() {
     }
 
+    @JsonIgnore
     public OrganisationUnit getParent() {
         return parent;
     }
 
+    @JsonIgnore
     public void setParent(OrganisationUnit parent) {
         this.parent = parent;
     }
 
+    @JsonIgnore
     public String getDisplayName() {
         return displayName;
     }
 
+    @JsonIgnore
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
+    @JsonIgnore
     public int getLevel() {
         return level;
     }
 
+    @JsonIgnore
     public void setLevel(int level) {
         this.level = level;
     }
 
+    @JsonIgnore
     public List<OrganisationUnit> getChildren() {
         return children;
     }
 
+    @JsonIgnore
     public void setChildren(List<OrganisationUnit> children) {
         this.children = children;
     }
 
+    @JsonIgnore
     public List<DataSet> getDataSets() {
         return dataSets;
     }
 
+    @JsonIgnore
     public void setDataSets(List<DataSet> dataSets) {
         this.dataSets = dataSets;
     }

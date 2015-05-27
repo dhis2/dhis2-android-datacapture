@@ -28,6 +28,7 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
 
@@ -37,51 +38,61 @@ import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
 public final class CategoryCombo extends BaseIdentifiableModel {
-    @Column String displayName;
-    @Column String dimensionType;
-    @Column boolean skipTotal;
-    List<CategoryOptionCombo> categoryOptionCombos;
-    List<Category> categories;
+    @JsonProperty("displayName") @Column String displayName;
+    @JsonProperty("dimensionType") @Column String dimensionType;
+    @JsonProperty("skipTotal") @Column boolean skipTotal;
+    @JsonProperty("categoryOptionCombos") List<CategoryOptionCombo> categoryOptionCombos;
+    @JsonProperty("categories") List<Category> categories;
 
     public CategoryCombo() {
     }
 
+    @JsonProperty
     public String getDisplayName() {
         return displayName;
     }
 
+    @JsonProperty
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
+    @JsonProperty
     public boolean isSkipTotal() {
         return skipTotal;
     }
 
+    @JsonProperty
     public void setSkipTotal(boolean skipTotal) {
         this.skipTotal = skipTotal;
     }
 
+    @JsonProperty
     public List<CategoryOptionCombo> getCategoryOptionCombos() {
         return categoryOptionCombos;
     }
 
+    @JsonProperty
     public void setCategoryOptionCombos(List<CategoryOptionCombo> categoryOptionCombos) {
         this.categoryOptionCombos = categoryOptionCombos;
     }
 
+    @JsonProperty
     public List<Category> getCategories() {
         return categories;
     }
 
+    @JsonProperty
     public void setCategories(List<Category> categories) {
         this.categories = categories;
     }
 
+    @JsonProperty
     public String getDimensionType() {
         return dimensionType;
     }
 
+    @JsonProperty
     public void setDimensionType(String dimensionType) {
         this.dimensionType = dimensionType;
     }

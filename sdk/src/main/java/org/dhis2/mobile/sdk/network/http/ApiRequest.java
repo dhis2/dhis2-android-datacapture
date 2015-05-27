@@ -96,7 +96,8 @@ public final class ApiRequest<I, T> {
         try {
             String responseBody = new String(response.getBody());
             data = mJsonConverter.deserialize(responseBody);
-        } catch (Exception conversionException) {
+        } catch (Throwable conversionException) {
+            conversionException.printStackTrace();
             throw APIException.conversionError(mRequest.getUrl(),
                     response, conversionException);
         }

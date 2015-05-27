@@ -29,6 +29,6 @@
 package org.dhis2.mobile.sdk.network.converters;
 
 public interface IJsonConverter<In, Out> {
-    public Out deserialize(String source);
-    public String serialize(In object);
+    Out deserialize(String source) throws Throwable;
+    String serialize(In object) throws Throwable;
 }

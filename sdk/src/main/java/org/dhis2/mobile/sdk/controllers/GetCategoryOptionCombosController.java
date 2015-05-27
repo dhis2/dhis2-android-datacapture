@@ -70,8 +70,8 @@ public final class GetCategoryOptionCombosController implements IController<List
                 continue;
             }
 
-            DateTime newLastUpdated = DateTime.parse(newCoc.getLastUpdated());
-            DateTime oldLastUpdated = DateTime.parse(oldCoc.getLastUpdated());
+            DateTime newLastUpdated = newCoc.getLastUpdated();
+            DateTime oldLastUpdated = oldCoc.getLastUpdated();
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
                 // we need to update current version

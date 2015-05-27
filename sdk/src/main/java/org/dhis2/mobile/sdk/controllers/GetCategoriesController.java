@@ -70,8 +70,8 @@ public class GetCategoriesController implements IController<List<Category>> {
                 continue;
             }
 
-            DateTime newLastUpdated = DateTime.parse(newCat.getLastUpdated());
-            DateTime oldLastUpdated = DateTime.parse(oldCat.getLastUpdated());
+            DateTime newLastUpdated = newCat.getLastUpdated();
+            DateTime oldLastUpdated = oldCat.getLastUpdated();
 
             if (newLastUpdated.isAfter(oldLastUpdated)) {
                 // we need to update current version

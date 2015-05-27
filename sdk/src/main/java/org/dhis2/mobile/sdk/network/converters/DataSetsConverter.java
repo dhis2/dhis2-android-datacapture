@@ -28,36 +28,31 @@
 
 package org.dhis2.mobile.sdk.network.converters;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.DataSet;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 public final class DataSetsConverter implements IJsonConverter<String, List<DataSet>> {
-    private static final String DATA_SETS = "dataSets";
+    private static final String ROOT_NODE = "dataSets";
+    private final ObjectMapper mMapper;
 
-    private final Gson mGson;
-
-    public DataSetsConverter(Gson gson) {
-        mGson = gson;
+    public DataSetsConverter(ObjectMapper mapper) {
+        mMapper = mapper;
     }
 
     @Override
-    public List<DataSet> deserialize(String source) {
-        JsonObject jObject = (new JsonParser()).parse(source).getAsJsonObject();
-        JsonArray jDataSets = jObject.getAsJsonArray(DATA_SETS);
-        Type type = new TypeToken<List<DataSet>>() { }.getType();
-        return mGson.fromJson(jDataSets, type);
+    public List<DataSet> deserialize(String source) throws Throwable {
+        JsonNode rootNode = mMapper.readTree(source);
+        return mMapper.convertValue(rootNode.get(ROOT_NODE),
+                new TypeReference<List<DataSet>>() { });
     }
 
     @Override
-    public String serialize(String object) {
+    public String serialize(String object) throws Throwable {
         return object;
     }
 }

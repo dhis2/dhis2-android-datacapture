@@ -28,7 +28,7 @@
 
 package org.dhis2.mobile.sdk.network.managers;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.Category;
 import org.dhis2.mobile.sdk.entities.CategoryCombo;
@@ -49,44 +49,44 @@ import org.dhis2.mobile.sdk.network.converters.UserAccountConverter;
 import java.util.List;
 
 public class JsonManager implements IJsonManager {
-    private Gson mGson;
+    private final ObjectMapper mMapper;
 
-    public JsonManager() {
-        mGson = new Gson();
+    public JsonManager(ObjectMapper mapper) {
+        mMapper = mapper;
     }
 
     @Override
     public IJsonConverter<UserAccount, UserAccount> getUserAccountConverter() {
-        return new UserAccountConverter(mGson);
+        return new UserAccountConverter(mMapper);
     }
 
     @Override
     public IJsonConverter<String, List<OrganisationUnit>> getOrgUnitsConverter() {
-        return new OrgUnitsConverter(mGson);
+        return new OrgUnitsConverter(mMapper);
     }
 
     @Override
     public IJsonConverter<String, List<DataSet>> getDataSetsConverter() {
-        return new DataSetsConverter(mGson);
+        return new DataSetsConverter(mMapper);
     }
 
     @Override
     public IJsonConverter<String, List<CategoryCombo>> getCategoryCombosConverter() {
-        return new CategoryComboConverter(mGson);
+        return new CategoryComboConverter(mMapper);
     }
 
     @Override
     public IJsonConverter<String, List<CategoryOptionCombo>> getCategoryOptionComboConverter() {
-        return new CategoryOptionComboConverter(mGson);
+        return new CategoryOptionComboConverter(mMapper);
     }
 
     @Override
     public IJsonConverter<String, List<Category>> getCategoryConverter() {
-        return new CategoryConverter(mGson);
+        return new CategoryConverter(mMapper);
     }
 
     @Override
     public IJsonConverter<String, List<CategoryOption>> getCategoryOptionConverter() {
-        return new CategoryOptionConverter(mGson);
+        return new CategoryOptionConverter(mMapper);
     }
 }

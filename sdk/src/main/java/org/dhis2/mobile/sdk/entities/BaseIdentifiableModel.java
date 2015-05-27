@@ -28,6 +28,8 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.structure.BaseModel;
@@ -35,46 +37,50 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 import org.joda.time.DateTime;
 
 public abstract class BaseIdentifiableModel extends BaseModel implements TimeStampedModel {
-    @Column @PrimaryKey String id;
-    @Column DateTime created;
-    @Column DateTime lastUpdated;
-    @Column String name;
+    @JsonProperty("id") @Column @PrimaryKey String id;
+    @JsonProperty("created") @Column DateTime created;
+    @JsonProperty("lastUpdated") @Column DateTime lastUpdated;
+    @JsonProperty("name") @Column String name;
 
     public BaseIdentifiableModel() {
     }
 
-    @Override
+    @JsonIgnore @Override
     public DateTime getCreated() {
         return created;
     }
 
-    @Override
+    @JsonIgnore @Override
     public void setCreated(DateTime created) {
         this.created = created;
     }
 
-    @Override
+    @JsonIgnore @Override
     public DateTime getLastUpdated() {
         return lastUpdated;
     }
 
-    @Override
+    @JsonIgnore @Override
     public void setLastUpdated(DateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 
+    @JsonIgnore
     public String getId() {
         return id;
     }
 
+    @JsonIgnore
     public void setId(String id) {
         this.id = id;
     }
 
+    @JsonIgnore
     public String getName() {
         return name;
     }
 
+    @JsonIgnore
     public void setName(String name) {
         this.name = name;
     }

@@ -138,7 +138,10 @@ public final class MetaDataController implements IController<Object> {
             }
 
             for (DataSet dataSet : orgUnit.getDataSets()) {
-                relations.add(new UnitToDataSetRelation(orgUnit, dataSet));
+                UnitToDataSetRelation relation = new UnitToDataSetRelation();
+                relation.setOrganisationUnit(orgUnit);
+                relation.setDataSet(dataSet);
+                relations.add(relation);
             }
         }
         return relations;

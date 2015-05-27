@@ -28,24 +28,24 @@
 
 package org.dhis2.mobile.sdk.network.converters;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.UserAccount;
 
 public class UserAccountConverter implements IJsonConverter<UserAccount, UserAccount> {
-    private final Gson mGson;
+    private final ObjectMapper mMapper;
 
-    public UserAccountConverter(Gson gson) {
-        mGson = gson;
+    public UserAccountConverter(ObjectMapper mapper) {
+        mMapper = mapper;
     }
 
     @Override
-    public UserAccount deserialize(String source) {
-        return mGson.fromJson(source, UserAccount.class);
+    public UserAccount deserialize(String source) throws Throwable {
+        return mMapper.readValue(source, UserAccount.class);
     }
 
     @Override
-    public String serialize(UserAccount object) {
-        return mGson.toJson(object, UserAccount.class);
+    public String serialize(UserAccount object) throws Throwable {
+        return mMapper.writeValueAsString(object);
     }
 }

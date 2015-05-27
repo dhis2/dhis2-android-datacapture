@@ -53,13 +53,13 @@ public final class UnitToDataSetRelation extends BaseModel implements RelationMo
             references = {
                     @ForeignKeyReference(columnName = ORG_UNIT_KEY, columnType = String.class, foreignColumnName = "id"),
             }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
-    ) final ForeignKeyContainer<OrganisationUnit> organisationUnit;
+    ) ForeignKeyContainer<OrganisationUnit> organisationUnit;
 
     @Column @ForeignKey(
             references = {
                     @ForeignKeyReference(columnName = DATA_SET_KEY, columnType = String.class, foreignColumnName = "id"),
             }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
-    ) final ForeignKeyContainer<DataSet> dataSet;
+    ) ForeignKeyContainer<DataSet> dataSet;
 
     @Override
     public String getFirstKey() {
@@ -75,16 +75,18 @@ public final class UnitToDataSetRelation extends BaseModel implements RelationMo
         return id;
     }
 
-    public UnitToDataSetRelation(OrganisationUnit unit, DataSet dataSet) {
+    public void setOrganisationUnit(OrganisationUnit unit) {
         isNull(unit, "OrganisationUnit object must not be null");
-        isNull(dataSet, "DataSet object must not be null");
 
         this.organisationUnit = new ForeignKeyContainer<>(OrganisationUnit.class);
-        this.dataSet = new ForeignKeyContainer<>(DataSet.class);
-
         this.organisationUnit.setModel(unit);
-        this.dataSet.setModel(dataSet);
+    }
 
+    public void setDataSet(DataSet dataSet) {
+        isNull(dataSet, "DataSet object must not be null");
+
+        this.dataSet = new ForeignKeyContainer<>(DataSet.class);
+        this.dataSet.setModel(dataSet);
     }
 
     public OrganisationUnit getOrganisationUnit() {

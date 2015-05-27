@@ -43,13 +43,19 @@ public final class DbHelper {
                 for (DbOperation operation : operations) {
                     switch (operation.getOperationType()) {
                         case INSERT: {
+                            System.out.println("*** Inserting ***");
                             operation.getModel().insert();
+                            break;
                         }
                         case UPDATE: {
+                            System.out.println("*** Updating ***");
                             operation.getModel().update();
+                            break;
                         }
                         case DELETE: {
+                            System.out.println("*** Deleting ***");
                             operation.getModel().delete();
+                            break;
                         }
                     }
                 }

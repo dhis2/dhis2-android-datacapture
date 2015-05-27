@@ -30,6 +30,8 @@ package org.dhis2.mobile.sdk.network.managers;
 
 import android.net.Uri;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.squareup.okhttp.OkHttpClient;
 
 import org.dhis2.mobile.sdk.network.models.Credentials;
@@ -44,8 +46,11 @@ public class NetworkManager implements INetworkManager {
     private Credentials mCredentials;
 
     public NetworkManager() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+
         mHttpManager = new HttpManager(new OkHttpClient());
-        mJsonManager = new JsonManager();
+        mJsonManager = new JsonManager(mapper);
         mBase64Manager = new Base64Manager();
         mLogManager = new LogManager();
     }

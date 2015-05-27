@@ -28,6 +28,8 @@
 
 package org.dhis2.mobile.sdk.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
 
@@ -37,51 +39,61 @@ import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
 public final class Category extends BaseIdentifiableModel {
-    @Column String dataDimension;
-    @Column String dataDimensionType;
-    @Column String dimension;
-    @Column String displayName;
-    List<CategoryOption> categoryOptions;
+    @JsonProperty("dataDimension") @Column String dataDimension;
+    @JsonProperty("dataDimensionType") @Column String dataDimensionType;
+    @JsonProperty("dimension") @Column String dimension;
+    @JsonProperty("displayName") @Column String displayName;
+    @JsonProperty("categoryOptions") List<CategoryOption> categoryOptions;
 
     public Category() {
     }
 
+    @JsonIgnore
     public String getDataDimension() {
         return dataDimension;
     }
 
+    @JsonIgnore
     public void setDataDimension(String dataDimension) {
         this.dataDimension = dataDimension;
     }
 
+    @JsonIgnore
     public String getDataDimensionType() {
         return dataDimensionType;
     }
 
+    @JsonIgnore
     public void setDataDimensionType(String dataDimensionType) {
         this.dataDimensionType = dataDimensionType;
     }
 
+    @JsonIgnore
     public String getDimension() {
         return dimension;
     }
 
+    @JsonIgnore
     public void setDimension(String dimension) {
         this.dimension = dimension;
     }
 
+    @JsonIgnore
     public String getDisplayName() {
         return displayName;
     }
 
+    @JsonIgnore
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
+    @JsonIgnore
     public List<CategoryOption> getCategoryOptions() {
         return categoryOptions;
     }
 
+    @JsonIgnore
     public void setCategoryOptions(List<CategoryOption> categoryOptions) {
         this.categoryOptions = categoryOptions;
     }

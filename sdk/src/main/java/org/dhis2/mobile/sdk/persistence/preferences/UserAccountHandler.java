@@ -32,6 +32,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.DateTimeConverter;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
@@ -68,9 +69,11 @@ public class UserAccountHandler implements IPreferenceHandler<UserAccount> {
     public void put(UserAccount account) {
         isNull(account, "UserAccount must not be null");
 
+        DateTimeConverter converter = new DateTimeConverter();
+
         put(ID, account.getId());
-        put(CREATED, account.getCreated());
-        put(LAST_UPDATED, account.getLastUpdated());
+        put(CREATED, converter.getDBValue(account.getCreated()));
+        put(LAST_UPDATED, converter.getDBValue(account.getLastUpdated()));
         put(NAME, account.getName());
         put(DISPLAY_NAME, account.getDisplayName());
         put(FIRST_NAME, account.getFirstName());
@@ -94,10 +97,12 @@ public class UserAccountHandler implements IPreferenceHandler<UserAccount> {
 
     @Override
     public UserAccount get() {
+        DateTimeConverter converter = new DateTimeConverter();
+
         UserAccount userAccount = new UserAccount();
         userAccount.setId(get(ID));
-        userAccount.setCreated(get(CREATED));
-        userAccount.setLastUpdated(get(LAST_UPDATED));
+        userAccount.setCreated(converter.getModelValue(CREATED));
+        userAccount.setLastUpdated(converter.getModelValue(LAST_UPDATED));
         userAccount.setName(get((NAME)));
         userAccount.setDisplayName(get(DISPLAY_NAME));
         userAccount.setFirstName(get(FIRST_NAME));
