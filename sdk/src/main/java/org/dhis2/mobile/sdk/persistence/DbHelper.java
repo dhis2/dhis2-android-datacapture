@@ -101,25 +101,34 @@ public final class DbHelper {
         return ops;
     }
 
+    // TODO The problem here is that each relation model does not contain orgUnit and dataSet keys (in case if it was not saved before)
+    // TODO you need to find a new way to store keys in Relation Models
     public static <T extends BaseModel & RelationModel> List<DbOperation> syncRelationModels(List<T> oldRelationsList,
                                                                                              List<T> newRelationsList) {
+        System.out.println("OldRelations: " + oldRelationsList.size());
+        System.out.println("NewRelations: " + newRelationsList.size());
+
         List<DbOperation> ops = new ArrayList<>();
         Map<String, T> oldRelations = relationModelListToMap(oldRelationsList);
         Map<String, T> newRelations = relationModelListToMap(newRelationsList);
+
         for (String oldRelationKey : oldRelations.keySet()) {
             T oldRelation = oldRelations.get(oldRelationKey);
             T newRelation = newRelations.get(oldRelationKey);
 
             if (newRelation == null) {
                 ops.add(DbOperation.delete(oldRelation));
+                System.out.println("DELETING_OLD_RELATION: " + oldRelationKey);
                 continue;
             }
 
             newRelations.remove(oldRelationKey);
+            System.out.println("DELETING_NEW_RELATION: " + oldRelationKey);
         }
 
         for (String newRelationKey : newRelations.keySet()) {
             ops.add(DbOperation.insert(newRelations.get(newRelationKey)));
+            System.out.println("INSERTING_NEW_RELATION: " + newRelationKey);
         }
 
         return ops;

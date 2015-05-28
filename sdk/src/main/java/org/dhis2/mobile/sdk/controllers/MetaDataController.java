@@ -89,10 +89,11 @@ public final class MetaDataController implements IController<Object> {
         //ops.addAll(mCatOptionHandler.sync(catOptions));
 
         // Handling relationships
-        ops.addAll(DbHelper.syncRelationModels(
+        List<DbOperation> operations = DbHelper.syncRelationModels(
                 new Select().from(UnitToDataSetRelation.class).queryList(),
-                buildUnitDataSetRelations(newUnits)
-        ));
+                buildUnitDataSetRelations(newUnits));
+        System.out.println("List<DbOperation> operations: " + operations.size());
+        ops.addAll(operations);
 
         //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
         //ops.addAll(mComboCategoryHandler.sync(catCombos));
@@ -118,6 +119,7 @@ public final class MetaDataController implements IController<Object> {
         Set<String> dataSetIds = new HashSet<>();
         if (units != null && units.size() > 0) {
             for (OrganisationUnit orgUnit : units) {
+                System.out.println("ORG_UNIT_DATA_SETS: " + orgUnit.getDataSets());
                 dataSetIds.addAll(toIds(orgUnit.getDataSets()));
             }
         }
