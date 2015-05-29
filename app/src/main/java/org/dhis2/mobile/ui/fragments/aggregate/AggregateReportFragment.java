@@ -47,6 +47,8 @@ import com.squareup.otto.Subscribe;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.api.models.DateHolder;
+import org.dhis2.mobile.sdk.entities.Category;
+import org.dhis2.mobile.sdk.entities.CategoryCombo;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
@@ -70,9 +72,11 @@ import butterknife.OnClick;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
-        implements LoaderCallbacks<Boolean>, OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener {
+        implements OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener {
     private static final String STATE = "state:AggregateReportFragment";
-    private static final int LOADER_ID = 345784834;
+    private static final int CHECK_LOADER_ID = 345784834;
+    private static final int CATEGORIES_LOADER_ID = 2342345;
+    private static final String CATEGORY_COMBO_ID = "args:categoryComboId";
 
     @InjectView(R.id.progress_bar) SmoothProgressBar mProgressBar;
     @InjectView(R.id.unit_button) CardTextViewButton mOrgUnitButton;
@@ -141,7 +145,19 @@ public class AggregateReportFragment extends BaseFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
+        getLoaderManager().initLoader(CHECK_LOADER_ID, getArguments(), new LoaderCallbacks<Boolean>() {
+
+            @Override public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+                return onCreateCheckLoader(id, args);
+            }
+
+            @Override public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
+                onCheckLoadFinished(loader, data);
+            }
+
+            @Override public void onLoaderReset(Loader<Boolean> loader) {
+            }
+        });
     }
 
     @Override
@@ -156,11 +172,11 @@ public class AggregateReportFragment extends BaseFragment
     }
 
     @Override
-    public void onDataSetSelected(String dataSetId, String dataSetLabel) {
+    public void onDataSetSelected(String dataSetId, String dataSetLabel, String categoryComboId) {
         mDataSetButton.setText(dataSetLabel);
         mPeriodButton.setEnabled(true);
 
-        mState.setDataSet(dataSetId, dataSetLabel);
+        mState.setDataSet(dataSetId, dataSetLabel, categoryComboId);
         mState.resetPeriod();
         handleViews(1);
     }
@@ -171,6 +187,25 @@ public class AggregateReportFragment extends BaseFragment
         mState.setPeriod(dateHolder);
         handleButton();
         handleViews(2);
+
+        // we need to put the categoryComboId inside of Bundle in order to
+        // enable its (categoryComboId) survival through configuration changes/
+        Bundle arguments = new Bundle();
+        arguments.putString(CATEGORY_COMBO_ID, mState.getDataSetCategoryComboId());
+
+        // load dataset categories
+        getLoaderManager().restartLoader(CATEGORIES_LOADER_ID, arguments, new LoaderCallbacks<List<Category>>() {
+
+            @Override public Loader<List<Category>> onCreateLoader(int id, Bundle args) {
+                return onCreateCategoriesLoader(id, args);
+            }
+
+            @Override public void onLoadFinished(Loader<List<Category>> loader, List<Category> data) {
+                onCategoriesLoadFinished(loader, data);
+            }
+
+            @Override public void onLoaderReset(Loader<List<Category>> loader) { }
+        });
     }
 
     private void handleButton() {
@@ -252,10 +287,8 @@ public class AggregateReportFragment extends BaseFragment
         apiException.printStackTrace();
     }
 
-
-    @Override
-    public Loader<Boolean> onCreateLoader(int id, Bundle bundle) {
-        if (id == LOADER_ID) {
+    public Loader<Boolean> onCreateCheckLoader(int id, Bundle bundle) {
+        if (id == CHECK_LOADER_ID) {
             List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
             tablesToTrack.add(OrganisationUnit.class);
             tablesToTrack.add(DataSet.class);
@@ -266,11 +299,9 @@ public class AggregateReportFragment extends BaseFragment
         return null;
     }
 
-    @Override
-    public void onLoadFinished(Loader<Boolean> booleanLoader,
-                               Boolean hasUnits) {
+    public void onCheckLoadFinished(Loader<Boolean> booleanLoader, Boolean hasUnits) {
         if (booleanLoader != null &&
-                booleanLoader.getId() == LOADER_ID) {
+                booleanLoader.getId() == CHECK_LOADER_ID) {
             mOrgUnitButton.setEnabled(hasUnits);
             if (!hasUnits) {
                 return;
@@ -286,7 +317,8 @@ public class AggregateReportFragment extends BaseFragment
                 if (!backedUpState.isDataSetEmpty()) {
                     onDataSetSelected(
                             backedUpState.getDataSetId(),
-                            backedUpState.getDataSetLabel()
+                            backedUpState.getDataSetLabel(),
+                            backedUpState.getDataSetCategoryComboId()
                     );
 
                     if (!backedUpState.isPeriodEmpty()) {
@@ -297,14 +329,46 @@ public class AggregateReportFragment extends BaseFragment
         }
     }
 
-    @Override
-    public void onLoaderReset(Loader<Boolean> booleanLoader) {
+    public Loader<List<Category>> onCreateCategoriesLoader(int id, Bundle bundle) {
+        if (isAdded() && getActivity() != null) {
+            if (id == CATEGORIES_LOADER_ID) {
+                List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+                tablesToTrack.add(Category.class);
+                String categoryComboId = bundle.getString(CATEGORY_COMBO_ID);
+                return new DbLoader<>(getActivity().getApplicationContext(), tablesToTrack,
+                        new CategoriesQuery(categoryComboId));
+            }
+        }
+        return null;
+    }
+
+    public void onCategoriesLoadFinished(Loader<List<Category>> loader,
+                                         List<Category> categories) {
+        if (loader.getId() == CATEGORIES_LOADER_ID) {
+            if (categories != null && !categories.isEmpty()) {
+                for (Category category : categories) {
+                    System.out.println(category.getDisplayName());
+                }
+            }
+        }
     }
 
     static class OrgUnitQuery implements Query<Boolean> {
 
         @Override public Boolean query(Context context) {
             return new Select().from(OrganisationUnit.class).queryList().size() > 0;
+        }
+    }
+
+    static class CategoriesQuery implements Query<List<Category>> {
+        private final String mCategoryComboId;
+
+        public CategoriesQuery(String categoryId) {
+            mCategoryComboId = categoryId;
+        }
+
+        @Override public List<Category> query(Context context) {
+            return CategoryCombo.getRelatedCategoriesFromDb(mCategoryComboId);
         }
     }
 }

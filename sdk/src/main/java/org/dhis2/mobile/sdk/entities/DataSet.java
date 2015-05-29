@@ -41,7 +41,7 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 import java.util.List;
 
-@ModelContainer @Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DhisDatabase.NAME)
 public final class DataSet extends BaseIdentifiableObject {
     private static final String CATEGORY_COMBO_KEY = "categoryComboKey";
 

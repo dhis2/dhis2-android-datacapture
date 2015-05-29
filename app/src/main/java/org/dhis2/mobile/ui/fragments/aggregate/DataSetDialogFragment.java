@@ -109,7 +109,7 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
             DataSet dataSet = mAdapter.getItemSafely(position);
             if (dataSet != null) {
                 mListener.onDataSetSelected(
-                        dataSet.getId(), dataSet.getDisplayName()
+                        dataSet.getId(), dataSet.getDisplayName(), dataSet.getCategoryCombo().getId()
                 );
             }
         }
@@ -148,7 +148,7 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
     }
 
     public interface OnDatasetSetListener {
-        void onDataSetSelected(String dataSetId, String dataSetName);
+        void onDataSetSelected(String dataSetId, String dataSetName, String categoryComboId);
     }
 
     static class DataSetsQuery implements Query<List<DataSet>> {

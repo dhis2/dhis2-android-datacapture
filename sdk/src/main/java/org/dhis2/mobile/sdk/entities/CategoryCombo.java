@@ -44,7 +44,6 @@ public final class CategoryCombo extends BaseIdentifiableObject {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("dimensionType") @Column String dimensionType;
     @JsonProperty("skipTotal") @Column boolean skipTotal;
-    @JsonProperty("categoryOptionCombos") List<CategoryOptionCombo> categoryOptionCombos;
     @JsonProperty("categories") List<Category> categories;
 
     public CategoryCombo() {
@@ -68,16 +67,6 @@ public final class CategoryCombo extends BaseIdentifiableObject {
     @JsonProperty
     public void setSkipTotal(boolean skipTotal) {
         this.skipTotal = skipTotal;
-    }
-
-    @JsonProperty
-    public List<CategoryOptionCombo> getCategoryOptionCombos() {
-        return categoryOptionCombos;
-    }
-
-    @JsonProperty
-    public void setCategoryOptionCombos(List<CategoryOptionCombo> categoryOptionCombos) {
-        this.categoryOptionCombos = categoryOptionCombos;
     }
 
     @JsonProperty

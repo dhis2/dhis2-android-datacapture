@@ -46,7 +46,6 @@ public class AggregateReportFragmentState implements Parcelable {
         }
     };
     private static final String TAG = AggregateReportFragmentState.class.getName();
-    private static final int DEFAULT_INDEX = -1;
     private boolean syncInProcess;
 
     private String orgUnitLabel;
@@ -54,6 +53,7 @@ public class AggregateReportFragmentState implements Parcelable {
 
     private String dataSetLabel;
     private String dataSetId;
+    private String dataSetCategoryComboId;
 
     private String periodLabel;
     private String periodDate;
@@ -65,7 +65,7 @@ public class AggregateReportFragmentState implements Parcelable {
         if (state != null) {
             setSyncInProcess(state.isSyncInProcess());
             setOrgUnit(state.getOrgUnitId(), state.getOrgUnitLabel());
-            setDataSet(state.getDataSetId(), state.getDataSetLabel());
+            setDataSet(state.getDataSetId(), state.getDataSetLabel(), state.getDataSetCategoryComboId());
             setPeriod(state.getPeriod());
         }
     }
@@ -78,6 +78,7 @@ public class AggregateReportFragmentState implements Parcelable {
 
         dataSetLabel = in.readString();
         dataSetId = in.readString();
+        dataSetCategoryComboId = in.readString();
 
         periodLabel = in.readString();
         periodDate = in.readString();
@@ -97,6 +98,7 @@ public class AggregateReportFragmentState implements Parcelable {
 
         parcel.writeString(dataSetLabel);
         parcel.writeString(dataSetId);
+        parcel.writeString(dataSetCategoryComboId);
 
         parcel.writeString(periodLabel);
         parcel.writeString(periodDate);
@@ -132,18 +134,20 @@ public class AggregateReportFragmentState implements Parcelable {
         return orgUnitId;
     }
 
-    public void setDataSet(String dataSetId, String dataSetLabel) {
+    public void setDataSet(String dataSetId, String dataSetLabel, String categoryComboId) {
         this.dataSetId = dataSetId;
         this.dataSetLabel = dataSetLabel;
+        this.dataSetCategoryComboId = categoryComboId;
     }
 
     public void resetDataSet() {
         dataSetId = null;
         dataSetLabel = null;
+        dataSetCategoryComboId = null;
     }
 
     public boolean isDataSetEmpty() {
-        return (dataSetId == null || dataSetLabel == null);
+        return (dataSetId == null || dataSetLabel == null || dataSetCategoryComboId == null);
     }
 
     public String getDataSetLabel() {
@@ -152,6 +156,10 @@ public class AggregateReportFragmentState implements Parcelable {
 
     public String getDataSetId() {
         return dataSetId;
+    }
+
+    public String getDataSetCategoryComboId() {
+        return dataSetCategoryComboId;
     }
 
     public DateHolder getPeriod() {
