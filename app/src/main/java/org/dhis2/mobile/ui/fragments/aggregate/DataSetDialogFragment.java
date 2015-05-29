@@ -29,8 +29,6 @@
 package org.dhis2.mobile.ui.fragments.aggregate;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -41,12 +39,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.raizlabs.android.dbflow.structure.Model;
+
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
-import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
+import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
+import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
+import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -56,6 +59,8 @@ import butterknife.OnItemClick;
 public class DataSetDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<List<DataSet>> {
     private static final int LOADER_ID = 340962123;
     private static String TAG = DataSetDialogFragment.class.getName();
+    private static final String ORG_UNIT_ID = "args:orgUnitId";
+
     @InjectView(R.id.simple_listview) ListView mListView;
     private SimpleAdapter<DataSet> mAdapter;
     private OnDatasetSetListener mListener;
@@ -64,7 +69,7 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
                                                     String orgUnitId) {
         DataSetDialogFragment fragment = new DataSetDialogFragment();
         Bundle args = new Bundle();
-        // args.putString(UnitDataSets.ORGANISATION_UNIT_ID, orgUnitId);
+        args.putString(ORG_UNIT_ID, orgUnitId);
         fragment.setOnClickListener(listener);
         fragment.setArguments(args);
         return fragment;
@@ -114,12 +119,12 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
     @Override
     public Loader<List<DataSet>> onCreateLoader(int id, Bundle bundle) {
         if (LOADER_ID == id && bundle != null) {
-            /* String orgUnitId = bundle.getString(UnitDataSets.ORGANISATION_UNIT_ID);
-            Uri uri = DbContract.OrganisationUnits.buildUriWithDataSets(orgUnitId);
-            return CursorLoaderBuilder.forUri(uri)
-                    .projection(DbManager.with(DataSet.class).getProjection())
-                    .transformation(new DataSetTransform())
-                    .build(getActivity()); */
+            String orgUnitId = bundle.getString(ORG_UNIT_ID);
+            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+            tablesToTrack.add(UnitToDataSetRelation.class);
+            tablesToTrack.add(DataSet.class);
+            return new DbLoader<>(getActivity().getApplication(),
+                    tablesToTrack, new DataSetsQuery(orgUnitId));
         }
         return null;
     }
@@ -143,15 +148,18 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
     }
 
     public interface OnDatasetSetListener {
-        public void onDataSetSelected(String dataSetId, String dataSetName);
+        void onDataSetSelected(String dataSetId, String dataSetName);
     }
 
-    static class DataSetTransform implements Transformation<List<DataSet>> {
+    static class DataSetsQuery implements Query<List<DataSet>> {
+        private final String mOrgUnitId;
 
-        @Override
-        public List<DataSet> transform(Context context, Cursor cursor) {
-            //return DbManager.with(DataSet.class).map(cursor, false);
-            return null;
+        public DataSetsQuery(String orgUnitId) {
+            mOrgUnitId = orgUnitId;
+        }
+
+        @Override public List<DataSet> query(Context context) {
+            return OrganisationUnit.queryRelatedDataSetsFromDb(mOrgUnitId);
         }
     }
 

@@ -30,25 +30,22 @@ package org.dhis2.mobile.sdk.network.tasks;
 
 import android.net.Uri;
 
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetDataSetsTask implements ITask<List<DataSet>> {
+final class GetDataSetsTask implements ITask<List<DataSet>> {
     private final ApiRequest<String, List<DataSet>> mRequest;
 
-    public GetDataSetsTask(DhisManager manager,
-                           Uri serverUri, Credentials credentials,
-                           List<String> ids, boolean flat) {
+    public GetDataSetsTask(INetworkManager manager, List<String> ids,
+                           boolean basicFieldsOnly) {
         String base64Credentials = manager.getBase64Manager()
-                .toBase64(credentials);
-        String url = buildQuery(serverUri, ids, flat);
+                .toBase64(manager.getCredentials());
+        String url = buildQuery(manager.getServerUri(), ids, basicFieldsOnly);
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
                 .header("Accept", "application/json")
@@ -59,7 +56,8 @@ public final class GetDataSetsTask implements ITask<List<DataSet>> {
         );
     }
 
-    private static String buildQuery(Uri serverUri, List<String> ids, boolean flat) {
+    private static String buildQuery(Uri serverUri, List<String> ids,
+                                     boolean basicFieldsOnly) {
         if (ids == null || ids.size() <= 0) {
             throw new IllegalArgumentException("Provide at least one DataSet id to download");
         }
@@ -68,8 +66,8 @@ public final class GetDataSetsTask implements ITask<List<DataSet>> {
                 .appendQueryParameter("paging", "false");
 
         String fields = "id,created,lastUpdated,name,displayName,version";
-        if (!flat) {
-            fields += ",expiryDays,allowFuturePeriods,periodType";
+        if (!basicFieldsOnly) {
+            fields += ",expiryDays,allowFuturePeriods,periodType,categoryCombo" + "[" + fields + "]";
         }
 
         builder.appendQueryParameter("fields", fields);

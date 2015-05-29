@@ -26,41 +26,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.loaders;
+package org.dhis2.mobile.sdk.network.tasks;
 
-import android.content.Context;
 import android.net.Uri;
 
-import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
+import org.dhis2.mobile.sdk.network.converters.IJsonManager;
+import org.dhis2.mobile.sdk.network.http.IBase64Manager;
+import org.dhis2.mobile.sdk.network.http.IHttpManager;
+import org.dhis2.mobile.sdk.network.models.Credentials;
+import org.dhis2.mobile.sdk.utils.ILogManager;
 
-public class TransformationCursorBuilder<T> {
-    private Uri mUri;
-    private String[] mProjection;
-    private String mSelection;
-    private String[] mSelectionArgs;
-    private String mSortOrder;
-    private Transformation<T> mTransformation;
-
-    public TransformationCursorBuilder(Uri uri, String[] projection,
-                                       String selection, String[] selectionArgs,
-                                       String sortOrder, Transformation<T> transformation) {
-        mUri = uri;
-        mProjection = projection;
-        mSelection = selection;
-        mSelectionArgs = selectionArgs;
-        mSortOrder = sortOrder;
-        mTransformation = transformation;
-    }
-
-    public TransformedCursorLoader<T> build(Context context) {
-        isNull(context, "Context object must not be null");
-        isNull(mUri, "Uri object must not be null");
-        isNull(mProjection, "String[] projection object must not be null");
-        isNull(mTransformation, "Transformation object must not be null");
-
-        return new TransformedCursorLoader<>(
-                context, mUri, mProjection, mSelection,
-                mSelectionArgs, mSortOrder, mTransformation
-        );
-    }
+public interface INetworkManager {
+    IBase64Manager getBase64Manager();
+    IHttpManager getHttpManager();
+    IJsonManager getJsonManager();
+    ILogManager getLogManager();
+    void setServerUri(Uri uri);
+    void setCredentials(Credentials credentials);
+    Uri getServerUri();
+    Credentials getCredentials();
 }

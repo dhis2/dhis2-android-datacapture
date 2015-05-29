@@ -31,13 +31,16 @@ package org.dhis2.mobile.sdk.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class CategoryCombo extends BaseIdentifiableModel {
+public final class CategoryCombo extends BaseIdentifiableObject {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("dimensionType") @Column String dimensionType;
     @JsonProperty("skipTotal") @Column boolean skipTotal;
@@ -95,5 +98,20 @@ public final class CategoryCombo extends BaseIdentifiableModel {
     @JsonProperty
     public void setDimensionType(String dimensionType) {
         this.dimensionType = dimensionType;
+    }
+
+    public static List<Category> getRelatedCategoriesFromDb(String comboId) {
+        List<CategoryComboToCategoryRelation> relations = new Select()
+                .from(CategoryComboToCategoryRelation.class)
+                .where(Condition.column(CategoryComboToCategoryRelation$Table
+                        .CATEGORYCOMBO_CATEGORYCOMBO).is(comboId))
+                .queryList();
+        List<Category> categories = new ArrayList<>();
+        if (relations != null && !relations.isEmpty()) {
+            for (CategoryComboToCategoryRelation relation : relations) {
+                categories.add(relation.getCategory());
+            }
+        }
+        return categories;
     }
 }

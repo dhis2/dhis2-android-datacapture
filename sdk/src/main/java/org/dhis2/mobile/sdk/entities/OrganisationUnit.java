@@ -33,13 +33,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@ModelContainer @Table(databaseName = DhisDatabase.NAME)
-public final class OrganisationUnit extends BaseIdentifiableModel {
+@ModelContainer
+@Table(databaseName = DhisDatabase.NAME)
+public final class OrganisationUnit extends BaseIdentifiableObject {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("level") @Column int level;
     @JsonProperty("parent") OrganisationUnit parent;
@@ -97,5 +101,23 @@ public final class OrganisationUnit extends BaseIdentifiableModel {
     @JsonIgnore
     public void setDataSets(List<DataSet> dataSets) {
         this.dataSets = dataSets;
+    }
+
+    @JsonIgnore
+    public static List<DataSet> queryRelatedDataSetsFromDb(String id) {
+        List<UnitToDataSetRelation> relations = new Select()
+                .from(UnitToDataSetRelation.class)
+                .where(Condition
+                        .column(UnitToDataSetRelation$Table.ORGANISATIONUNIT_ORGANISATIONUNIT)
+                        .is(id))
+                .queryList();
+        // read full versions of datasets
+        List<DataSet> dataSets = new ArrayList<>();
+        if (relations != null && !relations.isEmpty()) {
+            for (UnitToDataSetRelation relation : relations) {
+                dataSets.add(relation.getDataSet());
+            }
+        }
+        return dataSets;
     }
 }

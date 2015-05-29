@@ -29,8 +29,6 @@
 package org.dhis2.mobile.ui.fragments.aggregate;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -43,15 +41,21 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.Model;
+
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.api.date.CustomDateIterator;
 import org.dhis2.mobile.api.date.DateIteratorFactory;
 import org.dhis2.mobile.api.models.DateHolder;
 import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
-import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
+import org.dhis2.mobile.sdk.entities.DataSet$Table;
+import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
+import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PeriodDialogFragment extends DialogFragment
@@ -59,6 +63,7 @@ public class PeriodDialogFragment extends DialogFragment
         View.OnClickListener, AdapterView.OnItemClickListener {
     private static final String TAG = PeriodDialogFragment.class.getName();
     private static final int LOADER_ID = 345234575;
+    private static final String DATA_SET_ID = "args:dataSetId";
 
     private ListView mListView;
     private Button mPrevious;
@@ -73,7 +78,7 @@ public class PeriodDialogFragment extends DialogFragment
                                                    String dataSetId) {
         PeriodDialogFragment fragment = new PeriodDialogFragment();
         Bundle args = new Bundle();
-        // args.putString(DataSets.ID, dataSetId);
+        args.putString(DATA_SET_ID, dataSetId);
         fragment.setArguments(args);
         fragment.setOnItemClickListener(listener);
         return fragment;
@@ -158,13 +163,11 @@ public class PeriodDialogFragment extends DialogFragment
     @Override
     public Loader<DataSet> onCreateLoader(int id, Bundle bundle) {
         if (id == LOADER_ID && bundle != null) {
-            /* String dataSetId = bundle.getString(DataSets.ID);
-            Uri uri = DataSets.CONTENT_URI.buildUpon()
-                    .appendPath(dataSetId).build();
-            return CursorLoaderBuilder.forUri(uri)
-                    .projection(DbManager.with(DataSet.class).getProjection())
-                    .transformation(new TransformDataSet())
-                    .build(getActivity()); */
+            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+            tablesToTrack.add(DataSet.class);
+            String dataSetId = bundle.getString(DATA_SET_ID);
+            return new DbLoader<>(getActivity().getApplication(),
+                    tablesToTrack, new DataSetQuery(dataSetId));
         }
         return null;
     }
@@ -190,15 +193,20 @@ public class PeriodDialogFragment extends DialogFragment
     }
 
     public interface OnPeriodSetListener {
-        public void onPeriodSelected(DateHolder date);
+        void onPeriodSelected(DateHolder date);
     }
 
-    static class TransformDataSet implements Transformation<DataSet> {
+    static class DataSetQuery implements Query<DataSet> {
+        private final String mDataSetId;
 
-        @Override
-        public DataSet transform(Context context, Cursor cursor) {
-            //return DbManager.with(DataSet.class).mapSingleItem(cursor, false);
-            return null;
+        public DataSetQuery(String dataSetId) {
+            mDataSetId = dataSetId;
+        }
+
+        @Override public DataSet query(Context context) {
+            return new Select().from(DataSet.class)
+                    .where(Condition.column(DataSet$Table.ID).is(mDataSetId))
+                    .querySingle();
         }
     }
 

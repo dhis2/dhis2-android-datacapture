@@ -33,8 +33,8 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.tasks.GetCategoryOptionComboTask;
-import org.dhis2.mobile.sdk.persistence.models.Session;
+import org.dhis2.mobile.sdk.network.models.Session;
+import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -98,19 +98,13 @@ public final class GetCategoryOptionCombosController implements IController<List
     }
 
     private Map<String, CategoryOptionCombo> getNewBaseCocs() throws APIException {
-        return toMap(
-                (new GetCategoryOptionComboTask(mDhisManager,
-                        mSession.getServerUri(), mSession.getCredentials(),
-                        mCocIds, true)).run()
-        );
+        return toMap(NetworkManager.getInstance()
+                .getCategoryOptionCombosByIds(mCocIds, true));
     }
 
     private Map<String, CategoryOptionCombo> getNewFullCocs(List<String> ids) throws APIException {
-        return toMap(
-                (new GetCategoryOptionComboTask(mDhisManager,
-                        mSession.getServerUri(), mSession.getCredentials(),
-                        ids, false)).run()
-        );
+        return toMap(NetworkManager.getInstance()
+                .getCategoryOptionCombosByIds(ids, false));
     }
 
     private Map<String, CategoryOptionCombo> getOldFullCocs() {

@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.UserAccount;
 
-public class UserAccountConverter implements IJsonConverter<UserAccount, UserAccount> {
+final class UserAccountConverter implements IJsonConverter<UserAccount, UserAccount> {
     private final ObjectMapper mMapper;
 
     public UserAccountConverter(ObjectMapper mapper) {

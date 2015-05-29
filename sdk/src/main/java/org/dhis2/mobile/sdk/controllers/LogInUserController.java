@@ -34,11 +34,10 @@ import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
-import org.dhis2.mobile.sdk.network.tasks.ITask;
-import org.dhis2.mobile.sdk.network.tasks.LoginUserTask;
+import org.dhis2.mobile.sdk.network.models.Session;
+import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
-import org.dhis2.mobile.sdk.persistence.models.Session;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
@@ -71,10 +70,7 @@ public final class LogInUserController implements IController<UserAccount> {
     }
 
     private UserAccount getUserAccount() {
-        ITask<UserAccount> task = new LoginUserTask(
-                mDhisManager, mServerUri, mCredentials
-        );
-        return task.run();
+        return NetworkManager.getInstance().loginUser(mServerUri, mCredentials);
     }
 
     private void saveMetaData() {

@@ -30,25 +30,21 @@ package org.dhis2.mobile.sdk.network.tasks;
 
 import android.net.Uri;
 
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetCategoryOptionComboTask implements ITask<List<CategoryOptionCombo>> {
+final class GetCategoryOptionComboTask implements ITask<List<CategoryOptionCombo>> {
     private final ApiRequest<String, List<CategoryOptionCombo>> mRequest;
 
-    public GetCategoryOptionComboTask(DhisManager manager,
-                                      Uri serverUri, Credentials credentials,
-                                      List<String> ids, boolean flat) {
+    public GetCategoryOptionComboTask(INetworkManager manager, List<String> ids, boolean flat) {
         String base64Credentials = manager.getBase64Manager()
-                .toBase64(credentials);
-        String url = buildQuery(serverUri, ids, flat);
+                .toBase64(manager.getCredentials());
+        String url = buildQuery(manager.getServerUri(), ids, flat);
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
                 .header("Accept", "application/json")

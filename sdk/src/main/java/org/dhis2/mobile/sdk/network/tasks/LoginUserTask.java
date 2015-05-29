@@ -35,13 +35,12 @@ import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.managers.INetworkManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 
-public class LoginUserTask implements ITask<UserAccount> {
+final class LoginUserTask implements ITask<UserAccount> {
     private final ApiRequest<UserAccount, UserAccount> mRequest;
 
     public LoginUserTask(INetworkManager manager,
@@ -68,23 +67,41 @@ public class LoginUserTask implements ITask<UserAccount> {
 
     private static String buildQueryParams() {
         StringBuilder builder = new StringBuilder();
-        builder.append("?"); builder.append("fields"); builder.append("=");
-        builder.append("id"); builder.append(",");
-        builder.append("created"); builder.append(",");
-        builder.append("lastUpdated"); builder.append(",");
-        builder.append("name"); builder.append(",");
-        builder.append("displayName"); builder.append(",");
-        builder.append("firstName"); builder.append(",");
-        builder.append("surname"); builder.append(",");
-        builder.append("gender"); builder.append(",");
-        builder.append("birthday"); builder.append(",");
-        builder.append("introduction"); builder.append(",");
-        builder.append("education"); builder.append(",");
-        builder.append("employer"); builder.append(",");
-        builder.append("interests"); builder.append(",");
-        builder.append("jobTitle"); builder.append(",");
-        builder.append("languages"); builder.append(",");
-        builder.append("email"); builder.append(",");
+        builder.append("?");
+        builder.append("fields");
+        builder.append("=");
+        builder.append("id");
+        builder.append(",");
+        builder.append("created");
+        builder.append(",");
+        builder.append("lastUpdated");
+        builder.append(",");
+        builder.append("name");
+        builder.append(",");
+        builder.append("displayName");
+        builder.append(",");
+        builder.append("firstName");
+        builder.append(",");
+        builder.append("surname");
+        builder.append(",");
+        builder.append("gender");
+        builder.append(",");
+        builder.append("birthday");
+        builder.append(",");
+        builder.append("introduction");
+        builder.append(",");
+        builder.append("education");
+        builder.append(",");
+        builder.append("employer");
+        builder.append(",");
+        builder.append("interests");
+        builder.append(",");
+        builder.append("jobTitle");
+        builder.append(",");
+        builder.append("languages");
+        builder.append(",");
+        builder.append("email");
+        builder.append(",");
         builder.append("phoneNumber");
         return builder.toString();
     }

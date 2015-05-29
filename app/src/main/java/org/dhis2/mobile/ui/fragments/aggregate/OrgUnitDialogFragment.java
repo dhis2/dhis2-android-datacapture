@@ -29,7 +29,6 @@
 package org.dhis2.mobile.ui.fragments.aggregate;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -40,12 +39,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.Model;
+
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
-import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
+import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
+import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -117,10 +120,10 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
     @Override
     public Loader<List<OrganisationUnit>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            /* return CursorLoaderBuilder.forUri(OrganisationUnits.CONTENT_URI)
-                    .projection(DbManager.with(OrganisationUnit.class).getProjection())
-                    .transformation(new OrgUnitTransform())
-                    .build(getActivity()); */
+            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+            tablesToTrack.add(OrganisationUnit.class);
+            return new DbLoader<>(getActivity().getApplicationContext(),
+                    tablesToTrack, new OrgUnitQuery());
         }
         return null;
     }
@@ -136,15 +139,13 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
     }
 
     public interface OnOrgUnitSetListener {
-        public void onUnitSelected(String orgUnitId, String orgUnitLabel);
+        void onUnitSelected(String orgUnitId, String orgUnitLabel);
     }
 
-    static class OrgUnitTransform implements Transformation<List<OrganisationUnit>> {
+    static class OrgUnitQuery implements Query<List<OrganisationUnit>> {
 
-        @Override
-        public List<OrganisationUnit> transform(Context context, Cursor cursor) {
-            //return DbManager.with(OrganisationUnit.class).map(cursor, false);
-            return null;
+        @Override public List<OrganisationUnit> query(Context context) {
+            return new Select().from(OrganisationUnit.class).queryList();
         }
     }
 

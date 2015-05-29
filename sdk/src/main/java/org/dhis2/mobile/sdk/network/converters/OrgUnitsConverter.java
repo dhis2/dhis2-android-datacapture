@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 
 import java.util.List;
 
-public final class OrgUnitsConverter implements IJsonConverter<String, List<OrganisationUnit>> {
+final class OrgUnitsConverter implements IJsonConverter<String, List<OrganisationUnit>> {
     private static final String ROOT_NODE = "organisationUnits";
     private final ObjectMapper mMapper;
 

@@ -26,14 +26,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.network.managers;
+package org.dhis2.mobile.sdk.network.converters;
 
-import com.squareup.okhttp.Credentials;
+import org.dhis2.mobile.sdk.entities.Category;
+import org.dhis2.mobile.sdk.entities.CategoryCombo;
+import org.dhis2.mobile.sdk.entities.CategoryOption;
+import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
+import org.dhis2.mobile.sdk.entities.DataSet;
+import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.network.converters.IJsonConverter;
 
-public final class Base64Manager implements IBase64Manager {
+import java.util.List;
 
-    @Override
-    public String toBase64(org.dhis2.mobile.sdk.network.models.Credentials credentials) {
-        return Credentials.basic(credentials.getUsername(), credentials.getPassword());
-    }
+public interface IJsonManager {
+    IJsonConverter<UserAccount, UserAccount> getUserAccountConverter();
+    IJsonConverter<String, List<OrganisationUnit>> getOrgUnitsConverter();
+    IJsonConverter<String, List<DataSet>> getDataSetsConverter();
+    IJsonConverter<String, List<CategoryCombo>> getCategoryCombosConverter();
+    IJsonConverter<String, List<CategoryOptionCombo>> getCategoryOptionComboConverter();
+    IJsonConverter<String, List<Category>> getCategoryConverter();
+    IJsonConverter<String, List<CategoryOption>> getCategoryOptionConverter();
 }

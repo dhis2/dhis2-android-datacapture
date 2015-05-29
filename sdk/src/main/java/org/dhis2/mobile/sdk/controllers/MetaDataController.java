@@ -30,19 +30,18 @@ package org.dhis2.mobile.sdk.controllers;
 
 import com.raizlabs.android.dbflow.sql.language.Select;
 
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.Category;
 import org.dhis2.mobile.sdk.entities.CategoryCombo;
+import org.dhis2.mobile.sdk.entities.CategoryComboToCategoryRelation;
 import org.dhis2.mobile.sdk.entities.CategoryOption;
-import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
+import org.dhis2.mobile.sdk.entities.CategoryToCategoryOptionRelation;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
+import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.persistence.DbHelper;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
-import org.dhis2.mobile.sdk.persistence.models.Session;
-import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,78 +53,97 @@ import java.util.Set;
 import static org.dhis2.mobile.sdk.persistence.DbUtils.toIds;
 
 public final class MetaDataController implements IController<Object> {
-    private final DhisManager mDhisManager;
-    private final Session mSession;
+    private final NetworkManager mNetworkManager;
 
-    public MetaDataController(DhisManager dhisManager,
-                              SessionHandler sessionHandler) {
-        mDhisManager = dhisManager;
-        mSession = sessionHandler.get();
+    public MetaDataController() {
+        mNetworkManager = NetworkManager.getInstance();
     }
 
     @Override
     public Object run() throws APIException {
-        // first we need to fetch all metadata from server
-        List<OrganisationUnit> newUnits = getOrganisationUnits();
-        List<DataSet> newDataSets = getDataSets(newUnits);
-        //List<CategoryCombo> catCombos = getCategoryCombos(dataSets);
-        //List<Category> cats = getCats(catCombos);
-        //List<CategoryOption> catOptions = getCatOptions(
-        //        new ArrayList<CategoryOptionCombo>(), cats);
+        // fetching new data from distant instance.
+        List<OrganisationUnit> units = getOrganisationUnits();
+        List<DataSet> dataSets = getDataSets(units);
+        List<UnitToDataSetRelation> unitToDataSets = buildUnitDataSetRelations(units);
 
-        /*
-        List<CategoryOptionCombo> catOptCombos = getCatOptCombos(catCombos);
-        */
+        List<CategoryCombo> categoryCombos = getCategoryCombos(dataSets);
+        List<Category> categories = getCategories(categoryCombos);
+        List<CategoryComboToCategoryRelation> comboToCats = buildCatComboToCatRelations(categoryCombos);
 
+        List<CategoryOption> categoryOptions = getCategoryOptions(categories);
+        List<CategoryToCategoryOptionRelation> catToCatOptions = buildCatToCatOptionRelations(categories);
+
+        // creating db operations.
         Queue<DbOperation> ops = new LinkedList<>();
-        ops.addAll(DbHelper.syncBaseIdentifiableModels(
-                new Select().from(OrganisationUnit.class).queryList(), newUnits
-        ));
-        ops.addAll(DbHelper.syncBaseIdentifiableModels(
-                new Select().from(DataSet.class).queryList(), newDataSets
-        ));
-        //ops.addAll(mCategoryComboHandler.sync(catCombos));
-        //ops.addAll(mCategoryHandler.sync(cats));
-        //ops.addAll(mCatOptionHandler.sync(catOptions));
+        ops.addAll(DbHelper.createOperations(new Select().from(CategoryCombo.class).queryList(), categoryCombos));
+        ops.addAll(DbHelper.createOperations(new Select().from(Category.class).queryList(), categories));
+        ops.addAll(DbHelper.createOperations(new Select().from(CategoryOption.class).queryList(), categoryOptions));
 
-        // Handling relationships
-        List<DbOperation> operations = DbHelper.syncRelationModels(
-                new Select().from(UnitToDataSetRelation.class).queryList(),
-                buildUnitDataSetRelations(newUnits));
-        System.out.println("List<DbOperation> operations: " + operations.size());
-        ops.addAll(operations);
+        ops.addAll(DbHelper.createOperations(new Select().from(OrganisationUnit.class).queryList(), units));
+        ops.addAll(DbHelper.createOperations(new Select().from(DataSet.class).queryList(), dataSets));
 
-        //ops.addAll(mDataSetCatComboHandler.sync(dataSets));
-        //ops.addAll(mComboCategoryHandler.sync(catCombos));
-        //ops.addAll(mCategoryToOptionHandler.sync(cats));
-
-        // DbManager.applyBatch(new ArrayList<>(ops));
-        // DbManager.notifyChange(OrganisationUnit.class);
-        // DbManager.notifyChange(DataSet.class);
+        ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryComboToCategoryRelation.class).queryList(), comboToCats));
+        ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryToCategoryOptionRelation.class).queryList(), catToCatOptions));
+        ops.addAll(DbHelper.syncRelationModels(new Select().from(UnitToDataSetRelation.class).queryList(), unitToDataSets));
 
         DbHelper.applyBatch(ops);
         return new Object();
     }
 
-
     private List<OrganisationUnit> getOrganisationUnits() throws APIException {
-        return (new GetOrganisationUnitsController(
-                mDhisManager, mSession
-        )).run();
+        return new AbsBaseIdentifiableController<OrganisationUnit>() {
+
+            @Override List<OrganisationUnit> getNewBasicItems() {
+                List<OrganisationUnit> parentUnits = mNetworkManager
+                        .getAssignedOrganisationUnits();
+                List<OrganisationUnit> childUnits = mNetworkManager
+                        .getChildOrganisationUnits(toIds(parentUnits), true);
+                parentUnits.addAll(childUnits);
+                return parentUnits;
+            }
+
+            @Override List<OrganisationUnit> getNewFullItems(List<String> ids) {
+                return mNetworkManager.getOrganisationUnitsByIds(ids, false);
+            }
+
+            @Override List<OrganisationUnit> getItemsFromDb() {
+                // read all organisation units from database
+                List<OrganisationUnit> orgUnits = new Select()
+                        .from(OrganisationUnit.class)
+                        .queryList();
+                for (OrganisationUnit orgUnit : orgUnits) {
+                    // read relationships of unit with datasets
+                    orgUnit.setDataSets(OrganisationUnit
+                            .queryRelatedDataSetsFromDb(orgUnit.getId()));
+                }
+                return orgUnits;
+            }
+        }.run();
     }
 
-    private List<DataSet> getDataSets(List<OrganisationUnit> units) throws APIException {
+    private List<DataSet> getDataSets(List<OrganisationUnit> units) {
         /* extracting ids of assigned dataSets from units */
-        Set<String> dataSetIds = new HashSet<>();
+        final Set<String> dataSetIds = new HashSet<>();
         if (units != null && units.size() > 0) {
             for (OrganisationUnit orgUnit : units) {
-                System.out.println("ORG_UNIT_DATA_SETS: " + orgUnit.getDataSets());
                 dataSetIds.addAll(toIds(orgUnit.getDataSets()));
             }
         }
-        return (new GetDataSetsController(
-                mDhisManager, mSession, new ArrayList<>(dataSetIds)
-        )).run();
+
+        return new AbsBaseIdentifiableController<DataSet>() {
+
+            @Override List<DataSet> getNewBasicItems() {
+                return mNetworkManager.getDataSetsByIds(new ArrayList<>(dataSetIds), true);
+            }
+
+            @Override List<DataSet> getNewFullItems(List<String> ids) {
+                return mNetworkManager.getDataSetsByIds(ids, false);
+            }
+
+            @Override List<DataSet> getItemsFromDb() {
+                return new Select().from(DataSet.class).queryList();
+            }
+        }.run();
     }
 
     private List<UnitToDataSetRelation> buildUnitDataSetRelations(List<OrganisationUnit> units) {
@@ -150,55 +168,116 @@ public final class MetaDataController implements IController<Object> {
     }
 
     private List<CategoryCombo> getCategoryCombos(List<DataSet> dataSets) throws APIException {
-        Set<String> categoryComboIds = new HashSet<>(toIds(dataSets));
-        return (new GetCategoryCombosController(
-                mDhisManager, mSession, new ArrayList<>(categoryComboIds)
-        )).run();
+        final Set<String> categoryComboIds = new HashSet<>();
+        if (dataSets != null && !dataSets.isEmpty()) {
+            for (DataSet dataSet : dataSets) {
+                categoryComboIds.add(dataSet.getCategoryCombo().getId());
+            }
+        }
+
+        return new AbsBaseIdentifiableController<CategoryCombo>() {
+
+            @Override List<CategoryCombo> getNewBasicItems() {
+                return mNetworkManager.getCategoryCombosByIds(
+                        new ArrayList<>(categoryComboIds), true);
+            }
+
+            @Override List<CategoryCombo> getNewFullItems(List<String> ids) {
+                return mNetworkManager.getCategoryCombosByIds(ids, false);
+            }
+
+            @Override List<CategoryCombo> getItemsFromDb() {
+                List<CategoryCombo> categoryCombos = new Select()
+                        .from(CategoryCombo.class).queryList();
+                for (CategoryCombo categoryCombo : categoryCombos) {
+                    categoryCombo.setCategories(CategoryCombo
+                            .getRelatedCategoriesFromDb(categoryCombo.getId()));
+                }
+                return categoryCombos;
+            }
+        }.run();
     }
 
-    private List<Category> getCats(List<CategoryCombo> catCombos) throws APIException {
-        Set<String> ids = new HashSet<>();
+    private List<Category> getCategories(List<CategoryCombo> catCombos) throws APIException {
+        final Set<String> ids = new HashSet<>();
         if (catCombos != null && catCombos.size() > 0) {
             for (CategoryCombo catCombo : catCombos) {
                 ids.addAll(toIds(catCombo.getCategories()));
             }
         }
 
-        return (new GetCategoriesController(
-                mDhisManager, mSession, new ArrayList<>(ids)
-        )).run();
+        return new AbsBaseIdentifiableController<Category>() {
+
+            @Override List<Category> getNewBasicItems() {
+                return mNetworkManager.getCategoriesByIds(new ArrayList<>(ids), true);
+            }
+
+            @Override List<Category> getNewFullItems(List<String> ids) {
+                return mNetworkManager.getCategoriesByIds(ids, false);
+            }
+
+            @Override List<Category> getItemsFromDb() {
+                List<Category> categories = new Select().from(Category.class).queryList();
+                for (Category category : categories) {
+                    category.setCategoryOptions(Category
+                            .getRelatedOptions(category.getId()));
+                }
+                return categories;
+            }
+        }.run();
     }
 
-    private List<CategoryOption> getCatOptions(List<CategoryOptionCombo> cocs,
-                                               List<Category> cats) throws APIException {
-        Set<String> catOptionIds = new HashSet<>();
-        if (cocs != null && cocs.size() > 0) {
-            for (CategoryOptionCombo coc : cocs) {
-                catOptionIds.addAll(toIds(coc.getCategoryOptions()));
-            }
+    private List<CategoryComboToCategoryRelation> buildCatComboToCatRelations(List<CategoryCombo> combos) {
+        List<CategoryComboToCategoryRelation> relations = new ArrayList<>();
+        if (combos == null || combos.isEmpty()) {
+            return relations;
         }
 
-        if (cats != null && cats.size() > 0) {
-            for (Category category : cats) {
-                catOptionIds.addAll(toIds(category.getCategoryOptions()));
+        for (CategoryCombo combo : combos) {
+            if (combo.getCategories() == null || combo.getCategories().isEmpty()) {
+                continue;
+            }
+
+            for (Category category : combo.getCategories()) {
+                CategoryComboToCategoryRelation relation
+                        = new CategoryComboToCategoryRelation();
+                relation.setCategoryCombo(combo);
+                relation.setCategory(category);
+                relations.add(relation);
             }
         }
-        return (new GetCategoryOptionsController(mDhisManager,
-                mSession, new ArrayList<>(catOptionIds))).run();
+        return relations;
     }
 
-    /*
-    private List<CategoryOptionCombo> getCatOptCombos(List<CategoryCombo> catCombos) throws APIException {
-        Set<String> ids = new HashSet<>();
-        if (catCombos != null && catCombos.size() > 0) {
-            for (CategoryCombo catCombo : catCombos) {
-                ids.addAll(toIds(catCombo.getCategoryOptionCombos()));
+    private List<CategoryOption> getCategoryOptions(List<Category> categories) throws APIException {
+        final Set<String> ids = new HashSet<>();
+        if (categories != null && categories.size() > 0) {
+            for (Category category : categories) {
+                ids.addAll(toIds(category.getCategoryOptions()));
             }
         }
-
-        return (new GetCategoryOptionCombosController(
-                mDhisManager, null, mSession, new ArrayList<>(ids)
-        )).run();
+        return mNetworkManager.getCategoryOptions(new ArrayList<>(ids));
     }
-    */
+
+    private List<CategoryToCategoryOptionRelation> buildCatToCatOptionRelations(List<Category> categories) {
+        List<CategoryToCategoryOptionRelation> relations = new ArrayList<>();
+        if (categories == null || categories.isEmpty()) {
+            return relations;
+        }
+
+        for (Category category : categories) {
+            if (category.getCategoryOptions() == null || category.getCategoryOptions().isEmpty()) {
+                continue;
+            }
+
+            for (CategoryOption option : category.getCategoryOptions()) {
+                CategoryToCategoryOptionRelation relation
+                        = new CategoryToCategoryOptionRelation();
+                relation.setCategory(category);
+                relation.setCategoryOption(option);
+                relations.add(relation);
+            }
+        }
+        return relations;
+    }
 }

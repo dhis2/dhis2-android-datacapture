@@ -39,25 +39,29 @@ import org.dhis2.mobile.sdk.controllers.MetaDataController;
 import org.dhis2.mobile.sdk.entities.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.Response;
-import org.dhis2.mobile.sdk.network.managers.NetworkManager;
+import org.dhis2.mobile.sdk.network.tasks.INetworkManager;
+import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
-import org.dhis2.mobile.sdk.persistence.models.Session;
+import org.dhis2.mobile.sdk.network.models.Session;
 
 import java.net.HttpURLConnection;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public class DhisManager extends NetworkManager {
-    private final Context mContext;
-    private SessionHandler mSessionHandler;
-    private UserAccountHandler mUserAccountHandler;
+public class DhisManager {
+    private final INetworkManager mNetworkManager;
+    private final SessionHandler mSessionHandler;
+    private final UserAccountHandler mUserAccountHandler;
 
     public DhisManager(Context context) {
-        mContext = isNull(context, "Context object must not be null");
+        isNull(context, "Context object must not be null");
+
+        mNetworkManager = NetworkManager.getInstance();
         mSessionHandler = new SessionHandler(context);
         mUserAccountHandler = new UserAccountHandler(context);
+
         // fetch meta data from disk
         readMetaData();
     }
@@ -68,7 +72,7 @@ public class DhisManager extends NetworkManager {
     }
 
     public UserAccount confirmUser(Credentials credentials) {
-        return signInUser(getServerUri(), credentials);
+        return signInUser(mNetworkManager.getServerUri(), credentials);
     }
 
     public void logOutUser() throws APIException {
@@ -101,28 +105,25 @@ public class DhisManager extends NetworkManager {
     }
 
     public boolean isUserLoggedIn() {
-        return getServerUri() != null &&
-                getCredentials() != null;
+        return mNetworkManager.getServerUri() != null &&
+                mNetworkManager.getCredentials() != null;
     }
 
     public boolean isUserInvalidated() {
-        return getServerUri() != null &&
-                getCredentials() == null;
+        return mNetworkManager.getServerUri() != null &&
+                mNetworkManager.getCredentials() == null;
     }
 
     private void readMetaData() {
         Session session = mSessionHandler.get();
         if (session != null) {
-            setServerUri(session.getServerUri());
-            setCredentials(session.getCredentials());
+            mNetworkManager.setServerUri(session.getServerUri());
+            mNetworkManager.setCredentials(session.getCredentials());
         }
     }
 
     public void syncMetaData() throws APIException {
-        IController<Object> metaDataController = new MetaDataController(
-                this, mSessionHandler
-        );
-        runController(metaDataController);
+        runController(new MetaDataController());
     }
 
     // we need this method in order to catch certain types of exceptions.

@@ -26,15 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.network.managers;
+package org.dhis2.mobile.sdk.network.http;
 
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
-
-import org.dhis2.mobile.sdk.network.http.Header;
-import org.dhis2.mobile.sdk.network.http.Request;
-import org.dhis2.mobile.sdk.network.http.Response;
-import org.dhis2.mobile.sdk.network.http.RestMethod;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -30,25 +30,21 @@ package org.dhis2.mobile.sdk.network.tasks;
 
 import android.net.Uri;
 
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.Category;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetCategoriesTask implements ITask<List<Category>> {
+final class GetCategoriesTask implements ITask<List<Category>> {
     private final ApiRequest<String, List<Category>> mRequest;
 
-    public GetCategoriesTask(DhisManager manager,
-                             Uri serverUri, Credentials credentials,
-                             List<String> ids, boolean flat) {
+    public GetCategoriesTask(INetworkManager manager, List<String> ids, boolean flat) {
         String base64Credentials = manager.getBase64Manager()
-                .toBase64(credentials);
-        String url = buildQuery(serverUri, ids, flat);
+                .toBase64(manager.getCredentials());
+        String url = buildQuery(manager.getServerUri(), ids, flat);
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
                 .header("Accept", "application/json")
@@ -61,12 +57,12 @@ public final class GetCategoriesTask implements ITask<List<Category>> {
 
     private static String buildQuery(Uri serverUri, List<String> ids, boolean flat) {
         Uri.Builder builder = serverUri.buildUpon()
-                .appendPath("api/categories/")
+                .appendEncodedPath("api/categories/")
                 .appendQueryParameter("paging", "false");
         String baseIdentityParams = "id,created,lastUpdated,name,displayName";
         String fields = baseIdentityParams;
         if (!flat) {
-            fields += "," + "categoryOptions" + "[" + baseIdentityParams + "]";
+            fields += ",dimension,dataDimension,dataDimensionType,categoryOptions" + "[" + baseIdentityParams + "]";
         }
         builder.appendQueryParameter("fields", fields);
         if (ids != null && ids.size() > 0) {

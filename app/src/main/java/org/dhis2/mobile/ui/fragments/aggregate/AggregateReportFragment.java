@@ -30,7 +30,6 @@ package org.dhis2.mobile.ui.fragments.aggregate;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -42,14 +41,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.structure.Model;
 import com.squareup.otto.Subscribe;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.api.models.DateHolder;
+import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.loaders.CursorLoaderBuilder;
-import org.dhis2.mobile.sdk.persistence.loaders.Transformation;
+import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
+import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.activities.ReportEntryActivity;
 import org.dhis2.mobile.ui.fragments.BaseFragment;
 import org.dhis2.mobile.ui.fragments.aggregate.DataSetDialogFragment.OnDatasetSetListener;
@@ -57,6 +60,9 @@ import org.dhis2.mobile.ui.fragments.aggregate.OrgUnitDialogFragment.OnOrgUnitSe
 import org.dhis2.mobile.ui.fragments.aggregate.PeriodDialogFragment.OnPeriodSetListener;
 import org.dhis2.mobile.ui.views.CardDetailedButton;
 import org.dhis2.mobile.ui.views.CardTextViewButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -250,11 +256,12 @@ public class AggregateReportFragment extends BaseFragment
     @Override
     public Loader<Boolean> onCreateLoader(int id, Bundle bundle) {
         if (id == LOADER_ID) {
-            /* return CursorLoaderBuilder.forUri(OrganisationUnits.CONTENT_URI)
-                    .projection(DbManager.with(OrganisationUnit.class).getProjection())
-                    .transformation(new OrgUnitTransformation())
-                    .build(getActivity());
-                    */
+            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+            tablesToTrack.add(OrganisationUnit.class);
+            tablesToTrack.add(DataSet.class);
+            tablesToTrack.add(UnitToDataSetRelation.class);
+            return new DbLoader<>(getActivity().getApplicationContext(),
+                    tablesToTrack, new OrgUnitQuery());
         }
         return null;
     }
@@ -294,11 +301,10 @@ public class AggregateReportFragment extends BaseFragment
     public void onLoaderReset(Loader<Boolean> booleanLoader) {
     }
 
-    static class OrgUnitTransformation implements Transformation<Boolean> {
+    static class OrgUnitQuery implements Query<Boolean> {
 
-        @Override
-        public Boolean transform(Context context, Cursor cursor) {
-            return (cursor != null && cursor.getCount() > 0);
+        @Override public Boolean query(Context context) {
+            return new Select().from(OrganisationUnit.class).queryList().size() > 0;
         }
     }
 }

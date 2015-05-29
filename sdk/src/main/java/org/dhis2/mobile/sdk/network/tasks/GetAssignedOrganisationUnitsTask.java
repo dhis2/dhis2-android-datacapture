@@ -28,26 +28,21 @@
 
 package org.dhis2.mobile.sdk.network.tasks;
 
-import android.net.Uri;
-
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetAssignedOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
+final class GetAssignedOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
     private final ApiRequest<String, List<OrganisationUnit>> mRequest;
 
-    public GetAssignedOrganisationUnitsTask(DhisManager dhisManager, Uri serverUri,
-                                            Credentials credentials) {
+    public GetAssignedOrganisationUnitsTask(INetworkManager dhisManager) {
         String base64Credentials = dhisManager.getBase64Manager()
-                .toBase64(credentials);
-        String url = serverUri.buildUpon()
+                .toBase64(dhisManager.getCredentials());
+        String url = dhisManager.getServerUri().buildUpon()
                 .appendEncodedPath("api/me/")
                 .appendQueryParameter("fields", buildQueryParams())
                 .build().toString();
@@ -56,8 +51,10 @@ public final class GetAssignedOrganisationUnitsTask implements ITask<List<Organi
                 .header("Accept", "application/json")
                 .build();
 
-        mRequest = new ApiRequest<>(request, dhisManager.getHttpManager(),
-                dhisManager.getLogManager(), dhisManager.getJsonManager().getOrgUnitsConverter());
+        mRequest = new ApiRequest<>(request,
+                dhisManager.getHttpManager(),
+                dhisManager.getLogManager(),
+                dhisManager.getJsonManager().getOrgUnitsConverter());
     }
 
     private static String buildQueryParams() {

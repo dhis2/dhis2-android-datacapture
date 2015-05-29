@@ -35,20 +35,16 @@ import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.managers.NetworkManager;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetCategoryCombosTask implements ITask<List<CategoryCombo>> {
+final class GetCategoryCombosTask implements ITask<List<CategoryCombo>> {
     private final ApiRequest<String, List<CategoryCombo>> mRequest;
 
-    public GetCategoryCombosTask(NetworkManager manager,
-                                 Uri serverUri, Credentials credentials,
-                                 List<String> ids, boolean flat) {
+    public GetCategoryCombosTask(INetworkManager manager, List<String> ids, boolean onlyBasicFields) {
         String base64Credentials = manager.getBase64Manager()
-                .toBase64(credentials);
-        String url = buildQuery(serverUri, ids, flat);
+                .toBase64(manager.getCredentials());
+        String url = buildQuery(manager.getServerUri(), ids, onlyBasicFields);
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
                 .header("Accept", "application/json")
@@ -59,15 +55,15 @@ public final class GetCategoryCombosTask implements ITask<List<CategoryCombo>> {
         );
     }
 
-    private static String buildQuery(Uri serverUri, List<String> ids, boolean flat) {
+    private static String buildQuery(Uri serverUri, List<String> ids, boolean onlyBasicFields) {
         Uri.Builder builder = serverUri.buildUpon()
                 .appendEncodedPath("api/categoryCombos/")
                 .appendQueryParameter("paging", "false");
         String baseIdentityParams = "id,created,lastUpdated,name,displayName";
         String fields = baseIdentityParams;
 
-        if (!flat) {
-            fields += "," + "categories" + "[" + baseIdentityParams + "]";
+        if (!onlyBasicFields) {
+            fields += ",dimensionType,categories" + "[" + baseIdentityParams + "]";
         }
 
         builder.appendQueryParameter("fields", fields);

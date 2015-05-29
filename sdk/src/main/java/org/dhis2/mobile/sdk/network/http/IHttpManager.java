@@ -26,10 +26,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.network.managers;
+package org.dhis2.mobile.sdk.network.http;
 
-import org.dhis2.mobile.sdk.network.models.Credentials;
+import org.dhis2.mobile.sdk.network.http.Request;
+import org.dhis2.mobile.sdk.network.http.Response;
 
-public interface IBase64Manager {
-    public String toBase64(Credentials credentials);
+import java.io.IOException;
+
+public interface IHttpManager {
+    public Response request(Request request) throws IOException;
 }

@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.entities.Category;
 
 import java.util.List;
 
-public final class CategoryConverter implements IJsonConverter<String, List<Category>> {
+final class CategoryConverter implements IJsonConverter<String, List<Category>> {
     private static final String ROOT_NODE = "categories";
     private final ObjectMapper mMapper;
 

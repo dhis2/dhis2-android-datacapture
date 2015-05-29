@@ -30,26 +30,22 @@ package org.dhis2.mobile.sdk.network.tasks;
 
 import android.net.Uri;
 
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.controllers.IController;
 import org.dhis2.mobile.sdk.entities.CategoryOption;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
 import java.util.List;
 
-public final class GetCategoryOptionsTask implements IController<List<CategoryOption>> {
+final class GetCategoryOptionsTask implements IController<List<CategoryOption>> {
     private final ApiRequest<String, List<CategoryOption>> mRequest;
 
-    public GetCategoryOptionsTask(DhisManager manager,
-                                  Uri serverUri, Credentials credentials,
-                                  List<String> ids) {
+    public GetCategoryOptionsTask(INetworkManager manager, List<String> ids) {
         String base64Credentials = manager.getBase64Manager()
-                .toBase64(credentials);
-        String url = buildQuery(serverUri, ids);
+                .toBase64(manager.getCredentials());
+        String url = buildQuery(manager.getServerUri(), ids);
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
                 .header("Accept", "application/json")
@@ -62,7 +58,7 @@ public final class GetCategoryOptionsTask implements IController<List<CategoryOp
 
     private static String buildQuery(Uri serverUri, List<String> ids) {
         Uri.Builder builder = serverUri.buildUpon()
-                .appendPath("api/categoryOptions/")
+                .appendEncodedPath("api/categoryOptions/")
                 .appendQueryParameter("paging", "false");
         String baseIdentityParams = "id,created,lastUpdated,name,displayName";
         builder.appendQueryParameter("fields", baseIdentityParams);

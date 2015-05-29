@@ -28,25 +28,15 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
-import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.tasks.ITask;
-import org.dhis2.mobile.sdk.network.tasks.LoginUserTask;
-import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
+import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
-import org.dhis2.mobile.sdk.persistence.models.Session;
 
 public final class GetUserAccountController implements IController<UserAccount> {
-    private final DhisManager mDhisManager;
-    private final SessionHandler mSessionHandler;
     private final UserAccountHandler mUserAccountHandler;
 
-    public GetUserAccountController(DhisManager dhisManager,
-                                    SessionHandler sessionHandler,
-                                    UserAccountHandler userAccountHandler) {
-        mDhisManager = dhisManager;
-        mSessionHandler = sessionHandler;
+    public GetUserAccountController(UserAccountHandler userAccountHandler) {
         mUserAccountHandler = userAccountHandler;
     }
 
@@ -59,13 +49,11 @@ public final class GetUserAccountController implements IController<UserAccount> 
     }
 
     private UserAccount getUserAccount() {
-        Session session = mSessionHandler.get();
-        ITask<UserAccount> task = new LoginUserTask(
-                mDhisManager,
-                session.getServerUri(),
-                session.getCredentials()
-        );
-        return task.run();
+        return NetworkManager.getInstance()
+                .loginUser(
+                        NetworkManager.getInstance().getServerUri(),
+                        NetworkManager.getInstance().getCredentials()
+                );
     }
 
     private void saveUserAccount(UserAccount userAccount) {

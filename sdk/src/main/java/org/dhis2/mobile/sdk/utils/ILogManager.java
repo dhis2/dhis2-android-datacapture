@@ -26,62 +26,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.entities;
+package org.dhis2.mobile.sdk.utils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.structure.BaseModel;
-
-import org.joda.time.DateTime;
-
-public abstract class BaseIdentifiableModel extends BaseModel implements TimeStampedModel {
-    @JsonProperty("id") @Column @PrimaryKey String id;
-    @JsonProperty("created") @Column DateTime created;
-    @JsonProperty("lastUpdated") @Column DateTime lastUpdated;
-    @JsonProperty("name") @Column String name;
-
-    public BaseIdentifiableModel() {
-    }
-
-    @JsonIgnore @Override
-    public DateTime getCreated() {
-        return created;
-    }
-
-    @JsonIgnore @Override
-    public void setCreated(DateTime created) {
-        this.created = created;
-    }
-
-    @JsonIgnore @Override
-    public DateTime getLastUpdated() {
-        return lastUpdated;
-    }
-
-    @JsonIgnore @Override
-    public void setLastUpdated(DateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    @JsonIgnore
-    public String getId() {
-        return id;
-    }
-
-    @JsonIgnore
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @JsonIgnore
-    public String getName() {
-        return name;
-    }
-
-    @JsonIgnore
-    public void setName(String name) {
-        this.name = name;
-    }
+public interface ILogManager {
+    void LOGI(String tag, String message);
+    void LOGD(String tag, String message);
+    void LOGE(String tag, String message);
+    void LOGW(String tag, String message);
+    void LOGV(String tag, String message);
 }

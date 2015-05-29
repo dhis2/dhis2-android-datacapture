@@ -26,11 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.loaders;
+package org.dhis2.mobile.sdk.network.http;
 
-import android.content.Context;
-import android.database.Cursor;
+import org.dhis2.mobile.sdk.network.models.Credentials;
 
-public interface Transformation<T> {
-    public T transform(Context context, Cursor cursor);
+public interface IBase64Manager {
+    public String toBase64(Credentials credentials);
 }

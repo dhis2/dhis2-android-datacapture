@@ -3,7 +3,7 @@ package org.dhis2.mobile.sdk.persistence;
 import com.raizlabs.android.dbflow.runtime.TransactionManager;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.entities.BaseIdentifiableModel;
+import org.dhis2.mobile.sdk.entities.BaseIdentifiableObject;
 import org.dhis2.mobile.sdk.entities.RelationModel;
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
@@ -43,17 +43,14 @@ public final class DbHelper {
                 for (DbOperation operation : operations) {
                     switch (operation.getOperationType()) {
                         case INSERT: {
-                            System.out.println("*** Inserting ***");
                             operation.getModel().insert();
                             break;
                         }
                         case UPDATE: {
-                            System.out.println("*** Updating ***");
                             operation.getModel().update();
                             break;
                         }
                         case DELETE: {
-                            System.out.println("*** Deleting ***");
                             operation.getModel().delete();
                             break;
                         }
@@ -65,13 +62,13 @@ public final class DbHelper {
 
     /**
      * This utility method allows to determine which type of operation to apply to
-     * each BaseIdentifiableModel depending on TimeStamp.
+     * each BaseIdentifiableObject depending on TimeStamp.
      *
      * @param oldModels List of models from local storage.
      * @param newModels List of models of distance instance of DHIS.
      */
-    public static <T extends BaseIdentifiableModel> List<DbOperation> syncBaseIdentifiableModels(List<T> oldModels,
-                                                                                                  List<T> newModels) {
+    public static <T extends BaseIdentifiableObject> List<DbOperation> createOperations(List<T> oldModels,
+                                                                                        List<T> newModels) {
         List<DbOperation> ops = new ArrayList<>();
 
         Map<String, T> newModelsMap = toMap(newModels);

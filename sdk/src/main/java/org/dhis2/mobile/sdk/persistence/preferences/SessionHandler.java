@@ -33,7 +33,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 
 import org.dhis2.mobile.sdk.network.models.Credentials;
-import org.dhis2.mobile.sdk.persistence.models.Session;
+import org.dhis2.mobile.sdk.network.models.Session;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 

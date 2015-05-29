@@ -32,13 +32,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class Category extends BaseIdentifiableModel {
+public final class Category extends BaseIdentifiableObject {
     @JsonProperty("dataDimension") @Column String dataDimension;
     @JsonProperty("dataDimensionType") @Column String dataDimensionType;
     @JsonProperty("dimension") @Column String dimension;
@@ -96,5 +99,20 @@ public final class Category extends BaseIdentifiableModel {
     @JsonIgnore
     public void setCategoryOptions(List<CategoryOption> categoryOptions) {
         this.categoryOptions = categoryOptions;
+    }
+
+    public static List<CategoryOption> getRelatedOptions(String catId) {
+        List<CategoryToCategoryOptionRelation> relations = new Select()
+                .from(CategoryToCategoryOptionRelation.class)
+                .where(Condition.column(CategoryToCategoryOptionRelation$Table
+                        .CATEGORY_CATEGORY).is(catId))
+                .queryList();
+        List<CategoryOption> categoryOptions = new ArrayList<>();
+        if (relations != null && !relations.isEmpty()) {
+            for (CategoryToCategoryOptionRelation relation : relations) {
+                categoryOptions.add(relation.getCategoryOption());
+            }
+        }
+        return categoryOptions;
     }
 }

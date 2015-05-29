@@ -28,7 +28,7 @@
 
 package org.dhis2.mobile.sdk.persistence;
 
-import org.dhis2.mobile.sdk.entities.BaseIdentifiableModel;
+import org.dhis2.mobile.sdk.entities.BaseIdentifiableObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public final class DbUtils {
         // no instances
     }
 
-    public static <T extends BaseIdentifiableModel> Map<String, T> toMap(List<T> objects) {
+    public static <T extends BaseIdentifiableObject> Map<String, T> toMap(List<T> objects) {
         Map<String, T> map = new HashMap<>();
         if (objects != null && objects.size() > 0) {
             for (T object : objects) {
@@ -51,7 +51,7 @@ public final class DbUtils {
         return map;
     }
 
-    public static <T extends BaseIdentifiableModel> List<String> toIds(List<T> objects) {
+    public static <T extends BaseIdentifiableObject> List<String> toIds(List<T> objects) {
         List<String> ids = new ArrayList<>();
         if (objects != null && objects.size() > 0) {
             for (T object : objects) {
@@ -61,9 +61,9 @@ public final class DbUtils {
         return ids;
     }
 
-    public static <T extends BaseIdentifiableModel> void print(List<T> items) {
+    public static <T extends BaseIdentifiableObject> void print(List<T> items) {
         if (items != null && items.size() > 0) {
-            for (BaseIdentifiableModel item : items) {
+            for (BaseIdentifiableObject item : items) {
                 System.out.println("Name: " + item.getName());
             }
         }

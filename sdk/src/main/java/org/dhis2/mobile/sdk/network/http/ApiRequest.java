@@ -30,8 +30,7 @@ package org.dhis2.mobile.sdk.network.http;
 
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.converters.IJsonConverter;
-import org.dhis2.mobile.sdk.network.managers.IHttpManager;
-import org.dhis2.mobile.sdk.network.managers.ILogManager;
+import org.dhis2.mobile.sdk.utils.ILogManager;
 
 import java.io.IOException;
 

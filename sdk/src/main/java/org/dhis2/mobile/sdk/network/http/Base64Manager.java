@@ -26,26 +26,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.models;
+package org.dhis2.mobile.sdk.network.http;
 
-import android.net.Uri;
+import com.squareup.okhttp.Credentials;
 
-import org.dhis2.mobile.sdk.network.models.Credentials;
+public final class Base64Manager implements IBase64Manager {
 
-public final class Session {
-    private Uri serverUri;
-    private Credentials credentials;
-
-    public Session(Uri serverUri, Credentials credentials) {
-        this.serverUri = serverUri;
-        this.credentials = credentials;
-    }
-
-    public Credentials getCredentials() {
-        return credentials;
-    }
-
-    public Uri getServerUri() {
-        return serverUri;
+    @Override
+    public String toBase64(org.dhis2.mobile.sdk.network.models.Credentials credentials) {
+        return Credentials.basic(credentials.getUsername(), credentials.getPassword());
     }
 }

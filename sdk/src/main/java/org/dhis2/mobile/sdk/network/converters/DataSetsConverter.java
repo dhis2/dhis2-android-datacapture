@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.entities.DataSet;
 
 import java.util.List;
 
-public final class DataSetsConverter implements IJsonConverter<String, List<DataSet>> {
+final class DataSetsConverter implements IJsonConverter<String, List<DataSet>> {
     private static final String ROOT_NODE = "dataSets";
     private final ObjectMapper mMapper;
 

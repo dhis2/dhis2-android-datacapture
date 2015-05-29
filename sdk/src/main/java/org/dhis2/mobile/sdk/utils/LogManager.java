@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.network.managers;
+package org.dhis2.mobile.sdk.utils;
 
 import android.util.Log;
 

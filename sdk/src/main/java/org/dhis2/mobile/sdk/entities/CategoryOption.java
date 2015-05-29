@@ -36,7 +36,7 @@ import com.raizlabs.android.dbflow.annotation.Table;
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class CategoryOption extends BaseIdentifiableModel {
+public final class CategoryOption extends BaseIdentifiableObject {
     @JsonProperty("displayName") @Column String displayName;
 
     public CategoryOption() {

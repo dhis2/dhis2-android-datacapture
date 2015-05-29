@@ -26,49 +26,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.loaders;
+package org.dhis2.mobile.sdk.network.models;
 
 import android.net.Uri;
 
-public class CursorLoaderBuilder {
-    private Uri mUri;
-    private String[] mProjection;
-    private String mSelection;
-    private String[] mSelectionArgs;
-    private String mSortOrder;
-    private Transformation mTransformation;
+import org.dhis2.mobile.sdk.network.models.Credentials;
 
-    private CursorLoaderBuilder(Uri uri) {
-        mUri = uri;
+public final class Session {
+    private Uri serverUri;
+    private Credentials credentials;
+
+    public Session(Uri serverUri, Credentials credentials) {
+        this.serverUri = serverUri;
+        this.credentials = credentials;
     }
 
-    public static CursorLoaderBuilder forUri(Uri uri) {
-        return new CursorLoaderBuilder(uri);
+    public Credentials getCredentials() {
+        return credentials;
     }
 
-    public CursorLoaderBuilder projection(String[] projection) {
-        mProjection = projection;
-        return this;
-    }
-
-    public CursorLoaderBuilder selection(String selection) {
-        mSelection = selection;
-        return this;
-    }
-
-    public CursorLoaderBuilder selectionArgs(String[] selectionArgs) {
-        mSelectionArgs = selectionArgs;
-        return this;
-    }
-
-    public CursorLoaderBuilder sortOrder(String sortOrder) {
-        mSortOrder = sortOrder;
-        return this;
-    }
-
-    public <T> TransformationCursorBuilder<T> transformation(Transformation<T> transformation) {
-        mTransformation = transformation;
-        return new TransformationCursorBuilder<T>(mUri, mProjection, mSelection,
-                mSelectionArgs, mSortOrder, transformation);
+    public Uri getServerUri() {
+        return serverUri;
     }
 }

@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 
 import java.util.List;
 
-public final class CategoryOptionComboConverter implements IJsonConverter<String, List<CategoryOptionCombo>> {
+final class CategoryOptionComboConverter implements IJsonConverter<String, List<CategoryOptionCombo>> {
     private static final String ROOT_NODE = "categoryOptionCombos";
     private final ObjectMapper mMapper;
 

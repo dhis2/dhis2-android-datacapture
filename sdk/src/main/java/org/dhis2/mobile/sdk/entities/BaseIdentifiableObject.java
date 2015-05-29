@@ -26,26 +26,62 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.network.managers;
+package org.dhis2.mobile.sdk.entities;
 
-import android.net.Uri;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.network.models.Credentials;
+import org.joda.time.DateTime;
 
-public interface INetworkManager {
-    public IBase64Manager getBase64Manager();
+public abstract class BaseIdentifiableObject extends BaseModel implements TimeStampedModel {
+    @JsonProperty("id") @Column @PrimaryKey String id;
+    @JsonProperty("created") @Column DateTime created;
+    @JsonProperty("lastUpdated") @Column DateTime lastUpdated;
+    @JsonProperty("name") @Column String name;
 
-    public IHttpManager getHttpManager();
+    public BaseIdentifiableObject() {
+    }
 
-    public IJsonManager getJsonManager();
+    @JsonIgnore @Override
+    public DateTime getCreated() {
+        return created;
+    }
 
-    public ILogManager getLogManager();
+    @JsonIgnore @Override
+    public void setCreated(DateTime created) {
+        this.created = created;
+    }
 
-    public Uri getServerUri();
+    @JsonIgnore @Override
+    public DateTime getLastUpdated() {
+        return lastUpdated;
+    }
 
-    public void setServerUri(Uri uri);
+    @JsonIgnore @Override
+    public void setLastUpdated(DateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 
-    public Credentials getCredentials();
+    @JsonIgnore
+    public String getId() {
+        return id;
+    }
 
-    public void setCredentials(Credentials credentials);
+    @JsonIgnore
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @JsonIgnore
+    public String getName() {
+        return name;
+    }
+
+    @JsonIgnore
+    public void setName(String name) {
+        this.name = name;
+    }
 }

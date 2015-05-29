@@ -31,6 +31,9 @@ package org.dhis2.mobile.sdk.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.Table;
 
@@ -39,7 +42,9 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import java.util.List;
 
 @ModelContainer @Table(databaseName = DhisDatabase.NAME)
-public final class DataSet extends BaseIdentifiableModel {
+public final class DataSet extends BaseIdentifiableObject {
+    private static final String CATEGORY_COMBO_KEY = "categoryComboKey";
+
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("version") @Column int version;
     @JsonProperty("expiryDays") @Column int expiryDays;
@@ -47,8 +52,12 @@ public final class DataSet extends BaseIdentifiableModel {
     @JsonProperty("periodType") @Column String periodType;
 
     @JsonProperty("organisationUnits") List<OrganisationUnit> organisationUnits;
-    @JsonProperty("categoryCombo") CategoryCombo categoryCombo;
     @JsonProperty("sections") List<Object> sections;
+    @JsonProperty("categoryCombo") @Column @ForeignKey(
+            references = {
+                    @ForeignKeyReference(columnName = CATEGORY_COMBO_KEY, columnType = String.class, foreignColumnName = "id")
+            }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
+    ) CategoryCombo categoryCombo;
 
     public DataSet() {
     }

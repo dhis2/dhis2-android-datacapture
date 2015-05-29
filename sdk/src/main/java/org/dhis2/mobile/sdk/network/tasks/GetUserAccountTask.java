@@ -28,29 +28,19 @@
 
 package org.dhis2.mobile.sdk.network.tasks;
 
-import android.net.Uri;
-
 import org.dhis2.mobile.sdk.entities.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
-import org.dhis2.mobile.sdk.network.managers.INetworkManager;
-import org.dhis2.mobile.sdk.network.models.Credentials;
 
-import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
-
-public final class GetUserAccountTask implements ITask<UserAccount> {
+final class GetUserAccountTask implements ITask<UserAccount> {
     private final ApiRequest<UserAccount, UserAccount> mRequest;
 
-    public GetUserAccountTask(INetworkManager manager,
-                              Uri serverUri, Credentials credentials) {
-        isNull(serverUri, "Server URI must not be null");
-        isNull(credentials, "User credentials must not be null");
-
+    public GetUserAccountTask(INetworkManager manager) {
         String base64Credentials = manager.getBase64Manager()
-                .toBase64(credentials);
-        String url = serverUri.buildUpon()
+                .toBase64(manager.getCredentials());
+        String url = manager.getServerUri().buildUpon()
                 .appendEncodedPath("api/me/")
                 .appendQueryParameter("fields", buildQueryParams())
                 .build().toString();
@@ -67,22 +57,38 @@ public final class GetUserAccountTask implements ITask<UserAccount> {
 
     private static String buildQueryParams() {
         StringBuilder builder = new StringBuilder();
-        builder.append("id"); builder.append(",");
-        builder.append("created"); builder.append(",");
-        builder.append("lastUpdated"); builder.append(",");
-        builder.append("name"); builder.append(",");
-        builder.append("displayName"); builder.append(",");
-        builder.append("firstName"); builder.append(",");
-        builder.append("surname"); builder.append(",");
-        builder.append("gender"); builder.append(",");
-        builder.append("birthday"); builder.append(",");
-        builder.append("introduction"); builder.append(",");
-        builder.append("education"); builder.append(",");
-        builder.append("employer"); builder.append(",");
-        builder.append("interests"); builder.append(",");
-        builder.append("jobTitle"); builder.append(",");
-        builder.append("languages"); builder.append(",");
-        builder.append("email"); builder.append(",");
+        builder.append("id");
+        builder.append(",");
+        builder.append("created");
+        builder.append(",");
+        builder.append("lastUpdated");
+        builder.append(",");
+        builder.append("name");
+        builder.append(",");
+        builder.append("displayName");
+        builder.append(",");
+        builder.append("firstName");
+        builder.append(",");
+        builder.append("surname");
+        builder.append(",");
+        builder.append("gender");
+        builder.append(",");
+        builder.append("birthday");
+        builder.append(",");
+        builder.append("introduction");
+        builder.append(",");
+        builder.append("education");
+        builder.append(",");
+        builder.append("employer");
+        builder.append(",");
+        builder.append("interests");
+        builder.append(",");
+        builder.append("jobTitle");
+        builder.append(",");
+        builder.append("languages");
+        builder.append(",");
+        builder.append("email");
+        builder.append(",");
         builder.append("phoneNumber");
         return builder.toString();
     }

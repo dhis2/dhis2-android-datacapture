@@ -30,45 +30,52 @@
 package org.dhis2.mobile.sdk.entities;
 
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ConflictAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.annotation.Unique;
+import com.raizlabs.android.dbflow.annotation.UniqueGroup;
 import com.raizlabs.android.dbflow.structure.BaseModel;
-import com.raizlabs.android.dbflow.structure.container.ForeignKeyContainer;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-@Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DhisDatabase.NAME, uniqueColumnGroups = {
+        @UniqueGroup(groupNumber = UnitToDataSetRelation.UNIQUE_ORGUNIT_DATASET_GROUP, uniqueConflict = ConflictAction.FAIL)
+})
 public final class UnitToDataSetRelation extends BaseModel implements RelationModel {
-    private static final String ORG_UNIT_KEY = "orgUnitId";
-    private static final String DATA_SET_KEY = "dataSetId";
+    static final int UNIQUE_ORGUNIT_DATASET_GROUP = 1;
+    static final String ORG_UNIT_KEY = "organisationUnit";
+    static final String DATA_SET_KEY = "dataSet";
 
     @Column @PrimaryKey(autoincrement = true) int id;
 
-    @Column @ForeignKey(
+    @Column @Unique(unique = false, uniqueGroups = {UNIQUE_ORGUNIT_DATASET_GROUP})
+    @ForeignKey(
             references = {
                     @ForeignKeyReference(columnName = ORG_UNIT_KEY, columnType = String.class, foreignColumnName = "id"),
             }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
-    ) ForeignKeyContainer<OrganisationUnit> organisationUnit;
+    ) OrganisationUnit organisationUnit;
 
-    @Column @ForeignKey(
+    @Column @Unique(unique = false, uniqueGroups = {UNIQUE_ORGUNIT_DATASET_GROUP})
+    @ForeignKey(
             references = {
                     @ForeignKeyReference(columnName = DATA_SET_KEY, columnType = String.class, foreignColumnName = "id"),
             }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
-    ) ForeignKeyContainer<DataSet> dataSet;
+    ) DataSet dataSet;
 
     @Override
     public String getFirstKey() {
-        return (String) organisationUnit.getValue(ORG_UNIT_KEY);
+        return organisationUnit.getId();
     }
 
     @Override
     public String getSecondKey() {
-        return (String) dataSet.getValue(DATA_SET_KEY);
+        return dataSet.getId();
     }
 
     public int getId() {
@@ -76,24 +83,18 @@ public final class UnitToDataSetRelation extends BaseModel implements RelationMo
     }
 
     public void setOrganisationUnit(OrganisationUnit unit) {
-        isNull(unit, "OrganisationUnit object must not be null");
-
-        this.organisationUnit = new ForeignKeyContainer<>(OrganisationUnit.class);
-        this.organisationUnit.setModel(unit);
+        this.organisationUnit = isNull(unit, "OrganisationUnit object must not be null");
     }
 
     public void setDataSet(DataSet dataSet) {
-        isNull(dataSet, "DataSet object must not be null");
-
-        this.dataSet = new ForeignKeyContainer<>(DataSet.class);
-        this.dataSet.setModel(dataSet);
+        this.dataSet = isNull(dataSet, "DataSet object must not be null");
     }
 
     public OrganisationUnit getOrganisationUnit() {
-        return organisationUnit != null ? organisationUnit.toModel() : null;
+        return organisationUnit;
     }
 
     public DataSet getDataSet() {
-        return dataSet != null ? dataSet.toModel() : null;
+        return dataSet;
     }
 }

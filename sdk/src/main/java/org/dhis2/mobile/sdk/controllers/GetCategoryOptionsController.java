@@ -31,8 +31,7 @@ package org.dhis2.mobile.sdk.controllers;
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.entities.CategoryOption;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.tasks.GetCategoryOptionsTask;
-import org.dhis2.mobile.sdk.persistence.models.Session;
+import org.dhis2.mobile.sdk.network.models.Session;
 
 import java.util.List;
 
@@ -53,9 +52,10 @@ public final class GetCategoryOptionsController implements IController<List<Cate
 
     @Override
     public List<CategoryOption> run() throws APIException {
-        return (new GetCategoryOptionsTask(mDhisManager,
+        /* return (new GetCategoryOptionsTask(mDhisManager,
                 mSession.getServerUri(), mSession.getCredentials(),
-                mCatOptionIds)).run();
+                mCatOptionIds)).run(); */
+        return null;
     }
         /*
         Map<String, CategoryOption> newBaseCatOptions = getNewBaseCatOptions();

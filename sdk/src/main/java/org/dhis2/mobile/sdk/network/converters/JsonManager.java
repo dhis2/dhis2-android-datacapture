@@ -26,7 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.network.managers;
+package org.dhis2.mobile.sdk.network.converters;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.dhis2.mobile.sdk.entities.Category;
 import org.dhis2.mobile.sdk.entities.CategoryCombo;
@@ -35,16 +37,48 @@ import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
 import org.dhis2.mobile.sdk.entities.DataSet;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UserAccount;
-import org.dhis2.mobile.sdk.network.converters.IJsonConverter;
 
 import java.util.List;
 
-public interface IJsonManager {
-    public IJsonConverter<UserAccount, UserAccount> getUserAccountConverter();
-    public IJsonConverter<String, List<OrganisationUnit>> getOrgUnitsConverter();
-    public IJsonConverter<String, List<DataSet>> getDataSetsConverter();
-    public IJsonConverter<String, List<CategoryCombo>> getCategoryCombosConverter();
-    public IJsonConverter<String, List<CategoryOptionCombo>> getCategoryOptionComboConverter();
-    public IJsonConverter<String, List<Category>> getCategoryConverter();
-    public IJsonConverter<String, List<CategoryOption>> getCategoryOptionConverter();
+public class JsonManager implements IJsonManager {
+    private final ObjectMapper mMapper;
+
+    public JsonManager(ObjectMapper mapper) {
+        mMapper = mapper;
+    }
+
+    @Override
+    public IJsonConverter<UserAccount, UserAccount> getUserAccountConverter() {
+        return new UserAccountConverter(mMapper);
+    }
+
+    @Override
+    public IJsonConverter<String, List<OrganisationUnit>> getOrgUnitsConverter() {
+        return new OrgUnitsConverter(mMapper);
+    }
+
+    @Override
+    public IJsonConverter<String, List<DataSet>> getDataSetsConverter() {
+        return new DataSetsConverter(mMapper);
+    }
+
+    @Override
+    public IJsonConverter<String, List<CategoryCombo>> getCategoryCombosConverter() {
+        return new CategoryComboConverter(mMapper);
+    }
+
+    @Override
+    public IJsonConverter<String, List<CategoryOptionCombo>> getCategoryOptionComboConverter() {
+        return new CategoryOptionComboConverter(mMapper);
+    }
+
+    @Override
+    public IJsonConverter<String, List<Category>> getCategoryConverter() {
+        return new CategoryConverter(mMapper);
+    }
+
+    @Override
+    public IJsonConverter<String, List<CategoryOption>> getCategoryOptionConverter() {
+        return new CategoryOptionConverter(mMapper);
+    }
 }
