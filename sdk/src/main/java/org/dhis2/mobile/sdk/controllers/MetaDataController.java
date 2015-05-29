@@ -75,15 +75,15 @@ public final class MetaDataController implements IController<Object> {
 
         // creating db operations.
         Queue<DbOperation> ops = new LinkedList<>();
-        ops.addAll(DbHelper.createOperations(new Select().from(CategoryCombo.class).queryList(), categoryCombos));
-        ops.addAll(DbHelper.createOperations(new Select().from(Category.class).queryList(), categories));
         ops.addAll(DbHelper.createOperations(new Select().from(CategoryOption.class).queryList(), categoryOptions));
+        ops.addAll(DbHelper.createOperations(new Select().from(Category.class).queryList(), categories));
+        ops.addAll(DbHelper.createOperations(new Select().from(CategoryCombo.class).queryList(), categoryCombos));
 
         ops.addAll(DbHelper.createOperations(new Select().from(OrganisationUnit.class).queryList(), units));
         ops.addAll(DbHelper.createOperations(new Select().from(DataSet.class).queryList(), dataSets));
 
-        ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryComboToCategoryRelation.class).queryList(), comboToCats));
         ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryToCategoryOptionRelation.class).queryList(), catToCatOptions));
+        ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryComboToCategoryRelation.class).queryList(), comboToCats));
         ops.addAll(DbHelper.syncRelationModels(new Select().from(UnitToDataSetRelation.class).queryList(), unitToDataSets));
 
         DbHelper.applyBatch(ops);

@@ -29,45 +29,19 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <include layout="@layout/progress_bar_horizontal"/>
 
-    <LinearLayout
+    <ListView
+        android:id="@+id/categories_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="8dp">
-
-        <org.dhis2.mobile.ui.views.CardTextViewButton
-            android:id="@+id/unit_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            app:hint="@string/choose_organization_unit"/>
-
-        <org.dhis2.mobile.ui.views.CardTextViewButton
-            android:id="@+id/dataset_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            app:hint="@string/choose_dataset"/>
-
-        <org.dhis2.mobile.ui.views.CardTextViewButton
-            android:id="@+id/period_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            app:hint="@string/choose_period"/>
-
-        <org.dhis2.mobile.ui.views.CardDetailedButton
-            android:id="@+id/data_entry_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@color/transparent"
+        android:dividerHeight="0px"/>
 
 </LinearLayout>

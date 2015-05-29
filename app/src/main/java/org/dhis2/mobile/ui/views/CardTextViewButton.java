@@ -32,10 +32,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import org.dhis2.mobile.R;
 
 public class CardTextViewButton extends CardView {
+    private static final int ELEVATION = 2;
+    private static final int RADIUS = 4;
+    private static final int TEXT_VIEW_MARGIN = 10;
+
     private FontTextView mTextView;
     private CharSequence mHint;
 
@@ -58,11 +63,20 @@ public class CardTextViewButton extends CardView {
     }
 
     private void init(Context context) {
-        int pxs = getResources().getDimensionPixelSize(
-                R.dimen.card_text_view_margin);
+        int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, TEXT_VIEW_MARGIN,
+                getResources().getDisplayMetrics());
         LayoutParams textViewParams = new LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        textViewParams.setMargins(pxs, pxs, pxs, pxs);
+        textViewParams.setMargins(margin, margin, margin, margin);
+
+        float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, RADIUS,
+                getResources().getDisplayMetrics());
+        float elevation = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ELEVATION,
+                getResources().getDisplayMetrics());
+
+        setUseCompatPadding(true);
+        setCardElevation(elevation);
+        setRadius(radius);
 
         mTextView = new FontTextView(context);
         mTextView.setClickable(true);
@@ -78,6 +92,13 @@ public class CardTextViewButton extends CardView {
     public void setText(CharSequence sequence) {
         if (mTextView != null && sequence != null) {
             mTextView.setText(sequence);
+        }
+    }
+
+    public void setHint(CharSequence sequence) {
+        mHint = sequence;
+        if (mTextView != null && mHint != null) {
+            mTextView.setHint(mHint);
         }
     }
 

@@ -49,6 +49,8 @@ import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -145,7 +147,9 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
     static class OrgUnitQuery implements Query<List<OrganisationUnit>> {
 
         @Override public List<OrganisationUnit> query(Context context) {
-            return new Select().from(OrganisationUnit.class).queryList();
+            List<OrganisationUnit> units = new Select().from(OrganisationUnit.class).queryList();
+            Collections.sort(units, OrganisationUnit.COMPARATOR);
+            return units;
         }
     }
 

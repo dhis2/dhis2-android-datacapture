@@ -39,6 +39,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -56,6 +57,7 @@ import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.activities.ReportEntryActivity;
+import org.dhis2.mobile.ui.adapters.CategoryAdapter;
 import org.dhis2.mobile.ui.fragments.BaseFragment;
 import org.dhis2.mobile.ui.fragments.aggregate.DataSetDialogFragment.OnDatasetSetListener;
 import org.dhis2.mobile.ui.fragments.aggregate.OrgUnitDialogFragment.OnOrgUnitSetListener;
@@ -66,24 +68,23 @@ import org.dhis2.mobile.ui.views.CardTextViewButton;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
-        implements OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener {
+        implements View.OnClickListener, OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener {
     private static final String STATE = "state:AggregateReportFragment";
+    private static final String CATEGORY_COMBO_ID = "args:categoryComboId";
     private static final int CHECK_LOADER_ID = 345784834;
     private static final int CATEGORIES_LOADER_ID = 2342345;
-    private static final String CATEGORY_COMBO_ID = "args:categoryComboId";
 
-    @InjectView(R.id.progress_bar) SmoothProgressBar mProgressBar;
-    @InjectView(R.id.unit_button) CardTextViewButton mOrgUnitButton;
-    @InjectView(R.id.dataset_button) CardTextViewButton mDataSetButton;
-    @InjectView(R.id.period_button) CardTextViewButton mPeriodButton;
-    @InjectView(R.id.data_entry_button) CardDetailedButton mButton;
+    SmoothProgressBar mProgressBar;
+    ListView mCategoriesList;
+    CardTextViewButton mOrgUnitButton;
+    CardTextViewButton mDataSetButton;
+    CardTextViewButton mPeriodButton;
+    CardDetailedButton mButton;
 
+    private CategoryAdapter mAdapter;
     private AggregateReportFragmentState mState;
 
     @Override
@@ -94,9 +95,28 @@ public class AggregateReportFragment extends BaseFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle args) {
-        View view = inflater.inflate(R.layout.fragment_aggregate_report, container, false);
-        ButterKnife.inject(this, view);
-        return view;
+        View root = inflater.inflate(R.layout.fragment_aggregate_report, container, false);
+
+        mProgressBar = (SmoothProgressBar) root.findViewById(R.id.progress_bar);
+        mCategoriesList = (ListView) root.findViewById(R.id.categories_list_view);
+
+        View header = inflater.inflate(R.layout.fragment_aggregate_report_header, mCategoriesList, false);
+        View footer = inflater.inflate(R.layout.fragment_aggregate_report_footer, mCategoriesList, false);
+        mOrgUnitButton = (CardTextViewButton) header.findViewById(R.id.unit_button);
+        mDataSetButton = (CardTextViewButton) header.findViewById(R.id.dataset_button);
+        mPeriodButton = (CardTextViewButton) header.findViewById(R.id.period_button);
+        mButton = (CardDetailedButton) footer.findViewById(R.id.data_entry_button);
+
+        mOrgUnitButton.setOnClickListener(this);
+        mDataSetButton.setOnClickListener(this);
+        mPeriodButton.setOnClickListener(this);
+        mDataSetButton.setOnClickListener(this);
+
+        mAdapter = new CategoryAdapter(inflater);
+        mCategoriesList.addHeaderView(header, null, false);
+        mCategoriesList.addFooterView(footer, null, false);
+        mCategoriesList.setAdapter(mAdapter);
+        return root;
     }
 
     @Override
@@ -204,7 +224,8 @@ public class AggregateReportFragment extends BaseFragment
                 onCategoriesLoadFinished(loader, data);
             }
 
-            @Override public void onLoaderReset(Loader<List<Category>> loader) { }
+            @Override public void onLoaderReset(Loader<List<Category>> loader) {
+            }
         });
     }
 
@@ -251,10 +272,7 @@ public class AggregateReportFragment extends BaseFragment
         startActivity(intent);
     }
 
-    @OnClick({
-            R.id.unit_button, R.id.dataset_button,
-            R.id.period_button, R.id.data_entry_button
-    })
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.unit_button: {
@@ -346,9 +364,7 @@ public class AggregateReportFragment extends BaseFragment
                                          List<Category> categories) {
         if (loader.getId() == CATEGORIES_LOADER_ID) {
             if (categories != null && !categories.isEmpty()) {
-                for (Category category : categories) {
-                    System.out.println(category.getDisplayName());
-                }
+                mAdapter.swapData(categories);
             }
         }
     }

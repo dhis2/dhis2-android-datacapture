@@ -34,7 +34,6 @@
 
     <dimen name="drawer_size">250dp</dimen>
 
-    <dimen name="card_text_view_margin">8dp</dimen>
     <dimen name="card_detail_button_padding">8dp</dimen>
     <dimen name="card_detail_text_view_margin">4dp</dimen>
 </resources>

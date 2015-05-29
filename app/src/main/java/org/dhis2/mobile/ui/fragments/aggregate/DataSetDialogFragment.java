@@ -50,6 +50,7 @@ import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -159,7 +160,10 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
         }
 
         @Override public List<DataSet> query(Context context) {
-            return OrganisationUnit.queryRelatedDataSetsFromDb(mOrgUnitId);
+            List<DataSet> dataSets = OrganisationUnit
+                    .queryRelatedDataSetsFromDb(mOrgUnitId);
+            Collections.sort(dataSets, DataSet.COMPARATOR);
+            return dataSets;
         }
     }
 
