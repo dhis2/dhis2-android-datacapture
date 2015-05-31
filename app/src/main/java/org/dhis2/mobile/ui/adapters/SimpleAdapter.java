@@ -28,7 +28,6 @@
 
 package org.dhis2.mobile.ui.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +43,8 @@ public class SimpleAdapter<T> extends BaseAdapter {
     private LayoutInflater mInflater;
     private ExtractStringCallback<T> mCallback;
 
-    public SimpleAdapter(Context context) {
-        mInflater = LayoutInflater.from(context);
+    public SimpleAdapter(LayoutInflater inflater) {
+        mInflater = inflater;
     }
 
     public void setStringExtractor(ExtractStringCallback<T> callback) {
@@ -58,8 +57,8 @@ public class SimpleAdapter<T> extends BaseAdapter {
         View view;
 
         if (convertView == null) {
-            View root = mInflater.inflate(R.layout.dialog_fragment_listview_item, parent, false);
-            TextView textView = (TextView) root.findViewById(R.id.textview_item);
+            View root = mInflater.inflate(R.layout.dialog_fragment_listview_option_item, parent, false);
+            TextView textView = (TextView) root.findViewById(R.id.option_text_view_item);
 
             holder = new TextViewHolder(textView);
             root.setTag(holder);

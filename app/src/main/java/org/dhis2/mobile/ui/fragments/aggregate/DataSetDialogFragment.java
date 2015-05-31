@@ -30,14 +30,9 @@ package org.dhis2.mobile.ui.fragments.aggregate;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.raizlabs.android.dbflow.structure.Model;
 
@@ -47,54 +42,34 @@ import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
-import org.dhis2.mobile.ui.adapters.SimpleAdapter;
+import org.dhis2.mobile.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;
+import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnItemClick;
-
-public class DataSetDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<List<DataSet>> {
+public class DataSetDialogFragment extends AutoCompleteDialogFragment
+        implements LoaderManager.LoaderCallbacks<List<OptionAdapterValue>> {
+    public static final int ID = 23464235;
     private static final int LOADER_ID = 340962123;
-    private static String TAG = DataSetDialogFragment.class.getName();
     private static final String ORG_UNIT_ID = "args:orgUnitId";
 
-    @InjectView(R.id.simple_listview) ListView mListView;
-    private SimpleAdapter<DataSet> mAdapter;
-    private OnDatasetSetListener mListener;
-
-    public static DataSetDialogFragment newInstance(OnDatasetSetListener listener,
+    public static DataSetDialogFragment newInstance(OnOptionSelectedListener listener,
                                                     String orgUnitId) {
         DataSetDialogFragment fragment = new DataSetDialogFragment();
         Bundle args = new Bundle();
         args.putString(ORG_UNIT_ID, orgUnitId);
-        fragment.setOnClickListener(listener);
+        fragment.setOnOptionSetListener(listener);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_TITLE,
-                R.style.Theme_AppCompat_Light_Dialog);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_fragment_listview, container, false);
-        ButterKnife.inject(this, view);
-        return view;
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mAdapter = new SimpleAdapter<>(getActivity());
-        mAdapter.setStringExtractor(new StringExtractor());
-        mListView.setAdapter(mAdapter);
+        super.onViewCreated(view, savedInstanceState);
+        setDialogLabel(R.string.dialog_data_sets);
+        setDialogId(ID);
     }
 
     @Override
@@ -103,22 +78,8 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
         getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
     }
 
-
-    @OnItemClick(R.id.simple_listview)
-    public void onItemClick(int position) {
-        if (mListener != null) {
-            DataSet dataSet = mAdapter.getItemSafely(position);
-            if (dataSet != null) {
-                mListener.onDataSetSelected(
-                        dataSet.getId(), dataSet.getDisplayName(), dataSet.getCategoryCombo().getId()
-                );
-            }
-        }
-        dismiss();
-    }
-
     @Override
-    public Loader<List<DataSet>> onCreateLoader(int id, Bundle bundle) {
+    public Loader<List<OptionAdapterValue>> onCreateLoader(int id, Bundle bundle) {
         if (LOADER_ID == id && bundle != null) {
             String orgUnitId = bundle.getString(ORG_UNIT_ID);
             List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
@@ -131,47 +92,38 @@ public class DataSetDialogFragment extends DialogFragment implements LoaderManag
     }
 
     @Override
-    public void onLoadFinished(Loader<List<DataSet>> listLoader,
-                               List<DataSet> dbRows) {
-        mAdapter.swapData(dbRows);
+    public void onLoadFinished(Loader<List<OptionAdapterValue>> loader,
+                               List<OptionAdapterValue> data) {
+        if (loader != null && loader.getId() == LOADER_ID) {
+            getAdapter().swapData(data);
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<DataSet>> listLoader) {
+    public void onLoaderReset(Loader<List<OptionAdapterValue>> loader) {
+        if (loader != null && loader.getId() == LOADER_ID) {
+            getAdapter().swapData(null);
+        }
     }
 
-    public void setOnClickListener(OnDatasetSetListener listener) {
-        mListener = listener;
-    }
-
-    public void show(FragmentManager manager) {
-        show(manager, TAG);
-    }
-
-    public interface OnDatasetSetListener {
-        void onDataSetSelected(String dataSetId, String dataSetName, String categoryComboId);
-    }
-
-    static class DataSetsQuery implements Query<List<DataSet>> {
+    static class DataSetsQuery implements Query<List<OptionAdapterValue>> {
         private final String mOrgUnitId;
 
         public DataSetsQuery(String orgUnitId) {
             mOrgUnitId = orgUnitId;
         }
 
-        @Override public List<DataSet> query(Context context) {
+        @Override public List<OptionAdapterValue> query(Context context) {
             List<DataSet> dataSets = OrganisationUnit
                     .queryRelatedDataSetsFromDb(mOrgUnitId);
             Collections.sort(dataSets, DataSet.COMPARATOR);
-            return dataSets;
-        }
-    }
-
-    static class StringExtractor implements SimpleAdapter.ExtractStringCallback<DataSet> {
-
-        @Override
-        public String getString(DataSet object) {
-            return object.getDisplayName();
+            List<OptionAdapterValue> adapterValues = new ArrayList<>();
+            for (DataSet dataSet : dataSets) {
+                adapterValues.add(new OptionAdapterValue(
+                        dataSet.getId(), dataSet.getDisplayName(), dataSet.getCategoryCombo().getId()
+                ));
+            }
+            return adapterValues;
         }
     }
 }

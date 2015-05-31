@@ -31,5 +31,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/simple_listview"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:cacheColorHint="@color/transparent"/>
+    android:layout_height="match_parent"
+    android:cacheColorHint="@color/transparent"
+    android:divider="@color/dark_grey"
+    android:dividerHeight="1px"/>

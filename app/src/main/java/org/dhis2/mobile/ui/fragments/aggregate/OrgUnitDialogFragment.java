@@ -30,14 +30,9 @@ package org.dhis2.mobile.ui.fragments.aggregate;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.Model;
@@ -46,50 +41,30 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.OrganisationUnit;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
-import org.dhis2.mobile.ui.adapters.SimpleAdapter;
+import org.dhis2.mobile.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;
+import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnItemClick;
-
-public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallbacks<List<OrganisationUnit>> {
+public class OrgUnitDialogFragment extends AutoCompleteDialogFragment
+        implements LoaderCallbacks<List<OptionAdapterValue>> {
     private static final String TAG = OrgUnitDialogFragment.class.getName();
     private static final int LOADER_ID = 243756345;
+    public static final int ID = 573455;
 
-    @InjectView(R.id.simple_listview) ListView mListView;
-    private SimpleAdapter<OrganisationUnit> mAdapter;
-    private OnOrgUnitSetListener mListener;
-
-    public static OrgUnitDialogFragment newInstance(OnOrgUnitSetListener listener) {
+    public static OrgUnitDialogFragment newInstance(OnOptionSelectedListener listener) {
         OrgUnitDialogFragment fragment = new OrgUnitDialogFragment();
-        fragment.setOnClickListener(listener);
+        fragment.setOnOptionSetListener(listener);
         return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_TITLE,
-                R.style.Theme_AppCompat_Light_Dialog);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_fragment_listview, container, false);
-        ButterKnife.inject(this, view);
-        return view;
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mAdapter = new SimpleAdapter<>(getActivity());
-        mAdapter.setStringExtractor(new StringExtractor());
-        mListView.setAdapter(mAdapter);
+        super.onViewCreated(view, savedInstanceState);
+        setDialogLabel(R.string.dialog_organisation_units);
+        setDialogId(ID);
     }
 
     @Override
@@ -98,29 +73,8 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
         getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
     }
 
-    @OnItemClick(R.id.simple_listview)
-    public void onItemClick(int position) {
-        if (mListener != null) {
-            OrganisationUnit unit = mAdapter.getItemSafely(position);
-            if (unit != null) {
-                mListener.onUnitSelected(
-                        unit.getId(), unit.getDisplayName()
-                );
-            }
-        }
-        dismiss();
-    }
-
-    public void setOnClickListener(OnOrgUnitSetListener listener) {
-        mListener = listener;
-    }
-
-    public void show(FragmentManager manager) {
-        show(manager, TAG);
-    }
-
     @Override
-    public Loader<List<OrganisationUnit>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<OptionAdapterValue>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
             List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
             tablesToTrack.add(OrganisationUnit.class);
@@ -131,33 +85,32 @@ public class OrgUnitDialogFragment extends DialogFragment implements LoaderCallb
     }
 
     @Override
-    public void onLoadFinished(Loader<List<OrganisationUnit>> loader,
-                               List<OrganisationUnit> data) {
-        mAdapter.swapData(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<OrganisationUnit>> loader) {
-    }
-
-    public interface OnOrgUnitSetListener {
-        void onUnitSelected(String orgUnitId, String orgUnitLabel);
-    }
-
-    static class OrgUnitQuery implements Query<List<OrganisationUnit>> {
-
-        @Override public List<OrganisationUnit> query(Context context) {
-            List<OrganisationUnit> units = new Select().from(OrganisationUnit.class).queryList();
-            Collections.sort(units, OrganisationUnit.COMPARATOR);
-            return units;
+    public void onLoadFinished(Loader<List<OptionAdapterValue>> loader,
+                               List<OptionAdapterValue> data) {
+        if (loader != null && loader.getId() == LOADER_ID) {
+            getAdapter().swapData(data);
         }
     }
 
-    static class StringExtractor implements SimpleAdapter.ExtractStringCallback<OrganisationUnit> {
+    @Override
+    public void onLoaderReset(Loader<List<OptionAdapterValue>> loader) {
+        if (loader != null && loader.getId() == LOADER_ID) {
+            getAdapter().swapData(null);
+        }
+    }
 
-        @Override
-        public String getString(OrganisationUnit object) {
-            return object.getDisplayName();
+    static class OrgUnitQuery implements Query<List<OptionAdapterValue>> {
+
+        @Override public List<OptionAdapterValue> query(Context context) {
+            List<OrganisationUnit> units = new Select()
+                    .from(OrganisationUnit.class).queryList();
+            Collections.sort(units, OrganisationUnit.COMPARATOR);
+            List<OptionAdapterValue> optionAdapterValues = new ArrayList<>();
+            for (OrganisationUnit unit : units) {
+                optionAdapterValues.add(new OptionAdapterValue(
+                        unit.getId(), unit.getDisplayName(), null));
+            }
+            return optionAdapterValues;
         }
     }
 }

@@ -58,9 +58,8 @@ import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.activities.ReportEntryActivity;
 import org.dhis2.mobile.ui.adapters.CategoryAdapter;
+import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
 import org.dhis2.mobile.ui.fragments.BaseFragment;
-import org.dhis2.mobile.ui.fragments.aggregate.DataSetDialogFragment.OnDatasetSetListener;
-import org.dhis2.mobile.ui.fragments.aggregate.OrgUnitDialogFragment.OnOrgUnitSetListener;
 import org.dhis2.mobile.ui.fragments.aggregate.PeriodDialogFragment.OnPeriodSetListener;
 import org.dhis2.mobile.ui.views.CardDetailedButton;
 import org.dhis2.mobile.ui.views.CardTextViewButton;
@@ -71,7 +70,7 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
-        implements View.OnClickListener, OnOrgUnitSetListener, OnDatasetSetListener, OnPeriodSetListener {
+        implements View.OnClickListener, OnOptionSelectedListener, OnPeriodSetListener {
     private static final String STATE = "state:AggregateReportFragment";
     private static final String CATEGORY_COMBO_ID = "args:categoryComboId";
     private static final int CHECK_LOADER_ID = 345784834;
@@ -180,7 +179,6 @@ public class AggregateReportFragment extends BaseFragment
         });
     }
 
-    @Override
     public void onUnitSelected(String orgUnitId, String orgUnitLabel) {
         mOrgUnitButton.setText(orgUnitLabel);
         mDataSetButton.setEnabled(true);
@@ -191,7 +189,6 @@ public class AggregateReportFragment extends BaseFragment
         handleViews(0);
     }
 
-    @Override
     public void onDataSetSelected(String dataSetId, String dataSetLabel, String categoryComboId) {
         mDataSetButton.setText(dataSetLabel);
         mPeriodButton.setEnabled(true);
@@ -242,6 +239,7 @@ public class AggregateReportFragment extends BaseFragment
     }
 
     private void handleViews(int level) {
+        mAdapter.swapData(null);
         switch (level) {
             case 0:
                 mPeriodButton.setEnabled(false);
@@ -270,6 +268,17 @@ public class AggregateReportFragment extends BaseFragment
                 period, periodLabel
         );
         startActivity(intent);
+    }
+
+    @Override
+    public void onOptionSelected(int dialogId, int position,
+                                 String id, String name, String data) {
+        if (dialogId == OrgUnitDialogFragment.ID) {
+            onUnitSelected(id, name);
+        }
+        if (dialogId == DataSetDialogFragment.ID) {
+            onDataSetSelected(id, name, data);
+        }
     }
 
     @Override

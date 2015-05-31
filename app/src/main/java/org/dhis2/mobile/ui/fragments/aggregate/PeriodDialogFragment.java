@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -58,6 +59,11 @@ import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
+
 public class PeriodDialogFragment extends DialogFragment
         implements LoaderCallbacks<DataSet>,
         View.OnClickListener, AdapterView.OnItemClickListener {
@@ -65,9 +71,10 @@ public class PeriodDialogFragment extends DialogFragment
     private static final int LOADER_ID = 345234575;
     private static final String DATA_SET_ID = "args:dataSetId";
 
-    private ListView mListView;
-    private Button mPrevious;
-    private Button mNext;
+    @InjectView(R.id.simple_listview) ListView mListView;
+    @InjectView(R.id.previous) Button mPrevious;
+    @InjectView(R.id.next) Button mNext;
+    @InjectView(R.id.dialog_label) TextView mDialogLabel;
 
     private SimpleAdapter<DateHolder> mAdapter;
     private OnPeriodSetListener mListener;
@@ -93,23 +100,20 @@ public class PeriodDialogFragment extends DialogFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_fragment_listview_period, container, false);
-        mListView = (ListView) view.findViewById(R.id.simple_listview);
-        mPrevious = (Button) view.findViewById(R.id.previous);
-        mNext = (Button) view.findViewById(R.id.next);
-        return view;
+        return inflater.inflate(R.layout.dialog_fragment_listview_period, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mAdapter = new SimpleAdapter<>(getActivity());
+        ButterKnife.inject(this, view);
+
+        mDialogLabel.setText(R.string.period);
+
+        mAdapter = new SimpleAdapter<>(LayoutInflater.from(getActivity()));
         mAdapter.setStringExtractor(new ExtractPeriodLabel());
 
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
-
-        mPrevious.setOnClickListener(this);
-        mNext.setOnClickListener(this);
     }
 
     @Override
@@ -118,7 +122,7 @@ public class PeriodDialogFragment extends DialogFragment
         getLoaderManager().initLoader(LOADER_ID, getArguments(), this);
     }
 
-    @Override
+    @OnClick({R.id.previous, R.id.next, R.id.close_dialog_button})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.previous: {
@@ -138,10 +142,14 @@ public class PeriodDialogFragment extends DialogFragment
                 }
                 break;
             }
+            case R.id.close_dialog_button: {
+                dismiss();
+                break;
+            }
         }
     }
 
-    @Override
+    @OnItemClick(R.id.simple_listview)
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (mListener != null) {
             DateHolder date = mAdapter.getItemSafely(position);

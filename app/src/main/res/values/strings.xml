@@ -56,4 +56,11 @@
     <string name="choose_period">Choose period</string>
     <string name="title_activity_report_entry">ReportEntryActivity</string>
     <!-- END -->
+
+    <!-- START Dialog Fragments -->
+    <string name="search">Search</string>
+    <string name="dialog_organisation_units">Organisation units</string>
+    <string name="dialog_data_sets">Data sets</string>
+    <string name="dialog_period">Period</string>
+    <!-- END -->
 </resources>

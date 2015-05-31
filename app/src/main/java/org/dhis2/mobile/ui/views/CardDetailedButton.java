@@ -188,7 +188,7 @@ public class CardDetailedButton extends CardView {
         imgViewParams.gravity = Gravity.CENTER_VERTICAL;
 
         ImageView imageView = new ImageView(getContext());
-        imageView.setImageResource(R.drawable.ic_next);
+        imageView.setImageResource(R.mipmap.ic_next);
         imageView.setLayoutParams(imgViewParams);
         return imageView;
     }
