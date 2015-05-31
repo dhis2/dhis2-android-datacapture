@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.Category;
+import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment;
 import org.dhis2.mobile.ui.fragments.aggregate.CategoryDialogFragment;
 import org.dhis2.mobile.ui.views.CardTextViewButton;
 
@@ -94,17 +95,23 @@ public final class CategoryAdapter extends BaseAdapter {
         public ViewHolder(View itemView, FragmentManager fragmentManager) {
             cardTextViewButton = (CardTextViewButton) itemView
                     .findViewById(R.id.category_option_picker);
-            clickListener = new OnButtonClickListener(fragmentManager);
+            OnCategoryOptionSelectedListener onOptionSelectedListener
+                    = new OnCategoryOptionSelectedListener(cardTextViewButton);
+            clickListener = new OnButtonClickListener(fragmentManager,
+                    onOptionSelectedListener);
             cardTextViewButton.setOnClickListener(clickListener);
         }
     }
 
     private static class OnButtonClickListener implements View.OnClickListener {
         private final FragmentManager mManager;
+        private final OnCategoryOptionSelectedListener mListener;
         private Category mCategory;
 
-        public OnButtonClickListener(FragmentManager manager) {
+        public OnButtonClickListener(FragmentManager manager,
+                                     OnCategoryOptionSelectedListener listener) {
             mManager = manager;
+            mListener = listener;
         }
 
         public void setCategory(Category category) {
@@ -114,9 +121,24 @@ public final class CategoryAdapter extends BaseAdapter {
         @Override
         public void onClick(View v) {
             CategoryDialogFragment dialogFragment = CategoryDialogFragment
-                    .newInstance(mCategory.getId());
+                    .newInstance(mListener, mCategory.getId());
             dialogFragment.setDialogTitle(mCategory.getDisplayName());
             dialogFragment.show(mManager);
+        }
+    }
+
+    private static class OnCategoryOptionSelectedListener
+            implements AutoCompleteDialogFragment.OnOptionSelectedListener {
+        private final CardTextViewButton mButton;
+
+        public OnCategoryOptionSelectedListener(CardTextViewButton button) {
+            mButton = button;
+        }
+
+        @Override
+        public void onOptionSelected(int dialogId, int position,
+                                     String id, String name, String blob) {
+            mButton.setText(name);
         }
     }
 }

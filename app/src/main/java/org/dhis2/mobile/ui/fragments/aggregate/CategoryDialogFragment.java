@@ -25,11 +25,13 @@ public class CategoryDialogFragment extends AutoCompleteDialogFragment
     private static final int LOADER_ID = 4234421;
     private static final String CATEGORY_ID = "args:category";
 
-    public static CategoryDialogFragment newInstance(String categoryId) {
+    public static CategoryDialogFragment newInstance(OnOptionSelectedListener listener,
+                                                     String categoryId) {
         CategoryDialogFragment fragment = new CategoryDialogFragment();
         Bundle args = new Bundle();
         args.putString(CATEGORY_ID, categoryId);
         fragment.setArguments(args);
+        fragment.setOnOptionSetListener(listener);
         return fragment;
     }
 
