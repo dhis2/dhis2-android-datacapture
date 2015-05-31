@@ -48,6 +48,11 @@ public class CardDetailedButton extends CardView {
     private static final float TEXT_VIEW_CONTAINER_WEIGHT = 0.95f;
     private static final float ADDITIONAL_VIEW_WEIGHT = 0.05f;
 
+    private static final int ELEVATION = 2;
+    private static final int RADIUS = 4;
+    private static final int CONTAINER_PADDING = 8;
+    private static final int TEXT_VIEW_MARGIN = 4;
+
     private static final int BIG_TEXT_SIZE = 17;
     private static final int SMALL_TEXT_SIZE = 13;
 
@@ -77,6 +82,16 @@ public class CardDetailedButton extends CardView {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         );
         setLayoutParams(cardViewParams);
+
+        float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, RADIUS,
+                getResources().getDisplayMetrics());
+        float elevation = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ELEVATION,
+                getResources().getDisplayMetrics());
+
+        setUseCompatPadding(true);
+        setCardElevation(elevation);
+        setRadius(radius);
+
 
         mFirstLine = initTextView(R.string.regular_font_name, BIG_TEXT_SIZE, true);
         mSecondLine = initTextView(R.string.light_font_name, SMALL_TEXT_SIZE, false);
@@ -111,8 +126,8 @@ public class CardDetailedButton extends CardView {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
-        int containerPadding = getResources().getDimensionPixelSize(
-                R.dimen.card_detail_button_padding);
+        int containerPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, CONTAINER_PADDING,
+                getResources().getDisplayMetrics());
 
         LinearLayout container = new LinearLayout(getContext());
         container.setId(getId());
@@ -141,8 +156,8 @@ public class CardDetailedButton extends CardView {
             LinearLayout.LayoutParams textViewParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            int textViewMargin = getResources().getDimensionPixelSize(
-                    R.dimen.card_detail_text_view_margin);
+            int textViewMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, TEXT_VIEW_MARGIN,
+                    getResources().getDisplayMetrics());
             textViewParams.setMargins(0, 0, 0, textViewMargin);
             textView.setLayoutParams(textViewParams);
         }

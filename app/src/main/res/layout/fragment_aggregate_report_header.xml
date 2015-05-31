@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:paddingLeft="6dp"
     android:paddingRight="6dp"
-    android:paddingTop="2dp">
+    android:paddingTop="4dp">
 
     <org.dhis2.mobile.ui.views.CardTextViewButton
         android:id="@+id/unit_button"
