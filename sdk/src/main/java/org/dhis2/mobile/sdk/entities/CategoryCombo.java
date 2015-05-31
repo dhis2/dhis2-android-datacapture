@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class CategoryCombo extends BaseIdentifiableObject {
+public final class CategoryCombo extends BaseIdentifiableObject implements DisplayNameModel {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("dimensionType") @Column String dimensionType;
     @JsonProperty("skipTotal") @Column boolean skipTotal;

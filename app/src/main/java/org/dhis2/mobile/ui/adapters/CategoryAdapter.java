@@ -1,5 +1,6 @@
 package org.dhis2.mobile.ui.adapters;
 
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,16 +8,19 @@ import android.widget.BaseAdapter;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.Category;
+import org.dhis2.mobile.ui.fragments.aggregate.CategoryDialogFragment;
 import org.dhis2.mobile.ui.views.CardTextViewButton;
 
 import java.util.List;
 
 public final class CategoryAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
+    private final FragmentManager mManager;
     private List<Category> mCategories;
 
-    public CategoryAdapter(LayoutInflater inflater) {
+    public CategoryAdapter(LayoutInflater inflater, FragmentManager manager) {
         mInflater = inflater;
+        mManager = manager;
     }
 
     @Override
@@ -48,9 +52,9 @@ public final class CategoryAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (convertView == null) {
-            view = mInflater.inflate(R.layout.listview_card_text_view_button,
-                    parent, false);
-            holder = new ViewHolder(view);
+            view = mInflater
+                    .inflate(R.layout.listview_card_text_view_button, parent, false);
+            holder = new ViewHolder(view, mManager);
             view.setTag(holder);
         } else {
             view = convertView;
@@ -58,6 +62,7 @@ public final class CategoryAdapter extends BaseAdapter {
         }
 
         Category category = mCategories.get(position);
+        holder.clickListener.setCategory(category);
         holder.cardTextViewButton.setHint(category.getDisplayName());
 
         return view;
@@ -84,10 +89,34 @@ public final class CategoryAdapter extends BaseAdapter {
 
     static class ViewHolder {
         final CardTextViewButton cardTextViewButton;
+        final OnButtonClickListener clickListener;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, FragmentManager fragmentManager) {
             cardTextViewButton = (CardTextViewButton) itemView
                     .findViewById(R.id.category_option_picker);
+            clickListener = new OnButtonClickListener(fragmentManager);
+            cardTextViewButton.setOnClickListener(clickListener);
+        }
+    }
+
+    private static class OnButtonClickListener implements View.OnClickListener {
+        private final FragmentManager mManager;
+        private Category mCategory;
+
+        public OnButtonClickListener(FragmentManager manager) {
+            mManager = manager;
+        }
+
+        public void setCategory(Category category) {
+            mCategory = category;
+        }
+
+        @Override
+        public void onClick(View v) {
+            CategoryDialogFragment dialogFragment = CategoryDialogFragment
+                    .newInstance(mCategory.getId());
+            dialogFragment.setDialogTitle(mCategory.getDisplayName());
+            dialogFragment.show(mManager);
         }
     }
 }

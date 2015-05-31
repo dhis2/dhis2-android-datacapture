@@ -16,7 +16,6 @@
 
 package org.dhis2.mobile.ui.adapters;
 
-import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

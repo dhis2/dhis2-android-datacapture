@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:singleLine="false"
         android:textAllCaps="true"
-        android:textSize="15sp"
-        app:font="@string/light_font_name"/>
+        android:textSize="14sp"
+        app:font="@string/regular_font_name"/>
 
 </LinearLayout>

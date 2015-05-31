@@ -63,7 +63,7 @@ public class OrgUnitDialogFragment extends AutoCompleteDialogFragment
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setDialogLabel(R.string.dialog_organisation_units);
+        setDialogTitle(getResources().getString(R.string.dialog_organisation_units));
         setDialogId(ID);
     }
 
@@ -104,7 +104,7 @@ public class OrgUnitDialogFragment extends AutoCompleteDialogFragment
         @Override public List<OptionAdapterValue> query(Context context) {
             List<OrganisationUnit> units = new Select()
                     .from(OrganisationUnit.class).queryList();
-            Collections.sort(units, OrganisationUnit.COMPARATOR);
+            Collections.sort(units, OrganisationUnit.DISPLAY_NAME_MODEL_COMPARATOR);
             List<OptionAdapterValue> optionAdapterValues = new ArrayList<>();
             for (OrganisationUnit unit : units) {
                 optionAdapterValues.add(new OptionAdapterValue(

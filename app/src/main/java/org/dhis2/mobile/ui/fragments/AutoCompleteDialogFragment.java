@@ -62,7 +62,10 @@ public class AutoCompleteDialogFragment extends DialogFragment
 
     private AutoCompleteDialogAdapter mAdapter;
     private OnOptionSelectedListener mListener;
+
     private int mDialogId;
+    private CharSequence mDialogTitle;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +91,7 @@ public class AutoCompleteDialogFragment extends DialogFragment
 
         mAdapter = new AutoCompleteDialogAdapter(LayoutInflater.from(getActivity()));
         mListView.setAdapter(mAdapter);
+        mDialogLabel.setText(mDialogTitle);
     }
 
     @OnItemClick(R.id.simple_listview)
@@ -113,20 +117,6 @@ public class AutoCompleteDialogFragment extends DialogFragment
         mAdapter.getFilter().filter(editable.toString());
     }
 
-    /* This method must be called only after onViewCreated() */
-    public void setDialogLabel(int resourceId) {
-        if (mDialogLabel != null) {
-            mDialogLabel.setText(resourceId);
-        }
-    }
-
-    /* This method must be called only after onViewCreated() */
-    public void setDialogLabel(CharSequence sequence) {
-        if (mDialogLabel != null) {
-            mDialogLabel.setText(sequence);
-        }
-    }
-
     public void setDialogId(int dialogId) {
         mDialogId = dialogId;
     }
@@ -136,7 +126,15 @@ public class AutoCompleteDialogFragment extends DialogFragment
     }
 
     /* This method must be called only after onViewCreated() */
-    public CharSequence getDialogLabel() {
+    public void setDialogTitle(CharSequence sequence) {
+        mDialogTitle = sequence;
+        if (mDialogLabel != null) {
+            mDialogLabel.setText(sequence);
+        }
+    }
+
+    /* This method must be called only after onViewCreated() */
+    public CharSequence getDialogTitle() {
         if (mDialogLabel != null) {
             return mDialogLabel.getText();
         } else {

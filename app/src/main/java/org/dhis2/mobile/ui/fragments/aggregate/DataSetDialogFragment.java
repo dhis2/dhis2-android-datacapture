@@ -68,7 +68,7 @@ public class DataSetDialogFragment extends AutoCompleteDialogFragment
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setDialogLabel(R.string.dialog_data_sets);
+        setDialogTitle(getResources().getString(R.string.dialog_data_sets));
         setDialogId(ID);
     }
 
@@ -116,7 +116,7 @@ public class DataSetDialogFragment extends AutoCompleteDialogFragment
         @Override public List<OptionAdapterValue> query(Context context) {
             List<DataSet> dataSets = OrganisationUnit
                     .queryRelatedDataSetsFromDb(mOrgUnitId);
-            Collections.sort(dataSets, DataSet.COMPARATOR);
+            Collections.sort(dataSets, DataSet.DISPLAY_NAME_MODEL_COMPARATOR);
             List<OptionAdapterValue> adapterValues = new ArrayList<>();
             for (DataSet dataSet : dataSets) {
                 adapterValues.add(new OptionAdapterValue(

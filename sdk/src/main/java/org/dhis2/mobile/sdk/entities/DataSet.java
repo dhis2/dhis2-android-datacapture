@@ -34,17 +34,14 @@ import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ForeignKey;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
-import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.Table;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class DataSet extends BaseIdentifiableObject {
-    public static final DataSetComparator COMPARATOR = new DataSetComparator();
+public final class DataSet extends BaseIdentifiableObject implements DisplayNameModel {
     private static final String CATEGORY_COMBO_KEY = "categoryComboKey";
 
     @JsonProperty("displayName") @Column String displayName;
@@ -137,17 +134,5 @@ public final class DataSet extends BaseIdentifiableObject {
     @JsonIgnore
     public void setPeriodType(String periodType) {
         this.periodType = periodType;
-    }
-
-    public static class DataSetComparator implements Comparator<DataSet> {
-
-        @Override public int compare(DataSet first, DataSet second) {
-            if (first != null && first.getDisplayName() != null
-                    && second != null && second.getDisplayName() != null) {
-                return first.getDisplayName().compareTo(second.getDisplayName());
-            } else {
-                return 0;
-            }
-        }
     }
 }

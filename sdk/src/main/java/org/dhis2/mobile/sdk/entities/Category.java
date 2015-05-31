@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class Category extends BaseIdentifiableObject {
+public final class Category extends BaseIdentifiableObject implements DisplayNameModel {
     @JsonProperty("dataDimension") @Column String dataDimension;
     @JsonProperty("dataDimensionType") @Column String dataDimensionType;
     @JsonProperty("dimension") @Column String dimension;

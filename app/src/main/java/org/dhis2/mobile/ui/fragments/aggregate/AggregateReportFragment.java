@@ -111,7 +111,7 @@ public class AggregateReportFragment extends BaseFragment
         mPeriodButton.setOnClickListener(this);
         mDataSetButton.setOnClickListener(this);
 
-        mAdapter = new CategoryAdapter(inflater);
+        mAdapter = new CategoryAdapter(inflater, getChildFragmentManager());
         mCategoriesList.addHeaderView(header, null, false);
         mCategoriesList.addFooterView(footer, null, false);
         mCategoriesList.setAdapter(mAdapter);

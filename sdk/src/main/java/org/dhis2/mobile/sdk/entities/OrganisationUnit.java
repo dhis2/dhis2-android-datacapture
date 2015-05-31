@@ -31,7 +31,6 @@ package org.dhis2.mobile.sdk.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.ModelContainer;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
@@ -39,13 +38,10 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class OrganisationUnit extends BaseIdentifiableObject {
-    public static final OrganisationUnitComparator COMPARATOR = new OrganisationUnitComparator();
-
+public final class OrganisationUnit extends BaseIdentifiableObject implements DisplayNameModel {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("level") @Column int level;
     @JsonProperty("parent") OrganisationUnit parent;
@@ -121,17 +117,5 @@ public final class OrganisationUnit extends BaseIdentifiableObject {
             }
         }
         return dataSets;
-    }
-
-    public static class OrganisationUnitComparator implements Comparator<OrganisationUnit> {
-
-        @Override public int compare(OrganisationUnit first, OrganisationUnit second) {
-            if (first != null && first.getDisplayName() != null
-                    && second != null && second.getDisplayName() != null) {
-                return first.getDisplayName().compareTo(second.getDisplayName());
-            } else {
-                return 0;
-            }
-        }
     }
 }
