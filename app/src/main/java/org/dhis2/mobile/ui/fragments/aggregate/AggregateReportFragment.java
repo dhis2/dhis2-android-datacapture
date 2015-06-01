@@ -111,10 +111,9 @@ public class AggregateReportFragment extends BaseFragment
         mPeriodButton.setOnClickListener(this);
         mDataSetButton.setOnClickListener(this);
 
-        mAdapter = new CategoryAdapter(inflater, getChildFragmentManager());
         mCategoriesList.addHeaderView(header, null, false);
         mCategoriesList.addFooterView(footer, null, false);
-        mCategoriesList.setAdapter(mAdapter);
+
         return root;
     }
 
@@ -133,6 +132,10 @@ public class AggregateReportFragment extends BaseFragment
         if (mState == null) {
             mState = new AggregateReportFragmentState();
         }
+
+        mAdapter = new CategoryAdapter(LayoutInflater.from(getActivity()),
+                getChildFragmentManager(), mState);
+        mCategoriesList.setAdapter(mAdapter);
 
         mProgressBar.setVisibility(mState.isSyncInProcess() ? View.VISIBLE : View.INVISIBLE);
     }
@@ -186,6 +189,7 @@ public class AggregateReportFragment extends BaseFragment
         mState.setOrgUnit(orgUnitId, orgUnitLabel);
         mState.resetDataSet();
         mState.resetPeriod();
+        mState.resetCategoryOptions();
         handleViews(0);
     }
 
@@ -195,12 +199,14 @@ public class AggregateReportFragment extends BaseFragment
 
         mState.setDataSet(dataSetId, dataSetLabel, categoryComboId);
         mState.resetPeriod();
+        mState.resetCategoryOptions();
         handleViews(1);
     }
 
     @Override
     public void onPeriodSelected(DateHolder dateHolder) {
         mPeriodButton.setText(dateHolder.getLabel());
+
         mState.setPeriod(dateHolder);
         handleButton();
         handleViews(2);

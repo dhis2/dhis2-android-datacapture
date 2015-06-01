@@ -86,7 +86,7 @@ public class CategoryDialogFragment extends AutoCompleteDialogFragment
             if (options != null && !options.isEmpty()) {
                 Collections.sort(options, CategoryOption.DISPLAY_NAME_MODEL_COMPARATOR);
                 for (CategoryOption option : options) {
-                    values.add(new OptionAdapterValue(option.getId(), option.getDisplayName(), null));
+                    values.add(new OptionAdapterValue(option.getId(), option.getDisplayName(), mCategoryId));
                 }
             }
             return values;
