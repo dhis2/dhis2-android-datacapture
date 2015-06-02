@@ -34,12 +34,9 @@ import android.os.Parcelable;
 import org.dhis2.mobile.api.models.DateHolder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
-import static org.dhis2.mobile.utils.TextUtils.isEmpty;
 
 public class AggregateReportFragmentState implements Parcelable {
     public static final Creator<AggregateReportFragmentState> CREATOR
@@ -65,12 +62,10 @@ public class AggregateReportFragmentState implements Parcelable {
 
     private String periodLabel;
     private String periodDate;
-
-    // private CategoryOptionState[] categoryOptionStates;
-    private Map<String, String> categoryOptions;
+    private List<CategoryState> categoryStates;
 
     public AggregateReportFragmentState() {
-        categoryOptions = new HashMap<>();
+        categoryStates = new ArrayList<>();
     }
 
     public AggregateReportFragmentState(AggregateReportFragmentState state) {
@@ -79,11 +74,7 @@ public class AggregateReportFragmentState implements Parcelable {
             setOrgUnit(state.getOrgUnitId(), state.getOrgUnitLabel());
             setDataSet(state.getDataSetId(), state.getDataSetLabel(), state.getDataSetCategoryComboId());
             setPeriod(state.getPeriod());
-            setCategoryOptions(state.getCategoryOptions());
-        }
-
-        if (getCategoryOptions() == null) {
-            setCategoryOptions(new HashMap<String, String>());
+            setCategoryStates(new ArrayList<>(state.getCategoryStates()));
         }
     }
 
@@ -99,22 +90,9 @@ public class AggregateReportFragmentState implements Parcelable {
 
         periodLabel = in.readString();
         periodDate = in.readString();
+        categoryStates = new ArrayList<>();
 
-        categoryOptions = new HashMap<>();
-
-        List<String> categoryIds = new ArrayList<>();
-        List<String> categoryOptionIds = new ArrayList<>();
-
-        in.readStringList(categoryIds);
-        in.readStringList(categoryOptionIds);
-
-        if (!categoryIds.isEmpty()) {
-            for (int i = 0; i < categoryIds.size(); i++) {
-                String categoryId = categoryIds.get(i);
-                String categoryOptionId = categoryOptionIds.get(i);
-                categoryOptions.put(categoryId, categoryOptionId);
-            }
-        }
+        in.readTypedList(categoryStates, CategoryState.CREATOR);
     }
 
     @Override
@@ -135,19 +113,7 @@ public class AggregateReportFragmentState implements Parcelable {
 
         parcel.writeString(periodLabel);
         parcel.writeString(periodDate);
-
-        List<String> categoryIds = new ArrayList<>();
-        List<String> categoryOptionIds = new ArrayList<>();
-
-        if (categoryOptions != null) {
-            for (String categoryId : categoryOptions.keySet()) {
-                categoryIds.add(categoryId);
-                categoryOptionIds.add(categoryOptions.get(categoryId));
-            }
-        }
-
-        parcel.writeStringList(categoryIds);
-        parcel.writeStringList(categoryOptionIds);
+        parcel.writeTypedList(categoryStates);
     }
 
     public boolean isSyncInProcess() {
@@ -228,54 +194,53 @@ public class AggregateReportFragmentState implements Parcelable {
         return (periodLabel == null || periodDate == null);
     }
 
-    private void setCategoryOptions(Map<String, String> categoryOptions) {
-        this.categoryOptions = categoryOptions;
+    public List<CategoryState> getCategoryStates() {
+        return categoryStates;
     }
 
-    private Map<String, String> getCategoryOptions() {
-        return categoryOptions;
+    public void setCategoryStates(List<CategoryState> categoryStates) {
+        this.categoryStates = categoryStates;
     }
 
-    public void setCategoryOption(String categoryId, String categoryOptionId) {
-        isNull(categoryId, "Category ID object must not be null");
-        isNull(categoryOptionId, "CategoryOption ID object must not be null");
-        categoryOptions.put(categoryId, categoryOptionId);
+    public void resetCategoryStates() {
+        categoryStates = null;
     }
 
-    public void resetCategoryOptions() {
-        categoryOptions.clear();
+    public boolean areCategoryStatesEmpty() {
+        return categoryStates == null || categoryStates.isEmpty();
     }
 
-    public boolean areCategoryOptionsEmpty() {
-        return categoryOptions.isEmpty();
-    }
+    public static class CategoryState implements Parcelable {
+        public static final Creator<CategoryState> CREATOR
+                = new Creator<CategoryState>() {
 
-    public boolean isCategoryOptionSelected(String categoryId) {
-        isNull(categoryId, "Category ID object must not be null");
-        return (categoryOptions.containsKey(categoryId) &&
-                !isEmpty(categoryOptions.get(categoryId)));
-    }
-
-    public static class CategoryOptionState implements Parcelable {
-        public static final Creator<CategoryOptionState> CREATOR
-                = new Creator<CategoryOptionState>() {
-
-            public CategoryOptionState createFromParcel(Parcel in) {
-                return new CategoryOptionState(in);
+            public CategoryState createFromParcel(Parcel in) {
+                return new CategoryState(in);
             }
 
-            public CategoryOptionState[] newArray(int size) {
-                return new CategoryOptionState[size];
+            public CategoryState[] newArray(int size) {
+                return new CategoryState[size];
             }
         };
 
-        private static final String TAG = CategoryOptionState.class.getSimpleName();
-        private String categoryId;
+        private static final String TAG = CategoryState.class.getSimpleName();
+        private final String categoryId;
+        private final String categoryName;
         private String categoryOptionId;
+        private String categoryOptionName;
 
-        private CategoryOptionState(Parcel in) {
+        public CategoryState(String categoryId, String categoryName) {
+            isNull(categoryId, "Category ID must not be null");
+            isNull(categoryName, "Category name must not be null");
+            this.categoryId = categoryId;
+            this.categoryName = categoryName;
+        }
+
+        private CategoryState(Parcel in) {
             categoryId = in.readString();
+            categoryName = in.readString();
             categoryOptionId = in.readString();
+            categoryOptionName = in.readString();
         }
 
         @Override
@@ -286,23 +251,37 @@ public class AggregateReportFragmentState implements Parcelable {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(categoryId);
+            dest.writeString(categoryName);
             dest.writeString(categoryOptionId);
+            dest.writeString(categoryOptionName);
+        }
+
+        public boolean isCategoryOptionSelected() {
+            return categoryOptionId != null;
         }
 
         public String getCategoryId() {
             return categoryId;
         }
 
-        public void setCategoryId(String categoryId) {
-            this.categoryId = categoryId;
+        public String getCategoryName() {
+            return categoryName;
         }
 
         public String getCategoryOptionId() {
             return categoryOptionId;
         }
 
+        public String getCategoryOptionName() {
+            return categoryOptionName;
+        }
+
         public void setCategoryOptionId(String categoryOptionId) {
             this.categoryOptionId = categoryOptionId;
+        }
+
+        public void setCategoryOptionName(String categoryOptionName) {
+            this.categoryOptionName = categoryOptionName;
         }
     }
 }

@@ -7,31 +7,31 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.sdk.entities.Category;
-import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment;
-import org.dhis2.mobile.ui.fragments.aggregate.AggregateReportFragmentState;
+import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
+import org.dhis2.mobile.ui.fragments.aggregate.AggregateReportFragmentState.CategoryState;
 import org.dhis2.mobile.ui.fragments.aggregate.CategoryDialogFragment;
 import org.dhis2.mobile.ui.views.CardTextViewButton;
 
 import java.util.List;
 
 public final class CategoryAdapter extends BaseAdapter {
+    private static final String EMPTY_FIELD = "";
     private final LayoutInflater mInflater;
     private final FragmentManager mManager;
-    private final AggregateReportFragmentState mState;
-    private List<Category> mCategories;
+    private final OnOptionSelectedListener mListener;
+    private List<CategoryState> mCategoryStates;
 
     public CategoryAdapter(LayoutInflater inflater, FragmentManager manager,
-                           AggregateReportFragmentState state) {
+                           OnOptionSelectedListener listener) {
         mInflater = inflater;
         mManager = manager;
-        mState = state;
+        mListener = listener;
     }
 
     @Override
     public int getCount() {
-        if (mCategories != null) {
-            return mCategories.size();
+        if (mCategoryStates != null) {
+            return mCategoryStates.size();
         } else {
             return 0;
         }
@@ -39,8 +39,8 @@ public final class CategoryAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        if (mCategories != null) {
-            return mCategories.get(position);
+        if (mCategoryStates != null) {
+            return mCategoryStates.get(position);
         } else {
             return null;
         }
@@ -57,19 +57,24 @@ public final class CategoryAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (convertView == null) {
-            view = mInflater
-                    .inflate(R.layout.listview_card_text_view_button, parent, false);
-            holder = new ViewHolder(view, mManager, mState);
+            view = mInflater.inflate(
+                    R.layout.listview_card_text_view_button, parent, false);
+            holder = new ViewHolder(view, mManager, mListener);
             view.setTag(holder);
         } else {
             view = convertView;
             holder = (ViewHolder) view.getTag();
         }
 
-        Category category = mCategories.get(position);
-        holder.clickListener.setCategory(category);
-        holder.cardTextViewButton.setHint(category.getDisplayName());
+        CategoryState categoryState = mCategoryStates.get(position);
+        String optionName = EMPTY_FIELD;
+        if (categoryState.isCategoryOptionSelected()) {
+            optionName = categoryState.getCategoryOptionName();
+        }
 
+        holder.clickListener.setCategory(categoryState);
+        holder.cardTextViewButton.setHint(categoryState.getCategoryName());
+        holder.cardTextViewButton.setText(optionName);
         return view;
     }
 
@@ -83,70 +88,54 @@ public final class CategoryAdapter extends BaseAdapter {
         return false;
     }
 
-    public void swapData(List<Category> categories) {
-        boolean notifyAdapter = mCategories != categories;
-        mCategories = categories;
+    public void swapData(List<CategoryState> categories) {
+        boolean notifyAdapter = mCategoryStates != categories;
+        mCategoryStates = categories;
 
         if (notifyAdapter) {
             notifyDataSetChanged();
         }
     }
 
+    public List<CategoryState> getData() {
+        return mCategoryStates;
+    }
+
     static class ViewHolder {
         final CardTextViewButton cardTextViewButton;
         final OnButtonClickListener clickListener;
 
-        public ViewHolder(View itemView, FragmentManager fragmentManager, AggregateReportFragmentState state) {
+        public ViewHolder(View itemView, FragmentManager fragmentManager,
+                          OnOptionSelectedListener listener) {
             cardTextViewButton = (CardTextViewButton) itemView
                     .findViewById(R.id.category_option_picker);
-            OnCategoryOptionSelectedListener onOptionSelectedListener
-                    = new OnCategoryOptionSelectedListener(cardTextViewButton, state);
-            clickListener = new OnButtonClickListener(fragmentManager,
-                    onOptionSelectedListener);
+            clickListener = new OnButtonClickListener(
+                    fragmentManager, listener);
             cardTextViewButton.setOnClickListener(clickListener);
         }
     }
 
     private static class OnButtonClickListener implements View.OnClickListener {
         private final FragmentManager mManager;
-        private final OnCategoryOptionSelectedListener mListener;
-        private Category mCategory;
+        private final OnOptionSelectedListener mListener;
+        private CategoryState mCategoryState;
 
         public OnButtonClickListener(FragmentManager manager,
-                                     OnCategoryOptionSelectedListener listener) {
+                                     OnOptionSelectedListener listener) {
             mManager = manager;
             mListener = listener;
         }
 
-        public void setCategory(Category category) {
-            mCategory = category;
+        public void setCategory(CategoryState categoryState) {
+            mCategoryState = categoryState;
         }
 
         @Override
         public void onClick(View v) {
             CategoryDialogFragment dialogFragment = CategoryDialogFragment
-                    .newInstance(mListener, mCategory.getId());
-            dialogFragment.setDialogTitle(mCategory.getDisplayName());
+                    .newInstance(mListener, mCategoryState.getCategoryId());
+            dialogFragment.setDialogTitle(mCategoryState.getCategoryName());
             dialogFragment.show(mManager);
-        }
-    }
-
-    private static class OnCategoryOptionSelectedListener
-            implements AutoCompleteDialogFragment.OnOptionSelectedListener {
-        private final CardTextViewButton mButton;
-        private final AggregateReportFragmentState mState;
-
-        public OnCategoryOptionSelectedListener(CardTextViewButton button,
-                                                AggregateReportFragmentState state) {
-            mButton = button;
-            mState = state;
-        }
-
-        @Override
-        public void onOptionSelected(int dialogId, int position,
-                                     String categoryOptionId, String name, String categoryId) {
-            mButton.setText(name);
-            mState.setCategoryOption(categoryId, categoryOptionId);
         }
     }
 }

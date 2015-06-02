@@ -60,7 +60,7 @@ import org.dhis2.mobile.ui.activities.ReportEntryActivity;
 import org.dhis2.mobile.ui.adapters.CategoryAdapter;
 import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
 import org.dhis2.mobile.ui.fragments.BaseFragment;
-import org.dhis2.mobile.ui.fragments.aggregate.PeriodDialogFragment.OnPeriodSetListener;
+import org.dhis2.mobile.ui.fragments.aggregate.AggregateReportFragmentState.CategoryState;
 import org.dhis2.mobile.ui.views.CardDetailedButton;
 import org.dhis2.mobile.ui.views.CardTextViewButton;
 
@@ -70,19 +70,78 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class AggregateReportFragment extends BaseFragment
-        implements View.OnClickListener, OnOptionSelectedListener, OnPeriodSetListener {
+        implements View.OnClickListener, OnOptionSelectedListener {
     private static final String STATE = "state:AggregateReportFragment";
     private static final String CATEGORY_COMBO_ID = "args:categoryComboId";
     private static final int CHECK_LOADER_ID = 345784834;
     private static final int CATEGORIES_LOADER_ID = 2342345;
 
-    SmoothProgressBar mProgressBar;
-    ListView mCategoriesList;
-    CardTextViewButton mOrgUnitButton;
-    CardTextViewButton mDataSetButton;
-    CardTextViewButton mPeriodButton;
-    CardDetailedButton mButton;
+    final LoaderCallbacks<Boolean> CHECK_LOADER_CALLBACK = new LoaderCallbacks<Boolean>() {
 
+        @Override public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+            if (id == CHECK_LOADER_ID) {
+                List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+                tablesToTrack.add(OrganisationUnit.class);
+                tablesToTrack.add(DataSet.class);
+                tablesToTrack.add(UnitToDataSetRelation.class);
+                return new DbLoader<>(getActivity().getApplicationContext(),
+                        tablesToTrack, new OrgUnitQuery());
+            }
+            return null;
+        }
+
+        @Override public void onLoadFinished(Loader<Boolean> booleanLoader, Boolean hasUnits) {
+            if (booleanLoader != null && booleanLoader.getId() == CHECK_LOADER_ID) {
+                mOrgUnitButton.setEnabled(hasUnits);
+                if (hasUnits) {
+                    onRestoreInstanceState();
+                }
+            }
+        }
+
+        @Override public void onLoaderReset(Loader<Boolean> loader) {
+        }
+    };
+
+    final LoaderCallbacks<List<Category>> CATEGORY_LOADER_CALLBACK = new LoaderCallbacks<List<Category>>() {
+
+        @Override public Loader<List<Category>> onCreateLoader(int id, Bundle bundle) {
+            if (isAdded() && getActivity() != null) {
+                if (id == CATEGORIES_LOADER_ID) {
+                    List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+                    tablesToTrack.add(Category.class);
+                    String categoryComboId = bundle.getString(CATEGORY_COMBO_ID);
+                    return new DbLoader<>(getActivity().getApplicationContext(), tablesToTrack,
+                            new CategoriesQuery(categoryComboId));
+                }
+            }
+            return null;
+        }
+
+        @Override public void onLoadFinished(Loader<List<Category>> loader, List<Category> categories) {
+            if (loader.getId() == CATEGORIES_LOADER_ID) {
+                if (categories != null && !categories.isEmpty()) {
+                    List<CategoryState> states = new ArrayList<>();
+                    for (Category category : categories) {
+                        states.add(new CategoryState(category.getId(),
+                                category.getDisplayName()));
+                    }
+                    onCategoriesSelected(states);
+                }
+            }
+        }
+
+        @Override public void onLoaderReset(Loader<List<Category>> loader) {
+            mAdapter.swapData(null);
+        }
+    };
+
+    private SmoothProgressBar mProgressBar;
+    private ListView mCategoriesList;
+    private CardTextViewButton mOrgUnitButton;
+    private CardTextViewButton mDataSetButton;
+    private CardTextViewButton mPeriodButton;
+    private CardDetailedButton mButton;
     private CategoryAdapter mAdapter;
     private AggregateReportFragmentState mState;
 
@@ -134,10 +193,11 @@ public class AggregateReportFragment extends BaseFragment
         }
 
         mAdapter = new CategoryAdapter(LayoutInflater.from(getActivity()),
-                getChildFragmentManager(), mState);
+                getChildFragmentManager(), this);
         mCategoriesList.setAdapter(mAdapter);
 
-        mProgressBar.setVisibility(mState.isSyncInProcess() ? View.VISIBLE : View.INVISIBLE);
+        mProgressBar.setVisibility(mState.isSyncInProcess() ?
+                View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -164,126 +224,64 @@ public class AggregateReportFragment extends BaseFragment
         super.onSaveInstanceState(out);
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(CHECK_LOADER_ID, getArguments(), new LoaderCallbacks<Boolean>() {
+    public void onRestoreInstanceState() {
+        AggregateReportFragmentState backedUpState
+                = new AggregateReportFragmentState(mState);
+        if (!backedUpState.isOrgUnitEmpty()) {
+            onUnitSelected(
+                    backedUpState.getOrgUnitId(),
+                    backedUpState.getOrgUnitLabel()
+            );
 
-            @Override public Loader<Boolean> onCreateLoader(int id, Bundle args) {
-                return onCreateCheckLoader(id, args);
+            if (!backedUpState.isDataSetEmpty()) {
+                onDataSetSelected(
+                        backedUpState.getDataSetId(),
+                        backedUpState.getDataSetLabel(),
+                        backedUpState.getDataSetCategoryComboId()
+                );
+
+                if (!backedUpState.isPeriodEmpty()) {
+                    onPeriodSelected(backedUpState.getPeriod(), false);
+
+                    if (!backedUpState.areCategoryStatesEmpty()) {
+                        onCategoriesSelected(backedUpState.getCategoryStates());
+                    }
+                }
             }
-
-            @Override public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
-                onCheckLoadFinished(loader, data);
-            }
-
-            @Override public void onLoaderReset(Loader<Boolean> loader) {
-            }
-        });
-    }
-
-    public void onUnitSelected(String orgUnitId, String orgUnitLabel) {
-        mOrgUnitButton.setText(orgUnitLabel);
-        mDataSetButton.setEnabled(true);
-
-        mState.setOrgUnit(orgUnitId, orgUnitLabel);
-        mState.resetDataSet();
-        mState.resetPeriod();
-        mState.resetCategoryOptions();
-        handleViews(0);
-    }
-
-    public void onDataSetSelected(String dataSetId, String dataSetLabel, String categoryComboId) {
-        mDataSetButton.setText(dataSetLabel);
-        mPeriodButton.setEnabled(true);
-
-        mState.setDataSet(dataSetId, dataSetLabel, categoryComboId);
-        mState.resetPeriod();
-        mState.resetCategoryOptions();
-        handleViews(1);
-    }
-
-    @Override
-    public void onPeriodSelected(DateHolder dateHolder) {
-        mPeriodButton.setText(dateHolder.getLabel());
-
-        mState.setPeriod(dateHolder);
-        handleButton();
-        handleViews(2);
-
-        // we need to put the categoryComboId inside of Bundle in order to
-        // enable its (categoryComboId) survival through configuration changes/
-        Bundle arguments = new Bundle();
-        arguments.putString(CATEGORY_COMBO_ID, mState.getDataSetCategoryComboId());
-
-        // load dataset categories
-        getLoaderManager().restartLoader(CATEGORIES_LOADER_ID, arguments, new LoaderCallbacks<List<Category>>() {
-
-            @Override public Loader<List<Category>> onCreateLoader(int id, Bundle args) {
-                return onCreateCategoriesLoader(id, args);
-            }
-
-            @Override public void onLoadFinished(Loader<List<Category>> loader, List<Category> data) {
-                onCategoriesLoadFinished(loader, data);
-            }
-
-            @Override public void onLoaderReset(Loader<List<Category>> loader) {
-            }
-        });
-    }
-
-    private void handleButton() {
-        String orgUnit = getString(R.string.organisation_unit) +
-                ": " + mState.getOrgUnitLabel();
-        String dataSet = getString(R.string.dataset) +
-                ": " + mState.getDataSetLabel();
-        String period = getString(R.string.period) +
-                ": " + mState.getPeriod().getLabel();
-        mButton.setFirstLineText(orgUnit);
-        mButton.setSecondLineText(dataSet);
-        mButton.setThirdLineText(period);
-    }
-
-    private void handleViews(int level) {
-        mAdapter.swapData(null);
-        switch (level) {
-            case 0:
-                mPeriodButton.setEnabled(false);
-            case 1:
-                mButton.hide(true);
-                break;
-            case 2:
-                mButton.show(true);
         }
     }
 
-    private void startReportEntryActivity() {
-        String orgUnitId = mState.getOrgUnitId();
-        String orgUnitLabel = mState.getOrgUnitLabel();
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(CHECK_LOADER_ID, getArguments(), CHECK_LOADER_CALLBACK);
+    }
 
-        String dataSetId = mState.getDataSetId();
-        String dataSetLabel = mState.getDataSetLabel();
-
-        String period = mState.getPeriod().getDate();
-        String periodLabel = mState.getPeriod().getLabel();
-
-        Intent intent = ReportEntryActivity.newIntent(
-                getActivity(),
-                orgUnitId, orgUnitLabel,
-                dataSetId, dataSetLabel,
-                period, periodLabel
-        );
-        startActivity(intent);
+    @Subscribe
+    public void onApiException(APIException apiException) {
+        apiException.printStackTrace();
     }
 
     @Override
     public void onOptionSelected(int dialogId, int position,
                                  String id, String name, String data) {
-        if (dialogId == OrgUnitDialogFragment.ID) {
-            onUnitSelected(id, name);
-        }
-        if (dialogId == DataSetDialogFragment.ID) {
-            onDataSetSelected(id, name, data);
+        switch (dialogId) {
+            case OrgUnitDialogFragment.ID: {
+                onUnitSelected(id, name);
+                break;
+            }
+            case DataSetDialogFragment.ID: {
+                onDataSetSelected(id, name, data);
+                break;
+            }
+            case CategoryDialogFragment.ID: {
+                onCategorySelected(data, id, name);
+                break;
+            }
+            case PeriodDialogFragment.ID: {
+                onPeriodSelected(new DateHolder(id, name), true);
+                break;
+            }
         }
     }
 
@@ -315,73 +313,129 @@ public class AggregateReportFragment extends BaseFragment
         }
     }
 
-    @Subscribe
-    public void onApiException(APIException apiException) {
-        apiException.printStackTrace();
+    public void onUnitSelected(String orgUnitId, String orgUnitLabel) {
+        mOrgUnitButton.setText(orgUnitLabel);
+        mDataSetButton.setEnabled(true);
+
+        mState.setOrgUnit(orgUnitId, orgUnitLabel);
+        mState.resetDataSet();
+        mState.resetPeriod();
+        mState.resetCategoryStates();
+        handleViews(0);
     }
 
-    public Loader<Boolean> onCreateCheckLoader(int id, Bundle bundle) {
-        if (id == CHECK_LOADER_ID) {
-            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
-            tablesToTrack.add(OrganisationUnit.class);
-            tablesToTrack.add(DataSet.class);
-            tablesToTrack.add(UnitToDataSetRelation.class);
-            return new DbLoader<>(getActivity().getApplicationContext(),
-                    tablesToTrack, new OrgUnitQuery());
-        }
-        return null;
+    public void onDataSetSelected(String dataSetId, String dataSetLabel, String categoryComboId) {
+        mDataSetButton.setText(dataSetLabel);
+        mPeriodButton.setEnabled(true);
+
+        mState.setDataSet(dataSetId, dataSetLabel, categoryComboId);
+        mState.resetPeriod();
+        mState.resetCategoryStates();
+        handleViews(1);
     }
 
-    public void onCheckLoadFinished(Loader<Boolean> booleanLoader, Boolean hasUnits) {
-        if (booleanLoader != null &&
-                booleanLoader.getId() == CHECK_LOADER_ID) {
-            mOrgUnitButton.setEnabled(hasUnits);
-            if (!hasUnits) {
-                return;
-            }
+    public void onPeriodSelected(DateHolder dateHolder, boolean loadCategoriesFromDb) {
+        mPeriodButton.setText(dateHolder.getLabel());
 
-            AggregateReportFragmentState backedUpState = new AggregateReportFragmentState(mState);
-            if (!backedUpState.isOrgUnitEmpty()) {
-                onUnitSelected(
-                        backedUpState.getOrgUnitId(),
-                        backedUpState.getOrgUnitLabel()
-                );
+        mState.setPeriod(dateHolder);
+        mState.resetCategoryStates();
+        handleViews(2);
 
-                if (!backedUpState.isDataSetEmpty()) {
-                    onDataSetSelected(
-                            backedUpState.getDataSetId(),
-                            backedUpState.getDataSetLabel(),
-                            backedUpState.getDataSetCategoryComboId()
-                    );
+        if (loadCategoriesFromDb) {
+            // we need to put the categoryComboId inside of Bundle in order to
+            // enable its (categoryComboId) survival through configuration changes
+            Bundle arguments = new Bundle();
+            arguments.putString(CATEGORY_COMBO_ID,
+                    mState.getDataSetCategoryComboId());
 
-                    if (!backedUpState.isPeriodEmpty()) {
-                        onPeriodSelected(backedUpState.getPeriod());
-                    }
-                }
-            }
+            // load dataset categories
+            getLoaderManager().restartLoader(CATEGORIES_LOADER_ID,
+                    arguments, CATEGORY_LOADER_CALLBACK);
         }
     }
 
-    public Loader<List<Category>> onCreateCategoriesLoader(int id, Bundle bundle) {
-        if (isAdded() && getActivity() != null) {
-            if (id == CATEGORIES_LOADER_ID) {
-                List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
-                tablesToTrack.add(Category.class);
-                String categoryComboId = bundle.getString(CATEGORY_COMBO_ID);
-                return new DbLoader<>(getActivity().getApplicationContext(), tablesToTrack,
-                        new CategoriesQuery(categoryComboId));
-            }
+    public void onCategoriesSelected(List<CategoryState> states) {
+        mState.setCategoryStates(states);
+        mAdapter.swapData(new ArrayList<>(states));
+
+        if (areAllCategoriesChosen()) {
+            handleButton();
+            handleViews(3);
+        } else {
+            handleViews(2);
         }
-        return null;
     }
 
-    public void onCategoriesLoadFinished(Loader<List<Category>> loader,
-                                         List<Category> categories) {
-        if (loader.getId() == CATEGORIES_LOADER_ID) {
-            if (categories != null && !categories.isEmpty()) {
-                mAdapter.swapData(categories);
+    public void onCategorySelected(String categoryId, String categoryOptionId,
+                                   String categoryOptionName) {
+        for (CategoryState state : mState.getCategoryStates()) {
+            if (state.getCategoryId().equals(categoryId)) {
+                state.setCategoryOptionId(categoryOptionId);
+                state.setCategoryOptionName(categoryOptionName);
+                break;
             }
         }
+
+        onCategoriesSelected(mState.getCategoryStates());
+    }
+
+    private boolean areAllCategoriesChosen() {
+        List<CategoryState> categoryStates = mState.getCategoryStates();
+
+        if (categoryStates == null || categoryStates.isEmpty()) {
+            return false;
+        }
+        for (CategoryState categoryState : categoryStates) {
+            if (!categoryState.isCategoryOptionSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void handleButton() {
+        String orgUnit = getString(R.string.organisation_unit) +
+                ": " + mState.getOrgUnitLabel();
+        String dataSet = getString(R.string.dataset) +
+                ": " + mState.getDataSetLabel();
+        String period = getString(R.string.period) +
+                ": " + mState.getPeriod().getLabel();
+        mButton.setFirstLineText(orgUnit);
+        mButton.setSecondLineText(dataSet);
+        mButton.setThirdLineText(period);
+    }
+
+    private void handleViews(int level) {
+        switch (level) {
+            case 0:
+                mPeriodButton.setEnabled(false);
+            case 1:
+                mAdapter.swapData(null);
+            case 2:
+                mButton.hide(true);
+                break;
+            case 3:
+                mButton.show(true);
+        }
+    }
+
+    private void startReportEntryActivity() {
+        String orgUnitId = mState.getOrgUnitId();
+        String orgUnitLabel = mState.getOrgUnitLabel();
+
+        String dataSetId = mState.getDataSetId();
+        String dataSetLabel = mState.getDataSetLabel();
+
+        String period = mState.getPeriod().getDate();
+        String periodLabel = mState.getPeriod().getLabel();
+
+        Intent intent = ReportEntryActivity.newIntent(
+                getActivity(),
+                orgUnitId, orgUnitLabel,
+                dataSetId, dataSetLabel,
+                period, periodLabel
+        );
+        startActivity(intent);
     }
 
     static class OrgUnitQuery implements Query<Boolean> {

@@ -55,6 +55,7 @@ import org.dhis2.mobile.sdk.entities.DataSet$Table;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
+import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,7 @@ import butterknife.OnItemClick;
 public class PeriodDialogFragment extends DialogFragment
         implements LoaderCallbacks<DataSet>,
         View.OnClickListener, AdapterView.OnItemClickListener {
+    public static final int ID = 7932678;
     private static final String TAG = PeriodDialogFragment.class.getName();
     private static final int LOADER_ID = 345234575;
     private static final String DATA_SET_ID = "args:dataSetId";
@@ -77,11 +79,11 @@ public class PeriodDialogFragment extends DialogFragment
     @InjectView(R.id.dialog_label) TextView mDialogLabel;
 
     private SimpleAdapter<DateHolder> mAdapter;
-    private OnPeriodSetListener mListener;
+    private OnOptionSelectedListener mListener;
 
     private CustomDateIterator<List<DateHolder>> mIterator;
 
-    public static PeriodDialogFragment newInstance(OnPeriodSetListener listener,
+    public static PeriodDialogFragment newInstance(OnOptionSelectedListener listener,
                                                    String dataSetId) {
         PeriodDialogFragment fragment = new PeriodDialogFragment();
         Bundle args = new Bundle();
@@ -154,7 +156,7 @@ public class PeriodDialogFragment extends DialogFragment
         if (mListener != null) {
             DateHolder date = mAdapter.getItemSafely(position);
             if (date != null) {
-                mListener.onPeriodSelected(date);
+                mListener.onOptionSelected(ID, position, date.getDate(), date.getLabel(), null);
             }
             dismiss();
         }
@@ -164,7 +166,7 @@ public class PeriodDialogFragment extends DialogFragment
         show(manager, TAG);
     }
 
-    public void setOnItemClickListener(OnPeriodSetListener listener) {
+    public void setOnItemClickListener(OnOptionSelectedListener listener) {
         mListener = listener;
     }
 
@@ -200,9 +202,6 @@ public class PeriodDialogFragment extends DialogFragment
     public void onLoaderReset(Loader<DataSet> dbRowLoader) {
     }
 
-    public interface OnPeriodSetListener {
-        void onPeriodSelected(DateHolder date);
-    }
 
     static class DataSetQuery implements Query<DataSet> {
         private final String mDataSetId;
