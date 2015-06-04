@@ -31,7 +31,7 @@ package org.dhis2.mobile.sdk.network.tasks;
 import android.net.Uri;
 
 import org.dhis2.mobile.sdk.controllers.IController;
-import org.dhis2.mobile.sdk.entities.CategoryOption;
+import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;

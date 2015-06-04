@@ -38,7 +38,7 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.Model;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.sdk.entities.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;

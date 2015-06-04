@@ -1,4 +1,4 @@
-package org.dhis2.mobile.sdk.entities;
+package org.dhis2.mobile.sdk.persistence.models;
 
 
 public interface RelationModel {

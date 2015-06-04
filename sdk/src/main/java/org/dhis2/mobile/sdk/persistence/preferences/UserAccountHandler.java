@@ -31,7 +31,7 @@ package org.dhis2.mobile.sdk.persistence.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.persistence.DateTimeConverter;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;

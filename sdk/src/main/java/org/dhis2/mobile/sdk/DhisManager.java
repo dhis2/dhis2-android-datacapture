@@ -36,7 +36,7 @@ import org.dhis2.mobile.sdk.controllers.InvalidateUserController;
 import org.dhis2.mobile.sdk.controllers.LogInUserController;
 import org.dhis2.mobile.sdk.controllers.LogOutUserController;
 import org.dhis2.mobile.sdk.controllers.MetaDataController;
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.Response;
 import org.dhis2.mobile.sdk.network.tasks.INetworkManager;

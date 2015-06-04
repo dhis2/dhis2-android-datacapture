@@ -32,7 +32,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.dhis2.mobile.sdk.entities.Category;
+import org.dhis2.mobile.sdk.persistence.models.Category;
 
 import java.util.List;
 

@@ -34,7 +34,7 @@ import org.dhis2.mobile.api.job.base.Job;
 import org.dhis2.mobile.api.job.base.JobExecutor;
 import org.dhis2.mobile.api.job.base.NetworkJob;
 import org.dhis2.mobile.sdk.DhisManager;
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 

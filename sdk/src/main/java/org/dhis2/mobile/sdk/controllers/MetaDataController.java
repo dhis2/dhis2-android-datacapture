@@ -30,14 +30,14 @@ package org.dhis2.mobile.sdk.controllers;
 
 import com.raizlabs.android.dbflow.sql.language.Select;
 
-import org.dhis2.mobile.sdk.entities.Category;
-import org.dhis2.mobile.sdk.entities.CategoryCombo;
-import org.dhis2.mobile.sdk.entities.CategoryComboToCategoryRelation;
-import org.dhis2.mobile.sdk.entities.CategoryOption;
-import org.dhis2.mobile.sdk.entities.CategoryToCategoryOptionRelation;
-import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
+import org.dhis2.mobile.sdk.persistence.models.Category;
+import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
+import org.dhis2.mobile.sdk.persistence.models.CategoryComboToCategoryRelation;
+import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
+import org.dhis2.mobile.sdk.persistence.models.CategoryToCategoryOptionRelation;
+import org.dhis2.mobile.sdk.persistence.models.DataSet;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.persistence.DbHelper;

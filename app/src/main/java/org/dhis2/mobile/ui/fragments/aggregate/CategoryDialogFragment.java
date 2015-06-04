@@ -8,8 +8,8 @@ import android.view.View;
 
 import com.raizlabs.android.dbflow.structure.Model;
 
-import org.dhis2.mobile.sdk.entities.Category;
-import org.dhis2.mobile.sdk.entities.CategoryOption;
+import org.dhis2.mobile.sdk.persistence.models.Category;
+import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;

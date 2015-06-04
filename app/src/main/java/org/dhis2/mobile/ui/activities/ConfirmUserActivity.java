@@ -40,7 +40,7 @@ import android.widget.EditText;
 import com.squareup.otto.Subscribe;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 

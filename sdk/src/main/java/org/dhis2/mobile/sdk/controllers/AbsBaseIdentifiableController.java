@@ -1,6 +1,6 @@
 package org.dhis2.mobile.sdk.controllers;
 
-import org.dhis2.mobile.sdk.entities.BaseIdentifiableObject;
+import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
 import org.dhis2.mobile.sdk.network.APIException;
 
 import java.util.ArrayList;

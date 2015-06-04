@@ -26,62 +26,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.entities;
+package org.dhis2.mobile.sdk.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.raizlabs.android.dbflow.annotation.Table;
 
-import org.joda.time.DateTime;
+import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
-public abstract class BaseIdentifiableObject extends BaseModel implements TimeStampedModel {
-    @JsonProperty("id") @Column @PrimaryKey String id;
-    @JsonProperty("created") @Column DateTime created;
-    @JsonProperty("lastUpdated") @Column DateTime lastUpdated;
-    @JsonProperty("name") @Column String name;
+import java.util.List;
 
-    public BaseIdentifiableObject() {
-    }
+@Table(databaseName = DhisDatabase.NAME)
+public final class CategoryOptionCombo extends BaseIdentifiableObject {
+    @JsonProperty("displayName") @Column String displayName;
+    @JsonProperty("categoryOptions") List<CategoryOption> categoryOptions;
 
-    @JsonIgnore @Override
-    public DateTime getCreated() {
-        return created;
-    }
-
-    @JsonIgnore @Override
-    public void setCreated(DateTime created) {
-        this.created = created;
-    }
-
-    @JsonIgnore @Override
-    public DateTime getLastUpdated() {
-        return lastUpdated;
-    }
-
-    @JsonIgnore @Override
-    public void setLastUpdated(DateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
+    public CategoryOptionCombo() {
     }
 
     @JsonIgnore
-    public String getId() {
-        return id;
+    public List<CategoryOption> getCategoryOptions() {
+        return categoryOptions;
     }
 
     @JsonIgnore
-    public void setId(String id) {
-        this.id = id;
+    public void setCategoryOptions(List<CategoryOption> categoryOptions) {
+        this.categoryOptions = categoryOptions;
     }
 
     @JsonIgnore
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
 
     @JsonIgnore
-    public void setName(String name) {
-        this.name = name;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

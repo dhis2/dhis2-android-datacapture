@@ -31,7 +31,7 @@ package org.dhis2.mobile.sdk.controllers;
 import android.net.Uri;
 
 import org.dhis2.mobile.sdk.DhisManager;
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.network.models.Session;

@@ -30,7 +30,7 @@ package org.dhis2.mobile.sdk.network.converters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 
 final class UserAccountConverter implements IJsonConverter<UserAccount, UserAccount> {
     private final ObjectMapper mMapper;

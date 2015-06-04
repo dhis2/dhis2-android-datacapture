@@ -28,14 +28,13 @@
 
 package org.dhis2.mobile.sdk.network.converters;
 
-import org.dhis2.mobile.sdk.entities.Category;
-import org.dhis2.mobile.sdk.entities.CategoryCombo;
-import org.dhis2.mobile.sdk.entities.CategoryOption;
-import org.dhis2.mobile.sdk.entities.CategoryOptionCombo;
-import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.entities.UserAccount;
-import org.dhis2.mobile.sdk.network.converters.IJsonConverter;
+import org.dhis2.mobile.sdk.persistence.models.Category;
+import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
+import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
+import org.dhis2.mobile.sdk.persistence.models.CategoryOptionCombo;
+import org.dhis2.mobile.sdk.persistence.models.DataSet;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 
 import java.util.List;
 

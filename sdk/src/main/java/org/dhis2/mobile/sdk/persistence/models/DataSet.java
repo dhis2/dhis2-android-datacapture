@@ -26,39 +26,64 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.entities;
+package org.dhis2.mobile.sdk.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.ForeignKey;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
+import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.sql.builder.Condition;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Table(databaseName = DhisDatabase.NAME)
-public final class OrganisationUnit extends BaseIdentifiableObject implements DisplayNameModel {
+public final class DataSet extends BaseIdentifiableObject implements DisplayNameModel {
+    private static final String CATEGORY_COMBO_KEY = "categoryComboKey";
+
     @JsonProperty("displayName") @Column String displayName;
-    @JsonProperty("level") @Column int level;
-    @JsonProperty("parent") OrganisationUnit parent;
-    @JsonProperty("children") List<OrganisationUnit> children;
-    @JsonProperty("dataSets") List<DataSet> dataSets;
+    @JsonProperty("version") @Column int version;
+    @JsonProperty("expiryDays") @Column int expiryDays;
+    @JsonProperty("allowFuturePeriods") @Column boolean allowFuturePeriods;
+    @JsonProperty("periodType") @Column String periodType;
 
-    public OrganisationUnit() {
+    @JsonProperty("organisationUnits") List<OrganisationUnit> organisationUnits;
+    @JsonProperty("sections") List<Object> sections;
+    @JsonProperty("categoryCombo") @Column @ForeignKey(
+            references = {
+                    @ForeignKeyReference(columnName = CATEGORY_COMBO_KEY, columnType = String.class, foreignColumnName = "id")
+            }, saveForeignKeyModel = false, onDelete = ForeignKeyAction.CASCADE
+    ) CategoryCombo categoryCombo;
+
+    public DataSet() {
     }
 
     @JsonIgnore
-    public OrganisationUnit getParent() {
-        return parent;
+    public List<OrganisationUnit> getOrganisationUnits() {
+        return organisationUnits;
     }
 
     @JsonIgnore
-    public void setParent(OrganisationUnit parent) {
-        this.parent = parent;
+    public void setOrganisationUnits(List<OrganisationUnit> organisationUnits) {
+        this.organisationUnits = organisationUnits;
+    }
+
+    @JsonIgnore
+    public CategoryCombo getCategoryCombo() {
+        return categoryCombo;
+    }
+
+    @JsonIgnore
+    public void setCategoryCombo(CategoryCombo categoryCombo) {
+        this.categoryCombo = categoryCombo;
+    }
+
+    @JsonIgnore
+    public void setSections(List<Object> sections) {
+        this.sections = sections;
     }
 
     @JsonIgnore
@@ -72,50 +97,42 @@ public final class OrganisationUnit extends BaseIdentifiableObject implements Di
     }
 
     @JsonIgnore
-    public int getLevel() {
-        return level;
+    public int getVersion() {
+        return version;
     }
 
     @JsonIgnore
-    public void setLevel(int level) {
-        this.level = level;
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @JsonIgnore
-    public List<OrganisationUnit> getChildren() {
-        return children;
+    public int getExpiryDays() {
+        return expiryDays;
     }
 
     @JsonIgnore
-    public void setChildren(List<OrganisationUnit> children) {
-        this.children = children;
+    public void setExpiryDays(int expiryDays) {
+        this.expiryDays = expiryDays;
     }
 
     @JsonIgnore
-    public List<DataSet> getDataSets() {
-        return dataSets;
+    public boolean isAllowFuturePeriods() {
+        return allowFuturePeriods;
     }
 
     @JsonIgnore
-    public void setDataSets(List<DataSet> dataSets) {
-        this.dataSets = dataSets;
+    public void setAllowFuturePeriods(boolean allowFuturePeriods) {
+        this.allowFuturePeriods = allowFuturePeriods;
     }
 
     @JsonIgnore
-    public static List<DataSet> queryRelatedDataSetsFromDb(String id) {
-        List<UnitToDataSetRelation> relations = new Select()
-                .from(UnitToDataSetRelation.class)
-                .where(Condition
-                        .column(UnitToDataSetRelation$Table.ORGANISATIONUNIT_ORGANISATIONUNIT)
-                        .is(id))
-                .queryList();
-        // read full versions of datasets
-        List<DataSet> dataSets = new ArrayList<>();
-        if (relations != null && !relations.isEmpty()) {
-            for (UnitToDataSetRelation relation : relations) {
-                dataSets.add(relation.getDataSet());
-            }
-        }
-        return dataSets;
+    public String getPeriodType() {
+        return periodType;
+    }
+
+    @JsonIgnore
+    public void setPeriodType(String periodType) {
+        this.periodType = periodType;
     }
 }

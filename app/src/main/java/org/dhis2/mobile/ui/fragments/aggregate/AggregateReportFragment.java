@@ -48,11 +48,11 @@ import com.squareup.otto.Subscribe;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.api.models.DateHolder;
-import org.dhis2.mobile.sdk.entities.Category;
-import org.dhis2.mobile.sdk.entities.CategoryCombo;
-import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
+import org.dhis2.mobile.sdk.persistence.models.Category;
+import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
+import org.dhis2.mobile.sdk.persistence.models.DataSet;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;

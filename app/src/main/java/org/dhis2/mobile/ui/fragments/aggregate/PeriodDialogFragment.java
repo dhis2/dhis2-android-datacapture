@@ -50,10 +50,10 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.api.date.CustomDateIterator;
 import org.dhis2.mobile.api.date.DateIteratorFactory;
 import org.dhis2.mobile.api.models.DateHolder;
-import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.DataSet$Table;
+import org.dhis2.mobile.sdk.persistence.models.DataSet;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
+import org.dhis2.mobile.sdk.persistence.models.DataSet$Table;
 import org.dhis2.mobile.ui.adapters.SimpleAdapter;
 import org.dhis2.mobile.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
 

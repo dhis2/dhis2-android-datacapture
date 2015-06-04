@@ -28,7 +28,7 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
-import org.dhis2.mobile.sdk.entities.UserAccount;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;

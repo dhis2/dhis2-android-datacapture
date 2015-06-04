@@ -37,9 +37,9 @@ import android.view.View;
 import com.raizlabs.android.dbflow.structure.Model;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.sdk.entities.DataSet;
-import org.dhis2.mobile.sdk.entities.OrganisationUnit;
-import org.dhis2.mobile.sdk.entities.UnitToDataSetRelation;
+import org.dhis2.mobile.sdk.persistence.models.DataSet;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.persistence.loaders.DbLoader;
 import org.dhis2.mobile.sdk.persistence.loaders.Query;
 import org.dhis2.mobile.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;

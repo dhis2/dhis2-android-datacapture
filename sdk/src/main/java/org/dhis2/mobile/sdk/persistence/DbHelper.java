@@ -3,8 +3,8 @@ package org.dhis2.mobile.sdk.persistence;
 import com.raizlabs.android.dbflow.runtime.TransactionManager;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.entities.BaseIdentifiableObject;
-import org.dhis2.mobile.sdk.entities.RelationModel;
+import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
+import org.dhis2.mobile.sdk.persistence.models.RelationModel;
 import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 
