@@ -35,6 +35,7 @@ import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
+import org.dhis2.mobile.sdk.utils.Joiner;
 
 import java.util.List;
 
@@ -72,9 +73,9 @@ final class GetDataSetsTask implements ITask<List<DataSet>> {
 
         builder.appendQueryParameter("fields", fields);
         if (ids != null && ids.size() > 0) {
-            for (String id : ids) {
-                builder.appendQueryParameter("filter", "id:eq:" + id);
-            }
+            Joiner joiner = Joiner.on(",");
+            String queryParam = "[" + joiner.join(ids) + "]";
+            builder.appendQueryParameter("filter", "id:in:" + queryParam);
         }
 
         return builder.build().toString();

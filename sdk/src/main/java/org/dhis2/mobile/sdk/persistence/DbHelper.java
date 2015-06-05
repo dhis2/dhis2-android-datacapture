@@ -79,11 +79,13 @@ public final class DbHelper {
             T oldModel = oldModelsMap.get(oldModelKey);
 
             if (newModel == null) {
+                System.out.println("Deleting: " + oldModel.getId());
                 ops.add(DbOperation.delete(oldModel));
                 continue;
             }
 
             if (newModel.getLastUpdated().isAfter(oldModel.getLastUpdated())) {
+                System.out.println("Updating: " + oldModel.getId());
                 ops.add(DbOperation.update(newModel));
             }
 
@@ -91,6 +93,7 @@ public final class DbHelper {
         }
 
         for (String newModelKey : newModelsMap.keySet()) {
+            System.out.println("Inserting: " + newModelKey);
             T item = newModelsMap.get(newModelKey);
             ops.add(DbOperation.insert(item));
         }

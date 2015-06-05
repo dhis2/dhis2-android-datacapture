@@ -52,6 +52,7 @@ public final class DataSet extends BaseIdentifiableObject implements DisplayName
 
     @JsonProperty("organisationUnits") List<OrganisationUnit> organisationUnits;
     @JsonProperty("sections") List<Object> sections;
+    @JsonProperty("dataElements") List<DataElement> dataElements;
     @JsonProperty("categoryCombo") @Column @ForeignKey(
             references = {
                     @ForeignKeyReference(columnName = CATEGORY_COMBO_KEY, columnType = String.class, foreignColumnName = "id")
@@ -134,5 +135,19 @@ public final class DataSet extends BaseIdentifiableObject implements DisplayName
     @JsonIgnore
     public void setPeriodType(String periodType) {
         this.periodType = periodType;
+    }
+
+    @JsonIgnore
+    public List<Object> getSections() {
+        return sections;
+    }
+
+    @JsonIgnore
+    public List<DataElement> getDataElements() {
+        return dataElements;
+    }
+
+    public void setDataElements(List<DataElement> dataElements) {
+        this.dataElements = dataElements;
     }
 }

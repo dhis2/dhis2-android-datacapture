@@ -133,6 +133,8 @@ public class DhisManager {
         try {
             return controller.run();
         } catch (APIException apiException) {
+            apiException.printStackTrace();
+
             if (apiException.isHttpError()) {
                 Response response = apiException.getResponse();
                 if (response != null &&

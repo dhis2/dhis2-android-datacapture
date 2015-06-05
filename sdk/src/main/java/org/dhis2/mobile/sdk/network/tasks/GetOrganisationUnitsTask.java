@@ -30,11 +30,14 @@ package org.dhis2.mobile.sdk.network.tasks;
 
 import android.net.Uri;
 
-import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import com.raizlabs.android.dbflow.StringUtils;
+
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.utils.Joiner;
 
 import java.util.List;
 
@@ -86,15 +89,17 @@ final class GetOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
 
         builder.appendQueryParameter("fields", fields);
         if (ids != null && ids.size() > 0) {
-            for (String orgUnitId : ids) {
-                builder.appendQueryParameter("filter", "id:eq:" + orgUnitId);
-            }
+            Joiner joiner = Joiner.on(",");
+            String queryParam = "[" + joiner.join(ids) + "]";
+            System.out.println("QUERY_PARAM: " + queryParam);
+            builder.appendQueryParameter("filter", "id:in:" + queryParam);
         }
 
         if (parents != null && parents.size() > 0) {
-            for (String parent : parents) {
-                builder.appendQueryParameter("filter", "parent.id:eq:" + parent);
-            }
+            Joiner joiner = Joiner.on(",");
+            String queryParam = "[" + joiner.join(parents) + "]";
+            System.out.println("PARENT_IDS: " + queryParam);
+            builder.appendQueryParameter("filter", "parent.id:in:" + queryParam);
         }
 
         return builder.build().toString();
