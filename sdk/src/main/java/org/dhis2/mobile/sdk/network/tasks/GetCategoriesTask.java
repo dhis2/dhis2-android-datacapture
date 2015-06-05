@@ -56,15 +56,24 @@ final class GetCategoriesTask implements ITask<List<Category>> {
         );
     }
 
-    private static String buildQuery(Uri serverUri, List<String> ids, boolean flat) {
+    private static String buildQuery(Uri serverUri, List<String> ids,
+                                     boolean onlyBasicFields) {
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("Specify at least one id of category to download");
+        }
+
         Uri.Builder builder = serverUri.buildUpon()
                 .appendEncodedPath("api/categories/")
                 .appendQueryParameter("paging", "false");
-        String baseIdentityParams = "id,created,lastUpdated,name,displayName";
-        String fields = baseIdentityParams;
-        if (!flat) {
-            fields += ",dimension,dataDimension,dataDimensionType,categoryOptions" + "[" + baseIdentityParams + "]";
+
+        String fields;
+        if (onlyBasicFields) {
+            fields = "id,lastUpdated";
+        } else {
+            fields = "id,created,lastUpdated,dimension,dataDimension," +
+                    "dataDimensionType,categoryOptions[id]";
         }
+
         builder.appendQueryParameter("fields", fields);
         if (ids != null && ids.size() > 0) {
             Joiner joiner = Joiner.on(",");

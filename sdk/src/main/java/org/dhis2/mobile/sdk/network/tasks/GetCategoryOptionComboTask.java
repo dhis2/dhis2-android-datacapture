@@ -42,7 +42,8 @@ import java.util.List;
 final class GetCategoryOptionComboTask implements ITask<List<CategoryOptionCombo>> {
     private final ApiRequest<String, List<CategoryOptionCombo>> mRequest;
 
-    public GetCategoryOptionComboTask(INetworkManager manager, List<String> ids, boolean flat) {
+    public GetCategoryOptionComboTask(INetworkManager manager,
+                                      List<String> ids, boolean flat) {
         String base64Credentials = manager.getBase64Manager()
                 .toBase64(manager.getCredentials());
         String url = buildQuery(manager.getServerUri(), ids, flat);
@@ -56,12 +57,19 @@ final class GetCategoryOptionComboTask implements ITask<List<CategoryOptionCombo
         );
     }
 
-    private static String buildQuery(Uri serverUri, List<String> ids, boolean flat) {
+    private static String buildQuery(Uri serverUri, List<String> ids,
+                                     boolean onlyBasicFields) {
         Uri.Builder builder = serverUri.buildUpon()
                 .appendPath("api/categoryOptionCombos/")
                 .appendQueryParameter("paging", "false");
-        String baseIdentityParams = "id,created,lastUpdated,name,displayName";
-        builder.appendQueryParameter("fields", baseIdentityParams);
+
+        String fields;
+        if (onlyBasicFields) {
+            fields = "id,lastUpdated";
+        } else {
+            fields = "id,created,lastUpdated,name,displayName";
+        }
+        builder.appendQueryParameter("fields", fields);
 
         if (ids != null && ids.size() > 0) {
             Joiner joiner = Joiner.on(",");
@@ -69,9 +77,7 @@ final class GetCategoryOptionComboTask implements ITask<List<CategoryOptionCombo
             builder.appendQueryParameter("filter", "id:in:" + queryParam);
         }
 
-        String url = builder.build().toString();
-        System.out.println("URL: " + url);
-        return url;
+        return builder.build().toString();
     }
 
     @Override

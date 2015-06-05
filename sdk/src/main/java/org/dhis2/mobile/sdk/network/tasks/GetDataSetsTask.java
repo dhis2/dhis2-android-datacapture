@@ -59,24 +59,25 @@ final class GetDataSetsTask implements ITask<List<DataSet>> {
 
     private static String buildQuery(Uri serverUri, List<String> ids,
                                      boolean basicFieldsOnly) {
-        if (ids == null || ids.size() <= 0) {
+        if (ids == null || ids.isEmpty()) {
             throw new IllegalArgumentException("Provide at least one DataSet id to download");
         }
         Uri.Builder builder = serverUri.buildUpon()
                 .appendEncodedPath("api/dataSets/")
                 .appendQueryParameter("paging", "false");
 
-        String fields = "id,created,lastUpdated,name,displayName,version";
-        if (!basicFieldsOnly) {
-            fields += ",expiryDays,allowFuturePeriods,periodType,categoryCombo" + "[" + fields + "]";
+        String fields;
+        if (basicFieldsOnly) {
+            fields = "id,lastUpdated";
+        } else {
+            fields = "id,created,lastUpdated,name,displayName,expiryDays," +
+                    "allowFuturePeriods,periodType,categoryCombo[id]";
         }
-
         builder.appendQueryParameter("fields", fields);
-        if (ids != null && ids.size() > 0) {
-            Joiner joiner = Joiner.on(",");
-            String queryParam = "[" + joiner.join(ids) + "]";
-            builder.appendQueryParameter("filter", "id:in:" + queryParam);
-        }
+
+        Joiner joiner = Joiner.on(",");
+        String queryParam = "[" + joiner.join(ids) + "]";
+        builder.appendQueryParameter("filter", "id:in:" + queryParam);
 
         return builder.build().toString();
     }

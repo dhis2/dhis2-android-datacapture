@@ -30,6 +30,7 @@ package org.dhis2.mobile.sdk.controllers;
 
 import com.raizlabs.android.dbflow.sql.language.Select;
 
+import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
 import org.dhis2.mobile.sdk.persistence.models.Category;
 import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
 import org.dhis2.mobile.sdk.persistence.models.CategoryComboToCategoryRelation;
@@ -44,9 +45,11 @@ import org.dhis2.mobile.sdk.persistence.DbHelper;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -61,6 +64,14 @@ public final class MetaDataController implements IController<Object> {
 
     @Override
     public Object run() throws APIException {
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("fields", "organisationUnits[id,created,lastUpdated,name,displayName]");
+        List<OrganisationUnit> testRetrofit = RetrofitManager.buildService()
+                .getAssignedOrganisationUnitIds(queryParams);
+        for (OrganisationUnit unit : testRetrofit) {
+            System.out.println("OrganisationUnit: " + unit.getDisplayName());
+        }
+
         // fetching new data from distant instance.
         List<OrganisationUnit> units = getOrganisationUnits();
         List<DataSet> dataSets = getDataSets(units);
@@ -95,7 +106,7 @@ public final class MetaDataController implements IController<Object> {
 
             @Override List<OrganisationUnit> getNewBasicItems() {
                 List<OrganisationUnit> parentUnits = mNetworkManager
-                        .getAssignedOrganisationUnits();
+                        .getAssignedOrganisationUnits(true);
                 List<OrganisationUnit> childUnits = mNetworkManager
                         .getChildOrganisationUnits(toIds(parentUnits), true);
                 parentUnits.addAll(childUnits);
@@ -256,7 +267,24 @@ public final class MetaDataController implements IController<Object> {
                 ids.addAll(toIds(category.getCategoryOptions()));
             }
         }
-        return mNetworkManager.getCategoryOptions(new ArrayList<>(ids));
+
+        return new AbsBaseIdentifiableController<CategoryOption>() {
+
+            @Override
+            List<CategoryOption> getNewBasicItems() {
+                return mNetworkManager.getCategoryOptions(new ArrayList<>(ids), true);
+            }
+
+            @Override
+            List<CategoryOption> getNewFullItems(List<String> ids) {
+                return mNetworkManager.getCategoryOptions(new ArrayList<>(ids), false);
+            }
+
+            @Override
+            List<CategoryOption> getItemsFromDb() {
+                return new Select().from(CategoryOption.class).queryList();
+            }
+        }.run();
     }
 
     private List<CategoryToCategoryOptionRelation> buildCatToCatOptionRelations(List<Category> categories) {

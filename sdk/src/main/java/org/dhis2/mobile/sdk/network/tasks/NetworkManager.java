@@ -128,8 +128,8 @@ public class NetworkManager implements INetworkManager {
         return new LoginUserTask(this, serverUri, credentials).run();
     }
 
-    public List<OrganisationUnit> getAssignedOrganisationUnits() throws APIException {
-        return new GetAssignedOrganisationUnitsTask(this).run();
+    public List<OrganisationUnit> getAssignedOrganisationUnits(boolean onlyBasicFields) throws APIException {
+        return new GetAssignedOrganisationUnitsTask(this, onlyBasicFields).run();
     }
 
     public List<OrganisationUnit> getChildOrganisationUnits(List<String> parentIds, boolean onlyBasicFields) throws APIException {
@@ -161,11 +161,17 @@ public class NetworkManager implements INetworkManager {
     }
 
     public List<Category> getCategoriesByIds(List<String> ids, boolean onlyBasicFields) throws APIException {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
         return new GetCategoriesTask(this, ids, onlyBasicFields).run();
     }
 
-    public List<CategoryOption> getCategoryOptions(List<String> ids) throws APIException {
-        return new GetCategoryOptionsTask(this, ids).run();
+    public List<CategoryOption> getCategoryOptions(List<String> ids, boolean onlyBasicFields) throws APIException {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return new GetCategoryOptionsTask(this, ids, onlyBasicFields).run();
     }
 
     public List<CategoryOptionCombo> getCategoryOptionCombosByIds(List<String> ids, boolean onlyBasicFields) throws APIException {

@@ -123,7 +123,6 @@ public final class DbHelper {
             }
 
             newRelations.remove(oldRelationKey);
-            System.out.println("DELETING_NEW_RELATION: " + oldRelationKey);
         }
 
         for (String newRelationKey : newRelations.keySet()) {

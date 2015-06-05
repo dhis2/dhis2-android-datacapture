@@ -66,44 +66,8 @@ final class LoginUserTask implements ITask<UserAccount> {
     }
 
     private static String buildQueryParams() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("?");
-        builder.append("fields");
-        builder.append("=");
-        builder.append("id");
-        builder.append(",");
-        builder.append("created");
-        builder.append(",");
-        builder.append("lastUpdated");
-        builder.append(",");
-        builder.append("name");
-        builder.append(",");
-        builder.append("displayName");
-        builder.append(",");
-        builder.append("firstName");
-        builder.append(",");
-        builder.append("surname");
-        builder.append(",");
-        builder.append("gender");
-        builder.append(",");
-        builder.append("birthday");
-        builder.append(",");
-        builder.append("introduction");
-        builder.append(",");
-        builder.append("education");
-        builder.append(",");
-        builder.append("employer");
-        builder.append(",");
-        builder.append("interests");
-        builder.append(",");
-        builder.append("jobTitle");
-        builder.append(",");
-        builder.append("languages");
-        builder.append(",");
-        builder.append("email");
-        builder.append(",");
-        builder.append("phoneNumber");
-        return builder.toString();
+        return "id,created,lastUpdated,name,displayName,firstName,surname,gender,birthday,introduction," +
+                "education,employer,interests,jobTitle,languages,email,phoneNumber";
     }
 
     @Override

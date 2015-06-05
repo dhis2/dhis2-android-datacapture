@@ -61,8 +61,8 @@ final class GetOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
 
     public static String buildQuery(Uri serverUri, List<String> parents,
                                     List<String> ids, boolean onlyBasicFields) {
-        if ((parents == null || parents.size() <= 0) &&
-                (ids == null || ids.size() <= 0)) {
+        if ((parents == null || parents.isEmpty()) &&
+                (ids == null || ids.isEmpty())) {
             throw new IllegalArgumentException("You have to specify " +
                     "organisation unit ids to download");
         }
@@ -71,34 +71,24 @@ final class GetOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
                 .appendEncodedPath("api/organisationUnits/")
                 .appendQueryParameter("paging", "false");
 
-        // organisationUnits[id,created,lastUpdated,name,displayName,level,parent,
-        // children[id,created,lastUpdated,name,displayName,level,parent]]
-        String baseIdentityParams = "id,created,lastUpdated,name,displayName";
-        String fields = baseIdentityParams;
-        if (!onlyBasicFields) {
-            String dataSetParams = "dataSets" + "[" +
-                    baseIdentityParams + "," + "version" +
-                    "]";
-            String parentParams = "parent" + "[" + baseIdentityParams + "," + "level" + "]";
-            String childrenParams = "children" + "[" +
-                    baseIdentityParams + "," + "level" + "," + parentParams +
-                    "]";
-            fields += "," + "level" + "," + parentParams + "," +
-                    dataSetParams + "," + childrenParams;
+        String fields;
+        if (onlyBasicFields) {
+            fields = "id,lastUpdated";
+        } else {
+            fields = "id,created,lastUpdated,name,displayName,level,dataSets[id]";
         }
-
         builder.appendQueryParameter("fields", fields);
+
+
         if (ids != null && ids.size() > 0) {
             Joiner joiner = Joiner.on(",");
             String queryParam = "[" + joiner.join(ids) + "]";
-            System.out.println("QUERY_PARAM: " + queryParam);
             builder.appendQueryParameter("filter", "id:in:" + queryParam);
         }
 
         if (parents != null && parents.size() > 0) {
             Joiner joiner = Joiner.on(",");
             String queryParam = "[" + joiner.join(parents) + "]";
-            System.out.println("PARENT_IDS: " + queryParam);
             builder.appendQueryParameter("filter", "parent.id:in:" + queryParam);
         }
 

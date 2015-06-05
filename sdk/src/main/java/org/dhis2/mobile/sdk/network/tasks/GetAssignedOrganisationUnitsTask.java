@@ -28,23 +28,24 @@
 
 package org.dhis2.mobile.sdk.network.tasks;
 
-import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.http.ApiRequest;
 import org.dhis2.mobile.sdk.network.http.Request;
 import org.dhis2.mobile.sdk.network.http.RequestBuilder;
+import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 
 import java.util.List;
 
 final class GetAssignedOrganisationUnitsTask implements ITask<List<OrganisationUnit>> {
     private final ApiRequest<String, List<OrganisationUnit>> mRequest;
 
-    public GetAssignedOrganisationUnitsTask(INetworkManager dhisManager) {
+    public GetAssignedOrganisationUnitsTask(INetworkManager dhisManager,
+                                            boolean onlyBasicItems) {
         String base64Credentials = dhisManager.getBase64Manager()
                 .toBase64(dhisManager.getCredentials());
         String url = dhisManager.getServerUri().buildUpon()
                 .appendEncodedPath("api/me/")
-                .appendQueryParameter("fields", buildQueryParams())
+                .appendQueryParameter("fields", buildQueryParams(onlyBasicItems))
                 .build().toString();
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
@@ -57,10 +58,12 @@ final class GetAssignedOrganisationUnitsTask implements ITask<List<OrganisationU
                 dhisManager.getJsonManager().getOrgUnitsConverter());
     }
 
-    private static String buildQueryParams() {
-        return "organisationUnits" + "[" +
-                "id,created,lastUpdated,name,displayName,level" +
-                "]";
+    private static String buildQueryParams(boolean onlyBasicItems) {
+        if (onlyBasicItems) {
+            return "organisationUnits[id,lastUpdated]";
+        } else {
+            return "organisationUnits[id,created,lastUpdated,name,displayName,level,dataSets[id]]";
+        }
     }
 
     @Override

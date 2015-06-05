@@ -43,10 +43,11 @@ import java.util.List;
 final class GetCategoryOptionsTask implements IController<List<CategoryOption>> {
     private final ApiRequest<String, List<CategoryOption>> mRequest;
 
-    public GetCategoryOptionsTask(INetworkManager manager, List<String> ids) {
+    public GetCategoryOptionsTask(INetworkManager manager, List<String> ids,
+                                  boolean onlyBasicFields) {
         String base64Credentials = manager.getBase64Manager()
                 .toBase64(manager.getCredentials());
-        String url = buildQuery(manager.getServerUri(), ids);
+        String url = buildQuery(manager.getServerUri(), ids, onlyBasicFields);
         Request request = RequestBuilder.forUri(url)
                 .header("Authorization", base64Credentials)
                 .header("Accept", "application/json")
@@ -57,12 +58,23 @@ final class GetCategoryOptionsTask implements IController<List<CategoryOption>> 
         );
     }
 
-    private static String buildQuery(Uri serverUri, List<String> ids) {
+    private static String buildQuery(Uri serverUri, List<String> ids,
+                                     boolean onlyBasicFields) {
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("Specify at least one id of category option to download");
+        }
+
         Uri.Builder builder = serverUri.buildUpon()
                 .appendEncodedPath("api/categoryOptions/")
                 .appendQueryParameter("paging", "false");
-        String baseIdentityParams = "id,created,lastUpdated,name,displayName";
-        builder.appendQueryParameter("fields", baseIdentityParams);
+
+        String fields;
+        if (onlyBasicFields) {
+            fields = "id,lastUpdated";
+        } else {
+            fields = "id,created,lastUpdated,name,displayName";
+        }
+        builder.appendQueryParameter("fields", fields);
 
         if (ids != null && ids.size() > 0) {
             Joiner joiner = Joiner.on(",");

@@ -60,11 +60,12 @@ final class GetCategoryCombosTask implements ITask<List<CategoryCombo>> {
         Uri.Builder builder = serverUri.buildUpon()
                 .appendEncodedPath("api/categoryCombos/")
                 .appendQueryParameter("paging", "false");
-        String baseIdentityParams = "id,created,lastUpdated,name,displayName";
-        String fields = baseIdentityParams;
 
-        if (!onlyBasicFields) {
-            fields += ",dimensionType,categories" + "[" + baseIdentityParams + "]";
+        String fields;
+        if (onlyBasicFields) {
+            fields = "id,lastUpdated";
+        } else {
+            fields = "id,created,lastUpdated,name,displayName,dimensionType,categories[id]";
         }
 
         builder.appendQueryParameter("fields", fields);

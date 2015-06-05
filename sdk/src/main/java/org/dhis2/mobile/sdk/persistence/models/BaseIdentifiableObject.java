@@ -31,6 +31,7 @@ package org.dhis2.mobile.sdk.persistence.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.NotNull;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
@@ -38,8 +39,8 @@ import org.joda.time.DateTime;
 
 public abstract class BaseIdentifiableObject extends BaseModel implements TimeStampedModel {
     @JsonProperty("id") @Column @PrimaryKey String id;
-    @JsonProperty("created") @Column DateTime created;
-    @JsonProperty("lastUpdated") @Column DateTime lastUpdated;
+    @JsonProperty("created") @Column @NotNull DateTime created;
+    @JsonProperty("lastUpdated") @Column @NotNull DateTime lastUpdated;
     @JsonProperty("name") @Column String name;
 
     public BaseIdentifiableObject() {
