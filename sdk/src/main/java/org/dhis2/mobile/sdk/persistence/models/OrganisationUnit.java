@@ -41,7 +41,7 @@ import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME) @JsonRootName("organisationUnits")
+@Table(databaseName = DhisDatabase.NAME)
 public final class OrganisationUnit extends BaseIdentifiableObject implements DisplayNameModel {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("level") @Column int level;

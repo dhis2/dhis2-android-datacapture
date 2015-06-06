@@ -28,35 +28,34 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
-import android.net.Uri;
+import com.squareup.okhttp.HttpUrl;
 
-import org.dhis2.mobile.sdk.DhisManager;
-import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.network.models.Session;
-import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
-import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
+import org.dhis2.mobile.sdk.network.retrofit.DhisService;
+import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionManager;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 public final class LogInUserController implements IController<UserAccount> {
-    private final DhisManager mDhisManager;
-    private final Uri mServerUri;
+    private final HttpUrl mServerUrl;
     private final Credentials mCredentials;
-    private final SessionHandler mSessionHandler;
     private final UserAccountHandler mUserAccountHandler;
+    private final DhisService mService;
 
-    public LogInUserController(DhisManager dhisManager,
-                               SessionHandler sessionHandler,
-                               UserAccountHandler userAccountHandler,
-                               Uri serverUri, Credentials credentials) {
-        mDhisManager = isNull(dhisManager, "DhisManager must not be null");
-        mSessionHandler = isNull(sessionHandler, "SessionHandler must not be null");
+    public LogInUserController(UserAccountHandler userAccountHandler,
+                               HttpUrl serverUrl, Credentials credentials) {
         mUserAccountHandler = isNull(userAccountHandler, "UserAccountHandler must not be null");
-        mServerUri = isNull(serverUri, "Server URI must not be null");
+        mServerUrl = isNull(serverUrl, "Server URI must not be null");
         mCredentials = isNull(credentials, "User credentials must not be null");
+        mService = RetrofitManager.createService(mServerUrl, mCredentials);
     }
 
     @Override
@@ -70,14 +69,17 @@ public final class LogInUserController implements IController<UserAccount> {
     }
 
     private UserAccount getUserAccount() {
-        return NetworkManager.getInstance().loginUser(mServerUri, mCredentials);
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("fields", UserAccount.ALL_USER_ACCOUNT_FIELDS);
+        return mService.getCurrentUserAccount(queryParams);
     }
 
     private void saveMetaData() {
         Session session = new Session(
-                mServerUri, mCredentials
+                mServerUrl, mCredentials
         );
-        mSessionHandler.put(session);
+        SessionManager.getInstance()
+                .put(session);
     }
 
     private void saveUserAccount(UserAccount userAccount) {

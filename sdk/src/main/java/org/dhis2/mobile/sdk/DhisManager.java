@@ -29,65 +29,78 @@
 package org.dhis2.mobile.sdk;
 
 import android.content.Context;
-import android.net.Uri;
+
+import com.squareup.okhttp.HttpUrl;
 
 import org.dhis2.mobile.sdk.controllers.IController;
 import org.dhis2.mobile.sdk.controllers.InvalidateUserController;
 import org.dhis2.mobile.sdk.controllers.LogInUserController;
 import org.dhis2.mobile.sdk.controllers.LogOutUserController;
 import org.dhis2.mobile.sdk.controllers.MetaDataController;
-import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.http.Response;
-import org.dhis2.mobile.sdk.network.tasks.INetworkManager;
-import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 import org.dhis2.mobile.sdk.network.models.Credentials;
-import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
-import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 import org.dhis2.mobile.sdk.network.models.Session;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionManager;
+import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 
 import java.net.HttpURLConnection;
+
+import retrofit.client.Response;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 public class DhisManager {
-    private final INetworkManager mNetworkManager;
-    private final SessionHandler mSessionHandler;
+    private static DhisManager mDhisManager;
     private final UserAccountHandler mUserAccountHandler;
+    private Session mSession;
 
-    public DhisManager(Context context) {
+    public static void init(Context context) {
         isNull(context, "Context object must not be null");
+        if (mDhisManager == null) {
+            mDhisManager = new DhisManager(context);
+        }
+    }
 
-        mNetworkManager = NetworkManager.getInstance();
-        mSessionHandler = new SessionHandler(context);
+    public static DhisManager getInstance() {
+        if (mDhisManager == null) {
+            throw new IllegalArgumentException("You need to call init() first");
+        }
+
+        return mDhisManager;
+    }
+
+    private DhisManager(Context context) {
+        SessionManager.init(context);
         mUserAccountHandler = new UserAccountHandler(context);
 
         // fetch meta data from disk
         readMetaData();
     }
 
-    public UserAccount logInUser(Uri serverUri,
+    public UserAccount logInUser(HttpUrl serverUrl,
                                  Credentials credentials) throws APIException {
-        return signInUser(serverUri, credentials);
+        return signInUser(serverUrl, credentials);
     }
 
-    public UserAccount confirmUser(Credentials credentials) {
-        return signInUser(mNetworkManager.getServerUri(), credentials);
+    public UserAccount confirmUser(Credentials credentials) throws APIException {
+        // Session session = SessionManager.getInstance().get();
+        return signInUser(mSession.getServerUrl(), credentials);
     }
 
     public void logOutUser() throws APIException {
         IController<Object> controller =
-                new LogOutUserController(mSessionHandler, mUserAccountHandler);
+                new LogOutUserController(mUserAccountHandler);
         controller.run();
 
         // fetch meta data from disk
         readMetaData();
     }
 
-    private UserAccount signInUser(Uri serverUri,
+    private UserAccount signInUser(HttpUrl serverUrl,
                                    Credentials credentials) throws APIException {
         IController<UserAccount> controller = new LogInUserController(
-                this, mSessionHandler, mUserAccountHandler, serverUri, credentials);
+                mUserAccountHandler, serverUrl, credentials);
         UserAccount userAccount = controller.run();
 
         // fetch meta data from disk
@@ -97,7 +110,7 @@ public class DhisManager {
 
     public void invalidateMetaData() {
         InvalidateUserController invalidateController
-                = new InvalidateUserController(mSessionHandler);
+                = new InvalidateUserController();
         invalidateController.run();
 
         // fetch meta data from disk
@@ -105,30 +118,34 @@ public class DhisManager {
     }
 
     public boolean isUserLoggedIn() {
-        return mNetworkManager.getServerUri() != null &&
-                mNetworkManager.getCredentials() != null;
+        return mSession.getServerUrl() != null &&
+                mSession.getCredentials() != null;
     }
 
     public boolean isUserInvalidated() {
-        return mNetworkManager.getServerUri() != null &&
-                mNetworkManager.getCredentials() == null;
+        return mSession.getServerUrl() != null &&
+                mSession.getCredentials() == null;
     }
 
     private void readMetaData() {
-        Session session = mSessionHandler.get();
-        if (session != null) {
-            mNetworkManager.setServerUri(session.getServerUri());
-            mNetworkManager.setCredentials(session.getCredentials());
-        }
+        mSession = SessionManager.getInstance().get();
     }
 
     public void syncMetaData() throws APIException {
         runController(new MetaDataController());
     }
 
+    public HttpUrl getServerUrl() {
+        return mSession.getServerUrl();
+    }
+
+    public Credentials getUserCredentials() {
+        return mSession.getCredentials();
+    }
+
     // we need this method in order to catch certain types of exceptions.
     // For example: UnauthorizedException (HTTP 401)
-    // NOTE!: this method should be used fo controllers except LogInUserController
+    // NOTE!: this method should be used for controllers except LogInUserController
     private <T> T runController(IController<T> controller) throws APIException {
         try {
             return controller.run();

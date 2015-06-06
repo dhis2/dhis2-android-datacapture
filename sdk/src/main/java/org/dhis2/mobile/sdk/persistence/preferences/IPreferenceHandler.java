@@ -29,7 +29,7 @@
 package org.dhis2.mobile.sdk.persistence.preferences;
 
 public interface IPreferenceHandler<T> {
-    public void put(T object);
-    public void delete();
-    public T get();
+    void put(T object);
+    void delete();
+    T get();
 }

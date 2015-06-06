@@ -30,19 +30,21 @@ package org.dhis2.mobile.sdk.controllers;
 
 import com.raizlabs.android.dbflow.sql.language.Select;
 
+import org.dhis2.mobile.sdk.DhisManager;
+import org.dhis2.mobile.sdk.network.retrofit.DhisService;
 import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
+import org.dhis2.mobile.sdk.persistence.DbHelper;
 import org.dhis2.mobile.sdk.persistence.models.Category;
 import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
 import org.dhis2.mobile.sdk.persistence.models.CategoryComboToCategoryRelation;
 import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
 import org.dhis2.mobile.sdk.persistence.models.CategoryToCategoryOptionRelation;
 import org.dhis2.mobile.sdk.persistence.models.DataSet;
+import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
-import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
-import org.dhis2.mobile.sdk.persistence.DbHelper;
-import org.dhis2.mobile.sdk.persistence.models.DbOperation;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.utils.Joiner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,25 +55,21 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import retrofit.RetrofitError;
+
+import static org.dhis2.mobile.sdk.network.NetworkUtils.unwrapResponse;
 import static org.dhis2.mobile.sdk.persistence.DbUtils.toIds;
 
 public final class MetaDataController implements IController<Object> {
-    private final NetworkManager mNetworkManager;
+    private final DhisService mService;
 
     public MetaDataController() {
-        mNetworkManager = NetworkManager.getInstance();
+        mService = RetrofitManager.createService(DhisManager.getInstance().getServerUrl(),
+                DhisManager.getInstance().getUserCredentials());
     }
 
     @Override
-    public Object run() throws APIException {
-        Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("fields", "organisationUnits[id,created,lastUpdated,name,displayName]");
-        List<OrganisationUnit> testRetrofit = RetrofitManager.buildService()
-                .getAssignedOrganisationUnitIds(queryParams);
-        for (OrganisationUnit unit : testRetrofit) {
-            System.out.println("OrganisationUnit: " + unit.getDisplayName());
-        }
-
+    public Object run() throws RetrofitError {
         // fetching new data from distant instance.
         List<OrganisationUnit> units = getOrganisationUnits();
         List<DataSet> dataSets = getDataSets(units);
@@ -101,20 +99,25 @@ public final class MetaDataController implements IController<Object> {
         return new Object();
     }
 
-    private List<OrganisationUnit> getOrganisationUnits() throws APIException {
+    private List<OrganisationUnit> getOrganisationUnits() throws RetrofitError {
         return new AbsBaseIdentifiableController<OrganisationUnit>() {
 
             @Override List<OrganisationUnit> getNewBasicItems() {
-                List<OrganisationUnit> parentUnits = mNetworkManager
-                        .getAssignedOrganisationUnits(true);
-                List<OrganisationUnit> childUnits = mNetworkManager
-                        .getChildOrganisationUnits(toIds(parentUnits), true);
-                parentUnits.addAll(childUnits);
-                return parentUnits;
+                List<OrganisationUnit> assignedUnits = getAssignedUnits();
+                List<OrganisationUnit> childUnits = getChildUnits(assignedUnits);
+                assignedUnits.addAll(childUnits);
+                return assignedUnits;
             }
 
             @Override List<OrganisationUnit> getNewFullItems(List<String> ids) {
-                return mNetworkManager.getOrganisationUnitsByIds(ids, false);
+                if (ids == null || ids.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName,level,dataSets[id]");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
+                return unwrapResponse(mService.getOrganisationUnits(QUERY_MAP), "organisationUnits");
             }
 
             @Override List<OrganisationUnit> getItemsFromDb() {
@@ -128,6 +131,24 @@ public final class MetaDataController implements IController<Object> {
                             .queryRelatedDataSetsFromDb(orgUnit.getId()));
                 }
                 return orgUnits;
+            }
+
+            private List<OrganisationUnit> getAssignedUnits() throws RetrofitError {
+                final Map<String, String> QUERY_PARAMS = new HashMap<>();
+                QUERY_PARAMS.put("fields", "organisationUnits[id,lastUpdated]");
+                UserAccount userAccount = mService.getCurrentUserAccount(QUERY_PARAMS);
+                return userAccount.getOrganisationUnits();
+            }
+
+            private List<OrganisationUnit> getChildUnits(List<OrganisationUnit> assignedUnits) {
+                if (assignedUnits == null || assignedUnits.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_PARAMS = new HashMap<>();
+                QUERY_PARAMS.put("fields", "id,lastUpdated");
+                QUERY_PARAMS.put("filter", "parent.id:in:[" + Joiner.on(",").join(toIds(assignedUnits)) + "]");
+                return unwrapResponse(mService.getOrganisationUnits(QUERY_PARAMS), "organisationUnits");
             }
         }.run();
     }
@@ -144,11 +165,26 @@ public final class MetaDataController implements IController<Object> {
         return new AbsBaseIdentifiableController<DataSet>() {
 
             @Override List<DataSet> getNewBasicItems() {
-                return mNetworkManager.getDataSetsByIds(new ArrayList<>(dataSetIds), true);
+                if (dataSetIds.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,lastUpdated");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(dataSetIds) + "]");
+                return unwrapResponse(mService.getDataSets(QUERY_MAP), "dataSets");
             }
 
             @Override List<DataSet> getNewFullItems(List<String> ids) {
-                return mNetworkManager.getDataSetsByIds(ids, false);
+                if (ids == null || ids.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName,expiryDays," +
+                        "allowFuturePeriods,periodType,categoryCombo[id]");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
+                return unwrapResponse(mService.getDataSets(QUERY_MAP), "dataSets");
             }
 
             @Override List<DataSet> getItemsFromDb() {
@@ -178,7 +214,7 @@ public final class MetaDataController implements IController<Object> {
         return relations;
     }
 
-    private List<CategoryCombo> getCategoryCombos(List<DataSet> dataSets) throws APIException {
+    private List<CategoryCombo> getCategoryCombos(List<DataSet> dataSets) throws RetrofitError {
         final Set<String> categoryComboIds = new HashSet<>();
         if (dataSets != null && !dataSets.isEmpty()) {
             for (DataSet dataSet : dataSets) {
@@ -189,12 +225,26 @@ public final class MetaDataController implements IController<Object> {
         return new AbsBaseIdentifiableController<CategoryCombo>() {
 
             @Override List<CategoryCombo> getNewBasicItems() {
-                return mNetworkManager.getCategoryCombosByIds(
-                        new ArrayList<>(categoryComboIds), true);
+                if (categoryComboIds.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,lastUpdated");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(categoryComboIds) + "]");
+                return unwrapResponse(mService.getCategoryCombos(QUERY_MAP), "categoryCombos");
             }
 
             @Override List<CategoryCombo> getNewFullItems(List<String> ids) {
-                return mNetworkManager.getCategoryCombosByIds(ids, false);
+                if (ids == null || ids.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName," +
+                        "dimensionType,categories[id]");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
+                return unwrapResponse(mService.getCategoryCombos(QUERY_MAP), "categoryCombos");
             }
 
             @Override List<CategoryCombo> getItemsFromDb() {
@@ -209,22 +259,37 @@ public final class MetaDataController implements IController<Object> {
         }.run();
     }
 
-    private List<Category> getCategories(List<CategoryCombo> catCombos) throws APIException {
-        final Set<String> ids = new HashSet<>();
+    private List<Category> getCategories(List<CategoryCombo> catCombos) throws RetrofitError {
+        final Set<String> categoryIds = new HashSet<>();
         if (catCombos != null && catCombos.size() > 0) {
             for (CategoryCombo catCombo : catCombos) {
-                ids.addAll(toIds(catCombo.getCategories()));
+                categoryIds.addAll(toIds(catCombo.getCategories()));
             }
         }
 
         return new AbsBaseIdentifiableController<Category>() {
 
             @Override List<Category> getNewBasicItems() {
-                return mNetworkManager.getCategoriesByIds(new ArrayList<>(ids), true);
+                if (categoryIds.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,lastUpdated");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(categoryIds) + "]");
+                return unwrapResponse(mService.getCategories(QUERY_MAP), "categories");
             }
 
             @Override List<Category> getNewFullItems(List<String> ids) {
-                return mNetworkManager.getCategoriesByIds(ids, false);
+                if (ids == null || ids.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName, " +
+                        "dimension,dataDimension,dataDimensionType,categoryOptions[id]");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
+                return unwrapResponse(mService.getCategories(QUERY_MAP), "categories");
             }
 
             @Override List<Category> getItemsFromDb() {
@@ -260,28 +325,39 @@ public final class MetaDataController implements IController<Object> {
         return relations;
     }
 
-    private List<CategoryOption> getCategoryOptions(List<Category> categories) throws APIException {
-        final Set<String> ids = new HashSet<>();
+    private List<CategoryOption> getCategoryOptions(List<Category> categories) throws RetrofitError {
+        final Set<String> categoryOptions = new HashSet<>();
         if (categories != null && categories.size() > 0) {
             for (Category category : categories) {
-                ids.addAll(toIds(category.getCategoryOptions()));
+                categoryOptions.addAll(toIds(category.getCategoryOptions()));
             }
         }
 
         return new AbsBaseIdentifiableController<CategoryOption>() {
 
-            @Override
-            List<CategoryOption> getNewBasicItems() {
-                return mNetworkManager.getCategoryOptions(new ArrayList<>(ids), true);
+            @Override List<CategoryOption> getNewBasicItems() {
+                if (categoryOptions.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,lastUpdated");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(categoryOptions) + "]");
+                return unwrapResponse(mService.getCategoryOptions(QUERY_MAP), "categoryOptions");
             }
 
-            @Override
-            List<CategoryOption> getNewFullItems(List<String> ids) {
-                return mNetworkManager.getCategoryOptions(new ArrayList<>(ids), false);
+            @Override List<CategoryOption> getNewFullItems(List<String> ids) {
+                if (ids == null || ids.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
+                return unwrapResponse(mService.getCategoryOptions(QUERY_MAP), "categoryOptions");
             }
 
-            @Override
-            List<CategoryOption> getItemsFromDb() {
+            @Override List<CategoryOption> getItemsFromDb() {
                 return new Select().from(CategoryOption.class).queryList();
             }
         }.run();

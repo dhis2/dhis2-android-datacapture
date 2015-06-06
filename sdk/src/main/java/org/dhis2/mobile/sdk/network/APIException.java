@@ -28,9 +28,9 @@
 
 package org.dhis2.mobile.sdk.network;
 
-import org.dhis2.mobile.sdk.network.http.Response;
-
 import java.io.IOException;
+
+import retrofit.client.Response;
 
 public class APIException extends RuntimeException {
     private final String mUrl;
@@ -38,7 +38,6 @@ public class APIException extends RuntimeException {
     private final boolean mNetworkError;
     private final boolean mHttpError;
     private final boolean mConversionError;
-
 
     private APIException(String url, String message, Response response, Throwable exception,
                          boolean networkError, boolean httpError, boolean conversionError) {

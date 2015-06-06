@@ -28,16 +28,26 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
-import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
+import org.dhis2.mobile.sdk.network.retrofit.DhisService;
+import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class GetUserAccountController implements IController<UserAccount> {
     private final UserAccountHandler mUserAccountHandler;
+    private final DhisService mService;
 
     public GetUserAccountController(UserAccountHandler userAccountHandler) {
         mUserAccountHandler = userAccountHandler;
+        mService = RetrofitManager.createService(
+                DhisManager.getInstance().getServerUrl(),
+                DhisManager.getInstance().getUserCredentials()
+        );
     }
 
     @Override
@@ -49,11 +59,9 @@ public final class GetUserAccountController implements IController<UserAccount> 
     }
 
     private UserAccount getUserAccount() {
-        return NetworkManager.getInstance()
-                .loginUser(
-                        NetworkManager.getInstance().getServerUri(),
-                        NetworkManager.getInstance().getCredentials()
-                );
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("fields", UserAccount.ALL_USER_ACCOUNT_FIELDS);
+        return mService.getCurrentUserAccount(queryParams);
     }
 
     private void saveUserAccount(UserAccount userAccount) {

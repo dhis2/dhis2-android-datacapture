@@ -30,10 +30,23 @@ package org.dhis2.mobile.sdk.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 public final class UserAccount {
+    /**
+     * Value of 'fields' query parameter for getCurrentUserAccount() method
+     */
+    public static final String ALL_USER_ACCOUNT_FIELDS = "[id,created,lastUpdated,name,displayName," +
+            "firstName,surname," +
+            "gender,birthday,introduction," +
+            "education,employer,interests," +
+            "jobTitle,languages,email,phoneNumber," +
+            "organisationUnits[id]]";
+
     @JsonProperty("id") private String id;
     @JsonProperty("created") private DateTime created;
     @JsonProperty("lastUpdated") private DateTime lastUpdated;
@@ -51,6 +64,7 @@ public final class UserAccount {
     @JsonProperty("languages") private String languages;
     @JsonProperty("email") private String email;
     @JsonProperty("phoneNumber") private String phoneNumber;
+    @JsonProperty("organisationUnits") private List<OrganisationUnit> organisationUnits;
 
     public UserAccount() {
     }
@@ -223,5 +237,15 @@ public final class UserAccount {
     @JsonIgnore
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    @JsonIgnore
+    public List<OrganisationUnit> getOrganisationUnits() {
+        return organisationUnits;
+    }
+
+    @JsonIgnore
+    public void setOrganisationUnits(List<OrganisationUnit> organisationUnits) {
+        this.organisationUnits = organisationUnits;
     }
 }

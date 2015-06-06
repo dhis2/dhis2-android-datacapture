@@ -29,20 +29,18 @@
 package org.dhis2.mobile.sdk.controllers;
 
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.persistence.preferences.SessionHandler;
+import org.dhis2.mobile.sdk.persistence.preferences.SessionManager;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 public class InvalidateUserController implements IController<Object> {
-    private final SessionHandler mSessionHandler;
 
-    public InvalidateUserController(SessionHandler sessionHandler) {
-        mSessionHandler = isNull(sessionHandler, "SessionHandler must not be null");
+    public InvalidateUserController() {
     }
 
     @Override
     public Object run() throws APIException {
-        mSessionHandler.invalidate();
+        SessionManager.getInstance().invalidate();
         return new Object();
     }
 }

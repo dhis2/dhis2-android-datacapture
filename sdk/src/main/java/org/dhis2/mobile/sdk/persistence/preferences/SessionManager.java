@@ -30,35 +30,46 @@ package org.dhis2.mobile.sdk.persistence.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
+
+import com.squareup.okhttp.HttpUrl;
 
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.network.models.Session;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public final class SessionHandler implements IPreferenceHandler<Session> {
-    private static final String META_DATA = "preferences:Session";
+public final class SessionManager implements IPreferenceHandler<Session> {
+    private static final String PREFERENCES = "preferences:Session";
     private static final String SERVER_URI = "key:Uri";
     private static final String USERNAME = "key:username";
     private static final String PASSWORD = "key:password";
 
+    private static SessionManager mSessionManager;
     private SharedPreferences mPrefs;
 
-    public SessionHandler(Context context) {
+    private SessionManager(Context context) {
+        mPrefs = context.getSharedPreferences(PREFERENCES,
+                Context.MODE_PRIVATE);
+    }
+
+    public static void init(Context context) {
         isNull(context, "Context object must not be null");
-        mPrefs = context.getSharedPreferences(META_DATA, Context.MODE_PRIVATE);
+        mSessionManager = new SessionManager(context);
+    }
+
+    public static SessionManager getInstance() {
+        return mSessionManager;
     }
 
     @Override
     public Session get() {
-        String serverUriString = getString(SERVER_URI);
+        String serverUrlString = getString(SERVER_URI);
         String userNameString = getString(USERNAME);
         String passwordString = getString(PASSWORD);
 
-        Uri serverUri = null;
-        if (serverUriString != null) {
-            serverUri = Uri.parse(serverUriString);
+        HttpUrl serverUrl = null;
+        if (serverUrlString != null) {
+            serverUrl = HttpUrl.parse(serverUrlString);
         }
 
         Credentials credentials = null;
@@ -67,21 +78,21 @@ public final class SessionHandler implements IPreferenceHandler<Session> {
                     userNameString, passwordString
             );
         }
-        return new Session(serverUri, credentials);
+        return new Session(serverUrl, credentials);
     }
 
     @Override
     public void put(Session session) {
         isNull(session, "Session object must not be null");
-        Uri serverUri = session.getServerUri();
+        HttpUrl serverUrl = session.getServerUrl();
         Credentials credentials = session.getCredentials();
 
-        String uri = null;
+        String url = null;
         String username = null;
         String password = null;
 
-        if (serverUri != null) {
-            uri = serverUri.toString();
+        if (serverUrl != null) {
+            url = serverUrl.toString();
         }
 
         if (credentials != null) {
@@ -89,7 +100,7 @@ public final class SessionHandler implements IPreferenceHandler<Session> {
             password = credentials.getPassword();
         }
 
-        putString(SERVER_URI, uri);
+        putString(SERVER_URI, url);
         putString(USERNAME, username);
         putString(PASSWORD, password);
     }

@@ -29,6 +29,7 @@
 package org.dhis2.mobile.sdk.persistence;
 
 import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
+import org.dhis2.mobile.sdk.utils.Joiner;
 
 import java.util.ArrayList;
 import java.util.HashMap;

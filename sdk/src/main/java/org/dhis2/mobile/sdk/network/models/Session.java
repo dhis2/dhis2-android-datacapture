@@ -28,16 +28,14 @@
 
 package org.dhis2.mobile.sdk.network.models;
 
-import android.net.Uri;
-
-import org.dhis2.mobile.sdk.network.models.Credentials;
+import com.squareup.okhttp.HttpUrl;
 
 public final class Session {
-    private Uri serverUri;
-    private Credentials credentials;
+    private final HttpUrl serverUrl;
+    private final Credentials credentials;
 
-    public Session(Uri serverUri, Credentials credentials) {
-        this.serverUri = serverUri;
+    public Session(HttpUrl serverUrl, Credentials credentials) {
+        this.serverUrl = serverUrl;
         this.credentials = credentials;
     }
 
@@ -45,7 +43,7 @@ public final class Session {
         return credentials;
     }
 
-    public Uri getServerUri() {
-        return serverUri;
+    public HttpUrl getServerUrl() {
+        return serverUrl;
     }
 }

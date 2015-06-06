@@ -29,7 +29,8 @@
 package org.dhis2.mobile.api.models;
 
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.http.Response;
+
+import retrofit.client.Response;
 
 public final class ResponseHolder<T> {
     private Response mResponse;

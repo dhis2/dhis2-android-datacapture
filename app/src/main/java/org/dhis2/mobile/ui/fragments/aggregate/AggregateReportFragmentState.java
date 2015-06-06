@@ -230,9 +230,7 @@ public class AggregateReportFragmentState implements Parcelable {
         private String categoryOptionName;
 
         public CategoryState(String categoryId, String categoryName) {
-            isNull(categoryId, "Category ID must not be null");
-            isNull(categoryName, "Category name must not be null");
-            this.categoryId = categoryId;
+            this.categoryId = isNull(categoryId, "Category ID must not be null");
             this.categoryName = categoryName;
         }
 

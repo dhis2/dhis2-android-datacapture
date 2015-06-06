@@ -28,15 +28,15 @@
 
 package org.dhis2.mobile;
 
-import android.net.Uri;
+import com.squareup.okhttp.HttpUrl;
 
 import org.dhis2.mobile.api.job.base.Job;
 import org.dhis2.mobile.api.job.base.JobExecutor;
 import org.dhis2.mobile.api.job.base.NetworkJob;
 import org.dhis2.mobile.sdk.DhisManager;
-import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
@@ -53,12 +53,12 @@ public final class DhisService {
         mDhisManager = isNull(dhisManager, "DhisManager must not be null");
     }
 
-    public void logInUser(final Uri serverUri, final Credentials credentials) {
+    public void logInUser(final HttpUrl serverUrl, final Credentials credentials) {
         JobExecutor.enqueueJob(new NetworkJob<UserAccount>(LOG_IN_JOB_ID) {
 
             @Override
             public UserAccount execute() throws APIException {
-                return mDhisManager.logInUser(serverUri, credentials);
+                return mDhisManager.logInUser(serverUrl, credentials);
             }
         });
     }

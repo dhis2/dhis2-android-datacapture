@@ -1,12 +1,11 @@
 package org.dhis2.mobile.sdk.network.retrofit;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.OkHttpClient;
 
 import org.dhis2.mobile.sdk.network.models.Credentials;
-import org.dhis2.mobile.sdk.network.tasks.NetworkManager;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -14,51 +13,60 @@ import retrofit.client.OkClient;
 import retrofit.converter.Converter;
 import retrofit.converter.JacksonConverter;
 
+import static com.squareup.okhttp.Credentials.basic;
+
 
 public final class RetrofitManager {
 
-    public static DhisService buildService() {
-        String serverUrl = NetworkManager.getInstance().getServerUri()
-                .buildUpon().appendEncodedPath("api").toString();
+    private RetrofitManager() {
+        // no instances
+    }
 
+    public static DhisService createService(HttpUrl serverUrl, Credentials credentials) {
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(serverUrl)
+                .setEndpoint(provideServerUrl(serverUrl))
                 .setConverter(provideJacksonConverter())
                 .setClient(provideOkClient())
-                .setRequestInterceptor(new AuthInterceptor())
-                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setRequestInterceptor(provideInterceptor(credentials))
+                .setLogLevel(RestAdapter.LogLevel.BASIC)
                 .build();
         return restAdapter.create(DhisService.class);
     }
 
-    private static String provideServerUrl() {
-        return new HttpUrl.Builder()
-                .scheme("https")
-                .host("apps.dhis2.org/demo")
+    private static String provideServerUrl(HttpUrl httpUrl) {
+        String serverUrl = httpUrl.newBuilder()
                 .addPathSegment("api")
-                .build()
-                .toString();
+                .build().toString();
+        System.out.println("SERVER_URL: " + serverUrl);
+        return serverUrl;
     }
 
     private static Converter provideJacksonConverter() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
+        mapper.registerModule(new JodaModule());
         return new JacksonConverter(mapper);
     }
 
     private static OkClient provideOkClient() {
-        OkHttpClient okHttpClient =  new OkHttpClient();
-        return new OkClient(okHttpClient);
+        return new OkClient(new OkHttpClient());
+    }
+
+    private static AuthInterceptor provideInterceptor(Credentials credentials) {
+        return new AuthInterceptor(credentials.getUsername(), credentials.getPassword());
     }
 
     private static class AuthInterceptor implements RequestInterceptor {
+        private final String mUsername;
+        private final String mPassword;
+
+        public AuthInterceptor(String username, String password) {
+            mUsername = username;
+            mPassword = password;
+        }
 
         @Override
         public void intercept(RequestFacade request) {
-            Credentials credentials = NetworkManager.getInstance()
-                    .getCredentials();
-            String base64Credentials = NetworkManager.getInstance()
-                    .getBase64Manager().toBase64(credentials);
+            String base64Credentials = basic(mUsername, mPassword);
             request.addHeader("Authorization", base64Credentials);
         }
     }

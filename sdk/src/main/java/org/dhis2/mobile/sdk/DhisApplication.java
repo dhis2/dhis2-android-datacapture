@@ -40,5 +40,4 @@ public class DhisApplication extends Application {
         super.onCreate();
         FlowManager.init(this);
     }
-
 }

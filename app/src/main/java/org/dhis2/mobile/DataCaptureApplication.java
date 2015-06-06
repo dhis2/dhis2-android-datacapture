@@ -41,7 +41,8 @@ public class DataCaptureApplication extends DhisApplication {
         super.onCreate();
 
         EventBus.register(this);
-        mDhisManager = new DhisManager(getBaseContext());
+        DhisManager.init(getBaseContext());
+        mDhisManager = DhisManager.getInstance();
         mDhisService = new DhisService(mDhisManager);
     }
 
