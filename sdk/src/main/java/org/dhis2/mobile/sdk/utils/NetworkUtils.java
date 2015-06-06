@@ -1,4 +1,4 @@
-package org.dhis2.mobile.sdk.network;
+package org.dhis2.mobile.sdk.utils;
 
 import java.util.ArrayList;
 import java.util.List;

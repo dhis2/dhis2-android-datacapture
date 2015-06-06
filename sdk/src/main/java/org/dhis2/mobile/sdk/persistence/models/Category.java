@@ -35,12 +35,12 @@ import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DbDhis.NAME)
 public final class Category extends BaseIdentifiableObject implements DisplayNameModel {
     @JsonProperty("dataDimension") @Column String dataDimension;
     @JsonProperty("dataDimensionType") @Column String dataDimensionType;

@@ -35,12 +35,15 @@ import com.raizlabs.android.dbflow.annotation.ForeignKey;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyAction;
 import com.raizlabs.android.dbflow.annotation.ForeignKeyReference;
 import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DbDhis.NAME)
 public final class DataSet extends BaseIdentifiableObject implements DisplayNameModel {
     private static final String CATEGORY_COMBO_KEY = "categoryComboKey";
 
@@ -60,6 +63,23 @@ public final class DataSet extends BaseIdentifiableObject implements DisplayName
     ) CategoryCombo categoryCombo;
 
     public DataSet() {
+    }
+
+    public static List<DataElement> queryRelatedDataElementsFromDb(String id) {
+        List<DataSetToDataElementRelation> relations = new Select()
+                .from(DataSetToDataElementRelation.class)
+                .where(Condition
+                        .column(DataSetToDataElementRelation$Table.DATASET_DATASET)
+                        .is(id))
+                .queryList();
+        // read full versions of datasets
+        List<DataElement> dataElements = new ArrayList<>();
+        if (relations != null && !relations.isEmpty()) {
+            for (DataSetToDataElementRelation relation : relations) {
+                dataElements.add(relation.getDataElement());
+            }
+        }
+        return dataElements;
     }
 
     @JsonIgnore
@@ -147,6 +167,7 @@ public final class DataSet extends BaseIdentifiableObject implements DisplayName
         return dataElements;
     }
 
+    @JsonIgnore
     public void setDataElements(List<DataElement> dataElements) {
         this.dataElements = dataElements;
     }

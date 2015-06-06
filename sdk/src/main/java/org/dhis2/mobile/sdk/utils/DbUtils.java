@@ -28,10 +28,45 @@
 
 package org.dhis2.mobile.sdk.utils;
 
-public interface ILogManager {
-    void LOGI(String tag, String message);
-    void LOGD(String tag, String message);
-    void LOGE(String tag, String message);
-    void LOGW(String tag, String message);
-    void LOGV(String tag, String message);
+import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
+import org.dhis2.mobile.sdk.utils.Joiner;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class DbUtils {
+
+    private DbUtils() {
+        // no instances
+    }
+
+    public static <T extends BaseIdentifiableObject> Map<String, T> toMap(List<T> objects) {
+        Map<String, T> map = new HashMap<>();
+        if (objects != null && objects.size() > 0) {
+            for (T object : objects) {
+                map.put(object.getId(), object);
+            }
+        }
+        return map;
+    }
+
+    public static <T extends BaseIdentifiableObject> List<String> toIds(List<T> objects) {
+        List<String> ids = new ArrayList<>();
+        if (objects != null && objects.size() > 0) {
+            for (T object : objects) {
+                ids.add(object.getId());
+            }
+        }
+        return ids;
+    }
+
+    public static <T extends BaseIdentifiableObject> void print(List<T> items) {
+        if (items != null && items.size() > 0) {
+            for (BaseIdentifiableObject item : items) {
+                System.out.println("Name: " + item.getName());
+            }
+        }
+    }
 }

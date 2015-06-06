@@ -12,9 +12,9 @@ import com.raizlabs.android.dbflow.annotation.Unique;
 import com.raizlabs.android.dbflow.annotation.UniqueGroup;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
-@Table(databaseName = DhisDatabase.NAME, uniqueColumnGroups = {
+@Table(databaseName = DbDhis.NAME, uniqueColumnGroups = {
         @UniqueGroup(groupNumber = CategoryComboToCategoryRelation.UNIQUE_COMBO_TO_CATEGORY_GROUP, uniqueConflict = ConflictAction.FAIL)
 })
 public final class CategoryComboToCategoryRelation extends BaseModel implements RelationModel {

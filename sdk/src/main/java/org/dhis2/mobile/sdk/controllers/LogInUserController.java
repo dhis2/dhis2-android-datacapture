@@ -33,8 +33,8 @@ import com.squareup.okhttp.HttpUrl;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.network.models.Session;
-import org.dhis2.mobile.sdk.network.retrofit.DhisService;
-import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
+import org.dhis2.mobile.sdk.network.repository.DhisService;
+import org.dhis2.mobile.sdk.network.repository.RepoManager;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionManager;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
@@ -55,7 +55,7 @@ public final class LogInUserController implements IController<UserAccount> {
         mUserAccountHandler = isNull(userAccountHandler, "UserAccountHandler must not be null");
         mServerUrl = isNull(serverUrl, "Server URI must not be null");
         mCredentials = isNull(credentials, "User credentials must not be null");
-        mService = RetrofitManager.createService(mServerUrl, mCredentials);
+        mService = RepoManager.createService(mServerUrl, mCredentials);
     }
 
     @Override

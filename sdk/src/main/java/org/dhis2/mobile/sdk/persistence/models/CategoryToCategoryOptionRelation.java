@@ -11,9 +11,9 @@ import com.raizlabs.android.dbflow.annotation.Unique;
 import com.raizlabs.android.dbflow.annotation.UniqueGroup;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
-@Table(databaseName = DhisDatabase.NAME, uniqueColumnGroups = {
+@Table(databaseName = DbDhis.NAME, uniqueColumnGroups = {
         @UniqueGroup(groupNumber = CategoryToCategoryOptionRelation.UNIQUE_CATEGORY_TO_OPTION_GROUP, uniqueConflict = ConflictAction.FAIL)
 })
 public class CategoryToCategoryOptionRelation extends BaseModel implements RelationModel {

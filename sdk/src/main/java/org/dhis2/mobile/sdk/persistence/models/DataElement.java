@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
-@Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DbDhis.NAME)
 public final class DataElement extends BaseIdentifiableObject {
     public static final String VALUE_TYPE_INT = "int";
     public static final String VALUE_TYPE_STRING = "string";
@@ -32,6 +32,7 @@ public final class DataElement extends BaseIdentifiableObject {
     @JsonProperty("numberType") @Column String numberType;
     @JsonProperty("textType") @Column String textType;
     @JsonProperty("zeroIsSignificant") @Column boolean zeroIsSignificant;
+    @JsonProperty("categoryCombo") CategoryCombo categoryCombo;
 
     @JsonIgnore
     public String getDisplayName() {
@@ -111,5 +112,15 @@ public final class DataElement extends BaseIdentifiableObject {
     @JsonIgnore
     public void setZeroIsSignificant(boolean zeroIsSignificant) {
         this.zeroIsSignificant = zeroIsSignificant;
+    }
+
+    @JsonIgnore
+    public CategoryCombo getCategoryCombo() {
+        return categoryCombo;
+    }
+
+    @JsonIgnore
+    public void setCategoryCombo(CategoryCombo categoryCombo) {
+        this.categoryCombo = categoryCombo;
     }
 }

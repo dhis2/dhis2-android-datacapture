@@ -30,8 +30,8 @@ package org.dhis2.mobile.sdk.controllers;
 
 import org.dhis2.mobile.sdk.DhisManager;
 import org.dhis2.mobile.sdk.network.APIException;
-import org.dhis2.mobile.sdk.network.retrofit.DhisService;
-import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
+import org.dhis2.mobile.sdk.network.repository.DhisService;
+import org.dhis2.mobile.sdk.network.repository.RepoManager;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 
@@ -44,7 +44,7 @@ public final class GetUserAccountController implements IController<UserAccount> 
 
     public GetUserAccountController(UserAccountHandler userAccountHandler) {
         mUserAccountHandler = userAccountHandler;
-        mService = RetrofitManager.createService(
+        mService = RepoManager.createService(
                 DhisManager.getInstance().getServerUrl(),
                 DhisManager.getInstance().getUserCredentials()
         );

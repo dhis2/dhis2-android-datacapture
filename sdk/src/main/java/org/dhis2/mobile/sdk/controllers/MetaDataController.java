@@ -31,15 +31,17 @@ package org.dhis2.mobile.sdk.controllers;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.dhis2.mobile.sdk.DhisManager;
-import org.dhis2.mobile.sdk.network.retrofit.DhisService;
-import org.dhis2.mobile.sdk.network.retrofit.RetrofitManager;
+import org.dhis2.mobile.sdk.network.repository.DhisService;
+import org.dhis2.mobile.sdk.network.repository.RepoManager;
 import org.dhis2.mobile.sdk.persistence.DbHelper;
 import org.dhis2.mobile.sdk.persistence.models.Category;
 import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
 import org.dhis2.mobile.sdk.persistence.models.CategoryComboToCategoryRelation;
 import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
 import org.dhis2.mobile.sdk.persistence.models.CategoryToCategoryOptionRelation;
+import org.dhis2.mobile.sdk.persistence.models.DataElement;
 import org.dhis2.mobile.sdk.persistence.models.DataSet;
+import org.dhis2.mobile.sdk.persistence.models.DataSetToDataElementRelation;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
@@ -57,14 +59,14 @@ import java.util.Set;
 
 import retrofit.RetrofitError;
 
-import static org.dhis2.mobile.sdk.network.NetworkUtils.unwrapResponse;
-import static org.dhis2.mobile.sdk.persistence.DbUtils.toIds;
+import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
+import static org.dhis2.mobile.sdk.utils.NetworkUtils.unwrapResponse;
 
 public final class MetaDataController implements IController<Object> {
     private final DhisService mService;
 
     public MetaDataController() {
-        mService = RetrofitManager.createService(DhisManager.getInstance().getServerUrl(),
+        mService = RepoManager.createService(DhisManager.getInstance().getServerUrl(),
                 DhisManager.getInstance().getUserCredentials());
     }
 
@@ -73,27 +75,56 @@ public final class MetaDataController implements IController<Object> {
         // fetching new data from distant instance.
         List<OrganisationUnit> units = getOrganisationUnits();
         List<DataSet> dataSets = getDataSets(units);
-        List<UnitToDataSetRelation> unitToDataSets = buildUnitDataSetRelations(units);
+        List<UnitToDataSetRelation> unitToDataSets
+                = buildUnitDataSetRelations(units);
+
+        List<DataElement> dataElements = getDataElements(dataSets);
+        List<DataSetToDataElementRelation> dataSetToElementRelations
+                = buildDataSetToDataElementRelations(dataSets);
 
         List<CategoryCombo> categoryCombos = getCategoryCombos(dataSets);
         List<Category> categories = getCategories(categoryCombos);
-        List<CategoryComboToCategoryRelation> comboToCats = buildCatComboToCatRelations(categoryCombos);
+        List<CategoryComboToCategoryRelation> comboToCats
+                = buildCatComboToCatRelations(categoryCombos);
 
         List<CategoryOption> categoryOptions = getCategoryOptions(categories);
-        List<CategoryToCategoryOptionRelation> catToCatOptions = buildCatToCatOptionRelations(categories);
+        List<CategoryToCategoryOptionRelation> catToCatOptions
+                = buildCatToCatOptionRelations(categories);
 
         // creating db operations.
         Queue<DbOperation> ops = new LinkedList<>();
-        ops.addAll(DbHelper.createOperations(new Select().from(CategoryOption.class).queryList(), categoryOptions));
-        ops.addAll(DbHelper.createOperations(new Select().from(Category.class).queryList(), categories));
-        ops.addAll(DbHelper.createOperations(new Select().from(CategoryCombo.class).queryList(), categoryCombos));
+        ops.addAll(DbHelper.createOperations(new Select()
+                .from(CategoryOption.class)
+                .queryList(), categoryOptions));
+        ops.addAll(DbHelper.createOperations(new Select()
+                .from(Category.class)
+                .queryList(), categories));
+        ops.addAll(DbHelper.createOperations(new Select()
+                .from(CategoryCombo.class)
+                .queryList(), categoryCombos));
 
-        ops.addAll(DbHelper.createOperations(new Select().from(OrganisationUnit.class).queryList(), units));
-        ops.addAll(DbHelper.createOperations(new Select().from(DataSet.class).queryList(), dataSets));
+        ops.addAll(DbHelper.createOperations(new Select()
+                .from(DataElement.class)
+                .queryList(), dataElements));
+        ops.addAll(DbHelper.createOperations(new Select()
+                .from(DataSet.class)
+                .queryList(), dataSets));
+        ops.addAll(DbHelper.createOperations(new Select()
+                .from(OrganisationUnit.class)
+                .queryList(), units));
 
-        ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryToCategoryOptionRelation.class).queryList(), catToCatOptions));
-        ops.addAll(DbHelper.syncRelationModels(new Select().from(CategoryComboToCategoryRelation.class).queryList(), comboToCats));
-        ops.addAll(DbHelper.syncRelationModels(new Select().from(UnitToDataSetRelation.class).queryList(), unitToDataSets));
+        ops.addAll(DbHelper.syncRelationModels(new Select()
+                .from(CategoryToCategoryOptionRelation.class)
+                .queryList(), catToCatOptions));
+        ops.addAll(DbHelper.syncRelationModels(new Select()
+                .from(CategoryComboToCategoryRelation.class)
+                .queryList(), comboToCats));
+        ops.addAll(DbHelper.syncRelationModels(new Select()
+                .from(DataSetToDataElementRelation.class)
+                .queryList(), dataSetToElementRelations));
+        ops.addAll(DbHelper.syncRelationModels(new Select()
+                .from(UnitToDataSetRelation.class)
+                .queryList(), unitToDataSets));
 
         DbHelper.applyBatch(ops);
         return new Object();
@@ -182,13 +213,19 @@ public final class MetaDataController implements IController<Object> {
 
                 final Map<String, String> QUERY_MAP = new HashMap<>();
                 QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName,expiryDays," +
-                        "allowFuturePeriods,periodType,categoryCombo[id]");
+                        "allowFuturePeriods,periodType,categoryCombo[id],dataElements[id]");
                 QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
                 return unwrapResponse(mService.getDataSets(QUERY_MAP), "dataSets");
             }
 
             @Override List<DataSet> getItemsFromDb() {
-                return new Select().from(DataSet.class).queryList();
+                List<DataSet> dataSets = new Select()
+                        .from(DataSet.class).queryList();
+                for (DataSet dataSet : dataSets) {
+                    dataSet.setDataElements(DataSet
+                            .queryRelatedDataElementsFromDb(dataSet.getId()));
+                }
+                return dataSets;
             }
         }.run();
     }
@@ -208,6 +245,68 @@ public final class MetaDataController implements IController<Object> {
                 UnitToDataSetRelation relation = new UnitToDataSetRelation();
                 relation.setOrganisationUnit(orgUnit);
                 relation.setDataSet(dataSet);
+                relations.add(relation);
+            }
+        }
+        return relations;
+    }
+
+    private List<DataElement> getDataElements(List<DataSet> dataSets) throws RetrofitError {
+        final Set<String> dataElementIds = new HashSet<>();
+        if (dataSets != null && dataSets.size() > 0) {
+            for (DataSet dataSet : dataSets) {
+                dataElementIds.addAll(toIds(dataSet.getDataElements()));
+            }
+        }
+
+        return new AbsBaseIdentifiableController<DataElement>() {
+
+            @Override List<DataElement> getNewBasicItems() {
+                if (dataElementIds.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,lastUpdated");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(dataElementIds) + "]");
+                return unwrapResponse(mService.getDataElements(QUERY_MAP), "dataElements");
+            }
+
+            @Override List<DataElement> getNewFullItems(List<String> ids) {
+                if (ids == null || ids.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                final Map<String, String> QUERY_MAP = new HashMap<>();
+                QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName," +
+                        "formName,displayFormName,description," +
+                        "type,numberType,textType,zeroIsSignificant,categoryCombo[id]");
+                QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
+                return unwrapResponse(mService.getDataElements(QUERY_MAP), "dataElements");
+            }
+
+            @Override List<DataElement> getItemsFromDb() {
+                return new Select().from(DataElement.class).queryList();
+            }
+        }.run();
+    }
+
+    private List<DataSetToDataElementRelation> buildDataSetToDataElementRelations(List<DataSet> dataSets) {
+        List<DataSetToDataElementRelation> relations = new ArrayList<>();
+        if (dataSets == null || dataSets.isEmpty()) {
+            return relations;
+        }
+
+        for (DataSet dataSet : dataSets) {
+            if (dataSet.getDataElements() == null ||
+                    dataSet.getDataElements().isEmpty()) {
+                continue;
+            }
+
+            for (DataElement dataElement : dataSet.getDataElements()) {
+                DataSetToDataElementRelation relation = new DataSetToDataElementRelation();
+                relation.setDataSet(dataSet);
+                relation.setDataElement(dataElement);
                 relations.add(relation);
             }
         }

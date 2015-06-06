@@ -33,11 +33,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DbDhis.NAME)
 public final class CategoryOptionCombo extends BaseIdentifiableObject {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("categoryOptions") List<CategoryOption> categoryOptions;

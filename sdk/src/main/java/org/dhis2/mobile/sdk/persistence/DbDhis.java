@@ -27,12 +27,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dhis2.mobile.sdk.persistence.database;
+package org.dhis2.mobile.sdk.persistence;
 
 import com.raizlabs.android.dbflow.annotation.Database;
 
-@Database(name = DhisDatabase.NAME, version = DhisDatabase.VERSION)
-public final class DhisDatabase {
+@Database(name = DbDhis.NAME, version = DbDhis.VERSION)
+public final class DbDhis {
     public static final String NAME = "DataCapture";
     public static final int VERSION = 2;
 }

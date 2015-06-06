@@ -1,8 +1,9 @@
-package org.dhis2.mobile.sdk.network.retrofit;
+package org.dhis2.mobile.sdk.network.repository;
 
 import org.dhis2.mobile.sdk.persistence.models.Category;
 import org.dhis2.mobile.sdk.persistence.models.CategoryCombo;
 import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
+import org.dhis2.mobile.sdk.persistence.models.DataElement;
 import org.dhis2.mobile.sdk.persistence.models.DataSet;
 import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
@@ -21,6 +22,8 @@ public interface DhisService {
     @GET("/organisationUnits?paging=false") Map<String, List<OrganisationUnit>> getOrganisationUnits(@QueryMap Map<String, String> queryParams);
 
     @GET("/dataSets?paging=false") Map<String, List<DataSet>> getDataSets(@QueryMap Map<String, String> queryParams);
+
+    @GET("/dataElements?paging=false") Map<String, List<DataElement>> getDataElements(@QueryMap Map<String, String> queryParams);
 
     @GET("/categoryCombos?paging=false") Map<String, List<CategoryCombo>> getCategoryCombos(@QueryMap Map<String, String> queryParams);
 

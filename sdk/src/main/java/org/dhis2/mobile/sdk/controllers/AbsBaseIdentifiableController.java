@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.dhis2.mobile.sdk.persistence.DbUtils.toMap;
+import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 
 
 abstract class AbsBaseIdentifiableController<T extends BaseIdentifiableObject> implements IController<List<T>> {

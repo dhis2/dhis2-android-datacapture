@@ -5,7 +5,6 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
 import org.dhis2.mobile.sdk.persistence.models.RelationModel;
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import static org.dhis2.mobile.sdk.persistence.DbUtils.toMap;
+import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
 /**
@@ -38,7 +37,7 @@ public final class DbHelper {
             return;
         }
 
-        TransactionManager.transact(DhisDatabase.NAME, new Runnable() {
+        TransactionManager.transact(DbDhis.NAME, new Runnable() {
             @Override public void run() {
                 for (DbOperation operation : operations) {
                     switch (operation.getOperationType()) {

@@ -30,18 +30,17 @@ package org.dhis2.mobile.sdk.persistence.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(databaseName = DhisDatabase.NAME)
+@Table(databaseName = DbDhis.NAME)
 public final class OrganisationUnit extends BaseIdentifiableObject implements DisplayNameModel {
     @JsonProperty("displayName") @Column String displayName;
     @JsonProperty("level") @Column int level;

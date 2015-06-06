@@ -40,11 +40,11 @@ import com.raizlabs.android.dbflow.annotation.Unique;
 import com.raizlabs.android.dbflow.annotation.UniqueGroup;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import org.dhis2.mobile.sdk.persistence.database.DhisDatabase;
+import org.dhis2.mobile.sdk.persistence.DbDhis;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-@Table(databaseName = DhisDatabase.NAME, uniqueColumnGroups = {
+@Table(databaseName = DbDhis.NAME, uniqueColumnGroups = {
         @UniqueGroup(groupNumber = UnitToDataSetRelation.UNIQUE_ORGUNIT_DATASET_GROUP, uniqueConflict = ConflictAction.FAIL)
 })
 public final class UnitToDataSetRelation extends BaseModel implements RelationModel {

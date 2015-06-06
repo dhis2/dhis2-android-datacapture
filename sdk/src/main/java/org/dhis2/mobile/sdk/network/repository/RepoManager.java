@@ -1,4 +1,4 @@
-package org.dhis2.mobile.sdk.network.retrofit;
+package org.dhis2.mobile.sdk.network.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -16,9 +16,9 @@ import retrofit.converter.JacksonConverter;
 import static com.squareup.okhttp.Credentials.basic;
 
 
-public final class RetrofitManager {
+public final class RepoManager {
 
-    private RetrofitManager() {
+    private RepoManager() {
         // no instances
     }
 
@@ -34,11 +34,9 @@ public final class RetrofitManager {
     }
 
     private static String provideServerUrl(HttpUrl httpUrl) {
-        String serverUrl = httpUrl.newBuilder()
+        return httpUrl.newBuilder()
                 .addPathSegment("api")
                 .build().toString();
-        System.out.println("SERVER_URL: " + serverUrl);
-        return serverUrl;
     }
 
     private static Converter provideJacksonConverter() {
