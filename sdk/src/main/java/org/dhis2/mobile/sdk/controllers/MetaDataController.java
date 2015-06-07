@@ -279,7 +279,6 @@ public final class MetaDataController implements IController<Object> {
 
                 final Map<String, String> QUERY_MAP = new HashMap<>();
                 QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName," +
-                        "formName,displayFormName,description," +
                         "type,numberType,textType,zeroIsSignificant,categoryCombo[id]");
                 QUERY_MAP.put("filter", "id:in:[" + Joiner.on(",").join(ids) + "]");
                 return unwrapResponse(mService.getDataElements(QUERY_MAP), "dataElements");

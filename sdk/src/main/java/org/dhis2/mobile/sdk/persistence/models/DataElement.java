@@ -25,9 +25,6 @@ public final class DataElement extends BaseIdentifiableObject {
     public static final String VALUE_TYPE_LONG_TEXT = "longText";
 
     @JsonProperty("displayName") @Column String displayName;
-    @JsonProperty("formName") @Column String formName;
-    @JsonProperty("displayFormName") @Column String displayFormName;
-    @JsonProperty("description") @Column String description;
     @JsonProperty("type") @Column String type;
     @JsonProperty("numberType") @Column String numberType;
     @JsonProperty("textType") @Column String textType;
@@ -42,36 +39,6 @@ public final class DataElement extends BaseIdentifiableObject {
     @JsonIgnore
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    @JsonIgnore
-    public String getFormName() {
-        return formName;
-    }
-
-    @JsonIgnore
-    public void setFormName(String formName) {
-        this.formName = formName;
-    }
-
-    @JsonIgnore
-    public String getDisplayFormName() {
-        return displayFormName;
-    }
-
-    @JsonIgnore
-    public void setDisplayFormName(String displayFormName) {
-        this.displayFormName = displayFormName;
-    }
-
-    @JsonIgnore
-    public String getDescription() {
-        return description;
-    }
-
-    @JsonIgnore
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @JsonIgnore
