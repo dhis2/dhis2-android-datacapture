@@ -38,7 +38,7 @@ import org.dhis2.mobile.sdk.network.models.Session;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public final class SessionManager implements IPreferenceHandler<Session> {
+public final class SessionManager {
     private static final String PREFERENCES = "preferences:Session";
     private static final String SERVER_URI = "key:Uri";
     private static final String USERNAME = "key:username";
@@ -61,7 +61,6 @@ public final class SessionManager implements IPreferenceHandler<Session> {
         return mSessionManager;
     }
 
-    @Override
     public Session get() {
         String serverUrlString = getString(SERVER_URI);
         String userNameString = getString(USERNAME);
@@ -81,7 +80,6 @@ public final class SessionManager implements IPreferenceHandler<Session> {
         return new Session(serverUrl, credentials);
     }
 
-    @Override
     public void put(Session session) {
         isNull(session, "Session object must not be null");
         HttpUrl serverUrl = session.getServerUrl();
@@ -105,7 +103,6 @@ public final class SessionManager implements IPreferenceHandler<Session> {
         putString(PASSWORD, password);
     }
 
-    @Override
     public void delete() {
         mPrefs.edit().clear().apply();
     }

@@ -36,11 +36,12 @@ import org.dhis2.mobile.sdk.controllers.IController;
 import org.dhis2.mobile.sdk.controllers.InvalidateUserController;
 import org.dhis2.mobile.sdk.controllers.LogInUserController;
 import org.dhis2.mobile.sdk.controllers.LogOutUserController;
-import org.dhis2.mobile.sdk.controllers.MetaDataController;
+import org.dhis2.mobile.sdk.controllers.MetaDataController2;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.network.models.Session;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.persistence.preferences.LastUpdatedPreferences;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionManager;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 
@@ -53,6 +54,7 @@ import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 public class DhisManager {
     private static DhisManager mDhisManager;
     private final UserAccountHandler mUserAccountHandler;
+    private final LastUpdatedPreferences mLastUpdatedPreferences;
     private Session mSession;
 
     public static void init(Context context) {
@@ -73,9 +75,10 @@ public class DhisManager {
     private DhisManager(Context context) {
         SessionManager.init(context);
         mUserAccountHandler = new UserAccountHandler(context);
+        mLastUpdatedPreferences = new LastUpdatedPreferences(context);
 
         // fetch meta data from disk
-        readMetaData();
+        readSession();
     }
 
     public UserAccount logInUser(HttpUrl serverUrl,
@@ -94,17 +97,17 @@ public class DhisManager {
         controller.run();
 
         // fetch meta data from disk
-        readMetaData();
+        readSession();
     }
 
     private UserAccount signInUser(HttpUrl serverUrl,
                                    Credentials credentials) throws APIException {
         IController<UserAccount> controller = new LogInUserController(
-                mUserAccountHandler, serverUrl, credentials);
+                mUserAccountHandler, mLastUpdatedPreferences, serverUrl, credentials);
         UserAccount userAccount = controller.run();
 
         // fetch meta data from disk
-        readMetaData();
+        readSession();
         return userAccount;
     }
 
@@ -114,7 +117,7 @@ public class DhisManager {
         invalidateController.run();
 
         // fetch meta data from disk
-        readMetaData();
+        readSession();
     }
 
     public boolean isUserLoggedIn() {
@@ -127,12 +130,12 @@ public class DhisManager {
                 mSession.getCredentials() == null;
     }
 
-    private void readMetaData() {
+    private void readSession() {
         mSession = SessionManager.getInstance().get();
     }
 
     public void syncMetaData() throws APIException {
-        runController(new MetaDataController());
+        runController(new MetaDataController2(mLastUpdatedPreferences));
     }
 
     public HttpUrl getServerUrl() {

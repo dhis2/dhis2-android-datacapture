@@ -13,7 +13,7 @@ public final class DbOperation {
     private final BaseModel mModel;
 
     public enum OperationType {
-        INSERT, UPDATE, DELETE
+        INSERT, UPDATE, DELETE, SAVE
     }
 
     private DbOperation(OperationType operationType, BaseModel model) {
@@ -27,6 +27,10 @@ public final class DbOperation {
 
     public static <T extends BaseModel> DbOperation update(T model) {
         return new DbOperation(OperationType.UPDATE, model);
+    }
+
+    public static <T extends BaseModel> DbOperation save(T model) {
+        return new DbOperation(OperationType.SAVE, model);
     }
 
     public static <T extends BaseModel> DbOperation delete(T model) {

@@ -32,9 +32,12 @@ import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
 import org.dhis2.mobile.sdk.utils.Joiner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class DbUtils {
 
@@ -42,7 +45,7 @@ public final class DbUtils {
         // no instances
     }
 
-    public static <T extends BaseIdentifiableObject> Map<String, T> toMap(List<T> objects) {
+    public static <T extends BaseIdentifiableObject> Map<String, T> toMap(Collection<T> objects) {
         Map<String, T> map = new HashMap<>();
         if (objects != null && objects.size() > 0) {
             for (T object : objects) {
@@ -52,8 +55,18 @@ public final class DbUtils {
         return map;
     }
 
-    public static <T extends BaseIdentifiableObject> List<String> toIds(List<T> objects) {
+    public static <T extends BaseIdentifiableObject> List<String> toListIds(List<T> objects) {
         List<String> ids = new ArrayList<>();
+        if (objects != null && objects.size() > 0) {
+            for (T object : objects) {
+                ids.add(object.getId());
+            }
+        }
+        return ids;
+    }
+
+    public static <T extends BaseIdentifiableObject> Set<String> toSetIds(List<T> objects) {
+        Set<String> ids = new HashSet<>();
         if (objects != null && objects.size() > 0) {
             for (T object : objects) {
                 ids.add(object.getId());

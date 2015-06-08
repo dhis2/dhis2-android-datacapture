@@ -35,12 +35,15 @@ import org.dhis2.mobile.sdk.network.models.Credentials;
 import org.dhis2.mobile.sdk.network.models.Session;
 import org.dhis2.mobile.sdk.network.repository.DhisService;
 import org.dhis2.mobile.sdk.network.repository.RepoManager;
+import org.dhis2.mobile.sdk.persistence.models.SystemInfo;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.persistence.preferences.LastUpdatedPreferences;
 import org.dhis2.mobile.sdk.persistence.preferences.SessionManager;
 import org.dhis2.mobile.sdk.persistence.preferences.UserAccountHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
@@ -48,11 +51,14 @@ public final class LogInUserController implements IController<UserAccount> {
     private final HttpUrl mServerUrl;
     private final Credentials mCredentials;
     private final UserAccountHandler mUserAccountHandler;
+    private final LastUpdatedPreferences mLastUpdatedPreferences;
     private final DhisService mService;
 
     public LogInUserController(UserAccountHandler userAccountHandler,
+                               LastUpdatedPreferences lastUpdatedPreferences,
                                HttpUrl serverUrl, Credentials credentials) {
         mUserAccountHandler = isNull(userAccountHandler, "UserAccountHandler must not be null");
+        mLastUpdatedPreferences = isNull(lastUpdatedPreferences, "LastUpdatedPreferences must not be null");
         mServerUrl = isNull(serverUrl, "Server URI must not be null");
         mCredentials = isNull(credentials, "User credentials must not be null");
         mService = RepoManager.createService(mServerUrl, mCredentials);
@@ -60,29 +66,28 @@ public final class LogInUserController implements IController<UserAccount> {
 
     @Override
     public UserAccount run() throws APIException {
-        UserAccount userAccount = getUserAccount();
+        // First, we need to get UserAccount
+        final Map<String, String> QUERY_PARAMS = new HashMap<>();
+        QUERY_PARAMS.put("fields", UserAccount.ALL_USER_ACCOUNT_FIELDS);
+        UserAccount userAccount = mService.getCurrentUserAccount(QUERY_PARAMS);
+
+        // Second, we need to get SystemInfo about server.
+        SystemInfo systemInfo = mService.getSystemInfo();
+
         // if we got here, it means http
         // request was executed successfully
-        saveMetaData();
-        saveUserAccount(userAccount);
-        return userAccount;
-    }
 
-    private UserAccount getUserAccount() {
-        Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("fields", UserAccount.ALL_USER_ACCOUNT_FIELDS);
-        return mService.getCurrentUserAccount(queryParams);
-    }
+        /* save user credentials */
+        Session session = new Session(mServerUrl, mCredentials);
+        SessionManager.getInstance().put(session);
 
-    private void saveMetaData() {
-        Session session = new Session(
-                mServerUrl, mCredentials
-        );
-        SessionManager.getInstance()
-                .put(session);
-    }
-
-    private void saveUserAccount(UserAccount userAccount) {
+        /* save user account details */
         mUserAccountHandler.put(userAccount);
+
+        /* get server time zone and save it */
+        TimeZone serverTimeZone = systemInfo.getServerDate()
+                .getZone().toTimeZone();
+        mLastUpdatedPreferences.setServerTimeZone(serverTimeZone);
+        return userAccount;
     }
 }

@@ -118,4 +118,9 @@ public final class OrganisationUnit extends BaseIdentifiableObject implements Di
         }
         return dataSets;
     }
+
+    @Override
+    public int hashCode() {
+        return id == null ? super.hashCode() : id.hashCode();
+    }
 }

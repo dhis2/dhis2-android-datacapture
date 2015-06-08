@@ -65,6 +65,7 @@ public final class DataSet extends BaseIdentifiableObject implements DisplayName
     public DataSet() {
     }
 
+    @JsonIgnore
     public static List<DataElement> queryRelatedDataElementsFromDb(String id) {
         List<DataSetToDataElementRelation> relations = new Select()
                 .from(DataSetToDataElementRelation.class)
@@ -170,5 +171,10 @@ public final class DataSet extends BaseIdentifiableObject implements DisplayName
     @JsonIgnore
     public void setDataElements(List<DataElement> dataElements) {
         this.dataElements = dataElements;
+    }
+
+    @Override
+    public int hashCode() {
+        return id == null ? super.hashCode() : id.hashCode();
     }
 }

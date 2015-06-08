@@ -6,6 +6,7 @@ import org.dhis2.mobile.sdk.persistence.models.CategoryOption;
 import org.dhis2.mobile.sdk.persistence.models.DataElement;
 import org.dhis2.mobile.sdk.persistence.models.DataSet;
 import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.SystemInfo;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 
 import java.util.List;
@@ -16,6 +17,8 @@ import retrofit.http.QueryMap;
 
 
 public interface DhisService {
+
+    @GET("/system/info/") SystemInfo getSystemInfo();
 
     @GET("/me/") UserAccount getCurrentUserAccount(@QueryMap Map<String, String> queryParams);
 

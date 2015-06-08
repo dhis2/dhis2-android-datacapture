@@ -28,8 +28,8 @@
 
 package org.dhis2.mobile.sdk.controllers;
 
-import org.dhis2.mobile.sdk.network.APIException;
+import retrofit.RetrofitError;
 
 public interface IController<T> {
-    T run() throws APIException;
+    T run() throws RetrofitError;
 }

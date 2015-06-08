@@ -46,7 +46,10 @@ import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
 import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.persistence.models.UserAccount;
+import org.dhis2.mobile.sdk.persistence.preferences.LastUpdatedPreferences;
 import org.dhis2.mobile.sdk.utils.Joiner;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,41 +62,52 @@ import java.util.Set;
 
 import retrofit.RetrofitError;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toIds;
+import static org.dhis2.mobile.sdk.utils.DbUtils.toListIds;
+import static org.dhis2.mobile.sdk.utils.DbUtils.toSetIds;
 import static org.dhis2.mobile.sdk.utils.NetworkUtils.unwrapResponse;
 
 public final class MetaDataController implements IController<Object> {
     private final DhisService mService;
+    private final LastUpdatedPreferences mLastUpdatedPreferences;
 
-    public MetaDataController() {
+    public MetaDataController(LastUpdatedPreferences lastUpdatedPreferences) {
         mService = RepoManager.createService(DhisManager.getInstance().getServerUrl(),
                 DhisManager.getInstance().getUserCredentials());
+        mLastUpdatedPreferences = lastUpdatedPreferences;
     }
 
     @Override
     public Object run() throws RetrofitError {
+        final DateTime oldLastUpdated = mLastUpdatedPreferences.getLastUpdated();
+        final DateTime newLastUpdated = DateTime.now(DateTimeZone
+                .forTimeZone(mLastUpdatedPreferences.getServerTimeZone()));
+        final boolean isUpdating = oldLastUpdated != null;
+
         // fetching new data from distant instance.
+        /*** START this is ok ***/
         List<OrganisationUnit> units = getOrganisationUnits();
         List<DataSet> dataSets = getDataSets(units);
-        List<UnitToDataSetRelation> unitToDataSets
-                = buildUnitDataSetRelations(units);
+        List<DataElement> dataElements = getDataElements(dataSets, newLastUpdated, isUpdating);
 
-        List<DataElement> dataElements = getDataElements(dataSets);
+        /** building relationships among models */
         List<DataSetToDataElementRelation> dataSetToElementRelations
                 = buildDataSetToDataElementRelations(dataSets);
+        List<UnitToDataSetRelation> unitToDataSets
+                = buildUnitDataSetRelations(units);
+        /*** END this is ok ***/
 
-        List<CategoryCombo> categoryCombos = getCategoryCombos(dataSets);
+        /* List<CategoryCombo> categoryCombos = getCategoryCombos(dataSets);
         List<Category> categories = getCategories(categoryCombos);
         List<CategoryComboToCategoryRelation> comboToCats
                 = buildCatComboToCatRelations(categoryCombos);
 
         List<CategoryOption> categoryOptions = getCategoryOptions(categories);
         List<CategoryToCategoryOptionRelation> catToCatOptions
-                = buildCatToCatOptionRelations(categories);
+                = buildCatToCatOptionRelations(categories); */
 
         // creating db operations.
         Queue<DbOperation> ops = new LinkedList<>();
-        ops.addAll(DbHelper.createOperations(new Select()
+        /* ops.addAll(DbHelper.createOperations(new Select()
                 .from(CategoryOption.class)
                 .queryList(), categoryOptions));
         ops.addAll(DbHelper.createOperations(new Select()
@@ -101,11 +115,20 @@ public final class MetaDataController implements IController<Object> {
                 .queryList(), categories));
         ops.addAll(DbHelper.createOperations(new Select()
                 .from(CategoryCombo.class)
-                .queryList(), categoryCombos));
+                .queryList(), categoryCombos)); */
 
-        ops.addAll(DbHelper.createOperations(new Select()
+        /* ops.addAll(DbHelper.syncRelationModels(new Select()
+                .from(CategoryToCategoryOptionRelation.class)
+                .queryList(), catToCatOptions));
+        ops.addAll(DbHelper.syncRelationModels(new Select()
+                .from(CategoryComboToCategoryRelation.class)
+                .queryList(), comboToCats)); */
+
+        /*** START this is ok ***/
+        /* ops.addAll(DbHelper.createOperations(new Select()
                 .from(DataElement.class)
-                .queryList(), dataElements));
+                .queryList(), dataElements)); */
+        ops.addAll(DbHelper.save(dataElements));
         ops.addAll(DbHelper.createOperations(new Select()
                 .from(DataSet.class)
                 .queryList(), dataSets));
@@ -114,19 +137,16 @@ public final class MetaDataController implements IController<Object> {
                 .queryList(), units));
 
         ops.addAll(DbHelper.syncRelationModels(new Select()
-                .from(CategoryToCategoryOptionRelation.class)
-                .queryList(), catToCatOptions));
-        ops.addAll(DbHelper.syncRelationModels(new Select()
-                .from(CategoryComboToCategoryRelation.class)
-                .queryList(), comboToCats));
-        ops.addAll(DbHelper.syncRelationModels(new Select()
                 .from(DataSetToDataElementRelation.class)
                 .queryList(), dataSetToElementRelations));
         ops.addAll(DbHelper.syncRelationModels(new Select()
                 .from(UnitToDataSetRelation.class)
                 .queryList(), unitToDataSets));
+        /*** END this is ok ***/
 
         DbHelper.applyBatch(ops);
+        mLastUpdatedPreferences
+                .setLastUpdated(newLastUpdated);
         return new Object();
     }
 
@@ -178,7 +198,7 @@ public final class MetaDataController implements IController<Object> {
 
                 final Map<String, String> QUERY_PARAMS = new HashMap<>();
                 QUERY_PARAMS.put("fields", "id,lastUpdated");
-                QUERY_PARAMS.put("filter", "parent.id:in:[" + Joiner.on(",").join(toIds(assignedUnits)) + "]");
+                QUERY_PARAMS.put("filter", "parent.id:in:[" + Joiner.on(",").join(toListIds(assignedUnits)) + "]");
                 return unwrapResponse(mService.getOrganisationUnits(QUERY_PARAMS), "organisationUnits");
             }
         }.run();
@@ -189,7 +209,7 @@ public final class MetaDataController implements IController<Object> {
         final Set<String> dataSetIds = new HashSet<>();
         if (units != null && units.size() > 0) {
             for (OrganisationUnit orgUnit : units) {
-                dataSetIds.addAll(toIds(orgUnit.getDataSets()));
+                dataSetIds.addAll(toListIds(orgUnit.getDataSets()));
             }
         }
 
@@ -251,11 +271,40 @@ public final class MetaDataController implements IController<Object> {
         return relations;
     }
 
+    private List<DataElement> getDataElements(List<DataSet> dataSets, DateTime lastUpdated,
+                                              boolean isUpdating) throws RetrofitError {
+        /* final DateTime lastUpdated = mLastUpdatedPreferences
+                .getLastUpdatedFor(ResourceType.DATA_ELEMENT); */
+        final Set<String> dataSetIds = toSetIds(dataSets);
+
+        if (dataSetIds == null || dataSetIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        final Map<String, String> QUERY_MAP = new HashMap<>();
+        /* defining fields which we need to download from server */
+        QUERY_MAP.put("fields", "id,created,lastUpdated,name,displayName," +
+                "type,numberType,textType,zeroIsSignificant,categoryCombo[id]");
+
+        /* this filter is intended to give us only those data
+         elements which are assigned to datasets */
+        String filterValue = "dataSet.id:in:[" + Joiner.on(",").join(dataSetIds) + "]";
+        /* if lastUpdated equals null, it means we have not
+        downloaded any data elements from server yet. */
+        if (isUpdating) {
+            filterValue += "&filter=lastUpdated:gt:" + lastUpdated.toString();
+        }
+
+        QUERY_MAP.put("filter", filterValue);
+        return unwrapResponse(mService.getDataElements(QUERY_MAP), "dataElements");
+    }
+
+    /*
     private List<DataElement> getDataElements(List<DataSet> dataSets) throws RetrofitError {
         final Set<String> dataElementIds = new HashSet<>();
         if (dataSets != null && dataSets.size() > 0) {
             for (DataSet dataSet : dataSets) {
-                dataElementIds.addAll(toIds(dataSet.getDataElements()));
+                dataElementIds.addAll(toListIds(dataSet.getDataElements()));
             }
         }
 
@@ -289,6 +338,7 @@ public final class MetaDataController implements IController<Object> {
             }
         }.run();
     }
+    */
 
     private List<DataSetToDataElementRelation> buildDataSetToDataElementRelations(List<DataSet> dataSets) {
         List<DataSetToDataElementRelation> relations = new ArrayList<>();
@@ -361,7 +411,7 @@ public final class MetaDataController implements IController<Object> {
         final Set<String> categoryIds = new HashSet<>();
         if (catCombos != null && catCombos.size() > 0) {
             for (CategoryCombo catCombo : catCombos) {
-                categoryIds.addAll(toIds(catCombo.getCategories()));
+                categoryIds.addAll(toListIds(catCombo.getCategories()));
             }
         }
 
@@ -427,7 +477,7 @@ public final class MetaDataController implements IController<Object> {
         final Set<String> categoryOptions = new HashSet<>();
         if (categories != null && categories.size() > 0) {
             for (Category category : categories) {
-                categoryOptions.addAll(toIds(category.getCategoryOptions()));
+                categoryOptions.addAll(toListIds(category.getCategoryOptions()));
             }
         }
 

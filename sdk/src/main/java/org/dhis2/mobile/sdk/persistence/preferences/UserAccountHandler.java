@@ -31,12 +31,12 @@ package org.dhis2.mobile.sdk.persistence.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 import org.dhis2.mobile.sdk.persistence.DateTimeConverter;
+import org.dhis2.mobile.sdk.persistence.models.UserAccount;
 
 import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
 
-public class UserAccountHandler implements IPreferenceHandler<UserAccount> {
+public final class UserAccountHandler {
     private static final String USER_ACCOUNT_PREFERENCES = "userAccountPreferences";
 
     private static final String ID = "id";
@@ -65,7 +65,6 @@ public class UserAccountHandler implements IPreferenceHandler<UserAccount> {
                 Context.MODE_PRIVATE);
     }
 
-    @Override
     public void put(UserAccount account) {
         isNull(account, "UserAccount must not be null");
 
@@ -90,12 +89,10 @@ public class UserAccountHandler implements IPreferenceHandler<UserAccount> {
         put(PHONE_NUMBER, account.getPhoneNumber());
     }
 
-    @Override
     public void delete() {
         mPrefs.edit().clear().apply();
     }
 
-    @Override
     public UserAccount get() {
         DateTimeConverter converter = new DateTimeConverter();
 

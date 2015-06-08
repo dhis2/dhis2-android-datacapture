@@ -1,13 +1,16 @@
 package org.dhis2.mobile.sdk.persistence;
 
+import android.util.Log;
+
 import com.raizlabs.android.dbflow.runtime.TransactionManager;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import org.dhis2.mobile.sdk.persistence.models.BaseIdentifiableObject;
-import org.dhis2.mobile.sdk.persistence.models.RelationModel;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
+import org.dhis2.mobile.sdk.persistence.models.RelationModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +24,8 @@ import static org.dhis2.mobile.sdk.utils.Preconditions.isNull;
  * during single database transaction
  */
 public final class DbHelper {
+    private static final String TAG = DbHelper.class.getSimpleName();
+
     private DbHelper() {
         // no instances
     }
@@ -30,7 +35,7 @@ public final class DbHelper {
      *
      * @param operations List of DbOperations to be performed.
      */
-    public static void applyBatch(final Queue<DbOperation> operations) {
+    public static void applyBatch(final Collection<DbOperation> operations) {
         isNull(operations, "List<DbOperation> object must not be null");
 
         if (operations.isEmpty()) {
@@ -49,6 +54,9 @@ public final class DbHelper {
                             operation.getModel().update();
                             break;
                         }
+                        case SAVE:
+                            operation.getModel().save();
+                            break;
                         case DELETE: {
                             operation.getModel().delete();
                             break;
@@ -130,6 +138,55 @@ public final class DbHelper {
         }
 
         return ops;
+    }
+
+    public static <T extends BaseIdentifiableObject> List<DbOperation> createOperations(Collection<T> oldModels,
+                                                                                        Collection<T> newModels) {
+        List<DbOperation> ops = new ArrayList<>();
+
+        Map<String, T> newModelsMap = toMap(newModels);
+        Map<String, T> oldModelsMap = toMap(oldModels);
+
+        for (String oldModelKey : oldModelsMap.keySet()) {
+            T oldModel = oldModelsMap.get(oldModelKey);
+
+            if (!newModelsMap.containsKey(oldModelKey)) {
+                Log.d(TAG, "Deleting: " + oldModel.getId());
+                ops.add(DbOperation.delete(oldModel));
+                continue;
+            }
+
+            T newModel = newModelsMap.get(oldModelKey);
+            if (newModel != null && newModel.getLastUpdated()
+                    .isAfter(oldModel.getLastUpdated())) {
+                Log.d(TAG, "Updating: " + oldModel.getId());
+                ops.add(DbOperation.update(newModel));
+            }
+
+            newModelsMap.remove(oldModelKey);
+        }
+
+        for (String newModelKey : newModelsMap.keySet()) {
+            T item = newModelsMap.get(newModelKey);
+            if (item != null) {
+                Log.d(TAG, "Inserting: " + newModelKey);
+                ops.add(DbOperation.insert(item));
+            } else {
+                throw new IllegalArgumentException("Something went wrong");
+            }
+        }
+
+        return ops;
+    }
+
+    public static <T extends BaseModel> List<DbOperation> save(List<T> models) {
+        List<DbOperation> operations = new ArrayList<>();
+        if (models != null && !models.isEmpty()) {
+            for (T model : models) {
+                operations.add(DbOperation.save(model));
+            }
+        }
+        return operations;
     }
 
     private static <T extends RelationModel> Map<String, T> relationModelListToMap(List<T> relations) {
