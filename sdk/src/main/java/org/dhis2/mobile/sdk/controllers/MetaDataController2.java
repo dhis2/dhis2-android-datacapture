@@ -10,20 +10,20 @@ import org.dhis2.mobile.sdk.persistence.DbHelper;
 import org.dhis2.mobile.sdk.persistence.models.DataSet;
 import org.dhis2.mobile.sdk.persistence.models.DbOperation;
 import org.dhis2.mobile.sdk.persistence.models.OrganisationUnit;
+import org.dhis2.mobile.sdk.persistence.models.UnitToDataSetRelation;
 import org.dhis2.mobile.sdk.persistence.preferences.LastUpdatedPreferences;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.Queue;
 
 import retrofit.RetrofitError;
 
-import static org.dhis2.mobile.sdk.utils.DbUtils.toMap;
 import static org.dhis2.mobile.sdk.utils.NetworkUtils.unwrapResponse;
 
 public final class MetaDataController2 implements IController<Object> {
@@ -43,18 +43,21 @@ public final class MetaDataController2 implements IController<Object> {
         downloaded any metadata from server yet. */
         boolean isUpdating = mLastUpdatedPreferences.getLastUpdated() != null;
 
-        Set<OrganisationUnit> units = updateOrganisationUnits(lastUpdated, isUpdating);
-        Set<DataSet> dataSets = updateDataSets(lastUpdated, isUpdating);
+        List<OrganisationUnit> units = updateOrganisationUnits(lastUpdated, isUpdating);
+        List<DataSet> dataSets = updateDataSets(lastUpdated, isUpdating);
+        List<UnitToDataSetRelation> unitToDataSetRelations = buildUnitDataSetRelations(units);
 
         for (OrganisationUnit unit : units) {
             System.out.println("UNIT: " + unit.getId() + " " + unit.getDisplayName());
         }
 
-        Stack<DbOperation> dbOperations = new Stack<>();
-        dbOperations.addAll(DbHelper.createOperations(new Select()
-                .from(OrganisationUnit.class).queryList(), units));
+        Queue<DbOperation> dbOperations = new LinkedList<>();
         dbOperations.addAll(DbHelper.createOperations(new Select()
                 .from(DataSet.class).queryList(), dataSets));
+        dbOperations.addAll(DbHelper.createOperations(new Select()
+                .from(OrganisationUnit.class).queryList(), units));
+        dbOperations.addAll(DbHelper.syncRelationModels(new Select()
+                .from(UnitToDataSetRelation.class).queryList(), unitToDataSetRelations));
 
         DbHelper.applyBatch(dbOperations);
 
@@ -62,78 +65,7 @@ public final class MetaDataController2 implements IController<Object> {
         return new Object();
     }
 
-    private Set<OrganisationUnit> updateOrganisationUnits(DateTime lastUpdated, boolean isUpdating) throws RetrofitError {
-        final Set<OrganisationUnit> organisationUnits = new HashSet<>();
-        final Map<String, String> QUERY_MAP_BASIC = new HashMap<>();
-        final Map<String, String> QUERY_MAP_FULL = new HashMap<>();
-
-        QUERY_MAP_BASIC.put("fields", "id");
-        QUERY_MAP_FULL.put("fields", "id,created,lastUpdated,name,displayName,level,dataSets[id]");
-
-        if (!isUpdating) {
-            organisationUnits.addAll(unwrapResponse(mService.getOrganisationUnits(QUERY_MAP_FULL), "organisationUnits"));
-            return organisationUnits;
-        }
-
-        QUERY_MAP_FULL.put("filter", "lastUpdated:gt:" + lastUpdated.toString());
-
-        organisationUnits.addAll(unwrapResponse(mService.getOrganisationUnits(QUERY_MAP_BASIC), "organisationUnits"));
-        organisationUnits.addAll(unwrapResponse(mService.getOrganisationUnits(QUERY_MAP_FULL), "organisationUnits"));
-
-        return organisationUnits;
-    }
-
-    private List<DbOperation> updateOrganisationUnits2(DateTime lastUpdated, boolean isUpdating) throws RetrofitError {
-        // final Set<OrganisationUnit> organisationUnits = new HashSet<>();
-        final Map<String, String> QUERY_MAP_BASIC = new HashMap<>();
-        final Map<String, String> QUERY_MAP_FULL = new HashMap<>();
-
-        QUERY_MAP_BASIC.put("fields", "id");
-        QUERY_MAP_FULL.put("fields", "id,created,lastUpdated,name,displayName,level,dataSets[id]");
-
-        if (!isUpdating) {
-            List<OrganisationUnit> units = unwrapResponse(mService
-                    .getOrganisationUnits(QUERY_MAP_FULL), "organisationUnits");
-            return DbHelper.save(units);
-            // organisationUnits.addAll(unwrapResponse(mService.getOrganisationUnits(QUERY_MAP_FULL), "organisationUnits"));
-            // return organisationUnits;
-        }
-
-        QUERY_MAP_FULL.put("filter", "lastUpdated:gt:" + lastUpdated.toString());
-
-        // organisationUnits.addAll(unwrapResponse(mService.getOrganisationUnits(QUERY_MAP_BASIC), "organisationUnits"));
-        // organisationUnits.addAll(unwrapResponse(mService.getOrganisationUnits(QUERY_MAP_FULL), "organisationUnits"));
-        // return organisationUnits;
-
-        List<OrganisationUnit> basicUnits = unwrapResponse(mService
-                .getOrganisationUnits(QUERY_MAP_BASIC), "organisationUnits");
-        List<OrganisationUnit> newFullUnits = unwrapResponse(mService
-                .getOrganisationUnits(QUERY_MAP_FULL), "organisationUnits");
-
-        Map<String, OrganisationUnit> newOrgUnits = toMap(newFullUnits);
-        Map<String, OrganisationUnit> dbOrgUnits = toMap(new Select()
-                .from(OrganisationUnit.class).queryList());
-        Map<String, OrganisationUnit> currentOrgUnits = new HashMap<>();
-
-        for (OrganisationUnit orgUnit : basicUnits) {
-            String orgUnitKey = orgUnit.getId();
-            OrganisationUnit dbOrgUnit = dbOrgUnits.get(orgUnitKey);
-            OrganisationUnit newOrgUnit = newOrgUnits.get(orgUnitKey);
-
-            if (newOrgUnit != null) {
-                currentOrgUnits.put(orgUnitKey, newOrgUnit);
-                continue;
-            }
-
-            if (dbOrgUnit != null) {
-                currentOrgUnits.put(orgUnitKey, dbOrgUnit);
-            }
-        }
-
-        return null;
-    }
-
-    private List<OrganisationUnit> updateOrganisationUnits3(final DateTime lastUpdated, final boolean isUpdating) {
+    private List<OrganisationUnit> updateOrganisationUnits(final DateTime lastUpdated, final boolean isUpdating) throws RetrofitError {
         final Map<String, String> QUERY_MAP_BASIC = new HashMap<>();
         final Map<String, String> QUERY_MAP_FULL = new HashMap<>();
 
@@ -157,13 +89,21 @@ public final class MetaDataController2 implements IController<Object> {
             }
 
             @Override public List<OrganisationUnit> getPersistedItems() {
-                return new Select().from(OrganisationUnit.class).queryList();
+                // read all organisation units from database
+                List<OrganisationUnit> orgUnits = new Select()
+                        .from(OrganisationUnit.class)
+                        .queryList();
+                for (OrganisationUnit orgUnit : orgUnits) {
+                    // read relationships of unit with datasets
+                    orgUnit.setDataSets(OrganisationUnit
+                            .queryRelatedDataSetsFromDb(orgUnit.getId()));
+                }
+                return orgUnits;
             }
         }.run();
     }
 
-    private Set<DataSet> updateDataSets(DateTime lastUpdated, boolean isUpdating) throws RetrofitError {
-        final Set<DataSet> dataSets = new HashSet<>();
+    private List<DataSet> updateDataSets(final DateTime lastUpdated, final boolean isUpdating) throws RetrofitError {
         final Map<String, String> QUERY_MAP_BASIC = new HashMap<>();
         final Map<String, String> QUERY_MAP_FULL = new HashMap<>();
 
@@ -171,16 +111,44 @@ public final class MetaDataController2 implements IController<Object> {
         QUERY_MAP_FULL.put("fields", "id,created,lastUpdated,name,displayName,expiryDays," +
                 "allowFuturePeriods,periodType,categoryCombo[id],dataElements[id]");
 
-        if (!isUpdating) {
-            dataSets.addAll(unwrapResponse(mService.getDataSets(QUERY_MAP_FULL), "dataSets"));
-            return dataSets;
+        if (isUpdating) {
+            QUERY_MAP_FULL.put("filter", "lastUpdated:gt:" + lastUpdated.toString());
         }
 
-        QUERY_MAP_FULL.put("filter", "lastUpdated:gt:" + lastUpdated.toString());
+        return new AbsBaseController<DataSet>() {
 
-        dataSets.addAll(unwrapResponse(mService.getDataSets(QUERY_MAP_BASIC), "dataSets"));
-        dataSets.addAll(unwrapResponse(mService.getDataSets(QUERY_MAP_FULL), "dataSets"));
+            @Override public List<DataSet> getExistingItems() {
+                return unwrapResponse(mService.getDataSets(QUERY_MAP_BASIC), "dataSets");
+            }
 
-        return dataSets;
+            @Override public List<DataSet> getUpdatedItems() {
+                return unwrapResponse(mService.getDataSets(QUERY_MAP_FULL), "dataSets");
+            }
+
+            @Override public List<DataSet> getPersistedItems() {
+                return new Select().from(DataSet.class).queryList();
+            }
+        }.run();
+    }
+
+    private List<UnitToDataSetRelation> buildUnitDataSetRelations(List<OrganisationUnit> units) {
+        List<UnitToDataSetRelation> relations = new ArrayList<>();
+        if (units == null || units.isEmpty()) {
+            return relations;
+        }
+
+        for (OrganisationUnit orgUnit : units) {
+            if (orgUnit.getDataSets() == null || orgUnit.getDataSets().isEmpty()) {
+                continue;
+            }
+
+            for (DataSet dataSet : orgUnit.getDataSets()) {
+                UnitToDataSetRelation relation = new UnitToDataSetRelation();
+                relation.setOrganisationUnit(orgUnit);
+                relation.setDataSet(dataSet);
+                relations.add(relation);
+            }
+        }
+        return relations;
     }
 }
