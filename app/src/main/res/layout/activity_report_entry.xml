@@ -35,7 +35,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="org.dhis2.mobile.ui.activities.ReportEntryActivity">
+    tools:context="org.hisp.dhis.android.datacapture.ui.activities.ReportEntryActivity">
 
     <TextView
         android:layout_width="wrap_content"

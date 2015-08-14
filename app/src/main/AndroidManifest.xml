@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="org.dhis2.mobile"
+<manifest package="org.hisp.dhis.android.datacapture"
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:name=".DataCaptureApplication"
+        android:name="org.hisp.dhis.android.datacapture.DataCaptureApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/LightTheme"
         tools:replace="android:name">
         <activity
-            android:name=".ui.activities.LauncherActivity"
+            android:name="org.hisp.dhis.android.datacapture.ui.activities.LauncherActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -21,18 +21,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.LoginActivity"
+            android:name="org.hisp.dhis.android.datacapture.ui.activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/DarkTheme"/>
         <activity
-            android:name=".ui.activities.MenuActivity"
+            android:name="org.hisp.dhis.android.datacapture.ui.activities.MenuActivity"
             android:label="@string/title_activity_menu"/>
         <activity
-            android:name=".ui.activities.ConfirmUserActivity"
+            android:name="org.hisp.dhis.android.datacapture.ui.activities.ConfirmUserActivity"
             android:label="@string/title_activity_confirm_user">
         </activity>
         <activity
-            android:name=".ui.activities.ReportEntryActivity"
+            android:name="org.hisp.dhis.android.datacapture.ui.activities.ReportEntryActivity"
             android:label="@string/title_activity_report_entry">
         </activity>
     </application>

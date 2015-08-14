@@ -7,7 +7,7 @@
     android:paddingLeft="6dp"
     android:paddingRight="6dp">
 
-    <org.dhis2.mobile.ui.views.CardTextViewButton
+    <org.hisp.dhis.android.datacapture.ui.views.CardTextViewButton
         android:id="@+id/category_option_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

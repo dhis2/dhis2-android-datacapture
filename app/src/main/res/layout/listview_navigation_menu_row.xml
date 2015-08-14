@@ -43,7 +43,7 @@
         android:layout_marginLeft="16dp"
         android:contentDescription="@string/description"/>
 
-    <org.dhis2.mobile.ui.views.FontTextView
+    <org.hisp.dhis.android.datacapture.ui.views.FontTextView
         android:id="@+id/navigation_menu_item_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

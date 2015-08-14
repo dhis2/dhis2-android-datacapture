@@ -9,19 +9,19 @@
     android:paddingRight="6dp"
     android:paddingTop="4dp">
 
-    <org.dhis2.mobile.ui.views.CardTextViewButton
+    <org.hisp.dhis.android.datacapture.ui.views.CardTextViewButton
         android:id="@+id/unit_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hint="@string/choose_organization_unit"/>
 
-    <org.dhis2.mobile.ui.views.CardTextViewButton
+    <org.hisp.dhis.android.datacapture.ui.views.CardTextViewButton
         android:id="@+id/dataset_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:hint="@string/choose_dataset"/>
 
-    <org.dhis2.mobile.ui.views.CardTextViewButton
+    <org.hisp.dhis.android.datacapture.ui.views.CardTextViewButton
         android:id="@+id/period_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

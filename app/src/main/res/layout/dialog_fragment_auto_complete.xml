@@ -42,7 +42,7 @@
         android:layout_height="1px"
         android:background="@color/dark_navy_blue"/>
 
-    <org.dhis2.mobile.ui.views.FontEditText
+    <org.hisp.dhis.android.datacapture.ui.views.FontEditText
         android:id="@+id/filter_options"
         android:layout_width="match_parent"
         android:layout_height="48dp"

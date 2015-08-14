@@ -29,7 +29,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="org.dhis2.mobile.ui.activities.ReportEntryActivity">
+      tools:context="org.hisp.dhis.android.datacapture.ui.activities.ReportEntryActivity">
     <item android:id="@+id/action_settings"
           android:title="@string/action_settings"
           android:orderInCategory="100"

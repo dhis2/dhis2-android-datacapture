@@ -43,7 +43,7 @@
         android:orientation="horizontal"
         android:weightSum="1">
 
-        <org.dhis2.mobile.ui.views.FontButton
+        <org.hisp.dhis.android.datacapture.ui.views.FontButton
             android:id="@+id/previous"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -52,7 +52,7 @@
             android:background="@drawable/button_dialog_selector"
             android:drawableLeft="@mipmap/ic_previous_light"/>
 
-        <org.dhis2.mobile.ui.views.FontButton
+        <org.hisp.dhis.android.datacapture.ui.views.FontButton
             android:id="@+id/next"
             android:layout_width="0dp"
             android:layout_height="50dp"
