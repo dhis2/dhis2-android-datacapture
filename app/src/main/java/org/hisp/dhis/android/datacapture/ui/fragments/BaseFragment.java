@@ -32,7 +32,6 @@ import android.support.v4.app.Fragment;
 
 import org.hisp.dhis.android.datacapture.DataCaptureApplication;
 import org.hisp.dhis.android.datacapture.DhisService;
-import org.hisp.dhis.android.datacapture.sdk.DhisManager;
 import org.hisp.dhis.android.datacapture.utils.EventBus;
 
 public class BaseFragment extends Fragment {
@@ -52,16 +51,8 @@ public class BaseFragment extends Fragment {
     protected DhisService getDhisService() {
         DhisService dhisService = null;
         if (isAdded() && getActivity() != null) {
-            dhisService = ((DataCaptureApplication) getActivity().getApplication()).getDhisService();
+            dhisService = ((DataCaptureApplication) getActivity().getApplication()).getService();
         }
         return dhisService;
-    }
-
-    protected DhisManager getDhisManager() {
-        DhisManager dhisManager = null;
-        if (isAdded() && getActivity() != null) {
-            dhisManager = ((DataCaptureApplication) getActivity().getApplication()).getDhisManager();
-        }
-        return dhisManager;
     }
 }

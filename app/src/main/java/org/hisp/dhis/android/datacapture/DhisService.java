@@ -33,12 +33,10 @@ import com.squareup.okhttp.HttpUrl;
 import org.hisp.dhis.android.datacapture.api.job.base.Job;
 import org.hisp.dhis.android.datacapture.api.job.base.JobExecutor;
 import org.hisp.dhis.android.datacapture.api.job.base.NetworkJob;
-import org.hisp.dhis.android.datacapture.sdk.DhisManager;
-import org.hisp.dhis.android.datacapture.sdk.network.APIException;
-import org.hisp.dhis.android.datacapture.sdk.network.models.Credentials;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.UserAccount;
-
-import static org.hisp.dhis.android.datacapture.sdk.utils.Preconditions.isNull;
+import org.hisp.dhis.android.sdk.core.api.Dhis2;
+import org.hisp.dhis.android.sdk.core.network.APIException;
+import org.hisp.dhis.android.sdk.core.persistence.models.common.meta.Credentials;
+import org.hisp.dhis.android.sdk.models.user.UserAccount;
 
 public final class DhisService {
     public static final int LOG_IN_JOB_ID = 1;
@@ -47,18 +45,12 @@ public final class DhisService {
 
     public static final int SYNC_META_DATA = 4;
 
-    private DhisManager mDhisManager;
-
-    public DhisService(DhisManager dhisManager) {
-        mDhisManager = isNull(dhisManager, "DhisManager must not be null");
-    }
-
     public void logInUser(final HttpUrl serverUrl, final Credentials credentials) {
         JobExecutor.enqueueJob(new NetworkJob<UserAccount>(LOG_IN_JOB_ID) {
 
             @Override
             public UserAccount execute() throws APIException {
-                return mDhisManager.logInUser(serverUrl, credentials);
+                return Dhis2.logIn(serverUrl, credentials);
             }
         });
     }
@@ -73,7 +65,7 @@ public final class DhisService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return mDhisManager.confirmUser(credentials);
+                return Dhis2.confirmUser(credentials);
             }
         });
     }
@@ -83,7 +75,7 @@ public final class DhisService {
         JobExecutor.enqueueJob(new Job<Object>(LOG_OUT_JOB_ID) {
             @Override
             public Object inBackground() {
-                mDhisManager.logOutUser();
+                Dhis2.logOut();
                 return new Object();
             }
         });
@@ -94,7 +86,7 @@ public final class DhisService {
 
             @Override
             public Object execute() throws APIException {
-                mDhisManager.syncMetaData();
+                // Dhis2.syncMetaData();
                 return new Object();
             }
         });

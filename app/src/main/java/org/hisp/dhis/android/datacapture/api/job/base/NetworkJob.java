@@ -28,9 +28,9 @@
 
 package org.hisp.dhis.android.datacapture.api.job.base;
 
-import org.hisp.dhis.android.datacapture.api.models.ResponseHolder;
-import org.hisp.dhis.android.datacapture.sdk.network.APIException;
 import org.hisp.dhis.android.datacapture.utils.EventBus;
+import org.hisp.dhis.android.sdk.core.network.APIException;
+import org.hisp.dhis.android.sdk.core.persistence.models.common.meta.ResponseHolder;
 
 public abstract class NetworkJob<T> extends Job<ResponseHolder<T>> {
     public NetworkJob(int jobId) {

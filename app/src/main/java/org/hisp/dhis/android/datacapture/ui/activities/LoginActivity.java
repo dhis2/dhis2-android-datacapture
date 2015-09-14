@@ -40,9 +40,9 @@ import com.squareup.okhttp.HttpUrl;
 import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.android.datacapture.R;
-import org.hisp.dhis.android.datacapture.sdk.network.APIException;
-import org.hisp.dhis.android.datacapture.sdk.network.models.Credentials;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.UserAccount;
+import org.hisp.dhis.android.sdk.core.network.APIException;
+import org.hisp.dhis.android.sdk.core.persistence.models.common.meta.Credentials;
+import org.hisp.dhis.android.sdk.models.user.UserAccount;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

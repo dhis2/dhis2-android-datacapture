@@ -28,29 +28,26 @@
 
 package org.hisp.dhis.android.datacapture;
 
-import org.hisp.dhis.android.datacapture.sdk.DhisApplication;
-import org.hisp.dhis.android.datacapture.sdk.DhisManager;
-import org.hisp.dhis.android.datacapture.utils.EventBus;
+import android.app.Application;
 
-public class DataCaptureApplication extends DhisApplication {
+import org.hisp.dhis.android.datacapture.utils.EventBus;
+import org.hisp.dhis.android.sdk.core.api.Dhis2;
+
+public class DataCaptureApplication extends Application {
+
     private DhisService mDhisService;
-    private DhisManager mDhisManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         EventBus.register(this);
-        DhisManager.init(getBaseContext());
-        mDhisManager = DhisManager.getInstance();
-        mDhisService = new DhisService(mDhisManager);
+        Dhis2.init(getBaseContext());
+
+        mDhisService = new DhisService();
     }
 
-    public DhisService getDhisService() {
+    public DhisService getService() {
         return mDhisService;
-    }
-
-    public DhisManager getDhisManager() {
-        return mDhisManager;
     }
 }

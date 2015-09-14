@@ -35,7 +35,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import static org.hisp.dhis.android.datacapture.sdk.utils.Preconditions.isNull;
+import static org.hisp.dhis.android.sdk.models.utils.Preconditions.isNull;
 
 public final class JobExecutor {
     private static final String TAG = JobExecutor.class.getSimpleName();

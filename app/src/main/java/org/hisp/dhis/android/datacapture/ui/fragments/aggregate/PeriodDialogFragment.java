@@ -42,20 +42,16 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.raizlabs.android.dbflow.sql.builder.Condition;
-import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.Model;
 
 import org.hisp.dhis.android.datacapture.R;
 import org.hisp.dhis.android.datacapture.api.date.CustomDateIterator;
 import org.hisp.dhis.android.datacapture.api.date.DateIteratorFactory;
 import org.hisp.dhis.android.datacapture.api.models.DateHolder;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.DataSet;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.DbLoader;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.Query;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.DataSet$Table;
 import org.hisp.dhis.android.datacapture.ui.adapters.SimpleAdapter;
 import org.hisp.dhis.android.datacapture.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
+import org.hisp.dhis.android.sdk.core.persistence.loaders.Query;
+import org.hisp.dhis.android.sdk.models.dataset.DataSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,10 +69,14 @@ public class PeriodDialogFragment extends DialogFragment
     private static final int LOADER_ID = 345234575;
     private static final String DATA_SET_ID = "args:dataSetId";
 
-    @InjectView(R.id.simple_listview) ListView mListView;
-    @InjectView(R.id.previous) Button mPrevious;
-    @InjectView(R.id.next) Button mNext;
-    @InjectView(R.id.dialog_label) TextView mDialogLabel;
+    @InjectView(R.id.simple_listview)
+    ListView mListView;
+    @InjectView(R.id.previous)
+    Button mPrevious;
+    @InjectView(R.id.next)
+    Button mNext;
+    @InjectView(R.id.dialog_label)
+    TextView mDialogLabel;
 
     private SimpleAdapter<DateHolder> mAdapter;
     private OnOptionSelectedListener mListener;
@@ -173,11 +173,11 @@ public class PeriodDialogFragment extends DialogFragment
     @Override
     public Loader<DataSet> onCreateLoader(int id, Bundle bundle) {
         if (id == LOADER_ID && bundle != null) {
-            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+            /* List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
             tablesToTrack.add(DataSet.class);
             String dataSetId = bundle.getString(DATA_SET_ID);
             return new DbLoader<>(getActivity().getApplication(),
-                    tablesToTrack, new DataSetQuery(dataSetId));
+                    tablesToTrack, new DataSetQuery(dataSetId)); */
         }
         return null;
     }
@@ -210,10 +210,12 @@ public class PeriodDialogFragment extends DialogFragment
             mDataSetId = dataSetId;
         }
 
-        @Override public DataSet query(Context context) {
-            return new Select().from(DataSet.class)
+        @Override
+        public DataSet query(Context context) {
+            /* return new Select().from(DataSet.class)
                     .where(Condition.column(DataSet$Table.ID).is(mDataSetId))
-                    .querySingle();
+                    .querySingle(); */
+            return null;
         }
     }
 

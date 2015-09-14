@@ -38,11 +38,9 @@ import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.structure.Model;
 
 import org.hisp.dhis.android.datacapture.R;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.OrganisationUnit;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.DbLoader;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.Query;
 import org.hisp.dhis.android.datacapture.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;
 import org.hisp.dhis.android.datacapture.ui.fragments.AutoCompleteDialogFragment;
+import org.hisp.dhis.android.sdk.core.persistence.loaders.Query;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,10 +74,10 @@ public class OrgUnitDialogFragment extends AutoCompleteDialogFragment
     @Override
     public Loader<List<OptionAdapterValue>> onCreateLoader(int id, Bundle args) {
         if (LOADER_ID == id) {
-            List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+            /* List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
             tablesToTrack.add(OrganisationUnit.class);
             return new DbLoader<>(getActivity().getApplicationContext(),
-                    tablesToTrack, new OrgUnitQuery());
+                    tablesToTrack, new OrgUnitQuery()); */
         }
         return null;
     }
@@ -102,7 +100,7 @@ public class OrgUnitDialogFragment extends AutoCompleteDialogFragment
     static class OrgUnitQuery implements Query<List<OptionAdapterValue>> {
 
         @Override public List<OptionAdapterValue> query(Context context) {
-            List<OrganisationUnit> units = new Select()
+            /* List<OrganisationUnit> units = new Select()
                     .from(OrganisationUnit.class).queryList();
             Collections.sort(units, OrganisationUnit.DISPLAY_NAME_MODEL_COMPARATOR);
             List<OptionAdapterValue> optionAdapterValues = new ArrayList<>();
@@ -110,7 +108,8 @@ public class OrgUnitDialogFragment extends AutoCompleteDialogFragment
                 optionAdapterValues.add(new OptionAdapterValue(
                         unit.getId(), unit.getDisplayName(), null));
             }
-            return optionAdapterValues;
+            return optionAdapterValues; */
+            return null;
         }
     }
 }

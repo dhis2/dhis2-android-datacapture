@@ -36,7 +36,7 @@ import org.hisp.dhis.android.datacapture.api.models.DateHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hisp.dhis.android.datacapture.sdk.utils.Preconditions.isNull;
+import static org.hisp.dhis.android.sdk.models.utils.Preconditions.isNull;
 
 public class AggregateReportFragmentState implements Parcelable {
     public static final Creator<AggregateReportFragmentState> CREATOR

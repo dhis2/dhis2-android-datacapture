@@ -34,19 +34,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
 
-import com.raizlabs.android.dbflow.structure.Model;
-
 import org.hisp.dhis.android.datacapture.R;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.DbLoader;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.Query;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.DataSet;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.OrganisationUnit;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.UnitToDataSetRelation;
 import org.hisp.dhis.android.datacapture.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;
 import org.hisp.dhis.android.datacapture.ui.fragments.AutoCompleteDialogFragment;
+import org.hisp.dhis.android.sdk.core.persistence.loaders.Query;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DataSetDialogFragment extends AutoCompleteDialogFragment
@@ -81,12 +73,12 @@ public class DataSetDialogFragment extends AutoCompleteDialogFragment
     @Override
     public Loader<List<OptionAdapterValue>> onCreateLoader(int id, Bundle bundle) {
         if (LOADER_ID == id && bundle != null) {
-            String orgUnitId = bundle.getString(ORG_UNIT_ID);
+            /* String orgUnitId = bundle.getString(ORG_UNIT_ID);
             List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
             tablesToTrack.add(UnitToDataSetRelation.class);
             tablesToTrack.add(DataSet.class);
             return new DbLoader<>(getActivity().getApplication(),
-                    tablesToTrack, new DataSetsQuery(orgUnitId));
+                    tablesToTrack, new DataSetsQuery(orgUnitId)); */
         }
         return null;
     }
@@ -113,8 +105,9 @@ public class DataSetDialogFragment extends AutoCompleteDialogFragment
             mOrgUnitId = orgUnitId;
         }
 
-        @Override public List<OptionAdapterValue> query(Context context) {
-            List<DataSet> dataSets = OrganisationUnit
+        @Override
+        public List<OptionAdapterValue> query(Context context) {
+            /* List<DataSet> dataSets = OrganisationUnit
                     .queryRelatedDataSetsFromDb(mOrgUnitId);
             Collections.sort(dataSets, DataSet.DISPLAY_NAME_MODEL_COMPARATOR);
             List<OptionAdapterValue> adapterValues = new ArrayList<>();
@@ -122,8 +115,9 @@ public class DataSetDialogFragment extends AutoCompleteDialogFragment
                 adapterValues.add(new OptionAdapterValue(
                         dataSet.getId(), dataSet.getDisplayName(), dataSet.getCategoryCombo().getId()
                 ));
-            }
-            return adapterValues;
+            } */
+            // return adapterValues;
+            return null;
         }
     }
 }

@@ -42,20 +42,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.raizlabs.android.dbflow.sql.language.Select;
-import com.raizlabs.android.dbflow.structure.Model;
 import com.squareup.otto.Subscribe;
 
 import org.hisp.dhis.android.datacapture.R;
 import org.hisp.dhis.android.datacapture.api.models.DateHolder;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.Category;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.CategoryCombo;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.DataSet;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.OrganisationUnit;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.UnitToDataSetRelation;
-import org.hisp.dhis.android.datacapture.sdk.network.APIException;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.DbLoader;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.Query;
 import org.hisp.dhis.android.datacapture.ui.activities.ReportEntryActivity;
 import org.hisp.dhis.android.datacapture.ui.adapters.CategoryAdapter;
 import org.hisp.dhis.android.datacapture.ui.fragments.AutoCompleteDialogFragment.OnOptionSelectedListener;
@@ -63,6 +53,9 @@ import org.hisp.dhis.android.datacapture.ui.fragments.BaseFragment;
 import org.hisp.dhis.android.datacapture.ui.fragments.aggregate.AggregateReportFragmentState.CategoryState;
 import org.hisp.dhis.android.datacapture.ui.views.CardDetailedButton;
 import org.hisp.dhis.android.datacapture.ui.views.CardTextViewButton;
+import org.hisp.dhis.android.sdk.core.network.APIException;
+import org.hisp.dhis.android.sdk.core.persistence.loaders.Query;
+import org.hisp.dhis.android.sdk.models.category.Category;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,19 +71,22 @@ public class AggregateReportFragment extends BaseFragment
 
     final LoaderCallbacks<Boolean> CHECK_LOADER_CALLBACK = new LoaderCallbacks<Boolean>() {
 
-        @Override public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+        @Override
+        public Loader<Boolean> onCreateLoader(int id, Bundle args) {
             if (id == CHECK_LOADER_ID) {
-                List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+                /* List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
                 tablesToTrack.add(OrganisationUnit.class);
                 tablesToTrack.add(DataSet.class);
                 tablesToTrack.add(UnitToDataSetRelation.class);
                 return new DbLoader<>(getActivity().getApplicationContext(),
-                        tablesToTrack, new OrgUnitQuery());
+                        tablesToTrack, new OrgUnitQuery()); */
+                return null;
             }
             return null;
         }
 
-        @Override public void onLoadFinished(Loader<Boolean> booleanLoader, Boolean hasUnits) {
+        @Override
+        public void onLoadFinished(Loader<Boolean> booleanLoader, Boolean hasUnits) {
             if (booleanLoader != null && booleanLoader.getId() == CHECK_LOADER_ID) {
                 mOrgUnitButton.setEnabled(hasUnits);
                 if (hasUnits) {
@@ -99,31 +95,35 @@ public class AggregateReportFragment extends BaseFragment
             }
         }
 
-        @Override public void onLoaderReset(Loader<Boolean> loader) {
+        @Override
+        public void onLoaderReset(Loader<Boolean> loader) {
         }
     };
 
     final LoaderCallbacks<List<Category>> CATEGORY_LOADER_CALLBACK = new LoaderCallbacks<List<Category>>() {
 
-        @Override public Loader<List<Category>> onCreateLoader(int id, Bundle bundle) {
+        @Override
+        public Loader<List<Category>> onCreateLoader(int id, Bundle bundle) {
             if (isAdded() && getActivity() != null) {
                 if (id == CATEGORIES_LOADER_ID) {
-                    List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
+                    /* List<Class<? extends Model>> tablesToTrack = new ArrayList<>();
                     tablesToTrack.add(Category.class);
                     String categoryComboId = bundle.getString(CATEGORY_COMBO_ID);
                     return new DbLoader<>(getActivity().getApplicationContext(), tablesToTrack,
-                            new CategoriesQuery(categoryComboId));
+                            new CategoriesQuery(categoryComboId)); */
+                    return null;
                 }
             }
             return null;
         }
 
-        @Override public void onLoadFinished(Loader<List<Category>> loader, List<Category> categories) {
+        @Override
+        public void onLoadFinished(Loader<List<Category>> loader, List<Category> categories) {
             if (loader.getId() == CATEGORIES_LOADER_ID) {
                 if (categories != null && !categories.isEmpty()) {
                     List<CategoryState> states = new ArrayList<>();
                     for (Category category : categories) {
-                        states.add(new CategoryState(category.getId(),
+                        states.add(new CategoryState(category.getUId(),
                                 category.getDisplayName()));
                     }
                     onCategoriesSelected(states);
@@ -131,7 +131,8 @@ public class AggregateReportFragment extends BaseFragment
             }
         }
 
-        @Override public void onLoaderReset(Loader<List<Category>> loader) {
+        @Override
+        public void onLoaderReset(Loader<List<Category>> loader) {
             mAdapter.swapData(null);
         }
     };
@@ -440,8 +441,10 @@ public class AggregateReportFragment extends BaseFragment
 
     static class OrgUnitQuery implements Query<Boolean> {
 
-        @Override public Boolean query(Context context) {
-            return new Select().from(OrganisationUnit.class).queryList().size() > 0;
+        @Override
+        public Boolean query(Context context) {
+            // return new Select().from(OrganisationUnit.class).queryList().size() > 0;
+            return null;
         }
     }
 
@@ -452,8 +455,10 @@ public class AggregateReportFragment extends BaseFragment
             mCategoryComboId = categoryId;
         }
 
-        @Override public List<Category> query(Context context) {
-            return CategoryCombo.getRelatedCategoriesFromDb(mCategoryComboId);
+        @Override
+        public List<Category> query(Context context) {
+            // return CategoryCombo.getRelatedCategoriesFromDb(mCategoryComboId);
+            return null;
         }
     }
 }

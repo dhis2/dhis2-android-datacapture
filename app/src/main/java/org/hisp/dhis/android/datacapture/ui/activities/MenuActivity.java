@@ -50,6 +50,7 @@ import org.hisp.dhis.android.datacapture.ui.navigation.NavigationAdapter;
 import org.hisp.dhis.android.datacapture.ui.navigation.NavigationItem;
 import org.hisp.dhis.android.datacapture.ui.navigation.NavigationMenuItem;
 import org.hisp.dhis.android.datacapture.ui.navigation.NavigationSection;
+import org.hisp.dhis.android.sdk.core.api.Dhis2;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +60,7 @@ import butterknife.InjectView;
 import butterknife.OnItemClick;
 import butterknife.Optional;
 
-import static org.hisp.dhis.android.datacapture.sdk.utils.Preconditions.isNull;
+import static org.hisp.dhis.android.sdk.models.utils.Preconditions.isNull;
 
 public class MenuActivity extends BaseActivity {
     private static final int DATA_ENTRY_SECTION = 200;
@@ -74,9 +75,13 @@ public class MenuActivity extends BaseActivity {
     private static final int SETTINGS_MENU_ITEM = 401;
     private static final int ABOUT_MENU_ITEM = 402;
 
-    @InjectView(R.id.toolbar) Toolbar mToolbar;
-    @InjectView(R.id.drawer_layout) @Optional DrawerLayout mDrawerLayout;
-    @InjectView(R.id.left_drawer) ListView mNavigationListView;
+    @InjectView(R.id.toolbar)
+    Toolbar mToolbar;
+    @InjectView(R.id.drawer_layout)
+    @Optional
+    DrawerLayout mDrawerLayout;
+    @InjectView(R.id.left_drawer)
+    ListView mNavigationListView;
 
     ActionBarDrawerToggle mDrawerToggle;
     Runnable mPendingRunnable;
@@ -140,7 +145,7 @@ public class MenuActivity extends BaseActivity {
         }
 
         if (id == ABOUT_MENU_ITEM) {
-            getDhisManager().invalidateMetaData();
+            Dhis2.invalidateSession();
             startActivity(new Intent(this, LauncherActivity.class));
             finish();
         }

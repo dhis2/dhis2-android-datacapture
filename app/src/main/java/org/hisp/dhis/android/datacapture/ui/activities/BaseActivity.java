@@ -28,20 +28,20 @@
 
 package org.hisp.dhis.android.datacapture.ui.activities;
 
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
-import static android.widget.Toast.LENGTH_SHORT;
-import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 
 import org.hisp.dhis.android.datacapture.DataCaptureApplication;
 import org.hisp.dhis.android.datacapture.DhisService;
 import org.hisp.dhis.android.datacapture.R;
-import org.hisp.dhis.android.datacapture.sdk.DhisManager;
-import org.hisp.dhis.android.datacapture.sdk.network.APIException;
 import org.hisp.dhis.android.datacapture.utils.EventBus;
+import org.hisp.dhis.android.sdk.core.network.APIException;
 
-public class BaseActivity extends ActionBarActivity {
+import static android.widget.Toast.LENGTH_SHORT;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
+
+public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
@@ -56,11 +56,7 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     protected DhisService getDhisService() {
-        return ((DataCaptureApplication) getApplication()).getDhisService();
-    }
-
-    protected DhisManager getDhisManager() {
-        return ((DataCaptureApplication) getApplication()).getDhisManager();
+        return ((DataCaptureApplication) getApplication()).getService();
     }
 
     protected void showMessage(CharSequence message) {
@@ -74,18 +70,18 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     protected void showApiExceptionMessage(APIException apiException) {
-        if (apiException.isUnknownError()) {
-            throw new IllegalArgumentException("Unexpected error");
-        }
-
-        if (apiException.isNetworkError()) {
-            showMessage(R.string.no_network_connection);
-            return;
-        }
-
-        if (apiException.isConversionError()) {
-            showMessage(R.string.bad_response);
-            return;
+        switch (apiException.getKind()) {
+            case UNEXPECTED: {
+                throw new IllegalArgumentException("Unexpected error");
+            }
+            case NETWORK: {
+                showMessage(R.string.no_network_connection);
+                return;
+            }
+            case CONVERSION: {
+                showMessage(R.string.bad_response);
+                return;
+            }
         }
 
         int code = apiException.getResponse().getStatus();

@@ -6,17 +6,10 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.View;
 
-import com.raizlabs.android.dbflow.structure.Model;
-
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.Category;
-import org.hisp.dhis.android.datacapture.sdk.persistence.models.CategoryOption;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.DbLoader;
-import org.hisp.dhis.android.datacapture.sdk.persistence.loaders.Query;
 import org.hisp.dhis.android.datacapture.ui.adapters.AutoCompleteDialogAdapter.OptionAdapterValue;
 import org.hisp.dhis.android.datacapture.ui.fragments.AutoCompleteDialogFragment;
+import org.hisp.dhis.android.sdk.core.persistence.loaders.Query;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CategoryDialogFragment extends AutoCompleteDialogFragment
@@ -50,11 +43,12 @@ public class CategoryDialogFragment extends AutoCompleteDialogFragment
     @Override
     public Loader<List<OptionAdapterValue>> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID && isAdded()) {
-            List<Class<? extends Model>> modelsToTrack = new ArrayList<>();
+            /* List<Class<? extends Model>> modelsToTrack = new ArrayList<>();
             modelsToTrack.add(CategoryOption.class);
             String categoryId = getArguments().getString(CATEGORY_ID);
             return new DbLoader<>(getActivity(), modelsToTrack,
-                    new CategoryOptionQuery(categoryId));
+                    new CategoryOptionQuery(categoryId)); */
+            return null;
         }
         return null;
     }
@@ -81,8 +75,9 @@ public class CategoryDialogFragment extends AutoCompleteDialogFragment
             mCategoryId = categoryId;
         }
 
-        @Override public List<OptionAdapterValue> query(Context context) {
-            List<CategoryOption> options = Category.getRelatedOptions(mCategoryId);
+        @Override
+        public List<OptionAdapterValue> query(Context context) {
+            /* List<CategoryOption> options = Category.getRelatedOptions(mCategoryId);
             List<OptionAdapterValue> values = new ArrayList<>();
             if (options != null && !options.isEmpty()) {
                 Collections.sort(options, CategoryOption.DISPLAY_NAME_MODEL_COMPARATOR);
@@ -90,7 +85,8 @@ public class CategoryDialogFragment extends AutoCompleteDialogFragment
                     values.add(new OptionAdapterValue(option.getId(), option.getDisplayName(), mCategoryId));
                 }
             }
-            return values;
+            return values; */
+            return null;
         }
     }
 }
