@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- String resources for Login activity -->
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="server_url">Enter server URL</string>
+
+    <!-- String resources for aggregate report fragment -->
+    <string name="choose_data_set">Choose data set</string>
+    <string name="choose_program">Choose program</string>
+    <string name="choose_unit">Choose organisation unit</string>
+    <string name="choose_period">Choose period</string>
+
+    <!-- String resources for single event without registration fragment -->
+    <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="coordinates">Coordinates</string>
+    <string name="complete_date">Complete date</string>
+    <string name="choose_report_date">Choose report date</string>
+
+    <!-- String resources for downloader fragment -->
+    <string name="download_forms">Download forms</string>
+
+    <!-- menu items -->
+    <string name="aggregate_reporting">Aggregate Report</string>
+    <string name="single_event">Single Event</string>
+    <string name="profile">Profile</string>
+
+    <!-- Basic strings -->
+    <string name="organization_unit">Organisation Unit</string>
+    <string name="description">Description</string>
+    <string name="dataset">Data set</string>
+    <string name="program">Program</string>
+    <string name="period">Period</string>
+    <string name="swipe_to_update">Swipe to update</string>
+    <string name="no_forms_found">No forms found assigned to current user</string>
+
+</resources>

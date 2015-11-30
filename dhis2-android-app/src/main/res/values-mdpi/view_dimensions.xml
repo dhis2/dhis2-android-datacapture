@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LoginActivity layout dimensions -->
+    <dimen name="dhis2_logo_width">150dp</dimen>
+    <dimen name="dhis2_logo_margin_top">25dp</dimen>
+    <dimen name="dhis2_logo_margin_bottom">12dp</dimen>
+    <dimen name="dhis2_logo_land_margin_top">3dp</dimen>
+    <dimen name="dhis2_logo_land_margin_bottom">3dp</dimen>
+    
+</resources>

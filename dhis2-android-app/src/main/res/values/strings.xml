@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DHIS2 Data Capture</string>
+    <string name="title_activity_launcher">LauncherActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="desc">stub image</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="title_activity_menu">Menu</string>
+    <string name="title_activity_data_entry">DataEntryActivity</string>
+    <string name="title_activity_downloader">DownloaderActivity</string>
+    <string name="title_activity_sewrdata_entry">SEWRDataEntryActivity</string>
+
+</resources>

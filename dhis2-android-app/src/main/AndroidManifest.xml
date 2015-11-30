@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.dhis2.mobile">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Customtheme">
+
+        <service
+            android:name=".WorkService"
+            android:exported="false" />
+
+        <receiver android:name="org.dhis2.mobile.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".ui.activities.LauncherActivity"
+            android:label="@string/app_name"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activities.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@style/Theme.Customtheme.Custombackground"/>
+
+        <activity
+            android:name=".ui.activities.MenuActivity"
+            android:label="@string/title_activity_menu"
+            android:theme="@style/Theme.Customtheme.TitledBaseTheme"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name=".ui.activities.AggregateReportDataEntryActivity"
+            android:label="@string/title_activity_data_entry"
+            android:theme="@style/Theme.Customtheme.BaseTheme"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name=".ui.activities.SEWRDataEntryActivity"
+            android:label="@string/title_activity_sewrdata_entry"
+            android:theme="@style/Theme.Customtheme.BaseTheme"
+            android:windowSoftInputMode="adjustPan"/>
+
+    </application>
+
+</manifest>

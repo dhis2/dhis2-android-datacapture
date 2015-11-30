@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_background"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <include layout="@layout/listview_row_label" />
+
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal" >
+
+        <org.dhis2.mobile.ui.views.FontRadioButton
+            android:id="@+id/true_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/yes_button"
+            app:font="@string/regular_font_name"/>
+
+        <org.dhis2.mobile.ui.views.FontRadioButton
+            android:id="@+id/false_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/no_button"
+            app:font="@string/regular_font_name" />
+
+        <org.dhis2.mobile.ui.views.FontRadioButton
+            android:id="@+id/none_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/none_button"
+            app:font="@string/regular_font_name"/>
+    </RadioGroup>
+
+</LinearLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/program_info"
+    style="@style/MenuCardLayout">
+
+    <org.dhis2.mobile.ui.views.FontTextView
+        android:id="@+id/period_picker"
+        style="@style/DialogInvokerLayout"
+        android:text="@string/enter_date"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontTextView
+        android:id="@+id/coordinates_picker_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:text="@string/coordinates"
+        android:textSize="15sp"
+        app:font="@string/regular_font_name" />
+
+    <LinearLayout
+        android:id="@+id/coordinates_picker_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <org.dhis2.mobile.ui.views.FontEditText
+            android:id="@+id/longitude"
+            style="@style/CoordsEditTextStyle"
+            android:hint="@string/longitude"
+            app:font="@string/regular_font_name" />
+
+        <org.dhis2.mobile.ui.views.FontEditText
+            android:id="@+id/latitude"
+            style="@style/CoordsEditTextStyle"
+            android:hint="@string/latitude"
+            app:font="@string/regular_font_name" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/buttonsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/less"
+            style="@style/ButtonStyle"
+            android:layout_marginRight="3dp"
+            android:drawableLeft="@drawable/ic_previous"
+            android:paddingBottom="8dp"
+            android:paddingLeft="2dp"
+            android:paddingRight="25dp"
+            android:paddingTop="8dp" />
+
+        <Button
+            android:id="@+id/more"
+            style="@style/ButtonStyle"
+            android:layout_marginLeft="3dp"
+            android:drawableRight="@drawable/ic_next"
+            android:paddingBottom="8dp"
+            android:paddingLeft="25dp"
+            android:paddingRight="2dp"
+            android:paddingTop="8dp" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/dates_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:cacheColorHint="@android:color/transparent" >
+    </ListView>
+
+</LinearLayout>

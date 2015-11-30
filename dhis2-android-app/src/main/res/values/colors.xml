@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="light_grey">#e5e5e5</color>
+    <color name="dark_navy_blue">#1d5288</color>
+    <color name="light_blue">#67b0f9</color>
+    <color name="actionbar_blue">#1f70c3</color>
+    
+    <color name="login_button_state_enabled_false">#223f5c</color>
+    <color name="login_button_state_unpressed">#113151</color>
+    <color name="login_button_state_pressed">#0c243c</color>
+    
+    <color name="dialog_button_state_enabled_false">#adadad</color>
+	
+    <color name="darker_grey">#9f9f9f</color>
+    <color name="light_font_grey">#989898</color>
+    <color name="nav_list_pressed_grey">#cbcbcb</color>
+    
+    <color name="upload_button_state_unpressed">#C01f70c3</color>
+    <color name="upload_button_state_pressed">#C01d5288</color>
+    
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/user_data_entry"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dataentry_button_selector"
+    android:clickable="true"
+    android:padding="8dp">
+
+    <org.dhis2.mobile.ui.views.FontTextView
+        android:id="@+id/choosen_form"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="4dp"
+        android:singleLine="true"
+        android:textSize="17sp"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontTextView
+        android:id="@+id/choosen_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/choosen_form"
+        android:singleLine="true"
+        android:textColor="@drawable/organization_unit_textview_color_state"
+        android:textSize="14sp"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontTextView
+        android:id="@+id/form_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/choosen_unit"
+        android:layout_marginBottom="4dp"
+        android:singleLine="true"
+        android:textColor="@drawable/organization_unit_textview_color_state"
+        android:textSize="14sp"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/ic_dataentry"
+        app:font="@string/regular_font_name" />
+
+</RelativeLayout>

@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <include layout="@layout/progress_bar_light" />
+
+    <ImageView
+        android:id="@+id/dhis2_logo"
+        android:layout_width="@dimen/dhis2_logo_width"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/dhis2_logo_margin_bottom"
+        android:layout_marginTop="@dimen/dhis2_logo_margin_top"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/dhis2_logo" />
+
+    <org.dhis2.mobile.ui.views.FontEditText
+        android:id="@+id/server_url"
+        style="@style/LoginEditTextProperies"
+        android:layout_below="@id/dhis2_logo"
+        android:layout_centerHorizontal="true"
+        android:drawableLeft="@drawable/ic_server"
+        android:hint="@string/server_url"
+        android:inputType="textUri"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontEditText
+        android:id="@+id/username"
+        style="@style/LoginEditTextProperies"
+        android:layout_below="@+id/server_url"
+        android:layout_centerHorizontal="true"
+        android:drawableLeft="@drawable/ic_username"
+        android:hint="@string/username"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontEditText
+        android:id="@+id/password"
+        style="@style/LoginEditTextProperies"
+        android:layout_below="@+id/username"
+        android:layout_centerHorizontal="true"
+        android:drawableLeft="@drawable/ic_password"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        app:font="@string/regular_font_name" />
+
+    <org.dhis2.mobile.ui.views.FontButton
+        android:id="@+id/login_button"
+        android:layout_width="180dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/password"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/loginbutton_custom_selector"
+        android:text="@string/login_button"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:font="@string/regular_font_name" />
+
+</RelativeLayout>
