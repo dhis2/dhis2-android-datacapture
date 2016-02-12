@@ -28,8 +28,10 @@
 
 package org.dhis2.mobile.ui.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.Animation;
@@ -115,10 +117,21 @@ public class ConfirmUserActivity extends BaseActivity {
 
     @OnClick(R.id.delete_and_log_out_button)
     public void deleteAndLogOut() {
-        showProgress(true);
-        getDhisService().logOutUser();
-        startActivity(new Intent(this, LauncherActivity.class));
-        finish();
+
+        new AlertDialog.Builder(ConfirmUserActivity.this)
+                .setMessage(R.string.delete_and_log_out_question)
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        showProgress(true);
+                        getDhisService().logOutUser();
+                        startActivity(new Intent(ConfirmUserActivity.this, LauncherActivity.class));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+
     }
 
     @Subscribe

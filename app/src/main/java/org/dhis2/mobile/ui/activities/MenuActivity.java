@@ -28,6 +28,7 @@
 
 package org.dhis2.mobile.ui.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -74,9 +76,13 @@ public class MenuActivity extends BaseActivity {
     private static final int SETTINGS_MENU_ITEM = 401;
     private static final int ABOUT_MENU_ITEM = 402;
 
-    @InjectView(R.id.toolbar) Toolbar mToolbar;
-    @InjectView(R.id.drawer_layout) @Optional DrawerLayout mDrawerLayout;
-    @InjectView(R.id.left_drawer) ListView mNavigationListView;
+    @InjectView(R.id.toolbar)
+    Toolbar mToolbar;
+    @InjectView(R.id.drawer_layout)
+    @Optional
+    DrawerLayout mDrawerLayout;
+    @InjectView(R.id.left_drawer)
+    ListView mNavigationListView;
 
     ActionBarDrawerToggle mDrawerToggle;
     Runnable mPendingRunnable;
@@ -134,9 +140,19 @@ public class MenuActivity extends BaseActivity {
         final Fragment fragment = findFragmentById(id);
 
         if (id == LOG_OUT_MENU_ITEM) {
-            getDhisService().logOutUser();
-            startActivity(new Intent(this, LauncherActivity.class));
-            finish();
+            new AlertDialog.Builder(MenuActivity.this)
+                    .setMessage(R.string.log_out_question)
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            getDhisService().logOutUser();
+                            startActivity(new Intent(MenuActivity.this, LauncherActivity.class));
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+            return;
         }
 
         if (id == ABOUT_MENU_ITEM) {

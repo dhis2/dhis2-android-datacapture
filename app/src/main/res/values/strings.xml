@@ -25,6 +25,7 @@
     <!-- START ConfirmUserActivity resources -->
     <string name="delete_and_log_out">Delete and log out</string>
     <string name="re_log_in">Re-Log In</string>
+    <string name="delete_and_log_out_question">Are you sure you want delete user data?</string>
     <!-- END -->
 
     <!-- START MenuActivity resources -->
@@ -37,6 +38,7 @@
     <string name="log_out">Log out</string>
     <string name="other">OTHER</string>
     <string name="about">About</string>
+    <string name="log_out_question">Are you sure you want to log out?</string>
     <!-- END -->
 
     <!-- START Toast Messages -->
