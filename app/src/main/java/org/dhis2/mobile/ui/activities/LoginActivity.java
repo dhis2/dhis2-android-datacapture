@@ -36,6 +36,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
@@ -43,6 +44,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.sdk.entities.UserAccount;
 import org.dhis2.mobile.sdk.network.APIException;
 import org.dhis2.mobile.sdk.network.models.Credentials;
+import org.dhis2.mobile.utils.PreferenceUtil;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -61,6 +63,7 @@ public class LoginActivity extends BaseActivity {
     @InjectView(R.id.username) EditText mUsername;
     @InjectView(R.id.password) EditText mPassword;
     @InjectView(R.id.log_in_button) Button mLogInButton;
+    @InjectView(R.id.url) TextView mUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,11 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
 
-        mServerUrl.setText("https://apps.dhis2.org/demo/");
+        String currentServerUrl = PreferenceUtil.getServerUrl(LoginActivity.this);
+        mServerUrl.setText(currentServerUrl);
+        mServerUrl.setVisibility(View.GONE);
+
+        mUrl.setText(currentServerUrl);
         mUsername.setText("admin");
         mPassword.setText("district");
 
@@ -102,6 +109,13 @@ public class LoginActivity extends BaseActivity {
         );
     }
 
+    @OnClick(R.id.url)
+    public void hideUrl() {
+        mUrl.setVisibility(View.GONE);
+        mServerUrl.setVisibility(View.VISIBLE);
+    }
+
+
     @OnClick(R.id.log_in_button)
     public void logIn() {
         showProgress(true);
@@ -111,6 +125,11 @@ public class LoginActivity extends BaseActivity {
         String password = mPassword.getText().toString();
 
         if (serverUrl != null) {
+            PreferenceUtil.savePrefs(PreferenceUtil.SERVER_URL,serverUrl,LoginActivity.this);
+            mUrl.setVisibility(View.VISIBLE);
+            mServerUrl.setVisibility(View.GONE);
+            mUrl.setText(serverUrl);
+
             Uri serverUri = Uri.parse(serverUrl);
             getDhisService().logInUser(
                     serverUri, new Credentials(username, password)
