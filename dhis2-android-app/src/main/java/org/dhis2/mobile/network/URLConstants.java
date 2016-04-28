@@ -38,7 +38,8 @@ public class URLConstants {
 	public static final String ANONYMOUS_EVENT_PARAM = "?type=3";
 	public static final String EVENT_URL = "api/events";
 	
-	public static final String OPTION_SET_PARAM = "?links=false";
+	public static final String OPTION_SET_PARAM = "?fields=id,name,created,lastUpdated," +
+			"externalAccess,version,options[id,name,code,created,lastUpdated]";
 	public static final String OPTION_SET_URL = "api/optionSets";
 
 	public static final String DATASETS_URL = "api/me/assignedDataSets";

@@ -29,96 +29,42 @@
 
 package org.dhis2.mobile.io.models;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class OptionSet {
-	private static final String ID = "id";
-	private static final String NAME = "name";
-	private static final String CREATED = "created";
-	private static final String LAST_UPDATED = "lastUpdated";
-	private static final String EXTERNAL_ACCESS = "externalAccess";
-	private static final String VERSION = "version";
-	private static final String OPTIONS = "options";
-	
-	private String id;
-	private String name;
-	private String created;
-	private String lastUpdated;
-	private String externalAccess;
-	private String version;
-	private ArrayList<Option> options;
-	
-	/* public OptionSet(JsonObject jSource) {
-		if (jSource.has(ID)) {
-			id = jSource.getAsJsonPrimitive(ID).getAsString();
-		}
-		
-		if (jSource.has(NAME)) {
-			name = jSource.getAsJsonPrimitive(NAME).getAsString();
-		}
-		
-		if (jSource.has(CREATED)) {
-			created = jSource.getAsJsonPrimitive(CREATED).getAsString();
-		}
-		
-		if (jSource.has(LAST_UPDATED)) {
-			lastUpdated = jSource.getAsJsonPrimitive(LAST_UPDATED).getAsString();
-		}
-		
-		if (jSource.has(EXTERNAL_ACCESS)) {
-			externalAccess = jSource.getAsJsonPrimitive(EXTERNAL_ACCESS).getAsString();
-		}
-		
-		if (jSource.has(VERSION)) {
-			version = jSource.getAsJsonPrimitive(VERSION).getAsString();
-		}
-		
-		if (jSource.has(OPTIONS)) {
-			JsonArray jOptions = jSource.getAsJsonArray(OPTIONS);
-			Iterator<JsonElement> iterator = jOptions.iterator();
-			options = new ArrayList<Option>();
-			while(iterator.hasNext()) {
-				JsonElement jElement = iterator.next();
-				if (!jElement.isJsonNull()) {
-					String option = jElement.getAsJsonPrimitive().getAsString();
-					options.add(option);
-				}
-			}
-		}
-	} */
+    private String id;
+    private String name;
+    private String created;
+    private String lastUpdated;
+    private String externalAccess;
+    private String version;
+    private ArrayList<Option> options;
 
+    public String getId() {
+        return id;
+    }
 
+    public String getName() {
+        return name;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getCreated() {
+        return created;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
 
-	public String getCreated() {
-		return created;
-	}
+    public String getExternalAccess() {
+        return externalAccess;
+    }
 
-	public String getLastUpdated() {
-		return lastUpdated;
-	}
+    public ArrayList<Option> getOptions() {
+        return options;
+    }
 
-	public String getExternalAccess() {
-		return externalAccess;
-	}
-
-	public ArrayList<Option> getOptions() {
-		return options;
-	}
-
-	public String getVersion() {
-		return version;
-	}
+    public String getVersion() {
+        return version;
+    }
 }
