@@ -40,13 +40,17 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.WorkService;
+import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
+import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
@@ -58,6 +62,11 @@ import org.dhis2.mobile.utils.TextFileUtils.Directory;
 import org.dhis2.mobile.utils.ToastManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static android.text.TextUtils.isEmpty;
 
 public class AggregateReportDataEntryActivity extends BaseDataEntryActivity implements LoaderCallbacks<Form> {
     public static final String TAG = AggregateReportDataEntryActivity.class.getSimpleName();
@@ -94,28 +103,153 @@ public class AggregateReportDataEntryActivity extends BaseDataEntryActivity impl
     };
 
     private static class DataLoader extends AsyncTaskLoader<Form> {
+        private String orgUnit;
         private String formId;
+        private String period;
 
-        public DataLoader(Context context, String formId) {
+        public DataLoader(Context context, String orgUnit, String formId, String period) {
             super(context);
+
+            this.orgUnit = orgUnit;
             this.formId = formId;
+            this.period = period;
         }
 
         @Override
         public Form loadInBackground() {
             if (formId != null && TextFileUtils.doesFileExist(getContext(), Directory.DATASETS, formId)) {
-                String jForm = TextFileUtils.readTextFile(getContext(), Directory.DATASETS, formId);
-                if (jForm != null) {
-                    try {
-                        JsonObject jsonForm = JsonHandler.buildJsonObject(jForm);
-                        return JsonHandler.fromJson(jsonForm, Form.class);
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    } catch (ParsingException e) {
-                        e.printStackTrace();
+                Form form = loadForm();
+
+                // try to fit values
+                // from storage into form
+                loadValuesIntoForm(form);
+
+                return form;
+            }
+            return null;
+        }
+
+        private Form loadForm() {
+            String jForm = TextFileUtils.readTextFile(getContext(), Directory.DATASETS, formId);
+            if (jForm != null) {
+                try {
+                    JsonObject jsonForm = JsonHandler.buildJsonObject(jForm);
+                    return JsonHandler.fromJson(jsonForm, Form.class);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                } catch (ParsingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        private void loadValuesIntoForm(Form form) {
+            if (form == null || form.getGroups() == null || form.getGroups().isEmpty()) {
+                return;
+            }
+
+            String reportKey = buildReportKey();
+            if (isEmpty(reportKey)) {
+                return;
+            }
+
+            String report = loadReport(reportKey);
+            if (isEmpty(report)) {
+                return;
+            }
+
+            Map<String, String> fieldMap = new HashMap<String, String>();
+
+            try {
+                JsonObject jsonReport = JsonHandler.buildJsonObject(report);
+                JsonArray jsonElements = jsonReport.getAsJsonArray(Constants.DATA_VALUES);
+
+                fieldMap = buildFieldMap(jsonElements);
+            } catch (ParsingException e) {
+                e.printStackTrace();
+            }
+
+            if (!fieldMap.keySet().isEmpty()) {
+                // fill form with values
+
+                for (Group group : form.getGroups()) {
+                    if (group.getFields() == null || group.getFields().isEmpty()) {
+                        continue;
+                    }
+
+                    for (Field field : group.getFields()) {
+                        String key = buildFieldKey(field.getDataElement(),
+                                field.getCategoryOptionCombo());
+
+                        String value = fieldMap.get(key);
+                        if (!isEmpty(value)) {
+                            field.setValue(value);
+                        }
                     }
                 }
             }
+        }
+
+        private String loadReport(String reportKey) {
+            if (isEmpty(reportKey)) {
+                return null;
+            }
+
+            if (TextFileUtils.doesFileExist(
+                    getContext(), Directory.OFFLINE_DATASETS, reportKey)) {
+                String report = TextFileUtils.readTextFile(
+                        getContext(), Directory.OFFLINE_DATASETS, reportKey);
+
+                if (!isEmpty(report)) {
+                    return report;
+                }
+            }
+
+            return null;
+        }
+
+        private Map<String, String> buildFieldMap(JsonArray jsonFields) {
+            Map<String, String> fieldMap = new HashMap<String, String>();
+            if (jsonFields == null) {
+                return fieldMap;
+            }
+
+            for (JsonElement jsonElement : jsonFields) {
+                if (jsonElement instanceof JsonObject) {
+                    JsonElement jsonDataElement = (jsonElement.getAsJsonObject())
+                            .get(Field.DATA_ELEMENT);
+                    JsonElement jsonCategoryCombination = (jsonElement.getAsJsonObject())
+                            .get(Field.CATEGORY_OPTION_COMBO);
+                    JsonElement jsonValue = (jsonElement.getAsJsonObject())
+                            .get(Field.VALUE);
+
+                    String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
+                            jsonCategoryCombination.getAsString());
+                    String value = jsonValue != null ? jsonValue.getAsString() : "";
+
+                    fieldMap.put(fieldKey, value);
+                }
+            }
+
+            return fieldMap;
+        }
+
+        private String buildReportKey() {
+            if (!isEmpty(orgUnit) && !isEmpty(formId) && !isEmpty(period)) {
+                return orgUnit + formId + period;
+            }
+
+            return null;
+        }
+
+        private String buildFieldKey(String dataelement, String categoryOptionCombination) {
+            if (!isEmpty(dataelement) && !isEmpty(categoryOptionCombination)) {
+                return String.format(Locale.getDefault(), "%s.%s",
+                        dataelement, categoryOptionCombination);
+            }
+
             return null;
         }
     }
@@ -203,7 +337,8 @@ public class AggregateReportDataEntryActivity extends BaseDataEntryActivity impl
         if (id == DATA_PARSER_ID && args != null && args.getString(Response.BODY) != null) {
             return new DataParser(this, args.getString(Response.BODY));
         } else if (id == DATA_LOADER_ID && info != null) {
-            return new DataLoader(AggregateReportDataEntryActivity.this, info.getFormId());
+            return new DataLoader(AggregateReportDataEntryActivity.this,
+                    info.getOrgUnitId(), info.getFormId(), info.getPeriod());
         } else {
             return null;
         }
@@ -223,14 +358,17 @@ public class AggregateReportDataEntryActivity extends BaseDataEntryActivity impl
     }
 
     @Override
-    public void onLoaderReset(Loader<Form> loader) { }
+    public void onLoaderReset(Loader<Form> loader) {
+    }
 
     @Override
     protected void upload() {
         if (getAdapters() == null) {
-            ToastManager.makeToast(this, getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
+            ToastManager.makeToast(this, getString(R.string.something_went_wrong),
+                    Toast.LENGTH_SHORT).show();
             return;
         }
+
         ArrayList<Group> groups = new ArrayList<Group>();
         for (FieldAdapter adapter : getAdapters()) {
             groups.add(adapter.getGroup());
@@ -240,6 +378,7 @@ public class AggregateReportDataEntryActivity extends BaseDataEntryActivity impl
         intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
         intent.putExtra(DatasetInfoHolder.TAG, info);
         intent.putExtra(Group.TAG, groups);
+
         startService(intent);
         finish();
     }
