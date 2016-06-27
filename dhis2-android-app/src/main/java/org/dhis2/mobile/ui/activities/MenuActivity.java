@@ -47,7 +47,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.WorkService;
 import org.dhis2.mobile.ui.adapters.menuNavigation.NavigationListAdapter;
 import org.dhis2.mobile.ui.adapters.menuNavigation.NavigationMenuItem;
-import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
+import org.dhis2.mobile.ui.fragments.AggregateReportFragment2;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 import org.dhis2.mobile.ui.fragments.SEWRFragment;
 
@@ -199,7 +199,7 @@ public class MenuActivity extends BaseActivity {
     private void attachFragment(NavigationMenuItem menuItem) {
         Fragment fragment;
         if (menuItem == NavigationMenuItem.AGGREGATE_REPORT) {
-            fragment = new AggregateReportFragment();
+            fragment = new AggregateReportFragment2();
         } else if (menuItem == NavigationMenuItem.SINGLE_EVENT_WITHOUT_REGISTRATION) {
             fragment = new SEWRFragment();
         } else {
