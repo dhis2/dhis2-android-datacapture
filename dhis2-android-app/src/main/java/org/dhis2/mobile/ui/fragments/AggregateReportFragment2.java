@@ -31,7 +31,6 @@ public class AggregateReportFragment2 extends Fragment
     private static final String TAG = AggregateReportFragment2.class.getName();
     private static final int AGGREGATE_REPORT_LOADER_ID = TAG.length();
 
-    private ListView pickerListView;
     private PickerAdapter pickerAdapter;
 
     @Override
@@ -41,7 +40,7 @@ public class AggregateReportFragment2 extends Fragment
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        pickerListView = (ListView) view.findViewById(R.id.listview_pickers);
+        ListView pickerListView = (ListView) view.findViewById(R.id.listview_pickers);
         pickerAdapter = new PickerAdapter(getChildFragmentManager(), getActivity());
 
         pickerListView.setAdapter(pickerAdapter);
@@ -80,10 +79,10 @@ public class AggregateReportFragment2 extends Fragment
         @Override
         public Picker loadInBackground() {
             String jSourceUnits;
-            if (TextFileUtils.doesFileExist(getContext(),
-                    TextFileUtils.Directory.ROOT, TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS)) {
-                jSourceUnits = TextFileUtils.readTextFile(getContext(),
-                        TextFileUtils.Directory.ROOT, TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS);
+            if (TextFileUtils.doesFileExist(getContext(), TextFileUtils.Directory.ROOT,
+                    TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS)) {
+                jSourceUnits = TextFileUtils.readTextFile(getContext(), TextFileUtils.Directory.ROOT,
+                        TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS);
             } else {
                 return null;
             }
