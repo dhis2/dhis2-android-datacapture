@@ -29,14 +29,14 @@
 
 package org.dhis2.mobile.io.models;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 public class Form implements Parcelable {
-	public static final String TAG = Form.class.getSimpleName();
+    public static final String TAG = Form.class.getSimpleName();
 
     // Comparator which is used to sort forms in alphabetical order
     public static Comparator<Form> COMPARATOR = new Comparator<Form>() {
@@ -47,55 +47,62 @@ public class Form implements Parcelable {
         }
     };
 
-	private String id;
-	private String label;
-	private FormOptions options;
-	private ArrayList<Group> groups = new ArrayList<Group>();
-	
-	private Form(Parcel in) {
-		id = in.readString();
-		label = in.readString();
-		options = (FormOptions) in.readParcelable(FormOptions.class.getClassLoader());
-		in.readTypedList(groups, Group.CREATOR);
-	}
-	
-	public static final Parcelable.Creator<Form> CREATOR = new Parcelable.Creator<Form>() {
+    private String id;
+    private String label;
+    private CategoryCombo categoryCombo;
+    private FormOptions options;
+    private ArrayList<Group> groups = new ArrayList<Group>();
 
-		public Form createFromParcel(Parcel in) {
-			return new Form(in);
-		}
+    private Form(Parcel in) {
+        id = in.readString();
+        label = in.readString();
+        categoryCombo = in.readParcelable(CategoryCombo.class.getClassLoader());
+        options = in.readParcelable(FormOptions.class.getClassLoader());
+        in.readTypedList(groups, Group.CREATOR);
+    }
 
-		public Form[] newArray(int size) {
-			return new Form[size];
-		}
-	};
-	
-	@Override
-	public int describeContents() {
-		return TAG.length();
-	}
+    public static final Parcelable.Creator<Form> CREATOR = new Parcelable.Creator<Form>() {
 
-	@Override
-	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeString(id);
-		parcel.writeString(label);
-		parcel.writeParcelable(options, flags);
-		parcel.writeTypedList(groups);
-	}
+        public Form createFromParcel(Parcel in) {
+            return new Form(in);
+        }
 
-	public String getId() {
-		return id;
-	}
-	
-	public String getLabel() {
-		return label;
-	}
-	
-	public FormOptions getOptions() {
-		return options;
-	}
-	
-	public ArrayList<Group> getGroups() {
-		return groups;
-	}
+        public Form[] newArray(int size) {
+            return new Form[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return TAG.length();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(id);
+        parcel.writeString(label);
+        parcel.writeParcelable(categoryCombo, flags);
+        parcel.writeParcelable(options, flags);
+        parcel.writeTypedList(groups);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public FormOptions getOptions() {
+        return options;
+    }
+
+    public ArrayList<Group> getGroups() {
+        return groups;
+    }
+
+    public CategoryCombo getCategoryCombo() {
+        return categoryCombo;
+    }
 }
