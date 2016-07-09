@@ -31,12 +31,10 @@ package org.dhis2.mobile.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,19 +44,13 @@ import org.dhis2.mobile.WorkService;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment2;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 
-import static org.dhis2.mobile.utils.Preconditions.checkNotNull;
-
-public class MenuActivity extends BaseActivity
-        implements OnNavigationItemSelectedListener, DrawerListener {
+public class MenuActivity extends BaseActivity implements OnNavigationItemSelectedListener {
+    private static final String STATE_TOOLBAR_TITLE = "state:toolbarTitle";
 
     // layout
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
-    // Delaying attachment of fragment
-    // in order to avoid animation lag
-    private Runnable pendingRunnable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,10 +58,6 @@ public class MenuActivity extends BaseActivity
         setContentView(R.layout.activity_menu);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawerLayout != null) {
-            drawerLayout.addDrawerListener(this);
-        }
-
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         if (navigationView != null) {
             navigationView.inflateMenu(R.menu.menu_drawer_default);
@@ -81,16 +69,17 @@ public class MenuActivity extends BaseActivity
             toolbar.setNavigationIcon(R.drawable.ic_menu);
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View view) {
                     toggleNavigationDrawer();
                 }
             });
         }
 
         if (savedInstanceState == null) {
-            navigationView.setCheckedItem(R.id.drawer_item_aggregate_report);
-            toolbar.setTitle(R.string.aggregate_reporting);
-            attachFragment(new AggregateReportFragment2());
+            onNavigationItemSelected(navigationView.getMenu()
+                    .findItem(R.id.drawer_item_aggregate_report));
+        } else if (savedInstanceState.containsKey(STATE_TOOLBAR_TITLE) && toolbar != null) {
+            toolbar.setTitle(savedInstanceState.getString(STATE_TOOLBAR_TITLE));
         }
     }
 
@@ -98,11 +87,11 @@ public class MenuActivity extends BaseActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.drawer_item_aggregate_report: {
-                attachFragmentDelayed(new AggregateReportFragment2());
+                attachFragment(new AggregateReportFragment2());
                 break;
             }
             case R.id.drawer_item_profile: {
-                attachFragmentDelayed(new MyProfileFragment());
+                attachFragment(new MyProfileFragment());
                 break;
             }
             case R.id.drawer_item_logout: {
@@ -119,38 +108,12 @@ public class MenuActivity extends BaseActivity
     }
 
     @Override
-    public void onDrawerOpened(View drawerView) {
-        pendingRunnable = null;
-    }
-
-    @Override
-    public void onDrawerClosed(View drawerView) {
-        if (pendingRunnable != null) {
-            new Handler().post(pendingRunnable);
+    protected void onSaveInstanceState(Bundle outState) {
+        if (toolbar != null) {
+            outState.putString(STATE_TOOLBAR_TITLE, toolbar.getTitle().toString());
         }
 
-        pendingRunnable = null;
-    }
-
-    @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-        // stub implementation
-    }
-
-    @Override
-    public void onDrawerStateChanged(int newState) {
-        // stub implementation
-    }
-
-    protected void attachFragmentDelayed(final Fragment fragment) {
-        checkNotNull(fragment, "Fragment must not be null");
-
-        pendingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                attachFragment(fragment);
-            }
-        };
+        super.onSaveInstanceState(outState);
     }
 
     protected void attachFragment(Fragment fragment) {

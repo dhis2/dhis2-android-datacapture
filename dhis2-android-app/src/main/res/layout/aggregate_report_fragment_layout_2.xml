@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ptr_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/progress_bar_grey" />
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/ptr_layout"
+    <ListView
+        android:id="@+id/listview_pickers"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="4dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="7dp"
+        android:scrollbarSize="5dp"
+        android:scrollbarStyle="outsideInset"
+        android:scrollbarThumbVertical="@drawable/listview_scrollbar_shape" />
 
-        <ListView
-            android:id="@+id/listview_pickers"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="4dp"
-            android:paddingBottom="7dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="5dp"
-            android:paddingTop="7dp"
-            android:scrollbarSize="5dp"
-            android:scrollbarStyle="outsideInset"
-            android:scrollbarThumbVertical="@drawable/listview_scrollbar_shape" />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-</FrameLayout>
-
+</android.support.v4.widget.SwipeRefreshLayout>
