@@ -31,13 +31,13 @@ package org.dhis2.mobile.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.PrefUtils;
 
 /* LauncherActivity is entry point in application */
-public class LauncherActivity extends ActionBarActivity {
+public class LauncherActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

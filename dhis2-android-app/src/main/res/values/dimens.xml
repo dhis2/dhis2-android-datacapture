@@ -5,7 +5,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="activity_horizontal_slim_margin">8dp</dimen>
     <dimen name="activity_vertical_slim_margin">8dp</dimen>
-    
-    <dimen name="drawer_size">240dp</dimen>
+
+    <dimen name="navigation_drawer_width">304dp</dimen>
 
 </resources>

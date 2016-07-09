@@ -35,7 +35,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -55,7 +55,7 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends AppCompatActivity {
     public static final String TAG = "org.dhis2.mobile.ui.activities.LoginActivity";
     public static final String USERNAME = "username";
     public static final String SERVER = "server";

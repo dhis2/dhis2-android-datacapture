@@ -3,7 +3,7 @@ package org.dhis2.mobile.ui.activities;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -12,7 +12,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.CustomTypefaceSpan;
 import org.dhis2.mobile.utils.TypefaceManager;
 
-public class BaseActivity extends ActionBarActivity {
+public class BaseActivity extends AppCompatActivity {
     private Typeface mCustomTypeFace;
 
     public void onCreate(Bundle savedInstanceState) {
