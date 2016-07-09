@@ -4,6 +4,10 @@
     <color name="dark_navy_blue">#1d5288</color>
     <color name="light_blue">#67b0f9</color>
     <color name="actionbar_blue">#1f70c3</color>
+
+    <color name="color_primary_default">@color/actionbar_blue</color>
+    <color name="color_primary_dark">@color/dark_navy_blue</color>
+    <color name="color_accent_default">@color/login_button_state_pressed</color>
     
     <color name="login_button_state_enabled_false">#223f5c</color>
     <color name="login_button_state_unpressed">#113151</color>

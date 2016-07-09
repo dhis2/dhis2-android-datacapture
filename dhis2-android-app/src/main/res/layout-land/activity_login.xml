@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_navy_blue"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -28,7 +29,7 @@
         android:drawableLeft="@drawable/ic_server"
         android:hint="@string/server_url"
         android:inputType="textUri"
-        app:font="@string/regular_font_name"/>
+        app:font="@string/regular_font_name" />
 
     <org.dhis2.mobile.ui.views.FontEditText
         android:id="@+id/username"
@@ -37,7 +38,7 @@
         android:layout_centerHorizontal="true"
         android:drawableLeft="@drawable/ic_username"
         android:hint="@string/username"
-        app:font="@string/regular_font_name"/>
+        app:font="@string/regular_font_name" />
 
     <org.dhis2.mobile.ui.views.FontEditText
         android:id="@+id/password"
@@ -47,7 +48,7 @@
         android:drawableLeft="@drawable/ic_password"
         android:hint="@string/password"
         android:inputType="textPassword"
-        app:font="@string/regular_font_name"/>
+        app:font="@string/regular_font_name" />
 
     <org.dhis2.mobile.ui.views.FontButton
         android:id="@+id/login_button"
@@ -61,6 +62,6 @@
         android:textColor="@android:color/white"
         android:textSize="17sp"
         android:textStyle="bold"
-        app:font="@string/regular_font_name"/>
+        app:font="@string/regular_font_name" />
 
 </RelativeLayout>

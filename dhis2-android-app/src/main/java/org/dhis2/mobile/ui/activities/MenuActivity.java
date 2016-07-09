@@ -37,6 +37,7 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -50,7 +51,8 @@ import static org.dhis2.mobile.utils.Preconditions.checkNotNull;
 public class MenuActivity extends BaseActivity
         implements OnNavigationItemSelectedListener, DrawerListener {
 
-    // Drawer layout
+    // layout
+    private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -74,10 +76,21 @@ public class MenuActivity extends BaseActivity
             navigationView.setNavigationItemSelectedListener(this);
         }
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_menu);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleNavigationDrawer();
+                }
+            });
+        }
+
+        if (savedInstanceState == null) {
+            navigationView.setCheckedItem(R.id.drawer_item_aggregate_report);
+            toolbar.setTitle(R.string.aggregate_reporting);
+            attachFragment(new AggregateReportFragment2());
         }
     }
 
@@ -98,7 +111,9 @@ public class MenuActivity extends BaseActivity
             }
         }
 
-        toggleNavigationDrawer();
+        toolbar.setTitle(item.getTitle());
+        navigationView.setCheckedItem(R.id.drawer_item_aggregate_report);
+        drawerLayout.closeDrawers();
 
         return true;
     }
@@ -125,16 +140,6 @@ public class MenuActivity extends BaseActivity
     @Override
     public void onDrawerStateChanged(int newState) {
         // stub implementation
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            toggleNavigationDrawer();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     protected void attachFragmentDelayed(final Fragment fragment) {
