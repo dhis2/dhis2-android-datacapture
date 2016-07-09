@@ -81,6 +81,7 @@ public class FormsDownloadProcessor {
     private static final String DATASETS = "dataSets";
     private static final String PROGRAMS = "programs";
     private static final String OPTIONS = "options";
+    private static final String CATEGORY_COMBO = "categoryCombo";
 
     public static void updateDatasets(Context context) {
         PrefUtils.setResourceState(context,
@@ -242,8 +243,8 @@ public class FormsDownloadProcessor {
                 orgUnitsWithDatasets);
     }
 
-    private static OrganizationUnit[] handleUnitsWithDatasets(JsonObject jUnits,
-                                                              JsonObject jDatasets) throws ParsingException {
+    private static OrganizationUnit[] handleUnitsWithDatasets(
+            JsonObject jUnits, JsonObject jDatasets) throws ParsingException {
         JsonArray modifiedOrgUnits = new JsonArray();
 
         for (Map.Entry<String, JsonElement> entry : jUnits.entrySet()) {
@@ -256,6 +257,11 @@ public class FormsDownloadProcessor {
 
                 JsonObject jDataset = getJsonObject(jDatasets, id);
                 JsonObject options = getJsonObject(jDataset, OPTIONS);
+
+                if (jDataset.has(CATEGORY_COMBO)) {
+                    JsonObject categoryCombo = getJsonObject(jDataset, CATEGORY_COMBO);
+                    jForm.add(CATEGORY_COMBO, categoryCombo);
+                }
 
                 jForm.add(OPTIONS, options);
             }
