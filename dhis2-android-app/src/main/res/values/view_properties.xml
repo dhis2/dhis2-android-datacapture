@@ -23,14 +23,6 @@
         <item name="android:background">@drawable/card_background</item>
     </style>
 
-    <style name="DialogInvokerLayout">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/spinner_background_holo_light</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
     <style name="MenuCardTextViewLayout">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
