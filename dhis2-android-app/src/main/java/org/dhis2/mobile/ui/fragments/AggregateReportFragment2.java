@@ -400,10 +400,6 @@ public class AggregateReportFragment2 extends Fragment
 
         if (dataSetPickerChild.isLeaf()) {
             handleDataEntryButton(datasetInfoHolder);
-
-            // show button
-            Toast.makeText(getActivity(), "Ready for data-entry on dataset WITHOUT categories",
-                    Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -424,9 +420,6 @@ public class AggregateReportFragment2 extends Fragment
 
             datasetInfoHolder.setCategoryOptions(categoryOptions);
             handleDataEntryButton(datasetInfoHolder);
-
-            Toast.makeText(getActivity(), "Ready for data-entry on dataset WITH categories",
-                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -458,14 +451,6 @@ public class AggregateReportFragment2 extends Fragment
                     getString(R.string.organization_unit), info.getOrgUnitLabel());
             String period = String.format("%s: %s",
                     getString(R.string.period), info.getPeriodLabel());
-            String description;
-
-            // creating description
-            if (info.getCategoryOptions() != null) {
-                for (CategoryOption categoryOption : info.getCategoryOptions()) {
-                    String categoryOptionLabel = null;
-                }
-            }
 
             // setting labels
             formTextView.setText(info.getFormLabel());
