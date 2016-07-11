@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <include layout="@layout/list_of_fields" />
+    <include layout="@layout/listview" />
     <include layout="@layout/button_upload" />
     <include layout="@layout/progress_bar" />
 

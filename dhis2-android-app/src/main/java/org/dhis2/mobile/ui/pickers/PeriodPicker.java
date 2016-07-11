@@ -1,41 +1,17 @@
-/*
- * Copyright (c) 2014, Araz Abishov
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software
- * without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
 package org.dhis2.mobile.ui.pickers;
 
-import android.app.Dialog;
-import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.ui.adapters.dataEntry.DateAdapter;
@@ -45,87 +21,106 @@ import org.dhis2.mobile.utils.date.DateIteratorFactory;
 
 import java.util.ArrayList;
 
-public class PeriodPicker extends BaseItemPicker {
-    private Button add;
-    private Button sub;
+public class PeriodPicker extends DialogFragment {
+    private static final String TAG = PeriodPicker.class.getSimpleName();
+    private static final String ARG_TITLE = "arg:title";
+    private static final String ARG_PERIOD_TYPE = "arg:periodType";
+    private static final String ARG_OPEN_FUTURE_PERIOD = "arg:openFuturePeriod";
 
-    private ArrayList<DateHolder> dates;
-    private DateHolder savedDate;
+    private OnPeriodClickListener onPeriodClickListener;
 
-    public PeriodPicker(Context context, View root) {
-        super(context, root, R.id.textview_picker, R.string.choose_period, R.string.period);
+    public static PeriodPicker newInstance(String title, String periodType, int openFuturePeriod) {
+        PeriodPicker periodPicker = new PeriodPicker();
+        Bundle arguments = new Bundle();
+
+        arguments.putString(ARG_TITLE, title);
+        arguments.putString(ARG_PERIOD_TYPE, periodType);
+        arguments.putInt(ARG_OPEN_FUTURE_PERIOD, openFuturePeriod);
+        periodPicker.setArguments(arguments);
+
+        return periodPicker;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_period_picker, container, false);
     }
 
     @Override
-    protected void initDialog(Context context, int dialogTitleId) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View datePickerView = inflater.inflate(R.layout.dialog_period_picker, null);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        final TextView titleTextView = (TextView) view.findViewById(R.id.textview_titlebar_title);
+        final ImageView cancelImageView = (ImageView) view.findViewById(R.id.imageview_cancel);
 
-        dialog = new Dialog(context);
-        dialog.setContentView(datePickerView);
-        dialog.setTitle(dialogTitleId);
+        final DateAdapter dateAdapter = new DateAdapter(LayoutInflater.from(getActivity()));
+        final ListView listView = (ListView) view.findViewById(R.id.dates_listview);
 
-        labels = new ArrayList<>();
-        dates = new ArrayList<>();
+        final Button add = (Button) view.findViewById(R.id.more);
+        final Button sub = (Button) view.findViewById(R.id.less);
 
-        adapter = new DateAdapter(LayoutInflater.from(context));
+        final String periodType = getPeriodType();
+        final int openFuturePeriods = getOpenFuturePeriods();
 
-        list = (ListView) datePickerView.findViewById(R.id.dates_listview);
-        list.setAdapter(adapter);
-
-        add = (Button) datePickerView.findViewById(R.id.more);
-        sub = (Button) datePickerView.findViewById(R.id.less);
-
-        disable();
-    }
-
-    @Override
-    public void enable() {
-        super.enable();
-        resetSavedDate();
-    }
-
-    @Override
-    public void disable() {
-        super.disable();
-        resetSavedDate();
-    }
-
-    public void setPeriodType(String periodType, int openFP) {
         final CustomDateIterator<ArrayList<DateHolder>> iterator =
-                DateIteratorFactory.getDateIterator(periodType, openFP);
+                DateIteratorFactory.getDateIterator(periodType, openFuturePeriods);
 
-        OnClickListener subButtonClickListener = new OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                dates = iterator.previous();
-                updateDateLabels();
-                add.setEnabled(true);
-            }
-        };
-
-        OnClickListener addButtonClickListener = new OnClickListener() {
+        final View.OnClickListener onClickListener = new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                if (iterator.hasNext()) {
-                    dates = iterator.next();
-                    updateDateLabels();
-                    if (!iterator.hasNext()) {
-                        add.setEnabled(false);
+                switch (view.getId()) {
+                    case R.id.more: {
+                        if (iterator.hasNext()) {
+                            dateAdapter.swapData(iterator.next());
+                            listView.smoothScrollToPosition(0);
+
+                            if (!iterator.hasNext()) {
+                                add.setEnabled(false);
+                            }
+                        } else {
+                            add.setEnabled(false);
+                        }
+                        break;
                     }
-                } else {
-                    add.setEnabled(false);
+                    case R.id.less: {
+                        dateAdapter.swapData(iterator.previous());
+                        listView.smoothScrollToPosition(0);
+
+                        add.setEnabled(true);
+                        break;
+                    }
+                    case R.id.imageview_cancel: {
+                        dismiss();
+                        break;
+                    }
                 }
             }
         };
 
-        add.setOnClickListener(addButtonClickListener);
-        sub.setOnClickListener(subButtonClickListener);
+        listView.setAdapter(dateAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DateHolder dateHolder = dateAdapter.getData().get(position);
 
-        dates = iterator.current();
-        updateDateLabels();
+                if (onPeriodClickListener != null) {
+                    onPeriodClickListener.onPeriodClicked(dateHolder);
+                }
+
+                dismiss();
+            }
+        });
+
+        titleTextView.setText(getTitle());
+        cancelImageView.setOnClickListener(onClickListener);
+
+        add.setOnClickListener(onClickListener);
+        sub.setOnClickListener(onClickListener);
+
+        // render current dates
+        dateAdapter.swapData(iterator.current());
+        listView.smoothScrollToPosition(0);
 
         if (!iterator.hasNext()) {
             add.setEnabled(false);
@@ -134,29 +129,45 @@ public class PeriodPicker extends BaseItemPicker {
         }
     }
 
-    private void updateDateLabels() {
-        labels.clear();
+    public void setOnPeriodClickListener(OnPeriodClickListener onPeriodClickListener) {
+        this.onPeriodClickListener = onPeriodClickListener;
+    }
 
-        for (DateHolder date : dates) {
-            labels.add(date.getLabel());
+    public void show(FragmentManager fragmentManager) {
+        show(fragmentManager, TAG);
+    }
+
+    private String getTitle() {
+        if (getArguments() != null) {
+            if (getArguments().containsKey(ARG_TITLE)) {
+                return getArguments().getString(ARG_TITLE);
+            }
         }
-        adapter.notifyDataSetChanged();
-        list.smoothScrollToPosition(0);
+
+        return null;
     }
 
-    public ArrayList<DateHolder> getDates() {
-        return dates;
+    private String getPeriodType() {
+        if (getArguments() != null) {
+            if (getArguments().containsKey(ARG_PERIOD_TYPE)) {
+                return getArguments().getString(ARG_PERIOD_TYPE);
+            }
+        }
+
+        return null;
     }
 
-    public void saveSelection(DateHolder date) {
-        savedDate = date;
+    private int getOpenFuturePeriods() {
+        if (getArguments() != null) {
+            if (getArguments().containsKey(ARG_OPEN_FUTURE_PERIOD)) {
+                return getArguments().getInt(ARG_OPEN_FUTURE_PERIOD);
+            }
+        }
+
+        return -1;
     }
 
-    public DateHolder getSavedSelection() {
-        return savedDate;
-    }
-
-    private void resetSavedDate() {
-        savedDate = null;
+    public interface OnPeriodClickListener {
+        void onPeriodClicked(DateHolder dateHolder);
     }
 }

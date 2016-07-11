@@ -41,7 +41,7 @@ import android.view.View;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.WorkService;
-import org.dhis2.mobile.ui.fragments.AggregateReportFragment2;
+import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 
 public class MenuActivity extends BaseActivity implements OnNavigationItemSelectedListener {
@@ -87,7 +87,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.drawer_item_aggregate_report: {
-                attachFragment(new AggregateReportFragment2());
+                attachFragment(new AggregateReportFragment());
                 break;
             }
             case R.id.drawer_item_profile: {

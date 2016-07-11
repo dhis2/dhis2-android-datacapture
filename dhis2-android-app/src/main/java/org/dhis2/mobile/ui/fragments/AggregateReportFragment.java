@@ -1,32 +1,3 @@
-/*
- * Copyright (c) 2014, Araz Abishov
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software
- * without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
 package org.dhis2.mobile.ui.fragments;
 
 import android.content.BroadcastReceiver;
@@ -34,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -41,14 +13,14 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +32,8 @@ import org.dhis2.mobile.WorkService;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
+import org.dhis2.mobile.io.models.Category;
+import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.io.models.FormOptions;
 import org.dhis2.mobile.io.models.OrganizationUnit;
@@ -67,202 +41,77 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.ui.activities.AggregateReportDataEntryActivity;
-import org.dhis2.mobile.ui.pickers.BaseItemPicker;
-import org.dhis2.mobile.ui.pickers.ItemPicker;
+import org.dhis2.mobile.ui.adapters.PickerAdapter;
+import org.dhis2.mobile.ui.adapters.PickerAdapter.OnPickerListChangeListener;
+import org.dhis2.mobile.ui.models.Picker;
 import org.dhis2.mobile.ui.pickers.PeriodPicker;
 import org.dhis2.mobile.utils.PrefUtils;
-import org.dhis2.mobile.utils.PrefUtils.Resources;
-import org.dhis2.mobile.utils.PrefUtils.State;
 import org.dhis2.mobile.utils.TextFileUtils;
-import org.dhis2.mobile.utils.TextFileUtils.Directory;
-import org.dhis2.mobile.utils.TextFileUtils.FileNames;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.date.DateHolder;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-import static org.dhis2.mobile.utils.ViewUtils.enableViews;
-import static org.dhis2.mobile.utils.ViewUtils.hideAndDisableViews;
 import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
 import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
 
-public class AggregateReportFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<OrganizationUnit>> {
-    public static final String TAG = "org.dhis2.mobile.ui.fragments.aggregateReportFragment.aggregateReportFragment";
-    private static final int AGGREGATE_REPORT_LOADER_ID = TAG.length();
-    private static final String IS_REFRESHING = "isRefreshing";
+public class AggregateReportFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Picker> {
+    public static final String TAG = AggregateReportFragment.class.getName();
+    public static final int AGGREGATE_REPORT_LOADER_ID = TAG.length();
 
-    private View pickersContainer;
-    private View contentView;
-    private View stubFragmentLayout;
-    private ProgressBar progressBar;
+    // index of pickers in list
+    private static final int ORG_UNIT_PICKER_ID = 0;
+    private static final int DATASET_PICKER_ID = 1;
+
+    // state keys
+    private static final String STATE_PICKERS_ONE = "state:pickersOne";
+    private static final String STATE_PICKERS_TWO = "state:pickersTwo";
+    private static final String STATE_PICKERS_PERIOD = "state:pickersPeriod";
+    private static final String STATE_IS_REFRESHING = "state:isRefreshing";
+
+    // generic picker adapters
+    private PickerAdapter pickerAdapterOne;
+    private PickerAdapter pickerAdapterTwo;
+
+    // period picker views
+    private LinearLayout periodPickerLinearLayout;
+    private TextView periodPickerTextView;
+
+    // data entry button
+    private LinearLayout dataEntryButton;
+    private TextView formTextView;
+    private TextView formDescriptionTextView;
+    private TextView organisationUnitTextView;
+
+    // swipe refresh layout
     private SwipeRefreshLayout swipeRefreshLayout;
-    private boolean isRefreshing;
-
-    private View userEntryContainer;
-    private TextView choosenDataset;
-    private TextView choosenUnit;
-    private TextView choosenPeriod;
-
-    private PeriodPicker periodPicker;
-    private ItemPicker orgUnitPicker;
-    private ItemPicker datasetPicker;
-
-    private DatasetInfoHolder info;
-
-    private OrganizationUnit savedUnit;
-    private Form savedForm;
-    private DateHolder savedPeriod;
-
-    /* This class is responsible for async. data loading from storage */
-    private static class DataLoader extends AsyncTaskLoader<ArrayList<OrganizationUnit>> {
-
-        public DataLoader(FragmentActivity activity) {
-            super(activity);
-        }
-
-        @Override
-        public ArrayList<OrganizationUnit> loadInBackground() {
-            String jSourceUnits;
-            if (TextFileUtils.doesFileExist(getContext(),
-                    Directory.ROOT, FileNames.ORG_UNITS_WITH_DATASETS)) {
-                jSourceUnits = TextFileUtils.readTextFile(getContext(),
-                        Directory.ROOT, FileNames.ORG_UNITS_WITH_DATASETS);
-            } else {
-                return null;
-            }
-
-            if (jSourceUnits == null) {
-                return null;
-            }
-
-            ArrayList<OrganizationUnit> units = null;
-            try {
-                JsonArray jUnits = JsonHandler.buildJsonArray(jSourceUnits);
-                Type type = new TypeToken<ArrayList<OrganizationUnit>>() {
-                }.getType();
-                units = JsonHandler.fromJson(jUnits, type);
-            } catch (ParsingException e) {
-                e.printStackTrace();
-            }
-
-            return units;
-        }
-    }
-
-    /* this BroadcastReceiver waits for response with updates from service */
-    private BroadcastReceiver onFormsUpdateListener = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context cxt, Intent intent) {
-            hideProgressInActionBar();
-
-            int networkStatusCode = intent.getExtras().getInt(Response.CODE);
-            int parsingStatusCode = intent.getExtras().getInt(JsonHandler.PARSING_STATUS_CODE);
-
-            Context context = getActivity();
-            if (HTTPClient.isError(networkStatusCode)) {
-                String message = HTTPClient.getErrorMessage(context, networkStatusCode);
-                ToastManager.makeToast(context, message, Toast.LENGTH_LONG).show();
-            }
-
-            if (parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
-                String message = getString(R.string.bad_response);
-                ToastManager.makeToast(context, message, Toast.LENGTH_LONG).show();
-            }
-            loadData();
-        }
-    };
+    private View stubLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.aggregate_report_fragment_layout, container, false);
-        swipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.ptr_layout);
-        progressBar = (ProgressBar) root.findViewById(R.id.progress_bar);
+        return inflater.inflate(R.layout.fragment_aggregate_report, container, false);
+    }
 
-        pickersContainer = root.findViewById(R.id.pickers_container);
-        contentView = root.findViewById(R.id.content);
-        stubFragmentLayout = root.findViewById(R.id.pull_to_refresh_stub_screen);
-        userEntryContainer = root.findViewById(R.id.user_data_entry);
+    @Override
+    public void onViewCreated(View root, Bundle savedInstanceState) {
+        setupStubLayout(root);
+        setupDataEntryButton(root);
+        setupPickerRecyclerViews(root, savedInstanceState);
+        setupSwipeRefreshLayout(root, savedInstanceState);
 
-        // TextViews which will show user choice in userEntryContainer
-        choosenDataset = (TextView) userEntryContainer.findViewById(R.id.choosen_form);
-        choosenUnit = (TextView) userEntryContainer.findViewById(R.id.choosen_unit);
-        choosenPeriod = (TextView) userEntryContainer.findViewById(R.id.form_description);
-
-        //ViewUtils.hideAndDisableViews(pickersContainer, stubFragmentLayout);
-        //ViewUtils.hideAndDisableViews(contentView);
-        hideAndDisableViews(contentView);
-
-        SwipeRefreshLayout.OnRefreshListener listener = new SwipeRefreshLayout.OnRefreshListener() {
-
-            @Override
-            public void onRefresh() {
-                if (!isRefreshing) {
-                    startUpdate();
-                }
-            }
-        };
-
-        int blue = R.color.actionbar_blue;
-        int grey = R.color.light_grey;
-
-        swipeRefreshLayout.setOnRefreshListener(listener);
-        swipeRefreshLayout.setColorScheme(blue, grey, blue, grey);
-
-        orgUnitPicker = new ItemPicker(getActivity(), root, R.id.org_unit_dialog_invoker,
-                R.string.organization_unit, R.string.choose_unit);
-        datasetPicker = new ItemPicker(getActivity(), root, R.id.data_set_dialog_invoker,
-                R.string.dataset, R.string.choose_data_set);
-        periodPicker = new PeriodPicker(getActivity(), root);
-
-        userEntryContainer.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                startDataentryActivity();
-            }
-        });
-
-        // Creating holder
-        info = new DatasetInfoHolder();
-
-        // restore values from bundle
-        if (savedInstanceState != null) {
-            Bundle valuesBundle = savedInstanceState.getBundle(TAG);
-            if (valuesBundle != null) {
-                savedUnit = valuesBundle.getParcelable(OrganizationUnit.TAG);
-                savedForm = valuesBundle.getParcelable(Form.TAG);
-                savedPeriod = valuesBundle.getParcelable(DateHolder.TAG);
-                isRefreshing = valuesBundle.getBoolean(IS_REFRESHING, false);
-            }
+        if (savedInstanceState == null) {
+            loadData();
         }
-
-        State datasetState = PrefUtils.getResourceState(getActivity(), Resources.DATASETS);
-        if (!isRefreshing) {
-            isRefreshing = datasetState == State.REFRESHING;
-        }
-
-        if (!isRefreshing) {
-            boolean needsUpdate = datasetState == State.OUT_OF_DATE;
-            boolean isConnectionAvailable = NetworkUtils.checkConnection(getActivity());
-
-            if (needsUpdate && isConnectionAvailable) {
-                startUpdate();
-            } else {
-                loadData();
-            }
-        } else {
-            showProgressInActionBar();
-        }
-
-        return root;
     }
 
     @Override
     public void onPause() {
-        dismissAllPickers(orgUnitPicker, datasetPicker, periodPicker);
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(onFormsUpdateListener);
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(onFormsUpdateListener);
         super.onPause();
     }
 
@@ -275,73 +124,405 @@ public class AggregateReportFragment extends Fragment implements LoaderManager.L
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Bundle savedState = new Bundle();
-        savedState.putParcelable(OrganizationUnit.TAG, orgUnitPicker.getSavedSelection());
-        savedState.putParcelable(Form.TAG, datasetPicker.getSavedSelection());
-        savedState.putParcelable(DateHolder.TAG, periodPicker.getSavedSelection());
-        savedState.putBoolean(IS_REFRESHING, isRefreshing);
-        outState.putBundle(TAG, savedState);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public Loader<ArrayList<OrganizationUnit>> onCreateLoader(int id, Bundle args) {
+    public Loader<Picker> onCreateLoader(int id, Bundle args) {
         return new DataLoader(getActivity());
     }
 
     @Override
-    public void onLoadFinished(Loader<ArrayList<OrganizationUnit>> loader, ArrayList<OrganizationUnit> units) {
-        onLoadFinished(units);
+    public void onLoadFinished(Loader<Picker> loader, Picker data) {
+        pickerAdapterOne.swapData(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<ArrayList<OrganizationUnit>> loader) {
+    public void onLoaderReset(Loader<Picker> loader) {
+        // stub implementation
     }
 
-    protected void restorePreviousState() {
-        if (savedUnit != null) {
-            onUnitSelected(savedUnit);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (pickerAdapterOne != null) {
+            pickerAdapterOne.onSaveInstanceState(STATE_PICKERS_ONE, outState);
+        }
 
-            if (savedForm != null) {
-                onDatasetSelected(savedForm);
+        if (pickerAdapterTwo != null) {
+            pickerAdapterTwo.onSaveInstanceState(STATE_PICKERS_TWO, outState);
+        }
 
-                if (savedPeriod != null) {
-                    onDateSelected(savedPeriod);
-                }
+        if (periodPickerLinearLayout != null && periodPickerLinearLayout.getTag() != null) {
+            outState.putParcelable(STATE_PICKERS_PERIOD,
+                    (DateHolder) periodPickerLinearLayout.getTag());
+        }
+
+        if (swipeRefreshLayout != null) {
+            outState.putBoolean(STATE_IS_REFRESHING, swipeRefreshLayout.isRefreshing());
+        }
+
+        super.onSaveInstanceState(outState);
+    }
+
+    private void loadData() {
+        getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null, this).forceLoad();
+    }
+
+    private void setupStubLayout(View view) {
+        stubLayout = view.findViewById(R.id.pull_to_refresh_stub_screen);
+        stubLayout.setVisibility(View.GONE);
+    }
+
+    private void setupDataEntryButton(View root) {
+        dataEntryButton = (LinearLayout) root.findViewById(R.id.user_data_entry);
+        formTextView = (TextView) root.findViewById(R.id.choosen_form);
+        formDescriptionTextView = (TextView) root.findViewById(R.id.form_description);
+        organisationUnitTextView = (TextView) root.findViewById(R.id.choosen_unit);
+
+        dataEntryButton.setVisibility(View.GONE);
+    }
+
+    private void setupPickerRecyclerViews(View root, Bundle savedInstanceState) {
+        // setting up period picker
+        periodPickerLinearLayout = (LinearLayout) root.findViewById(R.id.linearlayout_picker);
+        periodPickerTextView = (TextView) root.findViewById(R.id.textview_picker);
+
+        periodPickerLinearLayout.setVisibility(View.GONE);
+        periodPickerLinearLayout.setTag(null);
+
+        ImageView periodPickerImageView = (ImageView) root.findViewById(R.id.imageview_cancel);
+        periodPickerImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onDateSelected(null);
+            }
+        });
+
+        // picker recycler views
+        pickerAdapterOne = new PickerAdapter.Builder()
+                .context(getActivity())
+                .fragmentManager(getChildFragmentManager())
+                .build();
+        pickerAdapterTwo = new PickerAdapter.Builder()
+                .context(getActivity())
+                .fragmentManager(getChildFragmentManager())
+                .renderPseudoRoots()
+                .build();
+
+        LinearLayoutManager layoutManagerOne = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManagerTwo = new LinearLayoutManager(getActivity());
+
+        layoutManagerOne.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManagerTwo.setOrientation(LinearLayoutManager.VERTICAL);
+
+        RecyclerView pickerRecyclerViewOne = (RecyclerView) root
+                .findViewById(R.id.recyclerview_pickers_one);
+        RecyclerView pickerRecyclerViewTwo = (RecyclerView) root
+                .findViewById(R.id.recyclerview_pickers_two);
+
+        pickerRecyclerViewTwo.setLayoutManager(layoutManagerTwo);
+        pickerRecyclerViewOne.setLayoutManager(layoutManagerOne);
+
+        pickerRecyclerViewTwo.setAdapter(pickerAdapterTwo);
+        pickerRecyclerViewOne.setAdapter(pickerAdapterOne);
+
+        pickerAdapterOne.setOnPickerListChangeListener(new OnPickerListChangeListener() {
+            @Override
+            public void onPickerListChanged(List<Picker> pickers) {
+                AggregateReportFragment.this.onPickerListChanged(pickers);
+            }
+        });
+
+        pickerAdapterTwo.setOnPickerListChangeListener(new OnPickerListChangeListener() {
+            @Override
+            public void onPickerListChanged(List<Picker> pickers) {
+                AggregateReportFragment.this.onPickerSelected();
+            }
+        });
+
+        pickerAdapterOne.onRestoreInstanceState(STATE_PICKERS_ONE, savedInstanceState);
+        pickerAdapterTwo.onRestoreInstanceState(STATE_PICKERS_TWO, savedInstanceState);
+
+        // restoring state of period picker afterwards
+        if (savedInstanceState != null &&
+                savedInstanceState.containsKey(STATE_PICKERS_PERIOD)) {
+            DateHolder dateHolder = savedInstanceState.getParcelable(STATE_PICKERS_PERIOD);
+
+            if (dateHolder != null) {
+                periodPickerLinearLayout.setTag(dateHolder);
+                periodPickerTextView.setText(dateHolder.getLabel());
+
+                // we need to try to render data entry button
+                onPickerSelected();
             }
         }
     }
 
-    private void loadData() {
-        showProgressBar();
-        setEnabledSwipeRefreshLayout(false);
-        getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null, this).forceLoad();
+    private void setupSwipeRefreshLayout(View root, Bundle savedInstanceState) {
+        swipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.ptr_layout);
+        SwipeRefreshLayout.OnRefreshListener listener = new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                startUpdate();
+            }
+        };
+
+        @ColorInt
+        int blue = R.color.actionbar_blue;
+
+        swipeRefreshLayout.setOnRefreshListener(listener);
+        swipeRefreshLayout.setColorSchemeColors(blue, blue);
+
+        PrefUtils.State datasetState = PrefUtils.getResourceState(
+                getActivity(), PrefUtils.Resources.DATASETS);
+
+        boolean isRefreshing = false;
+        if (savedInstanceState != null &&
+                savedInstanceState.containsKey(STATE_IS_REFRESHING)) {
+            isRefreshing = savedInstanceState.getBoolean(STATE_IS_REFRESHING, false);
+        }
+
+        if (!swipeRefreshLayout.isRefreshing()) {
+            isRefreshing = datasetState == PrefUtils.State.REFRESHING;
+        }
+
+        if (!isRefreshing) {
+            boolean needsUpdate = datasetState == PrefUtils.State.OUT_OF_DATE;
+            boolean isConnectionAvailable = NetworkUtils.checkConnection(getActivity());
+
+            if (needsUpdate && isConnectionAvailable) {
+                // startUpdate();
+            }
+        } else {
+            showProgressBar();
+        }
     }
 
-    private void onLoadFinished(ArrayList<OrganizationUnit> units) {
-        hideProgressBar();
-        setEnabledSwipeRefreshLayout(true);
+    private void onPickerListChanged(List<Picker> pickers) {
+        if (pickers != null && !pickers.isEmpty()) {
+            Picker lastPicker = pickers.get(pickers.size() - 1);
+            Picker lastPickerChild = lastPicker.getSelectedChild();
 
-        // if there is no any forms available, show stub screen
-        if (units == null) {
-            enableViews(stubFragmentLayout);
-            hideAndDisableViews(pickersContainer);
-            String message = getString(R.string.no_forms_found);
-            ToastManager.makeToast(getActivity(), message, Toast.LENGTH_SHORT).show();
+            if (lastPickerChild != null && lastPickerChild.areChildrenPseudoRoots()) {
+                // enable period picker as well
+                if (lastPickerChild.getTag() != null &&
+                        lastPickerChild.getTag() instanceof FormOptions) {
+                    handlePeriodPicker((FormOptions) lastPickerChild.getTag());
+                }
+
+                // we need to disconnect pseudo roots from node
+                pickerAdapterTwo.swapData(
+                        lastPickerChild.buildUpon()
+                                .parent(null)
+                                .build());
+            } else {
+                // hide period picker
+                periodPickerLinearLayout.setVisibility(View.GONE);
+                periodPickerLinearLayout.setTag(null);
+                periodPickerTextView.setText(null);
+
+                // clear category pickers
+                pickerAdapterTwo.swapData(null);
+            }
+
+            // hiding empty state message
+            stubLayout.setVisibility(View.GONE);
+
+            onPickerSelected();
         } else {
-            perfomInAnimation(getActivity(), R.anim.fade_in, pickersContainer);
-            hideAndDisableViews(stubFragmentLayout, userEntryContainer);
-
-            // pass data to spinner
-            handleUnits(units);
-            // restore user choices if available
-            restorePreviousState();
+            // showing empty state message
+            stubLayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void handlePeriodPicker(final FormOptions options) {
+        final String choosePeriodPrompt = getString(R.string.choose_period);
+        periodPickerTextView.setText(choosePeriodPrompt);
+
+        periodPickerLinearLayout.setVisibility(View.VISIBLE);
+        periodPickerLinearLayout.setTag(null);
+
+        periodPickerTextView.setText(choosePeriodPrompt);
+        periodPickerTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PeriodPicker periodPicker = PeriodPicker
+                        .newInstance(
+                                choosePeriodPrompt,
+                                options.getPeriodType(),
+                                options.getOpenFuturePeriods());
+                periodPicker.setOnPeriodClickListener(new PeriodPicker.OnPeriodClickListener() {
+                    @Override
+                    public void onPeriodClicked(DateHolder dateHolder) {
+                        onDateSelected(dateHolder);
+                    }
+                });
+                periodPicker.show(getChildFragmentManager());
+            }
+        });
+    }
+
+    private void onDateSelected(DateHolder date) {
+        String label = getString(R.string.choose_period);
+        if (date != null) {
+            label = date.getLabel();
+        }
+
+        periodPickerLinearLayout.setTag(date);
+        periodPickerTextView.setText(label);
+
+        onPickerSelected();
+    }
+
+    private void onPickerSelected() {
+        DatasetInfoHolder datasetInfoHolder = new DatasetInfoHolder();
+
+        // we need to traverse all views and pick up their states
+        List<Picker> pickerListOne = pickerAdapterOne.getData();
+        List<Picker> pickerListTwo = pickerAdapterTwo.getData();
+        DateHolder pickerPeriodDateHolder = null;
+
+        if (periodPickerLinearLayout.getTag() != null) {
+            pickerPeriodDateHolder = (DateHolder) periodPickerLinearLayout.getTag();
+        }
+
+        // if we have everything in place, we can show data entry button
+        if (pickerPeriodDateHolder == null) {
+            handleDataEntryButton(null);
+            return;
+        }
+
+        // set period to dataSetInfoHolder
+        datasetInfoHolder.setPeriod(pickerPeriodDateHolder.getDate());
+        datasetInfoHolder.setPeriodLabel(pickerPeriodDateHolder.getLabel());
+
+        if (!areAllPrimaryPickersPresent(pickerListOne)) {
+            handleDataEntryButton(null);
+            return;
+        }
+
+        // set set organisation unit and data set ids
+        Picker orgUnitPickerChild = pickerListOne.get(ORG_UNIT_PICKER_ID).getSelectedChild();
+        datasetInfoHolder.setOrgUnitId(orgUnitPickerChild.getId());
+        datasetInfoHolder.setOrgUnitLabel(orgUnitPickerChild.getName());
+
+        Picker dataSetPickerChild = pickerListOne.get(DATASET_PICKER_ID).getSelectedChild();
+        datasetInfoHolder.setFormId(dataSetPickerChild.getId());
+        datasetInfoHolder.setFormLabel(dataSetPickerChild.getName());
+
+        if (dataSetPickerChild.isLeaf()) {
+            handleDataEntryButton(datasetInfoHolder);
+            return;
+        }
+
+        if (dataSetPickerChild.areChildrenPseudoRoots()) {
+            // we need to check if all pseudo roots have values
+            if (!areAllSecondaryPickersPresent(pickerListTwo)) {
+                handleDataEntryButton(null);
+                return;
+            }
+
+            List<CategoryOption> categoryOptions = new ArrayList<>();
+
+            // building list of selected category options
+            for (Picker categoryPicker : pickerListTwo) {
+                Picker categoryPickerChild = categoryPicker.getSelectedChild();
+                categoryOptions.add((CategoryOption) categoryPickerChild.getTag());
+            }
+
+            datasetInfoHolder.setCategoryOptions(categoryOptions);
+            handleDataEntryButton(datasetInfoHolder);
+        }
+    }
+
+    private boolean areAllPrimaryPickersPresent(List<Picker> pickers) {
+        return pickers != null && pickers.size() > 1 &&
+                pickers.get(ORG_UNIT_PICKER_ID) != null &&
+                pickers.get(ORG_UNIT_PICKER_ID).getSelectedChild() != null &&
+                pickers.get(DATASET_PICKER_ID) != null &&
+                pickers.get(DATASET_PICKER_ID).getSelectedChild() != null;
+    }
+
+    private boolean areAllSecondaryPickersPresent(List<Picker> pickers) {
+        if (pickers == null) {
+            return false;
+        }
+
+        for (Picker secondaryPicker : pickers) {
+            if (secondaryPicker.getSelectedChild() == null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void handleDataEntryButton(final DatasetInfoHolder info) {
+        if (info != null) {
+            String unit = String.format("%s: %s",
+                    getString(R.string.organization_unit), info.getOrgUnitLabel());
+            String period = String.format("%s: %s",
+                    getString(R.string.period), info.getPeriodLabel());
+
+            // setting labels
+            formTextView.setText(info.getFormLabel());
+            formDescriptionTextView.setText(period);
+            organisationUnitTextView.setText(unit);
+
+            dataEntryButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startDataEntryActivity(info);
+                }
+            });
+
+            // dataEntryButton.setVisibility(View.VISIBLE);
+            if (!dataEntryButton.isShown()) {
+                perfomInAnimation(getActivity(), R.anim.in_left, dataEntryButton);
+            }
+        } else {
+            // reset all strings
+            formTextView.setText("");
+            formDescriptionTextView.setText("");
+            organisationUnitTextView.setText("");
+
+            // hide button
+            // dataEntryButton.setVisibility(View.GONE);
+            if (dataEntryButton.isShown()) {
+                perfomOutAnimation(getActivity(), R.anim.out_right, true, dataEntryButton);
+            }
+        }
+    }
+
+    private void startDataEntryActivity(DatasetInfoHolder info) {
+        if (info != null && getActivity() != null) {
+            Intent intent = new Intent(getActivity(), AggregateReportDataEntryActivity.class);
+            intent.putExtra(DatasetInfoHolder.TAG, info);
+
+            getActivity().startActivity(intent);
+            getActivity().overridePendingTransition(
+                    R.anim.slide_up, R.anim.activity_open_exit);
+        }
+    }
+
+    private void showProgressBar() {
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        });
+    }
+
+    private void hideProgressBar() {
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     private void startUpdate() {
         Log.i("startUpdate()", "Starting update of dataSets");
+
         Context context = getActivity();
         if (context == null) {
             return;
@@ -349,11 +530,7 @@ public class AggregateReportFragment extends Fragment implements LoaderManager.L
 
         boolean isConnectionAvailable = NetworkUtils.checkConnection(context);
         if (isConnectionAvailable) {
-            showProgressInActionBar();
-            // Hide dataentry button from screen
-            perfomOutAnimation(getActivity(), R.anim.out_right, true, userEntryContainer);
-            // Reset to default all previous user choices
-            resetValues();
+            showProgressBar();
 
             // Prepare Intent and start service
             Intent intent = new Intent(getActivity(), WorkService.class);
@@ -362,196 +539,140 @@ public class AggregateReportFragment extends Fragment implements LoaderManager.L
         } else {
             String message = getString(R.string.check_connection);
             ToastManager.makeToast(context, message, Toast.LENGTH_LONG).show();
-            hideProgressInActionBar();
+            hideProgressBar();
         }
     }
 
-    protected void handleUnits(final ArrayList<OrganizationUnit> units) {
-        ArrayList<String> labels = new ArrayList<String>();
-        for (OrganizationUnit unit : units) {
-            labels.add(unit.getLabel());
-        }
+    /* this BroadcastReceiver waits for response with updates from service */
+    private BroadcastReceiver onFormsUpdateListener = new BroadcastReceiver() {
 
-        OnItemClickListener listener = new OnItemClickListener() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            hideProgressBar();
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                onUnitSelected(units.get(pos));
+            int networkStatusCode = intent.getExtras().getInt(Response.CODE);
+            int parsingStatusCode = intent.getExtras().getInt(JsonHandler.PARSING_STATUS_CODE);
+
+            if (HTTPClient.isError(networkStatusCode)) {
+                String message = HTTPClient.getErrorMessage(getActivity(), networkStatusCode);
+                ToastManager.makeToast(getActivity(), message, Toast.LENGTH_LONG).show();
             }
-        };
 
-        orgUnitPicker.enable();
-        orgUnitPicker.updateContent(labels);
-        orgUnitPicker.setOnItemClickListener(listener);
-    }
-
-    protected void onUnitSelected(OrganizationUnit unit) {
-        orgUnitPicker.setText(unit.getLabel());
-        orgUnitPicker.dismiss();
-        orgUnitPicker.saveSelection(unit);
-
-        info.setOrgUnitLabel(unit.getLabel());
-        info.setOrgUnitId(unit.getId());
-
-        handleDatasets(unit.getForms());
-        disableViews(0);
-    }
-
-    protected void handleDatasets(final ArrayList<Form> datasets) {
-        ArrayList<String> labels = new ArrayList<String>();
-        for (Form form : datasets) {
-            labels.add(form.getLabel());
-        }
-
-        OnItemClickListener listener = new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                onDatasetSelected(datasets.get(pos));
+            if (parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
+                String message = getString(R.string.bad_response);
+                ToastManager.makeToast(getActivity(), message, Toast.LENGTH_LONG).show();
             }
-        };
 
-        datasetPicker.enable();
-        datasetPicker.updateContent(labels);
-        datasetPicker.setOnItemClickListener(listener);
-    }
+            loadData();
+        }
+    };
 
-    protected void onDatasetSelected(Form form) {
-        datasetPicker.setText(form.getLabel());
-        datasetPicker.saveSelection(form);
-        datasetPicker.dismiss();
+    /* This class is responsible for async. data loading from storage */
+    private static class DataLoader extends AsyncTaskLoader<Picker> {
 
-        info.setFormLabel(form.getLabel());
-        info.setFormId(form.getId());
+        public DataLoader(FragmentActivity activity) {
+            super(activity);
+        }
 
-        handleDates(form.getOptions());
-        disableViews(1);
-    }
-
-    protected void handleDates(FormOptions options) {
-        OnItemClickListener listener = new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
-                onDateSelected(periodPicker.getDates().get(pos));
+        @Override
+        public Picker loadInBackground() {
+            String jSourceUnits;
+            if (TextFileUtils.doesFileExist(getContext(), TextFileUtils.Directory.ROOT,
+                    TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS)) {
+                jSourceUnits = TextFileUtils.readTextFile(getContext(), TextFileUtils.Directory.ROOT,
+                        TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS);
+            } else {
+                return null;
             }
-        };
 
-        System.out.println("PERIOD_TYPE: " + options.getPeriodType());
-        System.out.println("ALLOW_FUTURE_PERIOD: " + options.getOpenFuturePeriods());
+            ArrayList<OrganizationUnit> units = null;
+            try {
+                JsonArray jUnits = JsonHandler.buildJsonArray(jSourceUnits);
+                Type type = new TypeToken<ArrayList<OrganizationUnit>>() {
+                    // capturing type
+                }.getType();
+                units = JsonHandler.fromJson(jUnits, type);
+            } catch (ParsingException e) {
+                e.printStackTrace();
+            }
 
-        periodPicker.enable();
-        periodPicker.setOnItemClickListener(listener);
-        periodPicker.setPeriodType(options.getPeriodType(), options.getOpenFuturePeriods());
-    }
+            String chooseOrganisationUnit = getContext().getString(R.string.choose_unit);
+            String chooseDataSet = getContext().getString(R.string.choose_data_set);
+            String choose = getContext().getString(R.string.choose);
+            Picker rootNode = null;
 
-    protected void onDateSelected(DateHolder date) {
-        periodPicker.setText(date.getLabel());
-        periodPicker.saveSelection(date);
-        periodPicker.dismiss();
+            if (units != null && !units.isEmpty()) {
+                rootNode = new Picker.Builder()
+                        .hint(chooseOrganisationUnit)
+                        .build();
 
-        info.setPeriodLabel(date.getLabel());
-        info.setPeriod(date.getDate());
+                for (OrganizationUnit organisationUnit : units) {
+                    Picker organisationUnitPicker = new Picker.Builder()
+                            .id(organisationUnit.getId())
+                            .name(organisationUnit.getLabel())
+                            .hint(chooseDataSet)
+                            .parent(rootNode)
+                            .build();
 
-        handleDataEntryInfo();
-        if (!userEntryContainer.isShown()) {
-            perfomInAnimation(getActivity(), R.anim.in_left, userEntryContainer);
-        }
-    }
+                    if (organisationUnit.getForms() == null ||
+                            organisationUnit.getForms().isEmpty()) {
+                        continue;
+                    }
 
-    protected void handleDataEntryInfo() {
-        if (info.getFormLabel() != null && info.getFormLabel() != null
-                && info.getPeriodLabel() != null) {
-            String unit = String.format("%s: %s", getString(R.string.organization_unit), info.getOrgUnitLabel());
-            String period = String.format("%s: %s", getString(R.string.period), info.getPeriodLabel());
+                    // going through data set
+                    for (Form dataSet : organisationUnit.getForms()) {
+                        FormOptions formOptions = null;
+                        if (dataSet.getOptions() != null) {
+                            // we need to pull out options from dataset and set them as tag
+                            formOptions = dataSet.getOptions();
+                        }
 
-            choosenDataset.setText(info.getFormLabel());
-            choosenUnit.setText(unit);
-            choosenPeriod.setText(period);
-        }
-    }
+                        Picker dataSetPicker = new Picker.Builder()
+                                .id(dataSet.getId())
+                                .name(dataSet.getLabel())
+                                .parent(organisationUnitPicker)
+                                .tag(formOptions)
+                                .build();
+                        organisationUnitPicker.addChild(dataSetPicker);
 
-    protected void startDataentryActivity() {
-        if (info != null && getActivity() != null) {
-            Intent intent = new Intent(getActivity(), AggregateReportDataEntryActivity.class);
-            intent.putExtra(DatasetInfoHolder.TAG, info);
-            getActivity().startActivity(intent);
-            getActivity().overridePendingTransition(R.anim.slide_up, R.anim.activity_open_exit);
-        }
-    }
+                        if (dataSet.getCategoryCombo() == null ||
+                                dataSet.getCategoryCombo().getCategories() == null) {
+                            continue;
+                        }
 
-    protected void disableViews(int level) {
-        switch (level) {
-            case 0:
-                periodPicker.disable();
-            case 1:
-                if (userEntryContainer.isShown()) {
-                    perfomOutAnimation(getActivity(), R.anim.out_right, true, userEntryContainer);
+                        for (Category category : dataSet.getCategoryCombo().getCategories()) {
+                            String label = String.format(Locale.getDefault(), "%s %s",
+                                    choose, category.getLabel());
+                            Picker categoryPicker = new Picker.Builder()
+                                    .id(category.getId())
+                                    .hint(label)
+                                    .parent(dataSetPicker)
+                                    .asPseudoRoot()
+                                    .build();
+                            dataSetPicker.addChild(categoryPicker);
+
+                            if (category.getCategoryOptions() == null ||
+                                    category.getCategoryOptions().isEmpty()) {
+                                continue;
+                            }
+
+                            for (CategoryOption option : category.getCategoryOptions()) {
+                                Picker categoryOptionPicker = new Picker.Builder()
+                                        .id(option.getId())
+                                        .name(option.getLabel())
+                                        .parent(categoryPicker)
+                                        .tag(option)
+                                        .build();
+                                categoryPicker.addChild(categoryOptionPicker);
+                            }
+                        }
+                    }
+
+                    rootNode.addChild(organisationUnitPicker);
                 }
-        }
-    }
-
-    protected static void dismissAllPickers(BaseItemPicker... pickers) {
-        for (BaseItemPicker picker : pickers) {
-            if (picker != null && picker.isShowing()) {
-                picker.dismiss();
             }
+
+            return rootNode;
         }
-    }
-
-    private void showProgressInActionBar() {
-        if (swipeRefreshLayout != null) {
-            isRefreshing = true;
-
-            if (!swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(true);
-            }
-        }
-    }
-
-    private void hideProgressInActionBar() {
-        if (swipeRefreshLayout != null) {
-            isRefreshing = false;
-
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }
-    }
-
-    private void showProgressBar() {
-        hideAndDisableViews(contentView);
-        enableViews(progressBar);
-    }
-
-    private void hideProgressBar() {
-        hideAndDisableViews(progressBar);
-        enableViews(contentView);
-    }
-
-    private void setEnabledSwipeRefreshLayout(boolean flag) {
-        if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setEnabled(flag);
-        }
-    }
-
-    private void resetValues() {
-        if (orgUnitPicker != null) {
-            orgUnitPicker.disable();
-        }
-
-        if (datasetPicker != null) {
-            datasetPicker.disable();
-        }
-
-        if (periodPicker != null) {
-            periodPicker.disable();
-        }
-
-        savedUnit = null;
-        savedForm = null;
-        savedPeriod = null;
-
-        info = new DatasetInfoHolder();
     }
 }

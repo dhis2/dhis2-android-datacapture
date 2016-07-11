@@ -149,7 +149,7 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.my_profile_fragment_layout, container, false);
+        View root = inflater.inflate(R.layout.fragment_my_profile, container, false);
         mSwipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.ptr_layout);
         mList = (ListView) mSwipeRefreshLayout.findViewById(R.id.list_of_fields);
         mProgressBar = (ProgressBar) root.findViewById(R.id.progress_bar);

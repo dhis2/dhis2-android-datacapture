@@ -125,7 +125,7 @@ public class DatePickerDialog extends AlertDialog implements OnDateChangedListen
 
         LayoutInflater inflater =
                 (LayoutInflater) themeContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.date_picker_dialog, null);
+        View view = inflater.inflate(R.layout.dialog_date_picker, null);
         setView(view);
         
         mDatePicker = (DatePicker) view.findViewById(R.id.datePicker);

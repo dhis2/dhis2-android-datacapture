@@ -51,8 +51,7 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkException;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
-import org.dhis2.mobile.ui.fragments.AggregateReportFragment2;
-import org.dhis2.mobile.ui.fragments.SEWRFragment;
+import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 
@@ -79,7 +78,6 @@ public class FormsDownloadProcessor {
     private static final String ORG_UNITS = "organisationUnits";
 
     private static final String DATASETS = "dataSets";
-    private static final String PROGRAMS = "programs";
     private static final String OPTIONS = "options";
     private static final String CATEGORY_COMBO = "categoryCombo";
 
@@ -116,7 +114,7 @@ public class FormsDownloadProcessor {
         }
 
         Log.i(TAG, "Download finished");
-        Intent intent = new Intent(AggregateReportFragment2.TAG);
+        Intent intent = new Intent(AggregateReportFragment.TAG);
         intent.putExtra(Response.CODE, networkStatusCode);
         intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -164,85 +162,6 @@ public class FormsDownloadProcessor {
                 orgUnitsWithDatasets);
     }
 
-    public static void updateSingleEventsWithoutReg(Context context) {
-        PrefUtils.setResourceState(context,
-                PrefUtils.Resources.SINGLE_EVENTS_WITHOUT_REGISTRATION,
-                PrefUtils.State.REFRESHING);
-
-        int networkStatusCode = HttpURLConnection.HTTP_OK;
-        int parsingStatusCode = JsonHandler.PARSING_OK_CODE;
-
-        try {
-            downloadSingleEventsWithoutReg(context);
-        } catch (NetworkException e) {
-            e.printStackTrace();
-            networkStatusCode = e.getErrorCode();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            parsingStatusCode = JsonHandler.PARSING_FAILED_CODE;
-        } catch (ParsingException e) {
-            e.printStackTrace();
-            parsingStatusCode = JsonHandler.PARSING_FAILED_CODE;
-        }
-
-        if (networkStatusCode == HttpURLConnection.HTTP_OK
-                && parsingStatusCode == JsonHandler.PARSING_OK_CODE) {
-            PrefUtils.setResourceState(context,
-                    PrefUtils.Resources.SINGLE_EVENTS_WITHOUT_REGISTRATION,
-                    PrefUtils.State.UP_TO_DATE);
-        } else {
-            PrefUtils.setResourceState(context,
-                    PrefUtils.Resources.SINGLE_EVENTS_WITHOUT_REGISTRATION,
-                    PrefUtils.State.ATTEMPT_TO_REFRESH_IS_MADE);
-        }
-
-        Log.i(TAG, "Download finished");
-        Intent intent = new Intent(SEWRFragment.TAG);
-        intent.putExtra(Response.CODE, networkStatusCode);
-        intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
-    private static void downloadSingleEventsWithoutReg(Context context)
-            throws NetworkException, ParsingException {
-        final String creds = PrefUtils.getCredentials(context);
-        final String server = PrefUtils.getServerURL(context);
-        final String programURL = server + URLConstants.PROGRAMS_URL + URLConstants.ANONYMOUS_EVENT_PARAM;
-
-        Response response = download(programURL, creds);
-        JsonObject jSource = buildJsonObject(response);
-
-        if (!jSource.has(ORG_UNITS) || !jSource.has(FORMS)) {
-            TextFileUtils.removeFile(context,
-                    TextFileUtils.Directory.ROOT,
-                    TextFileUtils.FileNames.ORG_UNITS_WITH_SEWR);
-            return;
-        }
-
-        JsonObject jUnits = getJsonObject(jSource, ORG_UNITS);
-        JsonObject jPrograms = getJsonObject(jSource, FORMS);
-
-        OrganizationUnit[] units = handleUnitsWithSEWR(jUnits, jPrograms);
-        HashMap<String, Form> forms = handleForms(jPrograms);
-
-        HashSet<String> optionSetIds = getOptionSetIds(forms);
-        updateOptionSets(context, optionSetIds);
-
-        Gson gson = new Gson();
-        for (String key : forms.keySet()) {
-            Form form = forms.get(key);
-            String jForm = gson.toJson(form);
-            TextFileUtils.writeTextFile(context,
-                    TextFileUtils.Directory.PROGRAMS, key, jForm);
-        }
-
-        String orgUnitsWithDatasets = gson.toJson(units);
-        TextFileUtils.writeTextFile(context,
-                TextFileUtils.Directory.ROOT,
-                TextFileUtils.FileNames.ORG_UNITS_WITH_SEWR,
-                orgUnitsWithDatasets);
-    }
-
     private static OrganizationUnit[] handleUnitsWithDatasets(
             JsonObject jUnits, JsonObject jDatasets) throws ParsingException {
         JsonArray modifiedOrgUnits = new JsonArray();
@@ -267,42 +186,6 @@ public class FormsDownloadProcessor {
             }
 
             jUnit.remove(DATASETS);
-            jUnit.add(FORMS, unitForms);
-
-            modifiedOrgUnits.add(jUnit);
-        }
-
-        // Deserialize organization units, sort them and their forms
-        // in alphabetical order, and serialize back into json string
-        OrganizationUnit[] orgUnits = fromJson(modifiedOrgUnits, OrganizationUnit[].class);
-        Arrays.sort(orgUnits, OrganizationUnit.COMPARATOR);
-
-        for (OrganizationUnit orgUnit : orgUnits) {
-            Collections.sort(orgUnit.getForms(), Form.COMPARATOR);
-        }
-
-        return orgUnits;
-    }
-
-    private static OrganizationUnit[] handleUnitsWithSEWR(JsonObject jUnits,
-                                                          JsonObject jDatasets) throws ParsingException {
-        JsonArray modifiedOrgUnits = new JsonArray();
-
-        for (Map.Entry<String, JsonElement> entry : jUnits.entrySet()) {
-            JsonObject jUnit = getAsJsonObject(entry.getValue());
-            JsonArray unitForms = getJsonArray(jUnit, PROGRAMS);
-
-            for (int i = 0; i < unitForms.size(); i++) {
-                JsonObject jForm = getAsJsonObject(unitForms.get(i));
-                String id = getString(jForm, ID);
-
-                JsonObject jDataset = getJsonObject(jDatasets, id);
-                JsonObject options = getJsonObject(jDataset, OPTIONS);
-
-                jForm.add(OPTIONS, options);
-            }
-
-            jUnit.remove(PROGRAMS);
             jUnit.add(FORMS, unitForms);
 
             modifiedOrgUnits.add(jUnit);

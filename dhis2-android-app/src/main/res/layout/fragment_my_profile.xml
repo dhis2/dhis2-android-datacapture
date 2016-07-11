@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/list_of_fields" />
+        <include layout="@layout/listview" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

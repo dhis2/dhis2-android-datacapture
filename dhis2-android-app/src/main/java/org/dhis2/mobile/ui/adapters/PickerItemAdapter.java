@@ -99,7 +99,7 @@ public class PickerItemAdapter extends BaseAdapter {
 
         if (convertView == null) {
             view = inflater.inflate(
-                    R.layout.dialog_listview_item, parent, false);
+                    R.layout.listview_row_picker_item, parent, false);
             viewHolder = new PickerItemViewHolder(view);
             view.setTag(viewHolder);
         } else {

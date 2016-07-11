@@ -57,7 +57,7 @@ public class DateAdapter extends BaseAdapter {
 
         if (convertView == null) {
             ViewGroup rootView = (ViewGroup) inflater.inflate(
-                    R.layout.dialog_listview_item, parent, false);
+                    R.layout.listview_row_picker_item, parent, false);
             TextView textView = (TextView) rootView.findViewById(R.id.text_item);
 
             holder = new TextViewHolder(textView);

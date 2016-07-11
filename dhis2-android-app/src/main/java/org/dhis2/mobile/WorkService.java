@@ -41,6 +41,7 @@ import org.dhis2.mobile.io.holders.ProgramInfoHolder;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.processors.AggregateReportUploadProcessor;
+import org.dhis2.mobile.processors.DatasetValuesDownloadProcessor;
 import org.dhis2.mobile.processors.FormsDownloadProcessor;
 import org.dhis2.mobile.processors.LoginProcessor;
 import org.dhis2.mobile.processors.MyProfileProcessor;
@@ -48,7 +49,6 @@ import org.dhis2.mobile.processors.OfflineDataProcessor;
 import org.dhis2.mobile.processors.RemoveDataProcessor;
 import org.dhis2.mobile.processors.SEWRUploadProcessor;
 import org.dhis2.mobile.ui.activities.LoginActivity;
-import org.dhis2.mobile.processors.DatasetValuesDownloadProcessor;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 
 import java.util.ArrayList;
@@ -61,7 +61,6 @@ public class WorkService extends Service {
     public static final String METHOD_UPLOAD_PROFILE_INFO = "uploadProfileInfo";
     public static final String METHOD_LOGIN_USER = "loginUser";
     public static final String METHOD_UPDATE_DATASETS = "updateDatasets";
-    public static final String METHOD_UPDATE_SINGLE_EVENTS_WITHOUT_REG = "singleEventsWithoutReg";
     public static final String METHOD_DOWNLOAD_LATEST_DATASET_VALUES = "downloadLatestDatasetValues";
     public static final String METHOD_UPLOAD_DATASET = "aggregateReportUploadProcessor";
     public static final String METHOD_UPLOAD_SEWR = "singleEventWithoutRgistrationProcessor";
@@ -70,7 +69,7 @@ public class WorkService extends Service {
 
     // maximum number of threads in thread pool
     private static final int QUANTITY_OF_THREADS = 3;
-    private static final String TAG = "org.dhis2.mobile.WorkService";
+    private static final String TAG = WorkService.class.getSimpleName();
 
     private ExecutorService executor;
 
@@ -82,7 +81,7 @@ public class WorkService extends Service {
         super.onCreate();
 
         executor = Executors.newFixedThreadPool(QUANTITY_OF_THREADS);
-        tasks = new ArrayList<Runnable>();
+        tasks = new ArrayList<>();
         Log.i(TAG, "onCreate()");
     }
 
@@ -148,10 +147,6 @@ public class WorkService extends Service {
 
         if (methodName.equals(METHOD_UPDATE_DATASETS)) {
             FormsDownloadProcessor.updateDatasets(context);
-        }
-
-        if (methodName.equals(METHOD_UPDATE_SINGLE_EVENTS_WITHOUT_REG)) {
-            FormsDownloadProcessor.updateSingleEventsWithoutReg(context);
         }
 
         if (methodName.equals(METHOD_DOWNLOAD_LATEST_DATASET_VALUES)) {
