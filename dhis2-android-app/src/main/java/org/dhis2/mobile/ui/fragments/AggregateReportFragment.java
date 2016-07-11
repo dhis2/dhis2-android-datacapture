@@ -44,7 +44,6 @@ import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.ui.adapters.PickerAdapter;
 import org.dhis2.mobile.ui.adapters.PickerAdapter.OnPickerListChangeListener;
 import org.dhis2.mobile.ui.models.Picker;
-import org.dhis2.mobile.ui.pickers.PeriodPicker;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;

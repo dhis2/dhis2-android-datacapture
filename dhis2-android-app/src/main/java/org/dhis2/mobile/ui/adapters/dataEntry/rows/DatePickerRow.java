@@ -32,14 +32,13 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 import org.dhis2.mobile.io.models.Field;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.ui.pickers.DatePickerDialog;
-import org.dhis2.mobile.ui.pickers.DatePickerDialog.OnDateSetListener;
+import org.dhis2.mobile.ui.fragments.DatePickerDialog;
+import org.dhis2.mobile.ui.fragments.DatePickerDialog.OnDateSetListener;
 import org.joda.time.LocalDate;
 
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;

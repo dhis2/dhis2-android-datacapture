@@ -33,14 +33,14 @@ public class PickerItemAdapter extends BaseAdapter {
         this.inflater = LayoutInflater.from(context);
         this.currentPicker = checkNotNull(picker, "Picker must not be null");
         this.originalPickers = currentPicker.getChildren();
-        this.filteredPickers = new ArrayList<Picker>(currentPicker.getChildren());
+        this.filteredPickers = new ArrayList<>(currentPicker.getChildren());
     }
 
     public PickerItemAdapter(Context context) {
         this.context = checkNotNull(context, "context must not be null!");
         this.inflater = LayoutInflater.from(context);
-        this.originalPickers = new ArrayList<Picker>();
-        this.filteredPickers = new ArrayList<Picker>();
+        this.originalPickers = new ArrayList<>();
+        this.filteredPickers = new ArrayList<>();
     }
 
     public void setOnPickerItemClickListener(OnPickerItemClickListener onPickerItemClickListener) {

@@ -1,4 +1,4 @@
-package org.dhis2.mobile.ui.pickers;
+package org.dhis2.mobile.ui.fragments;
 
 /*
  * Copyright (C) 2007 The Android Open Source Project
@@ -35,7 +35,6 @@ import android.widget.DatePicker.OnDateChangedListener;
  * guide.</p>
  */
 public class DatePickerDialog extends AlertDialog implements OnDateChangedListener {
-
     private static final String YEAR = "year";
     private static final String MONTH = "month";
     private static final String DAY = "day";

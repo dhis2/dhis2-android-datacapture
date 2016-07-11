@@ -30,6 +30,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:minHeight="428dp"
     android:minWidth="296dp"
     android:orientation="vertical">
@@ -51,6 +52,7 @@
     <ListView
         android:id="@+id/listview_picker_items"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:cacheColorHint="@android:color/transparent"/>
 
 </LinearLayout>

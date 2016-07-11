@@ -1,4 +1,4 @@
-package org.dhis2.mobile.ui.pickers;
+package org.dhis2.mobile.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -36,7 +36,9 @@ public class PeriodPicker extends DialogFragment {
         arguments.putString(ARG_TITLE, title);
         arguments.putString(ARG_PERIOD_TYPE, periodType);
         arguments.putInt(ARG_OPEN_FUTURE_PERIOD, openFuturePeriod);
+
         periodPicker.setArguments(arguments);
+        periodPicker.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
 
         return periodPicker;
     }
