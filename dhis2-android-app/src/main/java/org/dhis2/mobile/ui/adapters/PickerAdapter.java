@@ -105,14 +105,20 @@ public class PickerAdapter extends RecyclerView.Adapter {
     }
 
     public void onSaveInstanceState(String key, Bundle outState) {
-        if (outState != null && pickerTree != null) {
+        if (outState != null) {
             outState.putSerializable(key, pickerTree);
         }
     }
 
     public void onRestoreInstanceState(String key, Bundle savedInstanceState) {
         if (savedInstanceState != null && savedInstanceState.containsKey(key)) {
-            Picker pickerTree = (Picker) savedInstanceState.getSerializable(key);
+            Picker pickerTree = null;
+
+            // if the key is there, it does not mean that the value is not null
+            if (savedInstanceState.get(key) != null) {
+                pickerTree = (Picker) savedInstanceState.getSerializable(key);
+            }
+
             swapData(pickerTree);
         }
     }

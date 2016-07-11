@@ -89,6 +89,7 @@ public class AggregateReportFragment2 extends Fragment
 
     // swipe refresh layout
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View stubLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,6 +98,7 @@ public class AggregateReportFragment2 extends Fragment
 
     @Override
     public void onViewCreated(View root, Bundle savedInstanceState) {
+        setupStubLayout(root);
         setupDataEntryButton(root);
         setupPickerRecyclerViews(root, savedInstanceState);
         setupSwipeRefreshLayout(root, savedInstanceState);
@@ -108,7 +110,6 @@ public class AggregateReportFragment2 extends Fragment
 
     @Override
     public void onPause() {
-        // dismissAllPickers(orgUnitPicker, datasetPicker, periodPicker);
         LocalBroadcastManager.getInstance(getActivity())
                 .unregisterReceiver(onFormsUpdateListener);
         super.onPause();
@@ -129,9 +130,7 @@ public class AggregateReportFragment2 extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Picker> loader, Picker data) {
-        if (data != null) {
-            pickerAdapterOne.swapData(data);
-        }
+        pickerAdapterOne.swapData(data);
     }
 
     @Override
@@ -165,6 +164,11 @@ public class AggregateReportFragment2 extends Fragment
         getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null, this).forceLoad();
     }
 
+    private void setupStubLayout(View view) {
+        stubLayout = view.findViewById(R.id.pull_to_refresh_stub_screen);
+        stubLayout.setVisibility(View.GONE);
+    }
+
     private void setupDataEntryButton(View root) {
         dataEntryButton = (LinearLayout) root.findViewById(R.id.user_data_entry);
         formTextView = (TextView) root.findViewById(R.id.choosen_form);
@@ -189,7 +193,6 @@ public class AggregateReportFragment2 extends Fragment
                 onDateSelected(null);
             }
         });
-
 
         // picker recycler views
         pickerAdapterOne = new PickerAdapter.Builder()
@@ -285,7 +288,7 @@ public class AggregateReportFragment2 extends Fragment
             boolean isConnectionAvailable = NetworkUtils.checkConnection(getActivity());
 
             if (needsUpdate && isConnectionAvailable) {
-                startUpdate();
+                // startUpdate();
             }
         } else {
             showProgressBar();
@@ -319,7 +322,13 @@ public class AggregateReportFragment2 extends Fragment
                 pickerAdapterTwo.swapData(null);
             }
 
+            // hiding empty state message
+            stubLayout.setVisibility(View.GONE);
+
             onPickerSelected();
+        } else {
+            // showing empty state message
+            stubLayout.setVisibility(View.VISIBLE);
         }
     }
 

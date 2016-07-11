@@ -7,38 +7,47 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp">
+            android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerview_pickers_one"
+            <include layout="@layout/fragment_stub_layout" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingTop="8dp" />
+                android:orientation="vertical"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
 
-            <include layout="@layout/listview_row_picker" />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_pickers_one"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingTop="8dp" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerview_pickers_two"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false" />
+                <include layout="@layout/listview_row_picker" />
 
-            <include
-                layout="@layout/button_form_entry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"/>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_pickers_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false" />
 
-        </LinearLayout>
+                <include
+                    layout="@layout/button_form_entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
 
     </android.support.v4.widget.NestedScrollView>
 
