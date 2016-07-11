@@ -30,6 +30,7 @@
     <group
         android:id="@+id/drawer_group_main"
         android:checkableBehavior="single">
+
         <item
             android:id="@+id/drawer_item_aggregate_report"
             android:icon="@drawable/ic_aggregate_report"

@@ -12,4 +12,98 @@
     <string name="title_activity_downloader">DownloaderActivity</string>
     <string name="title_activity_sewrdata_entry">SEWRDataEntryActivity</string>
 
+    <!-- login -->
+    <string name="login_dialog_message">Please wait</string>
+    <string name="downloading_forms">Downloading forms</string>
+    <string name="downloading_values">Downloading values</string>
+
+    <!-- data entry -->
+    <string name="yes_button">Yes</string>
+    <string name="no_button">No</string>
+    <string name="none_button">No value</string>
+
+    <string name="enter_number">Enter number</string>
+    <string name="enter_integer">Enter integer</string>
+    <string name="enter_integer_positive">Enter positive integer</string>
+    <string name="enter_integer_positive_or_zero">Enter zero or positive integer</string>
+    <string name="enter_integer_negative">Enter negative integer</string>
+    <string name="enter_text">Enter text</string>
+    <string name="enter_long_text">Enter long text</string>
+    <string name="enter_date">Enter date (yyyy.mm.dd)</string>
+    <string name="find_option">Find option</string>
+
+    <string name="upload">Upload</string>
+    <string name="login_button">Log in</string>
+    <string name="log_out">Log out</string>
+    <string name="save">Save</string>
+
+    <!-- account -->
+    <string name="first_name">First name</string>
+    <string name="surname">Surname</string>
+    <string name="email">E-mail</string>
+    <string name="mobile_phone_number">Mobile phone number</string>
+    <string name="introduction">Introduction</string>
+    <string name="job_title">Job title</string>
+    <string name="gender">Gender</string>
+    <string name="birthday">Birthday</string>
+    <string name="nationality">Nationality</string>
+    <string name="employer">Employer</string>
+    <string name="education">Education</string>
+    <string name="interests">Interests</string>
+    <string name="languages">Languages</string>
+
+    <string name="option_male">Male</string>
+    <string name="option_female">Female</string>
+    <string name="option_other">Other</string>
+
+    <!-- toasts and notifications -->
+    <string name="check_connection">Please check connection</string>
+    <string name="wrong_url">Wrong URL</string>
+    <string name="wrong_username_password">Wrong password or username</string>
+    <string name="try_again">Please try again</string>
+    <string name="bad_response">Bad server response</string>
+
+    <string name="import_successfully_completed">Import successfully completed</string>
+    <string name="import_failed">Import failed</string>
+    <string name="something_went_wrong">Something went wrong</string>
+
+    <string name="profile_changes_saved">Changes have been successfully saved</string>
+    <string name="profile_changes_uploaded">Changes have been successfully uploaded</string>
+
+    <!-- String resources for Login activity -->
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="server_url">Enter server URL</string>
+
+    <!-- String resources for aggregate report fragment -->
+    <string name="choose">Choose</string>
+    <string name="choose_data_set">Choose data set</string>
+    <string name="choose_program">Choose program</string>
+    <string name="choose_unit">Choose organisation unit</string>
+    <string name="choose_period">Choose period</string>
+
+    <!-- String resources for single event without registration fragment -->
+    <string name="longitude">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="coordinates">Coordinates</string>
+    <string name="complete_date">Complete date</string>
+    <string name="choose_report_date">Choose report date</string>
+
+    <!-- String resources for downloader fragment -->
+    <string name="download_forms">Download forms</string>
+
+    <!-- menu items -->
+    <string name="aggregate_reporting">Aggregate Report</string>
+    <string name="single_event">Single Event</string>
+    <string name="profile">Profile</string>
+
+    <!-- Basic strings -->
+    <string name="organization_unit">Organisation Unit</string>
+    <string name="description">Description</string>
+    <string name="dataset">Data set</string>
+    <string name="program">Program</string>
+    <string name="period">Period</string>
+    <string name="swipe_to_update">Swipe to update</string>
+    <string name="no_forms_found">No forms found assigned to current user</string>
+
 </resources>

@@ -29,56 +29,58 @@
 
 package org.dhis2.mobile.io.models;
 
-import java.util.ArrayList;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Group implements Parcelable {
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Group implements Serializable, Parcelable {
     public static final String TAG = "org.dhis2.mobile.io.models.Group";
 
-	private String label;
-	private ArrayList<Field> fields = new ArrayList<Field>();
+    private String label;
+    private ArrayList<Field> fields = new ArrayList<Field>();
 
-	public Group() { }
-	
-	public Group(String label, ArrayList<Field> fields) {
-		this.label = label;
-		this.fields = fields;
-	}
+    public Group() {
+    }
 
-	private Group(Parcel in) {
-		label = in.readString();
-		in.readTypedList(fields, Field.CREATOR);
-	}
+    public Group(String label, ArrayList<Field> fields) {
+        this.label = label;
+        this.fields = fields;
+    }
 
-	public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>() {
+    private Group(Parcel in) {
+        label = in.readString();
+        in.readTypedList(fields, Field.CREATOR);
+    }
 
-		public Group createFromParcel(Parcel in) {
-			return new Group(in);
-		}
+    public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>() {
 
-		public Group[] newArray(int size) {
-			return new Group[size];
-		}
-	};
-	
+        public Group createFromParcel(Parcel in) {
+            return new Group(in);
+        }
+
+        public Group[] newArray(int size) {
+            return new Group[size];
+        }
+    };
+
     @Override
-	public void writeToParcel(Parcel group, int flags) {
-		group.writeString(label);	
-		group.writeTypedList(fields);
-	}
-    
+    public void writeToParcel(Parcel group, int flags) {
+        group.writeString(label);
+        group.writeTypedList(fields);
+    }
+
     @Override
-	public int describeContents() {
-		return 0;
-	}
+    public int describeContents() {
+        return 0;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public ArrayList<Field> getFields() {
-		return fields;
-	}
+    public ArrayList<Field> getFields() {
+        return fields;
+    }
 }

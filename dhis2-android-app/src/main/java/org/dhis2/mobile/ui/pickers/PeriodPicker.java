@@ -38,7 +38,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.ui.adapters.dataEntry.SimpleAdapter;
+import org.dhis2.mobile.ui.adapters.dataEntry.DateAdapter;
 import org.dhis2.mobile.utils.date.CustomDateIterator;
 import org.dhis2.mobile.utils.date.DateHolder;
 import org.dhis2.mobile.utils.date.DateIteratorFactory;
@@ -53,7 +53,7 @@ public class PeriodPicker extends BaseItemPicker {
     private DateHolder savedDate;
 
     public PeriodPicker(Context context, View root) {
-        super(context, root, R.id.period_picker_invoker, R.string.choose_period, R.string.period);
+        super(context, root, R.id.textview_picker, R.string.choose_period, R.string.period);
     }
 
     @Override
@@ -65,10 +65,10 @@ public class PeriodPicker extends BaseItemPicker {
         dialog.setContentView(datePickerView);
         dialog.setTitle(dialogTitleId);
 
-        labels = new ArrayList<String>();
-        dates = new ArrayList<DateHolder>();
+        labels = new ArrayList<>();
+        dates = new ArrayList<>();
 
-        adapter = new SimpleAdapter(LayoutInflater.from(context), labels);
+        adapter = new DateAdapter(LayoutInflater.from(context));
 
         list = (ListView) datePickerView.findViewById(R.id.dates_listview);
         list.setAdapter(adapter);

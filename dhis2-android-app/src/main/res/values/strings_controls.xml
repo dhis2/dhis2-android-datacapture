@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="upload">Upload</string>
-    <string name="login_button">Log in</string>
-    <string name="log_out">Log out</string>
-    <string name="save">Save</string>
-
-</resources>

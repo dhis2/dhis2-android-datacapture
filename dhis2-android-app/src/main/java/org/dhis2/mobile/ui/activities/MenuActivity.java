@@ -60,7 +60,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         if (navigationView != null) {
-            navigationView.inflateMenu(R.menu.menu_drawer_default);
+            navigationView.inflateMenu(R.menu.menu_drawer);
             navigationView.setNavigationItemSelectedListener(this);
         }
 

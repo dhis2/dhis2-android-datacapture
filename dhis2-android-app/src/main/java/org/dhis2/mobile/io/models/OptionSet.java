@@ -29,9 +29,10 @@
 
 package org.dhis2.mobile.io.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class OptionSet {
+public class OptionSet implements Serializable {
     private String id;
     private String name;
     private String created;

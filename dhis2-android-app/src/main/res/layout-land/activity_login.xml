@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin">
 
-    <include layout="@layout/progress_bar_light" />
+    <include layout="@layout/progress_bar" />
 
     <ImageView
         android:id="@+id/dhis2_logo"

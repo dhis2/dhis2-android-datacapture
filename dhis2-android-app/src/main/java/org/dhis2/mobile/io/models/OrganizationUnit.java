@@ -29,13 +29,14 @@
 
 package org.dhis2.mobile.io.models;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class OrganizationUnit implements Parcelable {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+public class OrganizationUnit implements Serializable, Parcelable {
 
     // Comparator which is used to sort organization units in alphabetical order
     public static Comparator<OrganizationUnit> COMPARATOR = new Comparator<OrganizationUnit>() {
@@ -46,64 +47,64 @@ public class OrganizationUnit implements Parcelable {
         }
     };
 
-	public static final String TAG = "org.dhis2.mobile.io.models.OrganizationUnit";
-	
-	private String id;
-	private String label;
-	private String level;
-	private String parent;
-	private ArrayList<Form> forms = new ArrayList<Form>();
+    public static final String TAG = "org.dhis2.mobile.io.models.OrganizationUnit";
 
-	private OrganizationUnit(Parcel in) {
-		id = in.readString();
-		label = in.readString();
-		level = in.readString();
-		parent = in.readString();
-		in.readTypedList(forms, Form.CREATOR);
-	}
-	
-	@Override
-	public int describeContents() {
-		return TAG.length();
-	}
+    private String id;
+    private String label;
+    private String level;
+    private String parent;
+    private ArrayList<Form> forms = new ArrayList<Form>();
 
-	@Override
-	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeString(id);
-		parcel.writeString(label);
-		parcel.writeString(level);
-		parcel.writeString(parent);
-		parcel.writeTypedList(forms);
-	}
-	
-	public static final Parcelable.Creator<OrganizationUnit> CREATOR = new Parcelable.Creator<OrganizationUnit>() {
+    private OrganizationUnit(Parcel in) {
+        id = in.readString();
+        label = in.readString();
+        level = in.readString();
+        parent = in.readString();
+        in.readTypedList(forms, Form.CREATOR);
+    }
 
-		public OrganizationUnit createFromParcel(Parcel in) {
-			return new OrganizationUnit(in);
-		}
+    @Override
+    public int describeContents() {
+        return TAG.length();
+    }
 
-		public OrganizationUnit[] newArray(int size) {
-			return new OrganizationUnit[size];
-		}
-	};
-	
-	public String getId() {
-		return id;
-	}
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(id);
+        parcel.writeString(label);
+        parcel.writeString(level);
+        parcel.writeString(parent);
+        parcel.writeTypedList(forms);
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public static final Parcelable.Creator<OrganizationUnit> CREATOR = new Parcelable.Creator<OrganizationUnit>() {
 
-	public String getLevel() {
-		return level;
-	}
+        public OrganizationUnit createFromParcel(Parcel in) {
+            return new OrganizationUnit(in);
+        }
 
-	public String getParent() {
-		return parent;
-	}
+        public OrganizationUnit[] newArray(int size) {
+            return new OrganizationUnit[size];
+        }
+    };
 
-	public ArrayList<Form> getForms() {
-		return forms;
-	}
+    public String getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public ArrayList<Form> getForms() {
+        return forms;
+    }
 }

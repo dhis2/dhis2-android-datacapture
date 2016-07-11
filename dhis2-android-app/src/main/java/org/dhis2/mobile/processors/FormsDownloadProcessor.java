@@ -51,7 +51,7 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkException;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
-import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
+import org.dhis2.mobile.ui.fragments.AggregateReportFragment2;
 import org.dhis2.mobile.ui.fragments.SEWRFragment;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
@@ -116,7 +116,7 @@ public class FormsDownloadProcessor {
         }
 
         Log.i(TAG, "Download finished");
-        Intent intent = new Intent(AggregateReportFragment.TAG);
+        Intent intent = new Intent(AggregateReportFragment2.TAG);
         intent.putExtra(Response.CODE, networkStatusCode);
         intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

@@ -1,6 +1,8 @@
 package org.dhis2.mobile.io.models;
 
-public class Option {
+import java.io.Serializable;
+
+public class Option implements Serializable {
     private String id;
     private String name;
     private String code;

@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 import org.dhis2.mobile.R;
 
-import org.dhis2.mobile.ui.adapters.dataEntry.SimpleAdapter;
+import org.dhis2.mobile.ui.adapters.dataEntry.DateAdapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Parcelable;
@@ -59,8 +59,8 @@ public class ItemPicker extends BaseItemPicker {
         dialog.setContentView(list);
 		dialog.setTitle(dialogTitleId);
         
-        labels = new ArrayList<String>();
-        adapter = new SimpleAdapter(inflater, labels);
+        labels = new ArrayList<>();
+        adapter = new DateAdapter(inflater);
         list.setAdapter(adapter);
         
         disable();

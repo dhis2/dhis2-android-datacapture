@@ -32,104 +32,107 @@ package org.dhis2.mobile.io.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Field implements Parcelable {
-	public static final String DATA_ELEMENT = "dataElement";
-	public static final String CATEGORY_OPTION_COMBO = "categoryOptionCombo";
-	public static final String VALUE = "value";
-	
-	public static final String TRUE  = "true";
-	public static final String FALSE = "false";
-	public static final String EMPTY_FIELD = "";
-	
-	private String dataElement;
-	private String categoryOptionCombo;
-	private String value = EMPTY_FIELD;
-	
-	private String label;
-	private String optionSet;
-	private String type;
-	
-	public Field() { }
-	
-    private Field (Parcel in){
-    	this.label = in.readString();
-    	this.dataElement = in.readString();
-    	this.categoryOptionCombo = in.readString();
-    	this.optionSet = in.readString();
-    	this.type = in.readString();
-    	this.value = in.readString();
+import java.io.Serializable;
+
+public class Field implements Serializable, Parcelable {
+    public static final String DATA_ELEMENT = "dataElement";
+    public static final String CATEGORY_OPTION_COMBO = "categoryOptionCombo";
+    public static final String VALUE = "value";
+
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+    public static final String EMPTY_FIELD = "";
+
+    private String dataElement;
+    private String categoryOptionCombo;
+    private String value = EMPTY_FIELD;
+
+    private String label;
+    private String optionSet;
+    private String type;
+
+    public Field() {
     }
-    
-	public final static Parcelable.Creator<Field> CREATOR = new Parcelable.Creator<Field>() {
 
-		public Field createFromParcel(Parcel in) {
-			return new Field(in);
-		}
+    private Field(Parcel in) {
+        this.label = in.readString();
+        this.dataElement = in.readString();
+        this.categoryOptionCombo = in.readString();
+        this.optionSet = in.readString();
+        this.type = in.readString();
+        this.value = in.readString();
+    }
 
-		public Field[] newArray(int size) {
-			return new Field[size];
-		}
-	};
-     
-     @Override
-     public void writeToParcel(Parcel field, int flag) {
-    	 field.writeString(label);
-    	 field.writeString(dataElement);
-    	 field.writeString(categoryOptionCombo);
-    	 field.writeString(optionSet);
-    	 field.writeString(type);
-    	 field.writeString(value);
- 	}
-     
- 	@Override
- 	public int describeContents() {
- 		return 0;
- 	}
-	
-	public void setValue(String value) {
-		if (value != null) {
-			this.value = value;
-		}
-	}
-	
-	public void setLabel(String label) {
-		this.label = label;
-	}
-	
-	public void setType(String type) {
-		this.type = type;
-	}
-	
-	public void setDataElement(String dataElement) {
-		this.dataElement = dataElement;
-	}
-	
-	public boolean hasOptionSet() {
-	    return optionSet != null;
-	}
-	
-	public String getLabel(){
-		return label;
-	}
-	
-	public String getDataElement(){
-		return dataElement;
-	}
-	
-	public String getCategoryOptionCombo(){
-		return categoryOptionCombo;
-	}
-	
-	public String getType(){
-		return type;
-	}
-	
-	public String getOptionSet(){
-		return optionSet;
-	}
-	
-	public String getValue(){
-		return value;
-	}
+    public final static Parcelable.Creator<Field> CREATOR = new Parcelable.Creator<Field>() {
+
+        public Field createFromParcel(Parcel in) {
+            return new Field(in);
+        }
+
+        public Field[] newArray(int size) {
+            return new Field[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel field, int flag) {
+        field.writeString(label);
+        field.writeString(dataElement);
+        field.writeString(categoryOptionCombo);
+        field.writeString(optionSet);
+        field.writeString(type);
+        field.writeString(value);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public void setValue(String value) {
+        if (value != null) {
+            this.value = value;
+        }
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setDataElement(String dataElement) {
+        this.dataElement = dataElement;
+    }
+
+    public boolean hasOptionSet() {
+        return optionSet != null;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getDataElement() {
+        return dataElement;
+    }
+
+    public String getCategoryOptionCombo() {
+        return categoryOptionCombo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getOptionSet() {
+        return optionSet;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
 

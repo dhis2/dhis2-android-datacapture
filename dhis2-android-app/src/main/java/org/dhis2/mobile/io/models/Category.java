@@ -3,10 +3,11 @@ package org.dhis2.mobile.io.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Category implements Parcelable {
+public class Category implements Serializable, Parcelable {
     private static final String TAG = Category.class.getCanonicalName();
 
     private String id;

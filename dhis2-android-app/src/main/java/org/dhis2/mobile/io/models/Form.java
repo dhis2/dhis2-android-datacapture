@@ -32,10 +32,11 @@ package org.dhis2.mobile.io.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class Form implements Parcelable {
+public class Form implements Serializable, Parcelable {
     public static final String TAG = Form.class.getSimpleName();
 
     // Comparator which is used to sort forms in alphabetical order

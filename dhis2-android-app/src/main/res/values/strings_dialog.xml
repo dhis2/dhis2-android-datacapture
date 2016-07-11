@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="login_dialog_message">Please wait</string> 
-    <string name="downloading_forms">Downloading forms</string>
-    <string name="downloading_values">Downloading values</string>
-</resources>

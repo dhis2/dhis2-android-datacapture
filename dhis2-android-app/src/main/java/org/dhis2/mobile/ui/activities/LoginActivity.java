@@ -107,6 +107,7 @@ public class LoginActivity extends AppCompatActivity {
         mPassword = (EditText) findViewById(R.id.password);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mProgressBar.setVisibility(View.GONE);
 
         // textwatcher is responsible for watching
         // after changes in all fields

@@ -32,55 +32,76 @@ package org.dhis2.mobile.io.holders;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.dhis2.mobile.io.models.CategoryOption;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatasetInfoHolder extends BaseFormInfoHolder {
-	public static final String TAG = "org.dhis2.mobile.io.holders.DatasetInfoHolder";
-	private String periodLabel;
-	private String period;
-	
-	public DatasetInfoHolder() { }
-	
-	protected DatasetInfoHolder(Parcel in) {
-		super(in);
-		periodLabel = in.readString();
-		period = in.readString();
-	}
-	
-	@Override
-	public void writeToParcel(Parcel parcel, int flags) {
-		super.writeToParcel(parcel, flags);
-		parcel.writeString(periodLabel);
-		parcel.writeString(period);
-	}
-	
-	@Override
-	public int describeContents() {
-		return TAG.length();
-	}
-	
-	public static final Parcelable.Creator<DatasetInfoHolder> CREATOR = new Parcelable.Creator<DatasetInfoHolder>() {
+    public static final String TAG = "org.dhis2.mobile.io.holders.DatasetInfoHolder";
+    private String periodLabel;
+    private String period;
+    private List<CategoryOption> categoryOptions = new ArrayList<>();
 
-		public DatasetInfoHolder createFromParcel(Parcel in) {
-			return new DatasetInfoHolder(in);
-		}
+    public DatasetInfoHolder() {
+    }
 
-		public DatasetInfoHolder[] newArray(int size) {
-			return new DatasetInfoHolder[size];
-		}
-	};
-	
-	public void setPeriodLabel(String periodLabel) {
-		this.periodLabel = periodLabel;
-	}
-	
-	public void setPeriod(String period) {
-		this.period = period;
-	}
-	
-	public String getPeriod() {
-		return period;
-	}
-	
-	public String getPeriodLabel() {
-		return periodLabel;
-	}
+    protected DatasetInfoHolder(Parcel in) {
+        super(in);
+        periodLabel = in.readString();
+        period = in.readString();
+        in.readTypedList(categoryOptions, CategoryOption.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        super.writeToParcel(parcel, flags);
+        parcel.writeString(periodLabel);
+        parcel.writeString(period);
+        parcel.writeTypedList(categoryOptions);
+    }
+
+    @Override
+    public int describeContents() {
+        return TAG.length();
+    }
+
+    public static final Parcelable.Creator<DatasetInfoHolder> CREATOR = new Parcelable.Creator<DatasetInfoHolder>() {
+
+        public DatasetInfoHolder createFromParcel(Parcel in) {
+            return new DatasetInfoHolder(in);
+        }
+
+        public DatasetInfoHolder[] newArray(int size) {
+            return new DatasetInfoHolder[size];
+        }
+    };
+
+    public void setPeriodLabel(String periodLabel) {
+        this.periodLabel = periodLabel;
+    }
+
+    public void setPeriod(String period) {
+        this.period = period;
+    }
+
+    public String getPeriod() {
+        return period;
+    }
+
+    public String getPeriodLabel() {
+        return periodLabel;
+    }
+
+    public void setCategoryOptions(List<CategoryOption> categoryOptions) {
+        this.categoryOptions.clear();
+
+        if (categoryOptions != null) {
+            this.categoryOptions.addAll(categoryOptions);
+        }
+    }
+
+    public List<CategoryOption> getCategoryOptions() {
+        return categoryOptions;
+    }
 }

@@ -5,6 +5,6 @@
 
     <include layout="@layout/list_of_fields" />
     <include layout="@layout/button_upload" />
-    <include layout="@layout/progress_bar_download_grey" />
+    <include layout="@layout/progress_bar" />
 
 </FrameLayout>

@@ -31,7 +31,7 @@ package org.dhis2.mobile.ui.pickers;
 
 import java.util.ArrayList;
 
-import org.dhis2.mobile.ui.adapters.dataEntry.SimpleAdapter;
+import org.dhis2.mobile.ui.adapters.dataEntry.DateAdapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
@@ -48,11 +48,10 @@ public abstract class BaseItemPicker {
     protected ListView list;
     
     protected ArrayList<String> labels;
-    protected SimpleAdapter adapter;
+    protected DateAdapter adapter;
     
     public BaseItemPicker(Context context, View root, int invokerId, int invokerTitleId, int dialogTitleId) {
-    	
-    	this.invokerTitleId = invokerTitleId; 
+    	this.invokerTitleId = invokerTitleId;
    
         invoker = (TextView) root.findViewById(invokerId);
         invoker.setOnClickListener(new OnClickListener() {

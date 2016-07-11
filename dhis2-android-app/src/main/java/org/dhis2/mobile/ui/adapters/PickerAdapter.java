@@ -31,10 +31,10 @@ package org.dhis2.mobile.ui.adapters;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -45,29 +45,42 @@ import org.dhis2.mobile.ui.models.Picker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PickerAdapter extends BaseAdapter {
+import static org.dhis2.mobile.utils.Preconditions.checkNotNull;
+
+public class PickerAdapter extends RecyclerView.Adapter {
     private static final String PICKER_ADAPTER_STATE = "state:pickerAdapter";
 
     private final FragmentManager fragmentManager;
     private final LayoutInflater layoutInflater;
     private final List<Picker> pickers;
+    private final boolean renderPseudoRoots;
 
     private OnPickerListChangeListener onPickerListChangeListener;
     private Picker pickerTree;
 
-    public PickerAdapter(FragmentManager fragmentManager, Context context) {
-        this.fragmentManager = fragmentManager;
+    private PickerAdapter(Context context, FragmentManager fragmentManager, boolean renderPseudoRoots) {
         this.layoutInflater = LayoutInflater.from(context);
-        this.pickers = new ArrayList<Picker>();
+        this.fragmentManager = fragmentManager;
+        this.renderPseudoRoots = renderPseudoRoots;
+        this.pickers = new ArrayList<>();
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new PickerViewHolder(layoutInflater.inflate(
+                R.layout.listview_row_picker, parent, false));
     }
 
     @Override
-    public int getCount() {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        PickerViewHolder viewHolder = (PickerViewHolder) holder;
+
+        Picker picker = pickers.get(position);
+        viewHolder.update(picker);
+    }
+
+    @Override
+    public int getItemCount() {
         int itemCount = pickers.size();
 
         if (itemCount > 0) {
@@ -83,47 +96,23 @@ public class PickerAdapter extends BaseAdapter {
         return itemCount;
     }
 
-    @Override
-    public Object getItem(int index) {
-        return pickers.get(index);
-    }
-
-    @Override
-    public long getItemId(int index) {
-        return index;
-    }
-
-    @Override
-    public View getView(int index, View convertView, ViewGroup parent) {
-        View view;
-        PickerViewHolder viewHolder;
-
-        if (convertView == null) {
-            view = layoutInflater.inflate(
-                    R.layout.listview_row_picker, parent, false);
-            viewHolder = new PickerViewHolder(view);
-            view.setTag(viewHolder);
-        } else {
-            view = convertView;
-            viewHolder = (PickerViewHolder) view.getTag();
-        }
-
-        Picker picker = (Picker) getItem(index);
-        viewHolder.update(picker);
-
-        return view;
-    }
-
     public void onSaveInstanceState(Bundle outState) {
-        if (outState != null && pickerTree != null) {
-            outState.putSerializable(PICKER_ADAPTER_STATE, pickerTree);
-        }
+        onSaveInstanceState(PICKER_ADAPTER_STATE, outState);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            Picker pickerTree = (Picker) savedInstanceState
-                    .getSerializable(PICKER_ADAPTER_STATE);
+        onRestoreInstanceState(PICKER_ADAPTER_STATE, savedInstanceState);
+    }
+
+    public void onSaveInstanceState(String key, Bundle outState) {
+        if (outState != null && pickerTree != null) {
+            outState.putSerializable(key, pickerTree);
+        }
+    }
+
+    public void onRestoreInstanceState(String key, Bundle savedInstanceState) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(key)) {
+            Picker pickerTree = (Picker) savedInstanceState.getSerializable(key);
             swapData(pickerTree);
         }
     }
@@ -137,25 +126,28 @@ public class PickerAdapter extends BaseAdapter {
         this.pickers.clear();
 
         if (pickerTree != null) {
-
             // flattening the picker tree into list
             Picker node = getRootNode(pickerTree);
             do {
                 // we don't want to add leaf nodes to list
                 if (!node.isLeaf()) {
-                    if (node.areChildrenRoots()) {
-                        for (Picker childNode : node.getChildren()) {
-                            pickers.add(childNode);
+                    if (node.areChildrenPseudoRoots()) {
+                        if (renderPseudoRoots) {
+                            for (Picker childNode : node.getChildren()) {
+                                pickers.add(childNode);
+                            }
                         }
-                    } else {
-                        pickers.add(node);
+
+                        continue;
                     }
+
+                    pickers.add(node);
                 }
             } while ((node = node.getSelectedChild()) != null);
         }
 
         if (onPickerListChangeListener != null) {
-            onPickerListChangeListener.onPickerListChanged(new ArrayList<Picker>(pickers));
+            onPickerListChangeListener.onPickerListChanged(new ArrayList<>(pickers));
         }
 
         notifyDataSetChanged();
@@ -164,7 +156,7 @@ public class PickerAdapter extends BaseAdapter {
     public List<Picker> getData() {
         // defensive copy: preventing clients from mutating
         // list of pickers set to adapter
-        return new ArrayList<Picker>(pickers);
+        return new ArrayList<>(pickers);
     }
 
     private Picker getRootNode(Picker picker) {
@@ -195,11 +187,13 @@ public class PickerAdapter extends BaseAdapter {
         }
     }
 
-    private class PickerViewHolder {
+    private class PickerViewHolder extends RecyclerView.ViewHolder {
         private final TextView pickerLabel;
         private final ImageView cancel;
 
         public PickerViewHolder(View itemView) {
+            super(itemView);
+
             pickerLabel = (TextView) itemView.findViewById(R.id.textview_picker);
             cancel = (ImageView) itemView.findViewById(R.id.imageview_cancel);
         }
@@ -277,6 +271,34 @@ public class PickerAdapter extends BaseAdapter {
         private void clearSelection() {
             picker.setSelectedChild(null);
             swapData(picker);
+        }
+    }
+
+    public static class Builder {
+        private Context context;
+        private FragmentManager fragmentManager;
+        private boolean renderPseudoRoots;
+
+        public Builder context(Context context) {
+            this.context = context;
+            return this;
+        }
+
+        public Builder fragmentManager(FragmentManager fragmentManager) {
+            this.fragmentManager = fragmentManager;
+            return this;
+        }
+
+        public Builder renderPseudoRoots() {
+            this.renderPseudoRoots = true;
+            return this;
+        }
+
+        public PickerAdapter build() {
+            checkNotNull(context, "context must not be null");
+            checkNotNull(fragmentManager, "fragmentManager must not be null");
+
+            return new PickerAdapter(context, fragmentManager, renderPseudoRoots);
         }
     }
 }

@@ -38,16 +38,16 @@ import static org.dhis2.mobile.utils.Preconditions.checkNotNull;
  * This class represents the node in tree data structure.
  */
 public class Picker implements Serializable {
-    // hint which describes the content of picker
-    private final String hint;
-
-    // if picker represents item
     private final String id;
     private final String name;
+    private final String hint;
+    private final boolean isPseudoRoot;
+
+    // tag represents any object which we want to pass around
+    private final Serializable tag;
 
     // parent node
     private final Picker parent;
-    private final boolean isRoot;
 
     // available options (child nodes in tree)
     private final List<Picker> children;
@@ -55,58 +55,61 @@ public class Picker implements Serializable {
     // selected item (represents path to selected node)
     private Picker selectedChild;
 
-    private Picker(String id, String name, String hint, Picker parent, boolean isRoot) {
+
+    private Picker(String id, String name, String hint, boolean isPseudoRoot, Serializable tag,
+                   Picker parent) {
         this.id = id;
         this.name = name;
         this.hint = hint;
+        this.isPseudoRoot = isPseudoRoot;
+        this.tag = tag;
         this.parent = parent;
-        this.isRoot = isRoot;
-        this.children = new ArrayList<Picker>();
+        this.children = new ArrayList<>();
     }
 
-    public static class Builder {
-        private String id;
-        private String name;
-        private String hint;
-        private Picker parent;
-        private boolean isRoot;
+    private Picker(String id, String name, String hint, boolean isPseudoRoot, Serializable tag,
+                   Picker parent, List<Picker> children, Picker selectedChild) {
+        this.hint = hint;
+        this.id = id;
+        this.name = name;
+        this.isPseudoRoot = isPseudoRoot;
+        this.tag = tag;
 
-        public Builder() {
-            // empty constructor
-        }
+        // relationships
+        this.parent = parent;
+        this.children = copyChildren(children);
+        this.selectedChild = findSelectedChild(selectedChild);
+    }
 
-        public Builder id(String id) {
-            this.id = id;
-            return this;
-        }
+    // deep copy all nodes in subtree down to leaves
+    private List<Picker> copyChildren(List<Picker> oldChildren) {
+        List<Picker> newChildren = new ArrayList<>();
 
-        public Builder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder hint(String hint) {
-            this.hint = hint;
-            return this;
-        }
-
-        public Builder parent(Picker parent) {
-            this.parent = parent;
-            return this;
-        }
-
-        public Builder asRoot() {
-            this.isRoot = true;
-            return this;
-        }
-
-        public Picker build() {
-            if (parent == null) {
-                isRoot = true;
+        if (oldChildren != null && !oldChildren.isEmpty()) {
+            for (Picker child : oldChildren) {
+                // recursively copying children with link to new parent
+                newChildren.add(new Picker(
+                        child.getId(), child.getName(), child.getHint(), child.isPseudoRoot(),
+                        child.getTag(), this, child.getChildren(), child.getSelectedChild()));
             }
-
-            return new Picker(id, name, hint, parent, isRoot);
         }
+
+        return newChildren;
+    }
+
+    // find corresponding selected child
+    private Picker findSelectedChild(Picker selectedChild) {
+        if (selectedChild == null) {
+            return null;
+        }
+
+        for (Picker child : this.children) {
+            if (selectedChild.equals(child)) {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     public String getHint() {
@@ -129,8 +132,12 @@ public class Picker implements Serializable {
         return children.isEmpty();
     }
 
-    public boolean isRoot() {
-        return isRoot;
+    public boolean isPseudoRoot() {
+        return isPseudoRoot;
+    }
+
+    public Serializable getTag() {
+        return tag;
     }
 
     public boolean addChild(Picker picker) {
@@ -140,11 +147,11 @@ public class Picker implements Serializable {
             return children.add(picker);
         }
 
-        if (picker.isRoot() && areChildrenRoots()) {
+        if (picker.isPseudoRoot() && areChildrenPseudoRoots()) {
             return children.add(picker);
         }
 
-        if (!picker.isRoot() && !areChildrenRoots()) {
+        if (!picker.isPseudoRoot() && !areChildrenPseudoRoots()) {
             return children.add(picker);
         }
 
@@ -160,9 +167,9 @@ public class Picker implements Serializable {
         return selectedChild;
     }
 
-    public boolean areChildrenRoots() {
+    public boolean areChildrenPseudoRoots() {
         for (Picker child : children) {
-            if (!child.isRoot()) {
+            if (!child.isPseudoRoot()) {
                 return false;
             }
         }
@@ -171,16 +178,21 @@ public class Picker implements Serializable {
     }
 
     public void setSelectedChild(Picker selectedChild) {
-        if (selectedChild != null && selectedChild.isRoot()) {
+        if (selectedChild != null && selectedChild.isPseudoRoot()) {
             throw new IllegalArgumentException("root picker cannot " +
                     "be set as selected child of given picker");
+        }
+
+        if (selectedChild != null && !equals(selectedChild.getParent())) {
+            throw new IllegalArgumentException("Current instance of picker must be a " +
+                    "parent of given child");
         }
 
         // if we set new selected child, we have to reset all descendants
         if (this.selectedChild != null) {
             this.selectedChild.setSelectedChild(null);
         } else {
-            if (areChildrenRoots()) {
+            if (areChildrenPseudoRoots()) {
                 // reset selection for adjacent trees as well
                 for (Picker child : children) {
                     child.setSelectedChild(null);
@@ -207,6 +219,7 @@ public class Picker implements Serializable {
         if (this == o) {
             return true;
         }
+
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
@@ -215,6 +228,7 @@ public class Picker implements Serializable {
         if (hint != null ? !hint.equals(picker.hint) : picker.hint != null) {
             return false;
         }
+
         if (id != null ? !id.equals(picker.id) : picker.id != null) {
             return false;
         }
@@ -229,5 +243,77 @@ public class Picker implements Serializable {
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
+    }
+
+    public Builder buildUpon() {
+        return new Builder(this);
+    }
+
+    public static class Builder {
+        // source picker
+        private Picker picker;
+
+        // properties
+        private String id;
+        private String name;
+        private String hint;
+        private boolean isPseudoRoot;
+        private Picker parent;
+        private Serializable tag;
+
+        private Builder(Picker picker) {
+            checkNotNull(picker, "Picker must not be null");
+
+            this.picker = picker;
+            this.id = picker.getId();
+            this.name = picker.getName();
+            this.hint = picker.getHint();
+            this.isPseudoRoot = picker.isPseudoRoot();
+            this.tag = picker.getTag();
+            this.parent = picker.getParent();
+        }
+
+        public Builder() {
+            // empty constructor
+        }
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder hint(String hint) {
+            this.hint = hint;
+            return this;
+        }
+
+        public Builder tag(Serializable tag) {
+            this.tag = tag;
+            return this;
+        }
+
+        public Builder parent(Picker parent) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder asPseudoRoot() {
+            this.isPseudoRoot = true;
+            return this;
+        }
+
+        public Picker build() {
+            if (picker != null) {
+                return new Picker(id, name, hint, isPseudoRoot, tag,
+                        parent, picker.getChildren(), picker.getSelectedChild());
+            }
+
+            return new Picker(id, name, hint, isPseudoRoot, tag, parent);
+        }
     }
 }

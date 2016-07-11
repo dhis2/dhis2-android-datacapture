@@ -32,67 +32,70 @@ package org.dhis2.mobile.io.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Coordinates implements Parcelable {
-	public static final String TAG = Coordinates.class.getSimpleName();
-	
-	public static final String LONGITUDE = "longitude";
-	public static final String LATITUDE = "latitude";
-	
-	private String longitude = "";
-	private String latitude = "";
-	
-	public Coordinates() { }
-	
-	public Coordinates(String latitude, String longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
-	
+import java.io.Serializable;
 
-	@Override
-	public int describeContents() {
-		return TAG.length();
-	}
-	
-	private Coordinates(Parcel in) {
-		longitude = in.readString();
-		latitude = in.readString();
-	}
-	
-	public static final Parcelable.Creator<Coordinates> CREATOR = new Parcelable.Creator<Coordinates>() {
+public class Coordinates implements Serializable, Parcelable {
+    public static final String TAG = Coordinates.class.getSimpleName();
 
-		public Coordinates createFromParcel(Parcel in) {
-			return new Coordinates(in);
-		}
+    public static final String LONGITUDE = "longitude";
+    public static final String LATITUDE = "latitude";
 
-		public Coordinates[] newArray(int size) {
-			return new Coordinates[size];
-		}
-	};
+    private String longitude = "";
+    private String latitude = "";
 
-	@Override
-	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeString(longitude);
-		parcel.writeString(latitude);
-	}
+    public Coordinates() {
+    }
 
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
-	}
+    public Coordinates(String latitude, String longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
-	}
 
-	public String getLongitude() {
-		return longitude;
-	}
+    @Override
+    public int describeContents() {
+        return TAG.length();
+    }
 
-	public String getLatitude() {
-		return latitude;
-	}
+    private Coordinates(Parcel in) {
+        longitude = in.readString();
+        latitude = in.readString();
+    }
 
-	public boolean hasCoordValues() {
-		return (!longitude.equals(Field.EMPTY_FIELD) && !latitude.equals(Field.EMPTY_FIELD));
-	}
+    public static final Parcelable.Creator<Coordinates> CREATOR = new Parcelable.Creator<Coordinates>() {
+
+        public Coordinates createFromParcel(Parcel in) {
+            return new Coordinates(in);
+        }
+
+        public Coordinates[] newArray(int size) {
+            return new Coordinates[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(longitude);
+        parcel.writeString(latitude);
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public boolean hasCoordValues() {
+        return (!longitude.equals(Field.EMPTY_FIELD) && !latitude.equals(Field.EMPTY_FIELD));
+    }
 }

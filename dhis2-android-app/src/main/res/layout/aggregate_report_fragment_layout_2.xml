@@ -5,19 +5,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/listview_pickers"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="4dp"
-        android:paddingBottom="7dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="5dp"
-        android:paddingTop="7dp"
-        android:scrollbarSize="5dp"
-        android:scrollbarStyle="outsideInset"
-        android:scrollbarThumbVertical="@drawable/listview_scrollbar_shape" />
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview_pickers_one"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingTop="8dp" />
+
+            <include layout="@layout/listview_row_picker" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview_pickers_two"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false" />
+
+            <include
+                layout="@layout/button_form_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"/>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </android.support.v4.widget.SwipeRefreshLayout>

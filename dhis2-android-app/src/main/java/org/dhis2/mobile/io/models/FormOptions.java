@@ -32,7 +32,9 @@ package org.dhis2.mobile.io.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class FormOptions implements Parcelable {
+import java.io.Serializable;
+
+public class FormOptions implements Serializable, Parcelable {
     public static final String TAG = "org.dhis2.mobile.io.models.FormOptions";
 
     // options related to datasets
