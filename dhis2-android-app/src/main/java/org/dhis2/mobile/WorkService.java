@@ -39,13 +39,13 @@ import android.util.Log;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
-import org.dhis2.mobile.processors.AggregateReportUploadProcessor;
-import org.dhis2.mobile.processors.DatasetValuesDownloadProcessor;
 import org.dhis2.mobile.processors.FormsDownloadProcessor;
 import org.dhis2.mobile.processors.LoginProcessor;
 import org.dhis2.mobile.processors.MyProfileProcessor;
 import org.dhis2.mobile.processors.OfflineDataProcessor;
 import org.dhis2.mobile.processors.RemoveDataProcessor;
+import org.dhis2.mobile.processors.ReportDownloadProcessor;
+import org.dhis2.mobile.processors.ReportUploadProcessor;
 import org.dhis2.mobile.ui.activities.LoginActivity;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 
@@ -126,42 +126,42 @@ public class WorkService extends Service {
         final String methodName = extras.getString(METHOD);
         Log.i(TAG, methodName);
 
-        if (methodName.equals(METHOD_UPLOAD_PROFILE_INFO)) {
+        if (METHOD_UPLOAD_PROFILE_INFO.equals(methodName)) {
             ArrayList<Field> fields = extras.getParcelableArrayList(MyProfileFragment.GROUP);
             MyProfileProcessor.uploadProfileInfo(context, fields);
         }
 
-        if (methodName.equals(METHOD_UPDATE_PROFILE_INFO)) {
+        if (METHOD_UPDATE_PROFILE_INFO.equals(methodName)) {
             MyProfileProcessor.updateProfileInfo(context);
         }
 
-        if (methodName.equals(METHOD_LOGIN_USER)) {
+        if (METHOD_LOGIN_USER.equals(methodName)) {
             String username = extras.getString(LoginActivity.USERNAME);
             String server = extras.getString(LoginActivity.SERVER);
             String creds = extras.getString(LoginActivity.CREDENTIALS);
             LoginProcessor.loginUser(context, server, creds, username);
         }
 
-        if (methodName.equals(METHOD_UPDATE_DATASETS)) {
+        if (METHOD_UPDATE_DATASETS.equals(methodName)) {
             FormsDownloadProcessor.updateDatasets(context);
         }
 
-        if (methodName.equals(METHOD_DOWNLOAD_LATEST_DATASET_VALUES)) {
+        if (METHOD_DOWNLOAD_LATEST_DATASET_VALUES.equals(methodName)) {
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
-            DatasetValuesDownloadProcessor.download(context, info);
+            ReportDownloadProcessor.download(context, info);
         }
 
-        if (methodName.equals(METHOD_UPLOAD_DATASET)) {
+        if (METHOD_UPLOAD_DATASET.equals(methodName)) {
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             ArrayList<Group> groups = extras.getParcelableArrayList(Group.TAG);
-            AggregateReportUploadProcessor.upload(context, info, groups);
+            ReportUploadProcessor.upload(context, info, groups);
         }
 
-        if (methodName.equals(METHOD_OFFLINE_DATA_UPLOAD)) {
+        if (METHOD_OFFLINE_DATA_UPLOAD.equals(methodName)) {
             OfflineDataProcessor.upload(context);
         }
 
-        if (methodName.equals(METHOD_REMOVE_ALL_DATA)) {
+        if (METHOD_REMOVE_ALL_DATA.equals(methodName)) {
             RemoveDataProcessor.removeData(context);
         }
     }

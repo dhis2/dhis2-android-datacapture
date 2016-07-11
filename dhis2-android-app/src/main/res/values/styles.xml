@@ -31,12 +31,11 @@
 
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- AlertDialogTheme theme -->
-        <item name="alertDialogTheme">@style/AppTheme.AlertDialog</item>
 
         <!-- Colour palette -->
         <item name="colorPrimary">@color/color_primary_default</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="colorAccent">@color/color_accent_default</item>
+        <item name="colorAccent">@color/color_primary_default</item>
 
         <!-- General properties -->
         <item name="android:windowBackground">@color/light_grey</item>
@@ -45,16 +44,10 @@
     <style name="AppTheme.Dialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/color_primary_default</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="colorAccent">@color/color_accent_default</item>
+        <item name="colorAccent">@color/color_primary_default</item>
 
         <!-- General properties -->
         <item name="android:windowBackground">@color/light_grey</item>
-    </style>
-
-    <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorPrimary">@color/color_primary_default</item>
-        <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="colorAccent">@color/color_accent_default</item>
     </style>
 
 </resources>

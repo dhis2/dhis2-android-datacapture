@@ -40,7 +40,7 @@ import org.dhis2.mobile.io.models.OrganizationUnit;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
-import org.dhis2.mobile.ui.activities.AggregateReportDataEntryActivity;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.ui.adapters.PickerAdapter;
 import org.dhis2.mobile.ui.adapters.PickerAdapter.OnPickerListChangeListener;
 import org.dhis2.mobile.ui.models.Picker;
@@ -469,7 +469,7 @@ public class AggregateReportFragment extends Fragment
             dataEntryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startDataEntryActivity(info);
+                    DataEntryActivity.navigateTo(getActivity(), info);
                 }
             });
 
@@ -488,17 +488,6 @@ public class AggregateReportFragment extends Fragment
             if (dataEntryButton.isShown()) {
                 perfomOutAnimation(getActivity(), R.anim.out_right, true, dataEntryButton);
             }
-        }
-    }
-
-    private void startDataEntryActivity(DatasetInfoHolder info) {
-        if (info != null && getActivity() != null) {
-            Intent intent = new Intent(getActivity(), AggregateReportDataEntryActivity.class);
-            intent.putExtra(DatasetInfoHolder.TAG, info);
-
-            getActivity().startActivity(intent);
-            getActivity().overridePendingTransition(
-                    R.anim.slide_up, R.anim.activity_open_exit);
         }
     }
 

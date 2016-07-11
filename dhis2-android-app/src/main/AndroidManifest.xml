@@ -13,7 +13,8 @@
         <service
             android:name=".WorkService"
             android:exported="false" />
-        <receiver android:name="org.dhis2.mobile.NetworkStateReceiver">
+
+        <receiver android:name=".NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
@@ -27,16 +28,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activities.LoginActivity"
-            android:label="@string/title_activity_login" />
+        <activity android:name=".ui.activities.LoginActivity" />
         <activity
             android:name=".ui.activities.MenuActivity"
-            android:label="@string/title_activity_menu"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.activities.AggregateReportDataEntryActivity"
-            android:label="@string/title_activity_data_entry"
+            android:name=".ui.activities.DataEntryActivity"
             android:windowSoftInputMode="adjustPan" />
     </application>
+
 </manifest>

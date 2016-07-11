@@ -31,18 +31,25 @@ package org.dhis2.mobile.processors;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.google.gson.JsonObject;
+
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
+import org.dhis2.mobile.io.json.JsonHandler;
+import org.dhis2.mobile.io.json.ParsingException;
+import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
-import org.dhis2.mobile.ui.activities.AggregateReportDataEntryActivity;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.PrefUtils;
 
-public class DatasetValuesDownloadProcessor {
+public class ReportDownloadProcessor {
 
-    private DatasetValuesDownloadProcessor() { }
+    private ReportDownloadProcessor() {
+    }
 
     public static void download(Context context, DatasetInfoHolder info) {
         String server = PrefUtils.getServerURL(context);
@@ -52,9 +59,34 @@ public class DatasetValuesDownloadProcessor {
                 + URLConstants.PERIOD_PARAM + info.getPeriod();
         String creds = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, creds);
-        Intent intent = new Intent(AggregateReportDataEntryActivity.TAG);
+
+        Form form = null;
+        if (response.getCode() >= 200 && response.getCode() < 300) {
+            form = parseForm(response.getBody());
+        }
+
+        Intent intent = new Intent(DataEntryActivity.TAG);
         intent.putExtra(Response.CODE, response.getCode());
-        intent.putExtra(Response.BODY, response.getBody());
+
+        if (form != null) {
+            intent.putExtra(Response.BODY, (Parcelable) form);
+        }
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private static Form parseForm(String responseBody) {
+        if (responseBody != null) {
+            try {
+                JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
+                return JsonHandler.fromJson(jsonForm, Form.class);
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } catch (ParsingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 }

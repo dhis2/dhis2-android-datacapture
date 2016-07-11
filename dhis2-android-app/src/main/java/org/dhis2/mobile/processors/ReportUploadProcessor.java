@@ -53,10 +53,10 @@ import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 
-public class AggregateReportUploadProcessor {
-    public static final String TAG = AggregateReportUploadProcessor.class.getSimpleName();
+public class ReportUploadProcessor {
+    public static final String TAG = ReportUploadProcessor.class.getSimpleName();
 
-    private AggregateReportUploadProcessor () { }
+    private ReportUploadProcessor() { }
 
     public static void upload(Context context, DatasetInfoHolder info, ArrayList<Group> groups) {
         String data = prepareContent(info, groups);

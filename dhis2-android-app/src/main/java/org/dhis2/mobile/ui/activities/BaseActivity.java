@@ -15,7 +15,8 @@ import org.dhis2.mobile.utils.TypefaceManager;
 public class BaseActivity extends AppCompatActivity {
     private Typeface mCustomTypeFace;
 
-    public void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mCustomTypeFace = getTypeFace();
