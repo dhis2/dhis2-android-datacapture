@@ -288,7 +288,7 @@ public class AggregateReportFragment extends Fragment
             boolean isConnectionAvailable = NetworkUtils.checkConnection(getActivity());
 
             if (needsUpdate && isConnectionAvailable) {
-                // startUpdate();
+                startUpdate();
             }
         } else {
             showProgressBar();

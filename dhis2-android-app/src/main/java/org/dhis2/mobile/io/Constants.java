@@ -34,12 +34,10 @@ public class Constants {
     }
 
     public static final String DATA_SET_ID = "dataSet";
-    public static final String FORM_LABEL = "dataSetLabel";
     public static final String ORG_UNIT_ID = "orgUnit";
-    public static final String ORG_UNIT_LABEL = "orgUnitLabel";
     public static final String PERIOD = "period";
-    public static final String PERIOD_LABEL = "periodLabel";
     public static final String COMPLETE_DATE = "completeDate";
+    public static final String ATTRIBUTE_CATEGORY_OPTIONS = "attributeCategoryOptions";
     public static final String DATA_VALUES = "dataValues";
     public static final String DATE_FORMAT = "YYYY-MM-dd";
 }

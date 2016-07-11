@@ -35,6 +35,7 @@ import android.os.Parcelable;
 import org.dhis2.mobile.io.models.CategoryOption;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DatasetInfoHolder extends BaseFormInfoHolder {
@@ -103,5 +104,31 @@ public class DatasetInfoHolder extends BaseFormInfoHolder {
 
     public List<CategoryOption> getCategoryOptions() {
         return categoryOptions;
+    }
+
+    public static String buildKey(DatasetInfoHolder info) {
+        List<String> options = new ArrayList<>();
+
+        if (info.getCategoryOptions() != null && !info.getCategoryOptions().isEmpty()) {
+            for (CategoryOption categoryOption : info.getCategoryOptions()) {
+                options.add(categoryOption.getId());
+            }
+        }
+
+        // we need to sort ids in order to achieve consistency
+        Collections.sort(options);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(info.getOrgUnitId());
+        stringBuilder.append(info.getFormId());
+        stringBuilder.append(info.getPeriod());
+
+        if (!options.isEmpty()) {
+            for (String option : options) {
+                stringBuilder.append(option);
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }

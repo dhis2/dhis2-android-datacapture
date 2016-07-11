@@ -167,12 +167,12 @@ public class WorkService extends Service {
     }
 
     private void onTaskFinished(Runnable obj) {
-        // Remove task of list of running tasks
+        // remove task of list of running tasks
         tasks.remove(obj);
-        // Kill service if there is no any running tasks
+
+        // kill service if there is no any running tasks
         if (tasks.size() == 0) {
             stopSelf();
         }
     }
-
 }

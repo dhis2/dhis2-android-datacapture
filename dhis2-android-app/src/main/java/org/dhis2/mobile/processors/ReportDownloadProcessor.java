@@ -33,12 +33,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
+import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
@@ -46,17 +48,16 @@ import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.PrefUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReportDownloadProcessor {
 
     private ReportDownloadProcessor() {
     }
 
     public static void download(Context context, DatasetInfoHolder info) {
-        String server = PrefUtils.getServerURL(context);
-        String url = server
-                + URLConstants.DATASET_VALUES_URL + "/" + info.getFormId() + "/"
-                + URLConstants.FORM_PARAM + info.getOrgUnitId()
-                + URLConstants.PERIOD_PARAM + info.getPeriod();
+        String url = buildUrl(context, info);
         String creds = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, creds);
 
@@ -73,6 +74,37 @@ public class ReportDownloadProcessor {
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private static String buildUrl(Context context, DatasetInfoHolder info) {
+        String server = PrefUtils.getServerURL(context);
+        String categoryOptions = buildCategoryOptionsString(info);
+        String url = server
+                + URLConstants.DATASET_VALUES_URL + "/" + info.getFormId() + "/"
+                + URLConstants.FORM_PARAM + info.getOrgUnitId()
+                + URLConstants.PERIOD_PARAM + info.getPeriod();
+        if (categoryOptions != null) {
+            url = url + URLConstants.CATEGORY_OPTIONS_PARAM + categoryOptions;
+        }
+
+        return url;
+    }
+
+    private static String buildCategoryOptionsString(DatasetInfoHolder info) {
+        List<String> categoryOptions = new ArrayList<>();
+
+        // extracting uids
+        if (info.getCategoryOptions() != null && !info.getCategoryOptions().isEmpty()) {
+            for (CategoryOption categoryOption : info.getCategoryOptions()) {
+                categoryOptions.add(categoryOption.getId());
+            }
+        }
+
+        if (!categoryOptions.isEmpty()) {
+            return "[" + TextUtils.join(",", categoryOptions) + "]";
+        }
+
+        return null;
     }
 
     private static Form parseForm(String responseBody) {

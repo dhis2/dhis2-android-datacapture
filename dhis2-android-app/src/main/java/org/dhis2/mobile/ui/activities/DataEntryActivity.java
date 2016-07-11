@@ -157,8 +157,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 .getParcelable(DatasetInfoHolder.TAG);
 
         if (id == LOADER_FORM_ID && info != null) {
-            return new DataLoader(DataEntryActivity.this,
-                    info.getOrgUnitId(), info.getFormId(), info.getPeriod());
+            return new DataLoader(DataEntryActivity.this, info);
         }
 
         return null;
@@ -391,22 +390,17 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     };
 
     private static class DataLoader extends AsyncTaskLoader<Form> {
-        private final String orgUnit;
-        private final String formId;
-        private final String period;
+        private final DatasetInfoHolder infoHolder;
 
-        public DataLoader(Context context, String orgUnit, String formId, String period) {
+        public DataLoader(Context context, DatasetInfoHolder infoHolder) {
             super(context);
-
-            this.orgUnit = orgUnit;
-            this.formId = formId;
-            this.period = period;
+            this.infoHolder = infoHolder;
         }
 
         @Override
         public Form loadInBackground() {
-            if (formId != null && TextFileUtils.doesFileExist(
-                    getContext(), TextFileUtils.Directory.DATASETS, formId)) {
+            if (infoHolder.getFormId() != null && TextFileUtils.doesFileExist(
+                    getContext(), TextFileUtils.Directory.DATASETS, infoHolder.getFormId())) {
                 Form form = loadForm();
 
                 // try to fit values
@@ -420,7 +414,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         private Form loadForm() {
             String jForm = TextFileUtils.readTextFile(
-                    getContext(), TextFileUtils.Directory.DATASETS, formId);
+                    getContext(), TextFileUtils.Directory.DATASETS, infoHolder.getFormId());
             try {
                 JsonObject jsonForm = JsonHandler.buildJsonObject(jForm);
                 return JsonHandler.fromJson(jsonForm, Form.class);
@@ -438,7 +432,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 return;
             }
 
-            String reportKey = buildReportKey();
+            String reportKey = DatasetInfoHolder.buildKey(infoHolder);
             if (isEmpty(reportKey)) {
                 return;
             }
@@ -522,14 +516,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             }
 
             return fieldMap;
-        }
-
-        private String buildReportKey() {
-            if (!isEmpty(orgUnit) && !isEmpty(formId) && !isEmpty(period)) {
-                return orgUnit + formId + period;
-            }
-
-            return null;
         }
 
         private String buildFieldKey(String dataElement, String categoryOptionCombination) {

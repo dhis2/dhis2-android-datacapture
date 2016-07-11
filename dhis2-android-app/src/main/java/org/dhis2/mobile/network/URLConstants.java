@@ -44,4 +44,5 @@ public class URLConstants {
 	
 	public static final String FORM_PARAM = "form?ou=";
 	public static final String PERIOD_PARAM = "&pe=";
+	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
 }
