@@ -37,7 +37,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
-import org.dhis2.mobile.io.holders.ProgramInfoHolder;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.processors.AggregateReportUploadProcessor;
@@ -47,7 +46,6 @@ import org.dhis2.mobile.processors.LoginProcessor;
 import org.dhis2.mobile.processors.MyProfileProcessor;
 import org.dhis2.mobile.processors.OfflineDataProcessor;
 import org.dhis2.mobile.processors.RemoveDataProcessor;
-import org.dhis2.mobile.processors.SEWRUploadProcessor;
 import org.dhis2.mobile.ui.activities.LoginActivity;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 
@@ -63,7 +61,6 @@ public class WorkService extends Service {
     public static final String METHOD_UPDATE_DATASETS = "updateDatasets";
     public static final String METHOD_DOWNLOAD_LATEST_DATASET_VALUES = "downloadLatestDatasetValues";
     public static final String METHOD_UPLOAD_DATASET = "aggregateReportUploadProcessor";
-    public static final String METHOD_UPLOAD_SEWR = "singleEventWithoutRgistrationProcessor";
     public static final String METHOD_OFFLINE_DATA_UPLOAD = "offlineDataUploading";
     public static final String METHOD_REMOVE_ALL_DATA = "removeAllData";
 
@@ -158,12 +155,6 @@ public class WorkService extends Service {
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             ArrayList<Group> groups = extras.getParcelableArrayList(Group.TAG);
             AggregateReportUploadProcessor.upload(context, info, groups);
-        }
-
-        if (methodName.equals(METHOD_UPLOAD_SEWR)) {
-            ProgramInfoHolder info = extras.getParcelable(ProgramInfoHolder.TAG);
-            ArrayList<Group> groups = extras.getParcelableArrayList(Group.TAG);
-            SEWRUploadProcessor.upload(context, info, groups);
         }
 
         if (methodName.equals(METHOD_OFFLINE_DATA_UPLOAD)) {

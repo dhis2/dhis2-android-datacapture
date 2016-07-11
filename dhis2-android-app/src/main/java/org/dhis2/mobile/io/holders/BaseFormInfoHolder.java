@@ -33,75 +33,76 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class BaseFormInfoHolder implements Parcelable {
-	public static final String TAG = "org.dhis2.mobile.io.holders.BaseFormInfoHolder";
-	
-	private String orgUnitLabel;
-	private String orgUnitId;
-	private String formLabel;
-	private String formId;
-	
-	public BaseFormInfoHolder() { }
-	
-	protected BaseFormInfoHolder(Parcel in) {
-		orgUnitLabel = in.readString();
-		orgUnitId = in.readString();
-		formLabel = in.readString();
-		formId = in.readString();
-	}
-	
-	@Override
-	public int describeContents() {
-		return TAG.length();
-	}
+    public static final String TAG = "org.dhis2.mobile.io.holders.BaseFormInfoHolder";
 
-	@Override
-	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeString(orgUnitLabel);
-		parcel.writeString(orgUnitId);
-		parcel.writeString(formLabel);
-		parcel.writeString(formId);
-	}
-	
-	public static final Parcelable.Creator<BaseFormInfoHolder> CREATOR = new Parcelable.Creator<BaseFormInfoHolder>() {
+    private String orgUnitLabel;
+    private String orgUnitId;
+    private String formLabel;
+    private String formId;
 
-		public BaseFormInfoHolder createFromParcel(Parcel in) {
-			return new BaseFormInfoHolder(in);
-		}
+    public BaseFormInfoHolder() {
+    }
 
-		public BaseFormInfoHolder[] newArray(int size) {
-			return new BaseFormInfoHolder[size];
-		}
-	};
-	
-	public void setOrgUnitLabel(String orgUnitLabel) {
-		this.orgUnitLabel = orgUnitLabel;
-	}
-	
-	public void setOrgUnitId(String orgUnitId) {
-		this.orgUnitId = orgUnitId;
-	}
-	
-	public void setFormLabel(String formLabel) {
-		this.formLabel = formLabel;
-	}
-	
-	public void setFormId(String formId) {
-		this.formId = formId;
-	}
-	
-	public String getOrgUnitLabel() {
-		return orgUnitLabel;
-	}
-	
-	public String getOrgUnitId() {
-		return orgUnitId;
-	}
-	
-	public String getFormLabel() {
-		return formLabel;
-	}
-	
-	public String getFormId() {
-		return formId;
-	}
+    protected BaseFormInfoHolder(Parcel in) {
+        orgUnitLabel = in.readString();
+        orgUnitId = in.readString();
+        formLabel = in.readString();
+        formId = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return TAG.length();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(orgUnitLabel);
+        parcel.writeString(orgUnitId);
+        parcel.writeString(formLabel);
+        parcel.writeString(formId);
+    }
+
+    public static final Parcelable.Creator<BaseFormInfoHolder> CREATOR = new Parcelable.Creator<BaseFormInfoHolder>() {
+
+        public BaseFormInfoHolder createFromParcel(Parcel in) {
+            return new BaseFormInfoHolder(in);
+        }
+
+        public BaseFormInfoHolder[] newArray(int size) {
+            return new BaseFormInfoHolder[size];
+        }
+    };
+
+    public void setOrgUnitLabel(String orgUnitLabel) {
+        this.orgUnitLabel = orgUnitLabel;
+    }
+
+    public void setOrgUnitId(String orgUnitId) {
+        this.orgUnitId = orgUnitId;
+    }
+
+    public void setFormLabel(String formLabel) {
+        this.formLabel = formLabel;
+    }
+
+    public void setFormId(String formId) {
+        this.formId = formId;
+    }
+
+    public String getOrgUnitLabel() {
+        return orgUnitLabel;
+    }
+
+    public String getOrgUnitId() {
+        return orgUnitId;
+    }
+
+    public String getFormLabel() {
+        return formLabel;
+    }
+
+    public String getFormId() {
+        return formId;
+    }
 }

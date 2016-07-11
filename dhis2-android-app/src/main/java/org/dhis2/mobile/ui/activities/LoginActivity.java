@@ -56,7 +56,7 @@ import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
 
 public class LoginActivity extends AppCompatActivity {
-    public static final String TAG = "org.dhis2.mobile.ui.activities.LoginActivity";
+    public static final String TAG = LoginActivity.class.getSimpleName();
     public static final String USERNAME = "username";
     public static final String SERVER = "server";
     public static final String CREDENTIALS = "creds";

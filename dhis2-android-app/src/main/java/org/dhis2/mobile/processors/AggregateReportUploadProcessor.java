@@ -54,8 +54,7 @@ import org.joda.time.LocalDate;
 import java.util.ArrayList;
 
 public class AggregateReportUploadProcessor {
-    public static final String TAG = "org.dhis2.mobile.ui.activities." +
-            "aggregateReportDataEntry.AggregateReportUploadProcessor";
+    public static final String TAG = AggregateReportUploadProcessor.class.getSimpleName();
 
     private AggregateReportUploadProcessor () { }
 

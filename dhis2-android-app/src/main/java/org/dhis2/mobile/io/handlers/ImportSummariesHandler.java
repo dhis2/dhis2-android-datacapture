@@ -35,43 +35,40 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ImportSummariesHandler {
-	private static final String SUCCESS = "SUCCESS";	
-	private static final Pattern STATUS = Pattern.compile("\"(status)\":\"(\\w+)\"");
-	private static final Pattern DESCRIPTION = Pattern.compile("\"(description)\":\"(.*?)\"");
-	
-	private ImportSummariesHandler() { }
-	
-	public static boolean isSuccess(String source) {
-		if (source == null || source.equals(Field.EMPTY_FIELD)) {
-			return false;
-		} 
-		Matcher matcher = STATUS.matcher(source);
-		if (matcher.find()) {
-			String status = matcher.group(2);
-			if (status != null && status.equals(SUCCESS)) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-	
-	public static String getDescription(String source, String defaultValue) {
-		if (source == null || source.equals(Field.EMPTY_FIELD)) {
-			return defaultValue;
-		}
-		Matcher matcher = DESCRIPTION.matcher(source);
-		if (matcher.find()) {
-			String description = matcher.group(2);
-			if (description != null && !description.equals(Field.EMPTY_FIELD)) {
-				return description;
-			} else {
-				return defaultValue;
-			}
-		} else {
-			return defaultValue;
-		}
-	}
+    private static final String SUCCESS = "SUCCESS";
+    private static final Pattern STATUS = Pattern.compile("\"(status)\":\"(\\w+)\"");
+    private static final Pattern DESCRIPTION = Pattern.compile("\"(description)\":\"(.*?)\"");
+
+    private ImportSummariesHandler() {
+    }
+
+    public static boolean isSuccess(String source) {
+        if (source == null || source.equals(Field.EMPTY_FIELD)) {
+            return false;
+        }
+        Matcher matcher = STATUS.matcher(source);
+        if (matcher.find()) {
+            String status = matcher.group(2);
+            return status != null && status.equals(SUCCESS);
+        } else {
+            return false;
+        }
+    }
+
+    public static String getDescription(String source, String defaultValue) {
+        if (source == null || source.equals(Field.EMPTY_FIELD)) {
+            return defaultValue;
+        }
+        Matcher matcher = DESCRIPTION.matcher(source);
+        if (matcher.find()) {
+            String description = matcher.group(2);
+            if (description != null && !description.equals(Field.EMPTY_FIELD)) {
+                return description;
+            } else {
+                return defaultValue;
+            }
+        } else {
+            return defaultValue;
+        }
+    }
 }

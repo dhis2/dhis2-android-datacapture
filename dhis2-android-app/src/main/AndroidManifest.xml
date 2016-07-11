@@ -38,9 +38,5 @@
             android:name=".ui.activities.AggregateReportDataEntryActivity"
             android:label="@string/title_activity_data_entry"
             android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".ui.activities.SEWRDataEntryActivity"
-            android:label="@string/title_activity_sewrdata_entry"
-            android:windowSoftInputMode="adjustPan" />
     </application>
 </manifest>

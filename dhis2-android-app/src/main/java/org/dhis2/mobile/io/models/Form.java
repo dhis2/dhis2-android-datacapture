@@ -52,7 +52,7 @@ public class Form implements Serializable, Parcelable {
     private String label;
     private CategoryCombo categoryCombo;
     private FormOptions options;
-    private ArrayList<Group> groups = new ArrayList<Group>();
+    private ArrayList<Group> groups = new ArrayList<>();
 
     private Form(Parcel in) {
         id = in.readString();

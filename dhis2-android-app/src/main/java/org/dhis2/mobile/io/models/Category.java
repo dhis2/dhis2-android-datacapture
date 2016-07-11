@@ -12,7 +12,7 @@ public class Category implements Serializable, Parcelable {
 
     private String id;
     private String label;
-    private List<CategoryOption> categoryOptions = new ArrayList<CategoryOption>();
+    private List<CategoryOption> categoryOptions = new ArrayList<>();
 
     public static final Parcelable.Creator<Category> CREATOR = new Parcelable.Creator<Category>() {
 

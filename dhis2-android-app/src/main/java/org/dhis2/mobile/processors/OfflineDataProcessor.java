@@ -36,7 +36,6 @@ import com.google.gson.Gson;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
-import org.dhis2.mobile.io.holders.ProgramInfoHolder;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
@@ -49,13 +48,13 @@ import java.io.File;
 public class OfflineDataProcessor {
     private static boolean isRunning;
 
-    private OfflineDataProcessor() { }
+    private OfflineDataProcessor() {
+    }
 
     public static void upload(Context context) {
         isRunning = true;
         uploadOfflineReports(context);
         uploadProfileInfo(context);
-        uploadOfflineEvents(context);
         isRunning = false;
     }
 
@@ -117,52 +116,6 @@ public class OfflineDataProcessor {
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
-                }
-            }
-        }
-    }
-
-    private static void uploadOfflineEvents(Context context) {
-        String path = TextFileUtils.getDirectoryPath(context, TextFileUtils.Directory.OFFLINE_ANONYMOUS_EVENTS);
-        File directory = new File(path);
-        if (!directory.exists()) {
-            return;
-        }
-        File[] eventFiles = directory.listFiles();
-        String url = PrefUtils.getServerURL(context) + URLConstants.EVENT_URL;
-        String creds = PrefUtils.getCredentials(context);
-        Gson gson = new Gson();
-        if (eventFiles != null && eventFiles.length > 0) {
-            for (File eventFile : eventFiles) {
-                // Retrieve offline report from file system
-                String report = TextFileUtils.readTextFile(eventFile);
-                // Try to upload to server
-                Response resp = HTTPClient.post(url, creds, report);
-                // If upload was successful, notify user and delete offline
-                // report
-                if (!HTTPClient.isError(resp.getCode())) {
-                    // Getting label of period and dataset
-                    String jsonProgramInfo = PrefUtils.getOfflineReportInfo(context, eventFile.getName());
-                    ProgramInfoHolder info = gson.fromJson(jsonProgramInfo, ProgramInfoHolder.class);
-
-                    String description;
-                    if (ImportSummariesHandler.isSuccess(resp.getBody())) {
-                        description = ImportSummariesHandler.getDescription(resp.getBody(),
-                                context.getString(R.string.import_successfully_completed));
-                    } else {
-                        description = ImportSummariesHandler.getDescription(resp.getBody(),
-                                context.getString(R.string.import_failed));
-                    }
-
-                    String message = String.format("(%s) %s", info.getEventDate(), info.getFormLabel());
-                    String title = description;
-
-                    // Firing notification to statusbar
-                    NotificationBuilder.fireNotification(context, title, message);
-
-                    // Removing uploaded data
-                    TextFileUtils.removeFile(eventFile);
-                    PrefUtils.removeOfflineReportInfo(context, eventFile.getName());
                 }
             }
         }

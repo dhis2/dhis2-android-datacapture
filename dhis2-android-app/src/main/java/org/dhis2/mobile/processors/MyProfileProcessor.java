@@ -55,7 +55,8 @@ public class MyProfileProcessor {
                 PrefUtils.State.REFRESHING);
 
         String accountInfo = UserAccountHandler.fromFields(fields);
-        TextFileUtils.writeTextFile(context, TextFileUtils.Directory.ROOT, TextFileUtils.FileNames.ACCOUNT_INFO, accountInfo);
+        TextFileUtils.writeTextFile(context, TextFileUtils.Directory.ROOT,
+                TextFileUtils.FileNames.ACCOUNT_INFO, accountInfo);
 
         String url = PrefUtils.getServerURL(context) + URLConstants.API_USER_ACCOUNT_URL;
         String creds = PrefUtils.getCredentials(context);

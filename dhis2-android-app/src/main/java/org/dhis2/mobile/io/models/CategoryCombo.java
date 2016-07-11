@@ -11,7 +11,7 @@ public class CategoryCombo implements Serializable, Parcelable {
     private static final String TAG = Category.class.getCanonicalName();
 
     private String id;
-    private List<Category> categories = new ArrayList<Category>();
+    private List<Category> categories = new ArrayList<>();
 
     public static final Parcelable.Creator<CategoryCombo> CREATOR = new Parcelable.Creator<CategoryCombo>() {
 

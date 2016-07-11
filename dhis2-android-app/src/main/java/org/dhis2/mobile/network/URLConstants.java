@@ -33,11 +33,7 @@ public class URLConstants {
 	private URLConstants() { }
 	
 	public static final String API_USER_ACCOUNT_URL = "api/me/user-account";
-	
-	public static final String PROGRAMS_URL = "api/me/assignedPrograms";
-	public static final String ANONYMOUS_EVENT_PARAM = "?type=3";
-	public static final String EVENT_URL = "api/events";
-	
+
 	public static final String OPTION_SET_PARAM = "?fields=id,name,created,lastUpdated," +
 			"externalAccess,version,options[id,name,code,created,lastUpdated]";
 	public static final String OPTION_SET_URL = "api/optionSets";

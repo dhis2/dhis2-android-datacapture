@@ -10,7 +10,6 @@
     <string name="title_activity_menu">Menu</string>
     <string name="title_activity_data_entry">DataEntryActivity</string>
     <string name="title_activity_downloader">DownloaderActivity</string>
-    <string name="title_activity_sewrdata_entry">SEWRDataEntryActivity</string>
 
     <!-- login -->
     <string name="login_dialog_message">Please wait</string>
@@ -94,7 +93,6 @@
 
     <!-- menu items -->
     <string name="aggregate_reporting">Aggregate Report</string>
-    <string name="single_event">Single Event</string>
     <string name="profile">Profile</string>
 
     <!-- Basic strings -->
