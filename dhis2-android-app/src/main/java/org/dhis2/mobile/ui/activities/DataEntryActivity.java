@@ -5,6 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.DataSetObservable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -334,21 +337,36 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return;
         }
 
-        ArrayList<Group> groups = new ArrayList<>();
-        for (FieldAdapter adapter : adapters) {
-            groups.add(adapter.getGroup());
+
+
+            ArrayList<Group> groups = new ArrayList<>();
+            for (FieldAdapter adapter : adapters) {
+                groups.add(adapter.getGroup());
+            }
+
+            DatasetInfoHolder info = getIntent().getExtras()
+                    .getParcelable(DatasetInfoHolder.TAG);
+
+        //Check if network is available. If not send via sms or else just upload via internet
+        if(!isNetworkAvailable()){
+            Intent intent = new Intent(this, WorkService.class);
+            intent.putExtra(WorkService.METHOD, WorkService.METHOD_SEND_VIA_SMS);
+            intent.putExtra(DatasetInfoHolder.TAG, info);
+            intent.putExtra(Group.TAG, groups);
+
+            startService(intent);
+            finish();
+
+        }else {
+
+            Intent intent = new Intent(this, WorkService.class);
+            intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
+            intent.putExtra(DatasetInfoHolder.TAG, info);
+            intent.putExtra(Group.TAG, groups);
+
+            startService(intent);
+            finish();
         }
-
-        DatasetInfoHolder info = getIntent().getExtras()
-                .getParcelable(DatasetInfoHolder.TAG);
-
-        Intent intent = new Intent(this, WorkService.class);
-        intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
-        intent.putExtra(DatasetInfoHolder.TAG, info);
-        intent.putExtra(Group.TAG, groups);
-
-        startService(intent);
-        finish();
     }
 
     private void getLatestValues() {
@@ -526,5 +544,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             return null;
         }
+    }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
