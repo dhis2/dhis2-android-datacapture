@@ -32,9 +32,9 @@ public class SendSmsProcessor {
     public static final String TAG = SendSmsProcessor.class.getSimpleName();
 
     public static void send (Context context, DatasetInfoHolder info, ArrayList<Group> groups){
-        String data = prepareContent(info, groups);
+        String data = prepareContent(info, groups, context);
         //insert destination number
-        sendSMS(context, "insert-number-here", data);
+        sendSMS(context, "078000555", data);
         if (!NetworkUtils.checkConnection(context)) {
             saveDataset(context, data, info);
             return;
@@ -42,7 +42,7 @@ public class SendSmsProcessor {
 
 
     }
-    private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups){
+    private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups, Context context){
         JsonObject content = new JsonObject();
         JsonArray values = putFieldValuesInJson(groups);
 
@@ -50,8 +50,13 @@ public class SendSmsProcessor {
         LocalDate currentDate = new LocalDate();
         String completeDate = currentDate.toString(Constants.DATE_FORMAT);
 
+        //Retrieve username
+        String username = PrefUtils.getUserName(context);
+
         /**
          Field title names have to be shortened to get more data sent via sms
+         Username = uN
+
          Oragnisation Unit = oU
          Dataset = dSet
          Period = p
@@ -59,6 +64,8 @@ public class SendSmsProcessor {
          Data Values = dV
          **/
 
+
+        content.addProperty("uN", username);
         content.addProperty("oU", info.getOrgUnitId());
         content.addProperty("dSet", info.getFormId());
         content.addProperty("p", info.getPeriod());
