@@ -34,7 +34,7 @@ public class SendSmsProcessor {
     public static void send (Context context, DatasetInfoHolder info, ArrayList<Group> groups){
         String data = prepareContent(info, groups, context);
         //insert destination number
-        sendSMS(context, "078000555", data);
+        sendSMS(context, "<insert number here>", data);
         if (!NetworkUtils.checkConnection(context)) {
             saveDataset(context, data, info);
             return;
