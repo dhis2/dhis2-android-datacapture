@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -84,7 +85,7 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView mList;
     private ProgressBar mProgressBar;
-    private Button mUploadButton;
+    private FloatingActionButton mUploadButton;
     private FieldAdapter mAdapter;
     private boolean mIsRefreshing;
 
@@ -153,7 +154,7 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
         mSwipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.ptr_layout);
         mList = (ListView) mSwipeRefreshLayout.findViewById(R.id.list_of_fields);
         mProgressBar = (ProgressBar) root.findViewById(R.id.progress_bar);
-        mUploadButton = (Button) root.findViewById(R.id.upload_button);
+        mUploadButton = (FloatingActionButton) root.findViewById(R.id.upload_button);
 
         ViewUtils.hideAndDisableViews(mList, mUploadButton, mProgressBar);
 

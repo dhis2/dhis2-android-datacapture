@@ -33,6 +33,7 @@ import org.dhis2.mobile.io.models.Field;
 
 import org.dhis2.mobile.R;
 
+import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -54,11 +55,15 @@ public class TextRow implements Row {
     public View getView(View convertView) {
         View view;
         EditTextHolder holder;
+
         
         if (convertView == null) {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_text, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
             EditText editText = (EditText) rowRoot.findViewById(R.id.edit_text_row);
+            TextInputLayout inputLayout = (TextInputLayout) rowRoot.findViewById(R.id.edit_text_row_layout);
+
+
            
             EditTextWatcher watcher = new EditTextWatcher(field);
             editText.addTextChangedListener(watcher);
@@ -115,10 +120,40 @@ class EditTextHolder {
     final TextView textLabel;
     final EditText editText;
     final EditTextWatcher textWatcher;
+    final TextInputLayout inputLayout;
+
+    EditTextHolder(TextView textLabel, EditText editText, EditTextWatcher textWatcher, TextInputLayout inputLayout) {
+        this.textLabel = textLabel;
+        this.editText = editText;
+        this.textWatcher = textWatcher;
+        this.inputLayout = inputLayout;
+    }
+
 
     EditTextHolder(TextView textLabel, EditText editText, EditTextWatcher textWatcher) {
         this.textLabel = textLabel;
         this.editText = editText;
         this.textWatcher = textWatcher;
+        inputLayout = null;
+    }
+
+}
+class EditTextHolder2 {
+    final TextView textLabel;
+    final EditText editText;
+    final EditText editText2;
+    final EditText editText3;
+    final EditText editText4;
+    final EditTextWatcher textWatcher;
+    final TextInputLayout inputLayout;
+
+    EditTextHolder2(TextView textLabel, EditText editText, EditText editText2, EditText editText3,EditText editText4, EditTextWatcher textWatcher, TextInputLayout inputLayout) {
+        this.textLabel = textLabel;
+        this.editText = editText;
+        this.editText2 = editText2;
+        this.editText3 = editText3;
+        this.editText4 = editText4;
+        this.textWatcher = textWatcher;
+        this.inputLayout = inputLayout;
     }
 }

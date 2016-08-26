@@ -12,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,6 +37,7 @@ import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
+import org.dhis2.mobile.processors.ReportUploadProcessor;
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
@@ -76,6 +78,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (info != null && activity != null) {
             Intent intent = new Intent(activity, DataEntryActivity.class);
             intent.putExtra(DatasetInfoHolder.TAG, info);
+            
 
             activity.startActivity(intent);
             activity.overridePendingTransition(
@@ -87,6 +90,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_entry);
+
 
         setupToolbar();
         setupFormSpinner();
@@ -100,6 +104,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
+
+
     }
 
     @Override
@@ -177,6 +183,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -290,6 +298,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 e.printStackTrace();
             }
 
+
+
             setupAdapters(adapters);
         }
     }
@@ -307,6 +317,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         for (FieldAdapter fieldAdapter : adapters) {
             formGroupLabels.add(fieldAdapter.getLabel());
         }
+
+        Log.i("Forms", formGroupLabels.toString());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getBaseContext(),
                 R.layout.spinner_item, formGroupLabels);
