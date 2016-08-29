@@ -34,6 +34,11 @@ import org.dhis2.mobile.io.models.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Import Summaries:
+ * Returns whether the post or import into DHIS2 was a success
+ * Returns the description of the response from DHIS2 in a formatted manner#
+ */
 public class ImportSummariesHandler {
     private static final String SUCCESS = "SUCCESS";
     private static final Pattern STATUS = Pattern.compile("\"(status)\":\"(\\w+)\"");
@@ -41,6 +46,12 @@ public class ImportSummariesHandler {
 
     private ImportSummariesHandler() {
     }
+
+    /**
+     * Returns whether an import was successful or not.
+     * @param source String. This would be the string response from DHIS2
+     * @return Boolean This returns whether the import was successful or not.
+     */
 
     public static boolean isSuccess(String source) {
         if (source == null || source.equals(Field.EMPTY_FIELD)) {
@@ -54,6 +65,13 @@ public class ImportSummariesHandler {
             return false;
         }
     }
+
+    /**
+     * Returns the import description
+     * @param source String. This would be the string response from DHIS2
+     * @param defaultValue String. This would be the string passed in as a default value and is returned if source is empty or null or has no description
+     * @return This is either import description or the default value passed in depending on whether the conditions set were passed.
+     */
 
     public static String getDescription(String source, String defaultValue) {
         if (source == null || source.equals(Field.EMPTY_FIELD)) {

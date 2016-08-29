@@ -18,6 +18,7 @@ import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.NetworkUtils;
+import org.dhis2.mobile.utils.KeyGenerator;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.joda.time.LocalDate;
@@ -44,6 +45,8 @@ public class SendSmsProcessor {
     }
     private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups, Context context){
         JsonObject content = new JsonObject();
+        KeyGenerator generator = new KeyGenerator();
+        Log.d("Generator", generator.parse(groups, "command"));
         JsonArray values = putFieldValuesInJson(groups);
 
         // Retrieve current date

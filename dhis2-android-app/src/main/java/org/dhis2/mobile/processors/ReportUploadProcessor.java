@@ -47,13 +47,14 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
+import org.dhis2.mobile.utils.IsTimely;
+import org.dhis2.mobile.utils.KeyGenerator;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ReportUploadProcessor {
@@ -99,6 +100,18 @@ public class ReportUploadProcessor {
     private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups) {
         JsonObject content = new JsonObject();
         JsonArray values = putFieldValuesInJson(groups);
+
+
+
+        //Check whether the report was timely or not
+        String period = info.getPeriod().substring(5);
+        Boolean isTimely = IsTimely.check(Integer.parseInt(period));
+
+        //Fill out timely dataElememt
+        JsonObject jField = new JsonObject();
+        jField.addProperty(Field.DATA_ELEMENT, "BpG5Yq4EWMT");
+        jField.addProperty(Field.VALUE, isTimely);
+        values.add(jField);
 
 
         // Retrieve current date
@@ -154,4 +167,6 @@ public class ReportUploadProcessor {
         PrefUtils.saveOfflineReportInfo(context, key, jsonReportInfo);
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.OFFLINE_DATASETS, key, data);
     }
+
+
 }
