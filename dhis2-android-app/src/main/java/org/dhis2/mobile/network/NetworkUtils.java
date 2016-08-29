@@ -36,15 +36,28 @@ import android.net.NetworkInfo;
 public class NetworkUtils {
     private NetworkUtils() { }
 
+    /**
+     * Checks if the device is connected to WIFI
+     * @param context Context
+     * @return Boolean
+     */
+
     public static boolean isConnectedWifi(Context context){
         NetworkInfo info = NetworkUtils.getNetworkInfo(context);
         return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
     }
 
+    //Ges the network info
     public static NetworkInfo getNetworkInfo(Context context){
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo();
     }
+
+    /**
+     * Checks if the device has an internet connection
+     * @param context Context
+     * @return Boolean
+     */
 
     public static boolean checkConnection(Context context) {
         ConnectivityManager cManager = (ConnectivityManager) context

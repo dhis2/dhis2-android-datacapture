@@ -46,11 +46,22 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+/**
+ * Does HTTP requests.
+ */
+
 public class HTTPClient {
     private static final int CONNECTION_TIME_OUT = 1500;
 
 	private HTTPClient() { }
 
+    /**
+     * Does a get call to the DHIS2 server
+     * @param server String The URL for the DHIS2 instance set by the user.
+     * @param creds String The users credentials aka username and password
+     * @return Response The response message from the server. This is parsed in as a new Response object.
+     * @see Response
+     */
 	public static Response get(String server, String creds) {
         Log.i("GET", server);
 		int code = -1;
@@ -93,6 +104,15 @@ public class HTTPClient {
         Log.i(Integer.toString(code), body);
         return (new Response(code, body));
 	}
+
+    /**
+     *
+     * @param server String The URL of the DHIS2 instance set by the user.
+     * @param creds String The users credentials aka username and password
+     * @param data String The data to be posted to the DHIS2 server.
+     * @return Response The response from the DHIS2 server parsed in a new Response object
+     * @see Response
+     */
 
 	public static Response post(String server, String creds, String data) {
         Log.i("POST", server);
@@ -141,6 +161,12 @@ public class HTTPClient {
 		return (new Response(code, body));
 	}
 
+    /**
+     * Converts an InputStream of bytes to a String.
+     * @param stream InputStream
+     * @return String
+     * @throws IOException
+     */
 	private static String readInputStream(InputStream stream)
 			throws IOException {
 		BufferedReader reader = new BufferedReader(
