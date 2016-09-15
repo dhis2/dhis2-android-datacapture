@@ -109,7 +109,7 @@ public class ReportUploadProcessor {
 
         //Fill out timely dataElememt
         JsonObject jField = new JsonObject();
-        jField.addProperty(Field.DATA_ELEMENT, "BpG5Yq4EWMT");
+        jField.addProperty(Field.DATA_ELEMENT, Constants.TIMELY);
         jField.addProperty(Field.VALUE, isTimely);
         values.add(jField);
 
