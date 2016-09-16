@@ -90,6 +90,8 @@ public class AggregateReportFragment extends Fragment
     private SwipeRefreshLayout swipeRefreshLayout;
     private View stubLayout;
 
+    private RecyclerView pickerRecyclerViewOne;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_aggregate_report, container, false);
@@ -105,6 +107,7 @@ public class AggregateReportFragment extends Fragment
         if (savedInstanceState == null) {
             loadData();
         }
+
     }
 
     @Override
@@ -130,6 +133,9 @@ public class AggregateReportFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Picker> loader, Picker data) {
         pickerAdapterOne.swapData(data);
+        //most user's only have one orgUnit, select the first item to save them time
+        pickerAdapterOne.selectFirstItem(data);
+
     }
 
     @Override
@@ -161,6 +167,7 @@ public class AggregateReportFragment extends Fragment
 
     private void loadData() {
         getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null, this).forceLoad();
+
     }
 
     private void setupStubLayout(View view) {
@@ -210,16 +217,24 @@ public class AggregateReportFragment extends Fragment
         layoutManagerOne.setOrientation(LinearLayoutManager.VERTICAL);
         layoutManagerTwo.setOrientation(LinearLayoutManager.VERTICAL);
 
-        RecyclerView pickerRecyclerViewOne = (RecyclerView) root
+         pickerRecyclerViewOne = (RecyclerView) root
                 .findViewById(R.id.recyclerview_pickers_one);
         RecyclerView pickerRecyclerViewTwo = (RecyclerView) root
                 .findViewById(R.id.recyclerview_pickers_two);
 
+
+
+
         pickerRecyclerViewTwo.setLayoutManager(layoutManagerTwo);
         pickerRecyclerViewOne.setLayoutManager(layoutManagerOne);
 
+        pickerRecyclerViewOne.findViewHolderForLayoutPosition(0);
+
+
         pickerRecyclerViewTwo.setAdapter(pickerAdapterTwo);
         pickerRecyclerViewOne.setAdapter(pickerAdapterOne);
+
+
 
         pickerAdapterOne.setOnPickerListChangeListener(new OnPickerListChangeListener() {
             @Override
@@ -552,6 +567,7 @@ public class AggregateReportFragment extends Fragment
             }
 
             loadData();
+
         }
     };
 

@@ -32,6 +32,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,7 @@ public class PickerAdapter extends RecyclerView.Adapter {
     private OnPickerListChangeListener onPickerListChangeListener;
     private Picker pickerTree;
 
+
     private PickerAdapter(Context context, FragmentManager fragmentManager, boolean renderPseudoRoots) {
         this.layoutInflater = LayoutInflater.from(context);
         this.fragmentManager = fragmentManager;
@@ -77,6 +79,8 @@ public class PickerAdapter extends RecyclerView.Adapter {
 
         Picker picker = pickers.get(position);
         viewHolder.update(picker);
+
+
     }
 
     @Override
@@ -94,6 +98,12 @@ public class PickerAdapter extends RecyclerView.Adapter {
         }
 
         return itemCount;
+    }
+
+    //Sets Picker to first child on the tree.
+    public void selectFirstItem(Picker pickerTree){
+        pickerTree.setSelectedChild(pickerTree.getChildren().get(0));
+        swapData(pickerTree);
     }
 
     public void onSaveInstanceState(Bundle outState) {
