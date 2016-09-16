@@ -166,9 +166,6 @@ public class AggregateReportFragment extends Fragment
 
     private void loadData() {
         getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null, this).forceLoad();
-//        pickerRecyclerViewOne.findViewHolderForAdapterPosition(0);
-//        pickerAdapterOne.onBindViewHolder(pickerRecyclerViewOne.findContainingViewHolder(root),0 );
-//        pickerAdapterOne.setItem();
 
     }
 
@@ -231,11 +228,6 @@ public class AggregateReportFragment extends Fragment
         pickerRecyclerViewOne.setLayoutManager(layoutManagerOne);
 
         pickerRecyclerViewOne.findViewHolderForLayoutPosition(0);
-//        pickerAdapterOne.onBindViewHolder(pickerRecyclerViewOne.findContainingViewHolder(root), 0);
-
-
-
-
 
 
         pickerRecyclerViewTwo.setAdapter(pickerAdapterTwo);
