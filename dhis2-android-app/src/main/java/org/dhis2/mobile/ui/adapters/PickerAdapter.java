@@ -101,7 +101,7 @@ public class PickerAdapter extends RecyclerView.Adapter {
     }
 
     //Sets Picker to first child on the tree.
-    public void setItem(Picker pickerTree){
+    public void selectFirstItem(Picker pickerTree){
         pickerTree.setSelectedChild(pickerTree.getChildren().get(0));
         swapData(pickerTree);
     }

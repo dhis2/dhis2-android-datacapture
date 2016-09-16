@@ -133,7 +133,8 @@ public class AggregateReportFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Picker> loader, Picker data) {
         pickerAdapterOne.swapData(data);
-        pickerAdapterOne.setItem(data);
+        //most user's only have one orgUnit, select the first item to save them time
+        pickerAdapterOne.selectFirstItem(data);
 
     }
 
