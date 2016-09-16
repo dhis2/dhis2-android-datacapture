@@ -40,4 +40,5 @@ public class Constants {
     public static final String ATTRIBUTE_CATEGORY_OPTIONS = "attributeCategoryOptions";
     public static final String DATA_VALUES = "dataValues";
     public static final String DATE_FORMAT = "YYYY-MM-dd";
+    public static final String TIMELY = "BpG5Yq4EWMT";
 }
