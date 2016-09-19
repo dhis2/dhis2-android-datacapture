@@ -100,7 +100,6 @@ public class FieldAdapter extends BaseAdapter {
                 }else if(i > 0 && field.getDataElement().equals(previousFieldId)){
                     groupedFields.add(field);
                 }else if(i > 0 && !field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0){
-                    previousFieldId = field.getDataElement();
                     //each disease has four fields.
                     //we create a row from the last for fields added
                     rows.add(new PosOrZeroIntegerRow2(inflater,
@@ -108,10 +107,9 @@ public class FieldAdapter extends BaseAdapter {
                             groupedFields.get(groupedFields.size()-3),
                             groupedFields.get(groupedFields.size()-2),
                             groupedFields.get(groupedFields.size()-1)));
-
-
-                    groupedFields.add(field);
                 }
+                previousFieldId = field.getDataElement();
+                groupedFields.add(field);
             } else if (field.getType().equals(RowTypes.INTEGER_POSITIVE.name())) {
                 rows.add(new PosIntegerRow(inflater, field));
             } else if (field.getType().equals(RowTypes.INTEGER_NEGATIVE.name())) {
