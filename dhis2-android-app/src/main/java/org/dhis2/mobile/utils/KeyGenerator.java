@@ -2,13 +2,9 @@ package org.dhis2.mobile.utils;
 
 import android.util.Log;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -42,7 +38,6 @@ public class KeyGenerator {
 
         Log.d("Generated ids", ids+"");
 
-
         return message;
     }
 
@@ -61,10 +56,6 @@ public class KeyGenerator {
         return generatedId;
     }
 
-    public static JsonArray check(JsonArray values){
-
-        return values;
-    }
 
 
 }

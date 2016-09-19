@@ -74,6 +74,7 @@ public class SendSmsProcessor {
 
     }
 
+    //Saves the dataset locally for future upload.
     private static void saveDataset(Context context, String data, DatasetInfoHolder info) {
         String key = DatasetInfoHolder.buildKey(info);
         Gson gson = new Gson();
