@@ -51,11 +51,19 @@ import org.dhis2.mobile.utils.PrefUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Processes previous forms that has been sent for a particular Dataset
+ */
 public class ReportDownloadProcessor {
 
     private ReportDownloadProcessor() {
     }
 
+    /**
+     *
+     * @param context
+     * @param info
+     */
     public static void download(Context context, DatasetInfoHolder info) {
         String url = buildUrl(context, info);
         String creds = PrefUtils.getCredentials(context);

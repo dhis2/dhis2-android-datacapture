@@ -30,6 +30,7 @@
 package org.dhis2.mobile.ui.adapters.dataEntry;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +39,13 @@ import android.widget.BaseAdapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.io.models.OptionSet;
+import org.dhis2.mobile.processors.ReportUploadProcessor;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.AutoCompleteRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.BooleanRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.CheckBoxRow;
@@ -54,6 +57,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.NegativeIntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.NumberRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosIntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow;
+import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.Row;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.RowTypes;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.TextRow;
@@ -68,10 +72,11 @@ public class FieldAdapter extends BaseAdapter {
 
     public FieldAdapter(Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
+        ArrayList<Field> groupedFields = new ArrayList<Field>();
+        String previousFieldId = "";
         this.group = group;
         this.rows = new ArrayList<Row>();
         this.adapterLabel = group.getLabel();
-
         LayoutInflater inflater = LayoutInflater.from(context);
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
@@ -87,13 +92,29 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.INTEGER.name())) {
                 rows.add(new IntegerRow(inflater, field));
             } else if (field.getType().equals(RowTypes.INTEGER_ZERO_OR_POSITIVE.name())) {
-                rows.add(new PosOrZeroIntegerRow(inflater, field));
+                //Changed from the others to support grouping of Diseases
+                //Specific test case for eidsr form
+                if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0){
+                    //each disease has four fields.
+                    //we create a row from the last for fields added
+                    rows.add(new PosOrZeroIntegerRow2(inflater,
+                            groupedFields.get(groupedFields.size()-4),
+                            groupedFields.get(groupedFields.size()-3),
+                            groupedFields.get(groupedFields.size()-2),
+                            groupedFields.get(groupedFields.size()-1)));
+
+                    groupedFields.clear();
+                }
+                groupedFields.add(field);
+                previousFieldId = field.getDataElement();
             } else if (field.getType().equals(RowTypes.INTEGER_POSITIVE.name())) {
                 rows.add(new PosIntegerRow(inflater, field));
             } else if (field.getType().equals(RowTypes.INTEGER_NEGATIVE.name())) {
                 rows.add(new NegativeIntegerRow(inflater, field));
             } else if (field.getType().equals(RowTypes.BOOLEAN.name())) {
-                rows.add(new BooleanRow(inflater, field));
+                if(!field.getDataElement().equals(Constants.TIMELY)){
+                    rows.add(new BooleanRow(inflater, field));
+                }
             } else if (field.getType().equals(RowTypes.TRUE_ONLY.name())) {
                 rows.add(new CheckBoxRow(inflater, field));
             } else if (field.getType().equals(RowTypes.DATE.name())) {
@@ -102,6 +123,7 @@ public class FieldAdapter extends BaseAdapter {
                 rows.add(new GenderRow(inflater, field));
             }
         }
+
     }
 
     @Override

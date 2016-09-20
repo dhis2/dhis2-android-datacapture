@@ -9,12 +9,29 @@
 
     <include layout="@layout/listview_row_label" />
 
-    <org.dhis2.mobile.ui.views.FontEditText
-        android:id="@+id/edit_long_text_row"
-        style="@style/ListViewEditTextStyle"
-        android:hint="@string/enter_long_text"
-        android:imeOptions="actionNext|flagNoExtractUi"
-        android:inputType="text"
-        app:font="@string/regular_font_name" />
+    <!--<org.dhis2.mobile.ui.views.FontEditText-->
+        <!--android:id="@+id/edit_long_text_row"-->
+        <!--style="@style/ListViewEditTextStyle"-->
+        <!--android:hint="@string/enter_long_text"-->
+        <!--android:imeOptions="actionNext|flagNoExtractUi"-->
+        <!--android:inputType="text"-->
+        <!--app:font="@string/regular_font_name" />-->
+
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <EditText
+            android:id="@+id/edit_long_text_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_text"
+            android:imeOptions="actionNext|flagNoExtractUi"
+            android:inputType="text"
+            />
+
+    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

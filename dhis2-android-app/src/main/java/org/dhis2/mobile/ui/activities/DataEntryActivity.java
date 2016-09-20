@@ -81,6 +81,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (info != null && activity != null) {
             Intent intent = new Intent(activity, DataEntryActivity.class);
             intent.putExtra(DatasetInfoHolder.TAG, info);
+            
 
 
             activity.startActivity(intent);

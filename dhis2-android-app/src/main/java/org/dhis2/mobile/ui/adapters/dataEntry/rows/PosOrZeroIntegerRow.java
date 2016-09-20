@@ -33,6 +33,7 @@ import org.dhis2.mobile.io.models.Field;
 
 import org.dhis2.mobile.R;
 
+import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -59,12 +60,14 @@ public class PosOrZeroIntegerRow implements Row {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_integer_positive_or_zero, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
             EditText editText = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row);
+            TextInputLayout inputLayout = (TextInputLayout) rowRoot.findViewById(R.id.edit_integer_pos_layout);
             editText.setFilters(new InputFilter[]{new InpFilter()});
             
             EditTextWatcher watcher = new EditTextWatcher(field);
             editText.addTextChangedListener(watcher);
+            inputLayout.setHint(field.getLabel());
             
-            holder = new EditTextHolder(label, editText, watcher);
+            holder = new EditTextHolder(label, editText, watcher,inputLayout);
             rowRoot.setTag(holder);
             view = rowRoot;
         } else {
