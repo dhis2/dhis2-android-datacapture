@@ -94,12 +94,7 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.INTEGER_ZERO_OR_POSITIVE.name())) {
                 //Changed from the others to support grouping of Diseases
                 //Specific test case for eidsr form
-                if(groupedFields.size() == 0) {
-                    groupedFields.add(field);
-                    previousFieldId = field.getDataElement();
-                }else if(i > 0 && field.getDataElement().equals(previousFieldId)){
-                    groupedFields.add(field);
-                }else if(i > 0 && !field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0){
+                if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0){
                     //each disease has four fields.
                     //we create a row from the last for fields added
                     rows.add(new PosOrZeroIntegerRow2(inflater,
@@ -107,9 +102,11 @@ public class FieldAdapter extends BaseAdapter {
                             groupedFields.get(groupedFields.size()-3),
                             groupedFields.get(groupedFields.size()-2),
                             groupedFields.get(groupedFields.size()-1)));
+
+                    groupedFields.clear();
                 }
-                previousFieldId = field.getDataElement();
                 groupedFields.add(field);
+                previousFieldId = field.getDataElement();
             } else if (field.getType().equals(RowTypes.INTEGER_POSITIVE.name())) {
                 rows.add(new PosIntegerRow(inflater, field));
             } else if (field.getType().equals(RowTypes.INTEGER_NEGATIVE.name())) {
