@@ -3,28 +3,20 @@ package org.dhis2.mobile.processors;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.Snackbar;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
-import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
-import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.utils.KeyGenerator;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
-import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by george on 8/10/16.
@@ -36,19 +28,32 @@ public class SendSmsProcessor {
         String data = prepareContent(groups);
         //insert destination number
         sendSMS(context, Constants.SMS_NUMBER, data);
-        //Save dataset for upload when there is internet connection
-        if (!NetworkUtils.checkConnection(context)) {
-            saveDataset(context, data, info);
-            return;
-        }
+
+        saveDataset(context, data, info);
 
     }
-    private static String prepareContent(ArrayList<Group> groups){
-        KeyGenerator generator = new KeyGenerator();
-        String msg = generator.parse(groups, "command");
+    private static String prepareContent(ArrayList<Group> submissionData){
+        KeyGenerator keyGenerator = new KeyGenerator();
+        String commandName = "command";
+
+        String message = "";
+        message += commandName+" ";
+        //TODO: insert period
+        //TODO: insert org unit
 
 
-        return msg;
+        //This is for the data elements and their values
+        for (Group group : submissionData) {
+            for (Field field : group.getFields()) {
+                if(!field.getValue().equals("")) {
+                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2)+",";
+                    message += field.getValue()+",";
+
+                }
+            }
+        }
+
+        return message;
     }
 
     /**
