@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <item name="TAG_HOLDER1_ID" type="id"/>
+    <item name="TAG_HOLDER2_ID" type="id"/>
+    <item name="TAG_HOLDER3_ID" type="id"/>
+    <item name="TAG_HOLDER4_ID" type="id"/>
+</resources>

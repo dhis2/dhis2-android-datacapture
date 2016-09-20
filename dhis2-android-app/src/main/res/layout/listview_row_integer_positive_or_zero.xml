@@ -9,12 +9,31 @@
 
     <include layout="@layout/listview_row_label" />
 
-    <org.dhis2.mobile.ui.views.FontEditText
-        android:id="@+id/edit_integer_pos_row"
-        style="@style/ListViewEditTextStyle"
-        android:hint="@string/enter_integer_positive_or_zero"
-        android:imeOptions="actionNext|flagNoExtractUi"
-        android:inputType="number"
-        app:font="@string/regular_font_name"/>
+    <!--<org.dhis2.mobile.ui.views.FontEditText-->
+        <!--android:id="@+id/edit_integer_pos_row"-->
+        <!--style="@style/ListViewEditTextStyle"-->
+        <!--android:hint="@string/enter_integer_positive_or_zero"-->
+        <!--android:imeOptions="actionNext|flagNoExtractUi"-->
+        <!--android:inputType="number"-->
+        <!--app:font="@string/regular_font_name"/>-->
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_integer_pos_layout"
+        >
+
+        <EditText
+            android:id="@+id/edit_integer_pos_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext|flagNoExtractUi"
+            android:inputType="number"
+            />
+
+    </android.support.design.widget.TextInputLayout>
+
+
+
 
 </LinearLayout>
