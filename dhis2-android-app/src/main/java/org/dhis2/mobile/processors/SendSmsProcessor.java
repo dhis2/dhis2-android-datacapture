@@ -34,7 +34,7 @@ public class SendSmsProcessor {
     }
     private static String prepareContent(ArrayList<Group> submissionData){
         KeyGenerator keyGenerator = new KeyGenerator();
-        String commandName = "command";
+        String commandName = Constants.COMMAND_NAME;
 
         String message = "";
         message += commandName+" ";
