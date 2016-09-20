@@ -65,6 +65,7 @@ public class ReportUploadProcessor {
     public static void upload(Context context, DatasetInfoHolder info, ArrayList<Group> groups) {
         String data = prepareContent(info, groups);
 
+
         if (!NetworkUtils.checkConnection(context)) {
             saveDataset(context, data, info);
             return;
@@ -99,6 +100,7 @@ public class ReportUploadProcessor {
         JsonObject content = new JsonObject();
         JsonArray values = putFieldValuesInJson(groups);
 
+
         // Retrieve current date
         LocalDate currentDate = new LocalDate();
         String completeDate = currentDate.toString(Constants.DATE_FORMAT);
@@ -113,7 +115,6 @@ public class ReportUploadProcessor {
         if (categoryOptions != null) {
             content.add(Constants.ATTRIBUTE_CATEGORY_OPTIONS, categoryOptions);
         }
-
         return content.toString();
     }
 

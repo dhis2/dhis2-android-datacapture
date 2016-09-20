@@ -5,6 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.DataSetObservable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -37,6 +40,7 @@ import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
+import org.dhis2.mobile.processors.ReportUploadProcessor;
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
@@ -78,6 +82,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             Intent intent = new Intent(activity, DataEntryActivity.class);
             intent.putExtra(DatasetInfoHolder.TAG, info);
             
+
 
             activity.startActivity(intent);
             activity.overridePendingTransition(
@@ -345,21 +350,30 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return;
         }
 
-        ArrayList<Group> groups = new ArrayList<>();
-        for (FieldAdapter adapter : adapters) {
-            groups.add(adapter.getGroup());
-        }
 
-        DatasetInfoHolder info = getIntent().getExtras()
-                .getParcelable(DatasetInfoHolder.TAG);
+
+            ArrayList<Group> groups = new ArrayList<>();
+            for (FieldAdapter adapter : adapters) {
+                groups.add(adapter.getGroup());
+            }
+
+            DatasetInfoHolder info = getIntent().getExtras()
+                    .getParcelable(DatasetInfoHolder.TAG);
 
         Intent intent = new Intent(this, WorkService.class);
-        intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
+        //Check if network is available. If not send via sms or else just upload via internet
+        if(!NetworkUtils.checkConnection(getApplicationContext())){
+            intent.putExtra(WorkService.METHOD, WorkService.METHOD_SEND_VIA_SMS);
+        }else {
+            intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
+        }
         intent.putExtra(DatasetInfoHolder.TAG, info);
         intent.putExtra(Group.TAG, groups);
 
         startService(intent);
         finish();
+
+
     }
 
     private void getLatestValues() {

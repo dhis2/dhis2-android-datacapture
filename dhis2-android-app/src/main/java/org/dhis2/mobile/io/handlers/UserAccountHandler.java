@@ -55,7 +55,7 @@ public class UserAccountHandler {
 	private static final String EMPLOYER = "employer";
 	private static final String EDUCATION = "education";
 	private static final String INTERESTS = "interests";
-	private static final String LANGUAGES = "languages";	
+	private static final String LANGUAGES = "languages";
 
     // ADD CHECK FOR VALIDNESS OF JSON BEFORE ACTUAL PARSING
     @Deprecated
@@ -68,7 +68,7 @@ public class UserAccountHandler {
         if (info == null) {
             return null;
         }
-		
+
 		String firstName = getString(info.getAsJsonPrimitive(FIRST_NAME));
 		Field mFirstName = toField(context, R.string.first_name, RowTypes.TEXT, FIRST_NAME, firstName);
 		

@@ -44,6 +44,7 @@ import org.dhis2.mobile.network.Response;
 import java.io.StringReader;
 import java.lang.reflect.Type;
 
+
 public class JsonHandler {
     public static final String PARSING_STATUS_CODE = "parsingStatusCode";
     public static final int PARSING_FAILED_CODE = 445769892;
