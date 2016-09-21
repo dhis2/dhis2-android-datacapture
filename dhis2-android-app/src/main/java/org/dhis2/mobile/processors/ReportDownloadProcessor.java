@@ -60,9 +60,10 @@ public class ReportDownloadProcessor {
     }
 
     /**
-     *
-     * @param context
-     * @param info
+     * Downloads forms that have been filled out from previous weeks or periods
+     * @param context Context
+     * @param info DatasetInfoHolder
+     * @see DatasetInfoHolder
      */
     public static void download(Context context, DatasetInfoHolder info) {
         String url = buildUrl(context, info);

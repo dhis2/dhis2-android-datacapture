@@ -5,6 +5,11 @@ import java.util.Calendar;
 /**
  * Created by George on 8/26/16.
  */
+
+/**
+ * Checks whether the report made is timely or not.
+ * Being timely is based on whether the report was submitted before 12 o'lock on Monday
+ */
 public class IsTimely {
     public IsTimely(){
 

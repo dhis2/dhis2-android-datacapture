@@ -21,6 +21,10 @@ import java.util.ArrayList;
 /**
  * Created by george on 8/10/16.
  */
+
+/**
+ * Sends an SMS. SMS sent is formatted specifically for use with DHIS2's SMS commands.
+ */
 public class SendSmsProcessor {
     public static final String TAG = SendSmsProcessor.class.getSimpleName();
 
