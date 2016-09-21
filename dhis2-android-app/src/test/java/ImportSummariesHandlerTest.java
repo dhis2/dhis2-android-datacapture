@@ -18,8 +18,8 @@ public class ImportSummariesHandlerTest {
 
     @Before
     public  void createResponse(){
-        mBadResponse = new Response(200, DummyDataTest.ERROR_IMPORT_RESPONSE);
-        mGoodResponse = new Response(200, DummyDataTest.SUCCESSFUL_IMPORT_RESPONSE);
+        mBadResponse = new Response(200, DummyTestData.ERROR_IMPORT_RESPONSE);
+        mGoodResponse = new Response(200, DummyTestData.SUCCESSFUL_IMPORT_RESPONSE);
     }
 
     @Test

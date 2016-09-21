@@ -30,7 +30,7 @@ public class UserAccountHandlerTest {
     @Before
     public void setup(){
         MockitoAnnotations.initMocks(this);
-        fields = UserAccountHandler.toFields(mMockContext, DummyDataTest.PROFILE_DATA);
+        fields = UserAccountHandler.toFields(mMockContext, DummyTestData.PROFILE_DATA);
     }
 
     @Test
@@ -40,17 +40,17 @@ public class UserAccountHandlerTest {
 
     @Test
     public void checkFirstDataElement(){
-        assertThat(fields.get(0).getDataElement(), is(DummyDataTest.FIRST_DATA_ELEMENT_IN_USER_ACCOUNT_FIELDS));
+        assertThat(fields.get(0).getDataElement(), is(DummyTestData.FIRST_DATA_ELEMENT_IN_USER_ACCOUNT_FIELDS));
     }
 
     @Test
     public void checkFirstName(){
-        assertThat(fields.get(0).getValue(), is(DummyDataTest.FIRST_NAME));
+        assertThat(fields.get(0).getValue(), is(DummyTestData.FIRST_NAME));
     }
 
     @Test
     public void checkProfileFields(){
-        assertThat(UserAccountHandler.fromFields(fields), is(DummyDataTest.PROCESSED_PROFILE_DATA));
+        assertThat(UserAccountHandler.fromFields(fields), is(DummyTestData.PROCESSED_PROFILE_DATA));
     }
 
 

@@ -19,12 +19,10 @@ import static org.junit.Assert.*;
  */
 public class JsonHandlerTest {
     private Response responseObject;
-    private ParsingException exception;
 
     @Before
     public void setup(){
-        responseObject = new Response(200, DummyDataTest.GOOD_GET_METHOD_FORM_RESPONSE);
-        exception = new ParsingException(DummyDataTest.JSON_EXCEPTION_STRING);
+        responseObject = new Response(200, DummyTestData.GOOD_GET_METHOD_FORM_RESPONSE);
     }
 
     @Test(expected = ParsingException.class)
@@ -40,7 +38,7 @@ public class JsonHandlerTest {
 
     @Test
     public void shouldBuildJsonArray() throws ParsingException {
-        assertThat(JsonHandler.buildJsonArray(DummyDataTest.GOOD_GET_METHOD_FORM_RESPONSE_ARRAY).get(0).toString(), is(DummyDataTest.GOOD_GET_METHOD_FORM_RESPONSE));
+        assertThat(JsonHandler.buildJsonArray(DummyTestData.GOOD_GET_METHOD_FORM_RESPONSE_ARRAY).get(0).toString(), is(DummyTestData.GOOD_GET_METHOD_FORM_RESPONSE));
     }
     @Test(expected = ParsingException.class)
     public void shouldNotBuildJsonArray() throws ParsingException {
@@ -52,21 +50,21 @@ public class JsonHandlerTest {
     public void shouldGetAsJsonObject() throws ParsingException {
         JsonElement jsonElement = JsonHandler.buildJsonObject(responseObject.getBody());
         assertThat(JsonHandler.getAsJsonObject(jsonElement), instanceOf(JsonObject.class));
-        assertThat(JsonHandler.getAsJsonObject(jsonElement).has(DummyDataTest.ID), is(true));
+        assertThat(JsonHandler.getAsJsonObject(jsonElement).has(DummyTestData.ID), is(true));
 
     }
 
     @Test(expected = ParsingException.class)
     public void shouldNotGetAsJsonObject() throws ParsingException{
-        JsonElement jsonElement = JsonHandler.buildJsonArray(DummyDataTest.GOOD_GET_METHOD_FORM_RESPONSE_ARRAY);
+        JsonElement jsonElement = JsonHandler.buildJsonArray(DummyTestData.GOOD_GET_METHOD_FORM_RESPONSE_ARRAY);
         JsonHandler.getAsJsonObject(jsonElement);
     }
 
     @Test
     public void shouldGetAsJsonArray() throws ParsingException {
-        JsonElement jsonElement = JsonHandler.buildJsonArray(DummyDataTest.GOOD_GET_METHOD_FORM_RESPONSE_ARRAY);
+        JsonElement jsonElement = JsonHandler.buildJsonArray(DummyTestData.GOOD_GET_METHOD_FORM_RESPONSE_ARRAY);
         assertThat(JsonHandler.getAsJsonArray(jsonElement), instanceOf(JsonArray.class));
-        assertThat(JsonHandler.getAsJsonArray(jsonElement).get(0).toString(), is(DummyDataTest.GOOD_GET_METHOD_FORM_RESPONSE));
+        assertThat(JsonHandler.getAsJsonArray(jsonElement).get(0).toString(), is(DummyTestData.GOOD_GET_METHOD_FORM_RESPONSE));
     }
 
     @Test(expected = ParsingException.class)
@@ -77,13 +75,13 @@ public class JsonHandlerTest {
 
     @Test
     public void shouldCreateOrganisationSerializableFromArray() throws ParsingException {
-        JsonArray jsonArray = JsonHandler.buildJsonArray(DummyDataTest.ORG_UNITS);
+        JsonArray jsonArray = JsonHandler.buildJsonArray(DummyTestData.ORG_UNITS);
         assertThat(JsonHandler.fromJson(jsonArray, OrganizationUnit[].class), instanceOf(OrganizationUnit[].class));
     }
 
     @Test(expected = ParsingException.class)
     public void shouldNotCreateSerializableFromArray() throws ParsingException{
-        JsonArray jsonArray = JsonHandler.buildJsonArray(DummyDataTest.ORG_UNITS);
+        JsonArray jsonArray = JsonHandler.buildJsonArray(DummyTestData.ORG_UNITS);
         //should throw exeption because an object of OrganizationUnit.class is being passed in instead of an array
         assertThat(JsonHandler.fromJson(jsonArray, OrganizationUnit.class), instanceOf(OrganizationUnit.class));
     }
