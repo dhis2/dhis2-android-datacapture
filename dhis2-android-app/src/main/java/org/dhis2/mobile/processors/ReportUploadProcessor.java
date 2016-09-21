@@ -62,6 +62,13 @@ public class ReportUploadProcessor {
     private ReportUploadProcessor() {
     }
 
+    /**
+     * Uploads a report to DHIS2 instance
+     * @param context Context
+     * @param info DatasetInfoHolder
+     * @param groups ArrayList<Group>
+     */
+
     public static void upload(Context context, DatasetInfoHolder info, ArrayList<Group> groups) {
         String data = prepareContent(info, groups);
 
@@ -95,6 +102,13 @@ public class ReportUploadProcessor {
             saveDataset(context, data, info);
         }
     }
+
+    /**
+     * Combines the dataset info and dataElements with their values into one JSON object and then returns it as a string
+     * @param info DatasetInfoHolder
+     * @param groups ArrayList<Group>
+     * @return String
+     */
 
     private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups) {
         JsonObject content = new JsonObject();
