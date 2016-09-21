@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
+import org.dhis2.mobile.utils.IsDisabled;
 
 public class PosOrZeroIntegerRow2 implements Row {
     private final LayoutInflater inflater;
@@ -169,7 +170,11 @@ public class PosOrZeroIntegerRow2 implements Row {
             holder4.editText.clearFocus();
 
 
-
+        //check whether field should be disabled
+        IsDisabled.check(holder.editText, field);
+        IsDisabled.check(holder2.editText, field2);
+        IsDisabled.check(holder3.editText, field3);
+        IsDisabled.check(holder4.editText, field4);
 
 
         return view;
