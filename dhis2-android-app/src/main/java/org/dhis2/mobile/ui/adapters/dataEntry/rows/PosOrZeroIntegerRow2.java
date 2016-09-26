@@ -32,7 +32,6 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,10 +42,11 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.utils.IsDisabled;
 
+import java.util.ArrayList;
+
 public class PosOrZeroIntegerRow2 implements Row {
     private final LayoutInflater inflater;
-    private final Field field;
-    private final Field field2, field3, field4;
+    private final Field field, field2, field3, field4;
 
     public PosOrZeroIntegerRow2(LayoutInflater inflater, Field field, Field field2, Field field3, Field field4 ) {
         this.inflater = inflater;
@@ -64,6 +64,11 @@ public class PosOrZeroIntegerRow2 implements Row {
         EditTextHolder holder3;
         EditTextHolder holder4;
 
+        ArrayList<Field> fields = new ArrayList<>();
+        fields.add(field);
+        fields.add(field2);
+        fields.add(field3);
+        fields.add(field4);
 
 
         if (convertView == null) {
@@ -121,52 +126,14 @@ public class PosOrZeroIntegerRow2 implements Row {
             holder4 = (EditTextHolder) view.getTag(R.id.TAG_HOLDER4_ID);
         }
 
-            String[] label = field.getLabel().split("<");
-
-            holder.textLabel.setText(label[0]);
-
-            holder.textWatcher.setField(field);
-            holder.editText.addTextChangedListener(holder.textWatcher);
-            holder.editText.setText(field.getValue());
-        if (holder.inputLayout != null) {
-            holder.inputLayout.setHint("<"+field.getLabel().split("<")[1].split(",")[0]);
-        }
-        holder.editText.clearFocus();
+        ArrayList<EditTextHolder> holders = new ArrayList<>();
+        holders.add(holder);
+        holders.add(holder2);
+        holders.add(holder3);
+        holders.add(holder4);
 
 
-
-
-            holder2.textWatcher.setField(field2);
-            holder2.editText.addTextChangedListener(holder2.textWatcher);
-            holder2.editText.setText(field2.getValue());
-        assert holder2.inputLayout != null;
-        holder2.inputLayout.setHint("<"+field2.getLabel().split("<")[1].split(",")[0]);
-            holder2.editText.clearFocus();
-
-
-
-            holder3.textWatcher.setField(field3);
-            holder3.editText.addTextChangedListener(holder3.textWatcher);
-            holder3.editText.setText(field3.getValue());
-        assert holder3.inputLayout != null;
-        holder3.inputLayout.setHint(">"+field3.getLabel().split(">")[1].split(",")[0]);
-            holder3.editText.clearFocus();
-
-
-
-            holder4.textWatcher.setField(field4);
-            holder4.editText.addTextChangedListener(holder4.textWatcher);
-            holder4.editText.setText(field4.getValue());
-        assert holder4.inputLayout != null;
-        holder4.inputLayout.setHint(">"+field4.getLabel().split(">")[1].split(",")[0]);
-            holder4.editText.clearFocus();
-
-
-        //check whether field should be disabled
-        IsDisabled.setEnabled(holder.editText, field, view.getContext());
-        IsDisabled.setEnabled(holder2.editText, field2, view.getContext());
-        IsDisabled.setEnabled(holder3.editText, field3, view.getContext());
-        IsDisabled.setEnabled(holder4.editText, field4, view.getContext());
+        setupEditTextHolders(holders, fields, view);
 
 
         return view;
@@ -193,5 +160,22 @@ public class PosOrZeroIntegerRow2 implements Row {
            
             return str;
         }       
+    }
+    private void setupEditTextHolders(ArrayList<EditTextHolder> holders, ArrayList<Field> fields, View view){
+        for(int i = 0; i < holders.size(); i++){
+
+            String[] label = fields.get(i).getLabel().split("<");
+
+            holders.get(i).textLabel.setText(label[0].substring(6));
+            holders.get(i).textWatcher.setField(fields.get(i));
+            holders.get(i).editText.addTextChangedListener(holders.get(i).textWatcher);
+            holders.get(i).editText.setText(fields.get(i).getValue());
+            holders.get(i).editText.setSelectAllOnFocus(true);
+            holders.get(i).editText.clearFocus();
+
+            IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
+
+        }
+
     }
 }
