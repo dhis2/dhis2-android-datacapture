@@ -11,32 +11,24 @@ import static org.junit.Assert.assertThat;
  */
 
 public class ImportSummariesHandlerTest {
-    private Response mBadResponse;
-    private Response mGoodResponse;
     private String errorDesc = "Import process was aborted";
     private String successDesc = "Import process completed successfully";
 
-    @Before
-    public  void createResponse(){
-        mBadResponse = new Response(200, DummyTestData.ERROR_IMPORT_RESPONSE);
-        mGoodResponse = new Response(200, DummyTestData.SUCCESSFUL_IMPORT_RESPONSE);
-    }
-
     @Test
     public void unsuccessfulImportSummary(){
-        assertThat(ImportSummariesHandler.isSuccess(mBadResponse.getBody()), is(false));
+        assertThat(ImportSummariesHandler.isSuccess(DummyTestData.ERROR_IMPORT_RESPONSE), is(false));
     }
     @Test
     public void successfulImportSummary(){
-        assertThat(ImportSummariesHandler.isSuccess(mGoodResponse.getBody()), is(true));
+        assertThat(ImportSummariesHandler.isSuccess(DummyTestData.SUCCESSFUL_IMPORT_RESPONSE), is(true));
     }
     @Test
     public void checkDescriptionForBadResponse(){
-        assertThat(ImportSummariesHandler.getDescription(mBadResponse.getBody(), errorDesc), is(errorDesc));
+        assertThat(ImportSummariesHandler.getDescription(DummyTestData.ERROR_IMPORT_RESPONSE, errorDesc), is(errorDesc));
     }
     @Test
     public void checkDescriptionForGoodResponse(){
-        assertThat(ImportSummariesHandler.getDescription(mGoodResponse.getBody(), errorDesc), is(successDesc));
+        assertThat(ImportSummariesHandler.getDescription(DummyTestData.SUCCESSFUL_IMPORT_RESPONSE, errorDesc), is(successDesc));
     }
 
 }
