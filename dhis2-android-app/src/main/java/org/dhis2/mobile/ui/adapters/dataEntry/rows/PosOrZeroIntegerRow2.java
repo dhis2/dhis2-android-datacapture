@@ -98,14 +98,6 @@ public class PosOrZeroIntegerRow2 implements Row {
             EditTextWatcher watcher4 = new EditTextWatcher(field4);
             editText4.addTextChangedListener(watcher4);
 
-
-
-
-
-
-
-
-
             
             holder = new EditTextHolder(label, editText, watcher,inputLayout);
 
@@ -171,10 +163,10 @@ public class PosOrZeroIntegerRow2 implements Row {
 
 
         //check whether field should be disabled
-        IsDisabled.check(holder.editText, field);
-        IsDisabled.check(holder2.editText, field2);
-        IsDisabled.check(holder3.editText, field3);
-        IsDisabled.check(holder4.editText, field4);
+        IsDisabled.setEnabled(holder.editText, field, view.getContext());
+        IsDisabled.setEnabled(holder2.editText, field2, view.getContext());
+        IsDisabled.setEnabled(holder3.editText, field3, view.getContext());
+        IsDisabled.setEnabled(holder4.editText, field4, view.getContext());
 
 
         return view;
