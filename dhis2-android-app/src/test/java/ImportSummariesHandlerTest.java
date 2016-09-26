@@ -1,6 +1,4 @@
 import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
-import org.dhis2.mobile.network.Response;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
