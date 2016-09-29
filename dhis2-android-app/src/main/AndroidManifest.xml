@@ -35,7 +35,8 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activities.DataEntryActivity"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
