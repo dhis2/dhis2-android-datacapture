@@ -311,10 +311,10 @@ public class AggregateReportFragment extends Fragment
                 }
 
                 // we need to disconnect pseudo roots from node
-                pickerAdapterTwo.swapData(
-                        lastPickerChild.buildUpon()
-                                .parent(null)
-                                .build());
+                // pickerAdapterTwo.swapData(
+                //        lastPickerChild.buildUpon()
+                //                .parent(null)
+                //                .build());
             } else {
                 // hide period picker
                 periodPickerLinearLayout.setVisibility(View.GONE);
@@ -362,14 +362,72 @@ public class AggregateReportFragment extends Fragment
         });
     }
 
-    private void onDateSelected(DateHolder date) {
+    private void onDateSelected(DateHolder dateHolder) {
         String label = getString(R.string.choose_period);
-        if (date != null) {
-            label = date.getLabel();
+        if (dateHolder != null) {
+            label = dateHolder.getLabel();
         }
 
-        periodPickerLinearLayout.setTag(date);
+        periodPickerLinearLayout.setTag(dateHolder);
         periodPickerTextView.setText(label);
+
+        if (dateHolder == null) {
+            // clear all categories if present
+            pickerAdapterTwo.swapData(null);
+
+            // trigger callback method
+            onPickerSelected();
+            return;
+        }
+
+        List<Picker> pickerListOne = pickerAdapterOne.getData();
+
+        Picker orgUnitPickerChild = pickerListOne.get(ORG_UNIT_PICKER_ID).getSelectedChild();
+        Picker dataSetPickerChild = pickerListOne.get(DATASET_PICKER_ID).getSelectedChild();
+
+        if (dataSetPickerChild.areChildrenPseudoRoots()) {
+            // we need to disconnect pseudo roots from node
+            pickerAdapterTwo.swapData(
+                    dataSetPickerChild.buildUpon()
+                            .parent(null)
+                            .build());
+
+            // traverse pseudo roots (categories) and set filter values to category options
+            List<Picker> categoryPickers = pickerAdapterTwo.getData();
+            if (categoryPickers != null && !categoryPickers.isEmpty()) {
+                for (Picker categoryPicker : categoryPickers) {
+                    if (categoryPicker.getChildren() == null || categoryPicker.getChildren().isEmpty()) {
+                        continue;
+                    }
+
+                    for (Picker categoryOptionPicker : categoryPicker.getChildren()) {
+                        List<Filter> categoryOptionFilters = categoryOptionPicker.getFilters();
+                        if (categoryOptionFilters == null || categoryOptionFilters.isEmpty()) {
+                            continue;
+                        }
+
+                        Log.d(TAG, categoryOptionPicker.getName());
+                        for (Filter categoryOptionFilter : categoryOptionFilters) {
+                            if (categoryOptionFilter instanceof OrganisationUnitsFilter) {
+                                ((OrganisationUnitsFilter) categoryOptionFilter)
+                                        .setOrganisationUnitId(orgUnitPickerChild.getId());
+                            }
+
+                            if (categoryOptionFilter instanceof PeriodFilter) {
+                                DateTime selectedDate = null;
+
+                                // parsing selected date
+                                if (!TextUtils.isEmpty(dateHolder.getDate())) {
+                                    selectedDate = DateTime.parse(dateHolder.getDateTime());
+                                }
+
+                                ((PeriodFilter) categoryOptionFilter).setSelectedDate(selectedDate);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         onPickerSelected();
     }
@@ -409,43 +467,6 @@ public class AggregateReportFragment extends Fragment
         Picker dataSetPickerChild = pickerListOne.get(DATASET_PICKER_ID).getSelectedChild();
         datasetInfoHolder.setFormId(dataSetPickerChild.getId());
         datasetInfoHolder.setFormLabel(dataSetPickerChild.getName());
-
-        // traverse pseudo roots (categories) and set filter values to
-        // category options
-        List<Picker> categoryPickers = pickerAdapterTwo.getData();
-        if (categoryPickers != null && !categoryPickers.isEmpty()) {
-            for (Picker categoryPicker : categoryPickers) {
-                if (categoryPicker.getChildren() == null || categoryPicker.getChildren().isEmpty()) {
-                    continue;
-                }
-
-                for (Picker categoryOptionPicker : categoryPicker.getChildren()) {
-                    List<Filter> categoryOptionFilters = categoryOptionPicker.getFilters();
-                    if (categoryOptionFilters == null || categoryOptionFilters.isEmpty()) {
-                        continue;
-                    }
-
-                    Log.d(TAG, categoryOptionPicker.getName());
-                    for (Filter categoryOptionFilter : categoryOptionFilters) {
-                        if (categoryOptionFilter instanceof OrganisationUnitsFilter) {
-                            ((OrganisationUnitsFilter) categoryOptionFilter)
-                                    .setOrganisationUnitId(orgUnitPickerChild.getId());
-                        }
-
-                        if (categoryOptionFilter instanceof PeriodFilter) {
-                            DateTime selectedDate = null;
-
-                            // parsing selected date
-                            if (!TextUtils.isEmpty(pickerPeriodDateHolder.getDate())) {
-                                selectedDate = DateTime.parse(pickerPeriodDateHolder.getDateTime());
-                            }
-
-                            ((PeriodFilter) categoryOptionFilter).setSelectedDate(selectedDate);
-                        }
-                    }
-                }
-            }
-        }
 
         if (dataSetPickerChild.isLeaf()) {
             handleDataEntryButton(datasetInfoHolder);
