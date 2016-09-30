@@ -1,0 +1,58 @@
+{
+  "diarrhoea" :{
+    "id": "PcFw3MoOC94",
+    "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
+    "isCritical": false
+  },
+  "severe malnutrition":{
+    "id": "FHfwXBYnhhl",
+    "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
+    "isCritical":false
+  },
+  "maternal deaths":{
+    "id": "JyHy4B7myv9",
+    "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
+    "isCritical": false
+  },
+  "neonatal tetanus":{
+    "id":"zSzK3FHsJOy",
+    "disabledFields": ["UNDER_FIVE_CASES", "UNDER_FIVE_DEATHS", "OVER_FIVE_DEATHS"],
+    "isCritical": false
+  },
+  "acute flaccid paralysis":{
+    "id": "ZybYDdwk3O2",
+    "disabledFields":[],
+    "isCritical": true
+  },
+  "acute viral hemorrhagic fever": {
+    "id": "gqQhU8INQKw",
+    "disabledFields":[],
+    "isCritical":true
+  },
+  "cholera":{
+    "id":"BR2cqsVasFd",
+    "disabledFields":[],
+    "isCritical": true
+  },
+  "dracunculiasis":{
+    "id":"u67EkxdKDbQ",
+    "disabledFields":[],
+    "isCritical":true
+  },
+  "monkey pox": {
+    "id": "FtexyU70UDV",
+    "disabledFields":[],
+    "isCritical":true
+  },
+  "plague": {
+    "id": "dx9dXyT0Gt8",
+    "disabledFields":[],
+    "isCritical":true
+  },
+  "small pox": {
+    "id": "dx9dXyT0Gt8",
+    "disabledFields":[],
+    "isCritical": true
+  }
+}
+
