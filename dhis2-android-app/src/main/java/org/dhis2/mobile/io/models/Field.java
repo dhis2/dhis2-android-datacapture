@@ -33,6 +33,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 public class Field implements Serializable, Parcelable {
     public static final String DATA_ELEMENT = "dataElement";
@@ -53,6 +54,15 @@ public class Field implements Serializable, Parcelable {
 
     public Field() {
     }
+
+    // Comparator which is used to sort forms in alphabetical order
+    public static Comparator<Field> COMPARATOR = new Comparator<Field>() {
+
+        @Override
+        public int compare(Field one, Field two) {
+            return one.getLabel().compareTo(two.getLabel());
+        }
+    };
 
     private Field(Parcel in) {
         this.label = in.readString();
