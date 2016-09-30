@@ -111,6 +111,7 @@ public class FilterableDialogFragment extends DialogFragment {
 
         EditText filterEditText = (EditText) view
                 .findViewById(R.id.edittext_filter_picker_items);
+        filterEditText.setHint(R.string.search);
         filterEditText.addTextChangedListener(new TextWatcher() {
 
             @Override
