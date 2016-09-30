@@ -2,6 +2,7 @@ package org.dhis2.mobile.ui.adapters;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import org.dhis2.mobile.R;
+import org.dhis2.mobile.ui.models.Filter;
 import org.dhis2.mobile.ui.models.Picker;
 
 import java.util.ArrayList;
@@ -32,8 +34,15 @@ public class PickerItemAdapter extends BaseAdapter {
         this.context = checkNotNull(context, "context must not be null!");
         this.inflater = LayoutInflater.from(context);
         this.currentPicker = checkNotNull(picker, "Picker must not be null");
-        this.originalPickers = currentPicker.getChildren();
-        this.filteredPickers = new ArrayList<>(currentPicker.getChildren());
+
+        this.originalPickers = new ArrayList<>();
+        this.filteredPickers = new ArrayList<>();
+
+        // will filter picker items based on filters
+        List<Picker> filteredPickerItems = processPickers(picker);
+
+        originalPickers.addAll(filteredPickerItems);
+        filteredPickers.addAll(filteredPickerItems);
     }
 
     public PickerItemAdapter(Context context) {
@@ -53,11 +62,41 @@ public class PickerItemAdapter extends BaseAdapter {
         filteredPickers.clear();
 
         if (picker != null) {
-            originalPickers.addAll(picker.getChildren());
-            filteredPickers.addAll(picker.getChildren());
+            // we need to pre-filter each picker
+            // based on attached Filters
+
+            List<Picker> filteredPickerItems = processPickers(picker);
+
+            originalPickers.addAll(filteredPickerItems);
+            filteredPickers.addAll(filteredPickerItems);
         }
 
         notifyDataSetChanged();
+    }
+
+    private List<Picker> processPickers(Picker picker) {
+        List<Picker> filteredPickerItems = new ArrayList<>();
+        if (picker.getChildren() != null && !picker.getChildren().isEmpty()) {
+            for (Picker pickerItem : picker.getChildren()) {
+                if (!applyFilters(pickerItem.getFilters())) {
+                    filteredPickerItems.add(pickerItem);
+                }
+            }
+        }
+
+        return filteredPickerItems;
+    }
+
+    private static boolean applyFilters(List<Filter> filters) {
+        if (filters != null && !filters.isEmpty()) {
+            for (Filter filter : filters) {
+                if (filter.apply()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public Picker getData() {
@@ -111,7 +150,7 @@ public class PickerItemAdapter extends BaseAdapter {
         return view;
     }
 
-    public void onBindViewHolder(PickerItemViewHolder holder, int position) {
+    private void onBindViewHolder(PickerItemViewHolder holder, int position) {
         Picker picker = filteredPickers.get(position);
 
         if (this.currentPicker != null && this.currentPicker.getSelectedChild() != null &&
@@ -139,8 +178,7 @@ public class PickerItemAdapter extends BaseAdapter {
                             new int[]{}
                     },
                     new int[]{
-                            context.getResources().getColor(
-                                    R.color.dark_navy_blue),
+                            ContextCompat.getColor(context, R.color.dark_navy_blue),
                             textViewLabel.getCurrentTextColor()
                     });
 

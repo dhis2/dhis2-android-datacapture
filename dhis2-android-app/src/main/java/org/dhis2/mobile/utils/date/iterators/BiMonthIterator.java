@@ -123,7 +123,7 @@ public class BiMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolde
                 label = String.format(DATE_LABEL_FORMAT, NOV_STR, DEC_STR, year);
             }
 
-            DateHolder dateHolder = new DateHolder(date, label);
+            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
             dates.add(dateHolder);
 
             counter++;

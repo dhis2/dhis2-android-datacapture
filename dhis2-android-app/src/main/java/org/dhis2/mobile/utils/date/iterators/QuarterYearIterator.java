@@ -115,7 +115,7 @@ public class QuarterYearIterator extends CustomDateIteratorClass<ArrayList<DateH
                 label = String.format(DATE_LABEL_FORMAT, OCT_STR, DEC_STR, cYearStr);
             }
 
-            DateHolder dateHolder = new DateHolder(date, label);
+            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
             dates.add(dateHolder);
 
             checkDate = checkDate.plusMonths(3);

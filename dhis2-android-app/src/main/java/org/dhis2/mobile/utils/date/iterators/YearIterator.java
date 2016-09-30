@@ -88,7 +88,7 @@ public class YearIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
 
         while (hasNext(checkDate) && counter < 10) {
             String dateStr = checkDate.year().getAsString();
-            DateHolder dateHolder = new DateHolder(dateStr, dateStr);
+            DateHolder dateHolder = new DateHolder(dateStr, checkDate.toString(), dateStr);
             dates.add(dateHolder);
 
             checkDate = checkDate.plusYears(1);

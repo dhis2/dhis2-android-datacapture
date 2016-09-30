@@ -49,12 +49,14 @@ public class Picker implements Serializable {
     // parent node
     private final Picker parent;
 
+    // list of filters which will be applied in UI
+    private final List<Filter> filters;
+
     // available options (child nodes in tree)
     private final List<Picker> children;
 
     // selected item (represents path to selected node)
     private Picker selectedChild;
-
 
     private Picker(String id, String name, String hint, boolean isPseudoRoot, Serializable tag,
                    Picker parent) {
@@ -63,12 +65,15 @@ public class Picker implements Serializable {
         this.hint = hint;
         this.isPseudoRoot = isPseudoRoot;
         this.tag = tag;
+
+        // relationships
         this.parent = parent;
+        this.filters = new ArrayList<>();
         this.children = new ArrayList<>();
     }
 
     private Picker(String id, String name, String hint, boolean isPseudoRoot, Serializable tag,
-                   Picker parent, List<Picker> children, Picker selectedChild) {
+                   Picker parent, List<Filter> filters, List<Picker> children, Picker selectedChild) {
         this.hint = hint;
         this.id = id;
         this.name = name;
@@ -77,6 +82,7 @@ public class Picker implements Serializable {
 
         // relationships
         this.parent = parent;
+        this.filters = filters;
         this.children = copyChildren(children);
         this.selectedChild = findSelectedChild(selectedChild);
     }
@@ -90,7 +96,7 @@ public class Picker implements Serializable {
                 // recursively copying children with link to new parent
                 newChildren.add(new Picker(
                         child.getId(), child.getName(), child.getHint(), child.isPseudoRoot(),
-                        child.getTag(), this, child.getChildren(), child.getSelectedChild()));
+                        child.getTag(), this, child.getFilters(), child.getChildren(), child.getSelectedChild()));
             }
         }
 
@@ -140,6 +146,12 @@ public class Picker implements Serializable {
         return tag;
     }
 
+    public boolean addFilter(Filter filter) {
+        checkNotNull(filter, "Filter must not be null");
+
+        return filters.add(filter);
+    }
+
     public boolean addChild(Picker picker) {
         checkNotNull(picker, "Picker must not be null");
 
@@ -157,6 +169,10 @@ public class Picker implements Serializable {
 
         throw new IllegalArgumentException("All child nodes should be of the same " +
                 "type (leaf or root)");
+    }
+
+    public List<Filter> getFilters() {
+        return filters;
     }
 
     public List<Picker> getChildren() {
@@ -310,7 +326,7 @@ public class Picker implements Serializable {
         public Picker build() {
             if (picker != null) {
                 return new Picker(id, name, hint, isPseudoRoot, tag,
-                        parent, picker.getChildren(), picker.getSelectedChild());
+                        parent, picker.getFilters(), picker.getChildren(), picker.getSelectedChild());
             }
 
             return new Picker(id, name, hint, isPseudoRoot, tag, parent);

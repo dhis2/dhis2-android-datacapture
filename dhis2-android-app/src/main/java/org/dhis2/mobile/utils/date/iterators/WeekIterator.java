@@ -105,7 +105,7 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            DateHolder dateHolder = new DateHolder(date, label);
+            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
             dates.add(dateHolder);
 
             counter++;
@@ -115,5 +115,4 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
         Collections.reverse(dates);
         return dates;
     }
-
 }

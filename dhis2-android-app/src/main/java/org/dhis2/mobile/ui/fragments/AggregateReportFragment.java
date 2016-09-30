@@ -15,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,12 +44,15 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.ui.adapters.PickerAdapter;
 import org.dhis2.mobile.ui.adapters.PickerAdapter.OnPickerListChangeListener;
+import org.dhis2.mobile.ui.models.Filter;
 import org.dhis2.mobile.ui.models.Picker;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -406,6 +410,43 @@ public class AggregateReportFragment extends Fragment
         datasetInfoHolder.setFormId(dataSetPickerChild.getId());
         datasetInfoHolder.setFormLabel(dataSetPickerChild.getName());
 
+        // traverse pseudo roots (categories) and set filter values to
+        // category options
+        List<Picker> categoryPickers = pickerAdapterTwo.getData();
+        if (categoryPickers != null && !categoryPickers.isEmpty()) {
+            for (Picker categoryPicker : categoryPickers) {
+                if (categoryPicker.getChildren() == null || categoryPicker.getChildren().isEmpty()) {
+                    continue;
+                }
+
+                for (Picker categoryOptionPicker : categoryPicker.getChildren()) {
+                    List<Filter> categoryOptionFilters = categoryOptionPicker.getFilters();
+                    if (categoryOptionFilters == null || categoryOptionFilters.isEmpty()) {
+                        continue;
+                    }
+
+                    Log.d(TAG, categoryOptionPicker.getName());
+                    for (Filter categoryOptionFilter : categoryOptionFilters) {
+                        if (categoryOptionFilter instanceof OrganisationUnitsFilter) {
+                            ((OrganisationUnitsFilter) categoryOptionFilter)
+                                    .setOrganisationUnitId(orgUnitPickerChild.getId());
+                        }
+
+                        if (categoryOptionFilter instanceof PeriodFilter) {
+                            DateTime selectedDate = null;
+
+                            // parsing selected date
+                            if (!TextUtils.isEmpty(pickerPeriodDateHolder.getDate())) {
+                                selectedDate = DateTime.parse(pickerPeriodDateHolder.getDateTime());
+                            }
+
+                            ((PeriodFilter) categoryOptionFilter).setSelectedDate(selectedDate);
+                        }
+                    }
+                }
+            }
+        }
+
         if (dataSetPickerChild.isLeaf()) {
             handleDataEntryButton(datasetInfoHolder);
             return;
@@ -651,6 +692,29 @@ public class AggregateReportFragment extends Fragment
                                         .parent(categoryPicker)
                                         .tag(option)
                                         .build();
+
+                                // building filters
+                                OrganisationUnitsFilter organisationUnitsFilter =
+                                        new OrganisationUnitsFilter(option.getOrganisationUnits());
+
+                                // we need to parse dates which are located within option
+                                DateTime startDate = null;
+                                DateTime endDate = null;
+
+                                if (!TextUtils.isEmpty(option.getStartDate())) {
+                                    startDate = DateTime.parse(option.getStartDate());
+                                }
+
+                                if (!TextUtils.isEmpty(option.getEndDate())) {
+                                    endDate = DateTime.parse(option.getEndDate());
+                                }
+
+                                PeriodFilter periodFilter = new PeriodFilter(startDate, endDate);
+
+                                // adding filters which will be triggered in PickerItemAdapter
+                                categoryOptionPicker.addFilter(organisationUnitsFilter);
+                                categoryOptionPicker.addFilter(periodFilter);
+
                                 categoryPicker.addChild(categoryOptionPicker);
                             }
                         }
@@ -661,6 +725,63 @@ public class AggregateReportFragment extends Fragment
             }
 
             return rootNode;
+        }
+    }
+
+    private static class OrganisationUnitsFilter implements Filter, Serializable {
+        private final List<String> organisationUnitIds;
+        private String organisationUnitId;
+
+        OrganisationUnitsFilter(List<String> organisationUnitIds) {
+            this.organisationUnitIds = organisationUnitIds;
+        }
+
+        void setOrganisationUnitId(String organisationUnitId) {
+            this.organisationUnitId = organisationUnitId;
+        }
+
+        @Override
+        public boolean apply() {
+            return !(organisationUnitIds == null || organisationUnitId == null) &&
+                    !organisationUnitIds.contains(organisationUnitId);
+        }
+    }
+
+    private static class PeriodFilter implements Filter, Serializable {
+        private final DateTime startDate;
+        private final DateTime endDate;
+        private DateTime selectedDate;
+
+        PeriodFilter(DateTime startDate, DateTime endDate) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+        }
+
+        void setSelectedDate(DateTime selectedDate) {
+            this.selectedDate = selectedDate;
+        }
+
+        @Override
+        public boolean apply() {
+            if ((startDate == null && endDate == null) || selectedDate == null) {
+                return false;
+            }
+
+            if (startDate != null && endDate != null) {
+                // return true, if criteria is not between two dates
+                // return startDate.isBefore(selectedDate) || endDate.isAfter(selectedDate);
+                return !(selectedDate.isAfter(startDate) && selectedDate.isBefore(endDate));
+            }
+
+            if (startDate != null) {
+                // return true, if criteria is before startDate
+                // return startDate.isBefore(selectedDate);
+                return !(selectedDate.isAfter(startDate));
+            }
+
+            // return true, if criteria is after endDate
+            // return endDate.isAfter(selectedDate);
+            return !(selectedDate.isBefore(endDate));
         }
     }
 }

@@ -33,48 +33,56 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class DateHolder implements Parcelable {
-	public static final String TAG = DateHolder.class.getSimpleName();
-	
-	private final String label;
-	private final String date;
-	
-	public DateHolder(String date, String label) {
-	    this.date = date;
-	    this.label = label;
-	}
-	
-	private DateHolder(Parcel in) {
-		label = in.readString();
-		date = in.readString();
-	}
-	
-	public static final Parcelable.Creator<DateHolder> CREATOR = new Parcelable.Creator<DateHolder>() {
+    public static final String TAG = DateHolder.class.getSimpleName();
 
-		public DateHolder createFromParcel(Parcel in) {
-			return new DateHolder(in);
-		}
+    private final String date;
+    private final String dateTime;
+    private final String label;
 
-		public DateHolder[] newArray(int size) {
-			return new DateHolder[size];
-		}
-	};
+    public DateHolder(String date, String dateTime, String label) {
+        this.date = date;
+        this.dateTime = dateTime;
+        this.label = label;
+    }
 
-	@Override
-	public int describeContents() {
-		return TAG.length();
-	}
+    private DateHolder(Parcel in) {
+        date = in.readString();
+        dateTime = in.readString();
+        label = in.readString();
+    }
 
-	@Override
-	public void writeToParcel(Parcel parcel, int flags) {
-		parcel.writeString(label);
-		parcel.writeString(date);
-	}
-	
-	public String getLabel() {
-		return label;
-	}
-	
-	public String getDate() {
-		return date;
-	}
+    public static final Parcelable.Creator<DateHolder> CREATOR = new Parcelable.Creator<DateHolder>() {
+
+        public DateHolder createFromParcel(Parcel in) {
+            return new DateHolder(in);
+        }
+
+        public DateHolder[] newArray(int size) {
+            return new DateHolder[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return TAG.length();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(date);
+        parcel.writeString(dateTime);
+        parcel.writeString(label);
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
 }

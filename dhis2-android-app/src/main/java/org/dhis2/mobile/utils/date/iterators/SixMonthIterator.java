@@ -107,7 +107,7 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
             checkDate = checkDate.plusMonths(6);
             counter++;
 
-            DateHolder dateHolder = new DateHolder(date, label);
+            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
             dates.add(dateHolder);
         }
 

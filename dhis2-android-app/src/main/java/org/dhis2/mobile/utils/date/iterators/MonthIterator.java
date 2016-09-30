@@ -98,7 +98,7 @@ public class MonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>
             String date = checkDate.toString(DATE_FORMAT);
             String label = String.format(DATE_LABEL_FORMAT, month, year);
 
-            DateHolder dateHolder = new DateHolder(date, label);
+            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
             dates.add(dateHolder);
 
             counter++;

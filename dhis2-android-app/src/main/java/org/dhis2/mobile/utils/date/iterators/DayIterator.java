@@ -104,7 +104,7 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
             String label = String.format(DATE_LABEL_FORMAT, dName, mName, yName);
 
             checkDate = checkDate.plusDays(1);
-            DateHolder holder = new DateHolder(date, label);
+            DateHolder holder = new DateHolder(date, checkDate.toString(), label);
             dates.add(holder);
         }
 

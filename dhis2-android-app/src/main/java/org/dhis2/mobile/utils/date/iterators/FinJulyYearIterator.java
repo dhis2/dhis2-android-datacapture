@@ -70,7 +70,7 @@ public class FinJulyYearIterator extends YearIterator {
             String dateStr = checkDate.minusYears(1).year().getAsString();
             String label = String.format(FIN_DATE_LABEL_FORMAT, JUL_STR, dateStr, JUN_STR, checkDate.year().getAsString());
             String date = dateStr + JULY;
-            DateHolder dateHolder = new DateHolder(date, label);
+            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
             dates.add(dateHolder);
 
             checkDate = checkDate.plusYears(1);
