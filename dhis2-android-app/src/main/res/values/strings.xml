@@ -80,6 +80,7 @@
     <string name="choose_program">Choose program</string>
     <string name="choose_unit">Choose organisation unit</string>
     <string name="choose_period">Choose period</string>
+    <string name="search">Search</string>
 
     <!-- String resources for single event without registration fragment -->
     <string name="longitude">Longitude</string>
