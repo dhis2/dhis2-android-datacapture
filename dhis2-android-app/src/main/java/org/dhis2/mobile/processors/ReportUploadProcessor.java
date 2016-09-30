@@ -114,6 +114,20 @@ public class ReportUploadProcessor {
         JsonObject content = new JsonObject();
         JsonArray values = putFieldValuesInJson(groups);
 
+        //Check whether a timely report has already been sent
+        if(!IsTimely.hasBeenSet(groups)) {
+            //Check whether the report was timely or not
+            //substring is used so as to only get the week number
+            String period = info.getPeriod();
+            Boolean isTimely = IsTimely.check(period);
+
+            //Fill out timely dataElement
+            JsonObject jField = new JsonObject();
+            jField.addProperty(Field.DATA_ELEMENT, Constants.TIMELY);
+            jField.addProperty(Field.VALUE, isTimely);
+            values.add(jField);
+        }
+
 
         // Retrieve current date
         LocalDate currentDate = new LocalDate();
