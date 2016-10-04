@@ -19,20 +19,19 @@ public class IsTimely {
     public IsTimely(){
 
     }
-    public static Boolean check(String period){
+    public static Boolean check(Calendar calendar, String period){
         Boolean timely = false;
-
         int periodWeek = Integer.parseInt(period.substring(5));
-        int periodYear = Integer.parseInt(period.substring(0,5));
-        int weekNumber = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
-        int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-        int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-
+        int periodYear = Integer.parseInt(period.substring(0,4));
+        int weekNumber = calendar.get(Calendar.WEEK_OF_YEAR);
+        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int year = calendar.get(Calendar.YEAR);
 
         if(!(periodYear < year) &&  periodWeek == weekNumber -2 && currentDay == Calendar.MONDAY && currentHour < 12){
             timely = true;
         }
+
         return timely;
     }
     public static Boolean hasBeenSet(ArrayList<Group> groups){
@@ -47,4 +46,5 @@ public class IsTimely {
 
         return false;
     }
+
 }

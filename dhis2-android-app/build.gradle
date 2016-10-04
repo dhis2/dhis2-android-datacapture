@@ -46,22 +46,17 @@ dependencies {
     compile 'joda-time:joda-time:2.6'
     compile 'commons-net:commons-net:3.3'
     compile 'com.android.support:support-annotations:24.2.0'
-
     // Required -- JUnit 4 framework
     testCompile 'junit:junit:4.12'
     androidTestCompile 'junit:junit:4.12'
-
     // Android JUnit Runner
     androidTestCompile 'com.android.support.test:runner:0.5'
-
     // JUnit4 Rules
     androidTestCompile 'com.android.support.test:rules:0.5'
-
     //Mockito
     testCompile 'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.1'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.1'
-
     // Espresso core
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2') {
         exclude group: 'javax.inject'
@@ -70,16 +65,21 @@ dependencies {
         exclude group: 'javax.inject'
         exclude group: 'com.android.support'
     }
-
     // Espresso-idling-resource for synchronization with background jobs
     androidTestCompile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
-
     // Espresso-intents for validation and stubbing of Intents
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
-
     //Mock Web Server
     androidTestCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
-
+    //PowerMock
+    testCompile ('org.powermock:powermock-api-mockito:1.6.2') {
+        exclude module: 'hamcrest-core'
+        exclude module: 'objenesis'
+    }
+    testCompile ('org.powermock:powermock-module-junit4:1.6.2') {
+        exclude module: 'hamcrest-core'
+        exclude module: 'objenesis'
+    }
 }
 
 

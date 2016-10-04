@@ -54,6 +54,7 @@ import org.dhis2.mobile.utils.TextFileUtils;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class ReportUploadProcessor {
@@ -119,7 +120,7 @@ public class ReportUploadProcessor {
             //Check whether the report was timely or not
             //substring is used so as to only get the week number
             String period = info.getPeriod();
-            Boolean isTimely = IsTimely.check(period);
+            Boolean isTimely = IsTimely.check(Calendar.getInstance(), period);
 
             //Fill out timely dataElement
             JsonObject jField = new JsonObject();
