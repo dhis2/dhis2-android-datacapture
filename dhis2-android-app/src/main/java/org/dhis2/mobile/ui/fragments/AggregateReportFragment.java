@@ -763,8 +763,15 @@ public class AggregateReportFragment extends Fragment
 
         @Override
         public boolean apply() {
-            return !(organisationUnitIds == null || organisationUnitId == null) &&
-                    !organisationUnitIds.contains(organisationUnitId);
+            if (organisationUnitIds == null || organisationUnitIds.isEmpty()) {
+                return false;
+            }
+
+            if (organisationUnitId == null) {
+                return false;
+            }
+
+            return !organisationUnitIds.contains(organisationUnitId);
         }
     }
 
