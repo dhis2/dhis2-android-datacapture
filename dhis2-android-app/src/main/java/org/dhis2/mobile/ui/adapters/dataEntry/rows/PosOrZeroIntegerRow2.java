@@ -89,6 +89,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             EditText editText4 = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row_4);
 
 
+
             ArrayList<EditText> editTexts = new ArrayList<>();
             editTexts.add(editText);
             editTexts.add(editText2);
@@ -147,7 +148,6 @@ public class PosOrZeroIntegerRow2 implements Row {
             return str;
         }
     }
-
 
     private void setOnFocusChangeListeners(final ArrayList<EditTextHolder> editTextHolders, final Context context){
         for( int i = 0; i < editTextHolders.size(); i++){
