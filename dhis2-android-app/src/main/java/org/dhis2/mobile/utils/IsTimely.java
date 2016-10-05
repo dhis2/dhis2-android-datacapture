@@ -8,7 +8,6 @@ import org.joda.time.Days;
 import org.joda.time.MutableDateTime;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by George on 8/26/16.
