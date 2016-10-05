@@ -55,6 +55,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private final Field field,field2, field3, field4;
     private AlertDialog alertDialog;
     private AlertDialog criticalDiseaseAlertDialog;
+    private IsCritical isCritical;
     private final String defaultValue = "0";
 
 
@@ -100,6 +101,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isCritical = new IsCritical(view.getContext());
         } else {
             view = convertView;
 
@@ -110,6 +112,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isCritical = new IsCritical(view.getContext());
         }
 
 
@@ -163,7 +166,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private void setupValidations(EditTextHolder editTextHolder, Context context){
         if(editTextHolder.textWatcher.hasChanged()  && Integer.parseInt(editTextHolder.editText.getText().toString()) > 0 ){
             editTextHolder.textWatcher.setChanged(false);
-            if(IsCritical.check(field, context)){
+            if(isCritical.check(field)){
                 showCriticalValidation(editTextHolder, context);
             }
         }
@@ -173,9 +176,9 @@ public class PosOrZeroIntegerRow2 implements Row {
         if(!alertDialog.isShowing()){
             criticalDiseaseAlertDialog.setTitle(context.getString(R.string.validation_alert_dialog_title));
             if(holder.isCasesField){
-                criticalDiseaseAlertDialog.setMessage("You are about to submit "+ holder.editText.getText()+" cases(s) for "+ field.getLabel().split(PREFIX)[0].substring(6));
+                criticalDiseaseAlertDialog.setMessage(getValidationMessage(holder.editText, "case"));
             }else{
-                criticalDiseaseAlertDialog.setMessage("You are about to submit "+ holder.editText.getText()+" death(s) for "+ field.getLabel().split(PREFIX)[0].substring(6));
+                criticalDiseaseAlertDialog.setMessage(getValidationMessage(holder.editText, "death"));
             }
             criticalDiseaseAlertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.validation_alert_dialog_confirmation), new DialogInterface.OnClickListener() {
                 @Override
@@ -272,6 +275,17 @@ public class PosOrZeroIntegerRow2 implements Row {
             isEmpty = true;
         }
         return isEmpty;
+    }
+
+    private String getValidationMessage(EditText editText, String type){
+        String message;
+        if(Integer.parseInt(editText.getText().toString()) > 1){
+            message = "You are about to submit "+ editText.getText()+" "+type+"s for "+ field.getLabel().split(PREFIX)[0].substring(6);
+        }else{
+            message = "You are about to submit "+ editText.getText()+" "+type+" for "+ field.getLabel().split(PREFIX)[0].substring(6);
+        }
+
+        return message;
     }
 
 }

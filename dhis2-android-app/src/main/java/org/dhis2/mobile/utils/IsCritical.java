@@ -15,11 +15,15 @@ import java.util.Map;
  * Checks whether a disease is under the critical disease category.
  */
 public class IsCritical {
+    private final Map diseases;
 
-    public static Boolean check(Field field, Context context){
+    public IsCritical(Context context){
+        this.diseases = DiseaseImporter.importDiseases(context);
+    }
+
+    public Boolean check(Field field){
         Boolean isCritical = false;
 
-        Map diseases = DiseaseImporter.importDiseases(context);
         assert diseases != null;
         if(diseases.get(field.getDataElement()) != null) {
             Disease disease = (Disease) diseases.get(field.getDataElement());
