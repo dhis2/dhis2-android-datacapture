@@ -67,7 +67,7 @@ public class PosOrZeroIntegerRow implements Row {
             editText.addTextChangedListener(watcher);
             inputLayout.setHint(field.getLabel());
             
-            holder = new EditTextHolder(label, editText, watcher,inputLayout);
+            holder = new EditTextHolder(label, editText, watcher);
             rowRoot.setTag(holder);
             view = rowRoot;
         } else {
