@@ -28,7 +28,9 @@ public class IsTimely {
         int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
         int year = calendar.get(Calendar.YEAR);
 
-        if(!(periodYear < year) &&  periodWeek == weekNumber -2 && currentDay == Calendar.MONDAY && currentHour < 12){
+        if(!(periodYear < year) &&
+                periodWeek == (weekNumber -2 < 0 ? 52 : weekNumber-2) &&
+                currentDay == Calendar.MONDAY && currentHour < 12){
             timely = true;
         }
 
