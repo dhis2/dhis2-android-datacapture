@@ -3,28 +3,18 @@ import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.utils.IsTimely;
 import org.joda.time.DateTime;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by george on 10/4/16.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({IsTimely.class})
 public class IsTimelyTest {
-    private final String period = "2016W37";
+    private final String period = "2016W39";
 
     @Test
     public void hasBeenSetShouldReturnTrue(){
@@ -56,74 +46,59 @@ public class IsTimelyTest {
 
     @Test
     public void timelyCheckShouldReturnTrue(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 2016);
-        calendar.set(Calendar.WEEK_OF_YEAR, 39);
-        calendar.set(Calendar.HOUR_OF_DAY,11);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        //Current date set to Monday 3rd October 2016. 11AM. Week Number = 40
+        DateTime dt = new DateTime(2016,10,3,11, 0, 0, 0);
+        Boolean isTimely = IsTimely.check(dt, period);
 
-        PowerMockito.mockStatic(Calendar.class);
-        when(Calendar.getInstance()).thenReturn(calendar);
-
-        Boolean isTimely = IsTimely.check(calendar, period);
         assertThat(isTimely, is(true));
-        assertThat(Calendar.getInstance(), is(calendar));
-        PowerMockito.verifyStatic();
-
     }
 
     @Test
     public void timelyCheckShouldReturnFalseIfHourHasPast12(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 2016);
-        calendar.set(Calendar.WEEK_OF_YEAR, 39);
-        calendar.set(Calendar.HOUR_OF_DAY,13);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        //Current date set to Monday 3rd October 2016. 1PM. Week Number = 40
+        DateTime dt = new DateTime(2016,10,3,13, 0, 0, 0);
+        Boolean isTimely = IsTimely.check(dt, period);
 
-        PowerMockito.mockStatic(Calendar.class);
-        when(Calendar.getInstance()).thenReturn(calendar);
-
-        Boolean isTimely = IsTimely.check(calendar, period);
         assertThat(isTimely, is(false));
-        assertThat(Calendar.getInstance(), is(calendar));
-        PowerMockito.verifyStatic();
-
     }
 
     @Test
     public void timelyCheckShouldReturnFalseIfDayIsNotMonday(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 2016);
-        calendar.set(Calendar.WEEK_OF_YEAR, 39);
-        calendar.set(Calendar.HOUR_OF_DAY,11);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+        //Current date set to Tuesday 4th October 2016. 11AM. Week Number = 40
+        DateTime dt = new DateTime(2016,10,4,11, 0, 0, 0);
+        Boolean isTimely = IsTimely.check(dt, period);
 
-        PowerMockito.mockStatic(Calendar.class);
-        when(Calendar.getInstance()).thenReturn(calendar);
-
-        Boolean isTimely = IsTimely.check(calendar, period);
         assertThat(isTimely, is(false));
-        assertThat(Calendar.getInstance(), is(calendar));
-        PowerMockito.verifyStatic();
-
     }
 
     @Test
-    public void timelyCheckShouldReturnFalse(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 2015);
-        calendar.set(Calendar.WEEK_OF_YEAR, 37);
-        calendar.set(Calendar.HOUR_OF_DAY,11);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+    public void timelyCheckShouldReturnFalseIfPeriodYearIsGreaterThanCurrentYear(){
+        String period = "2345W39";
+        //Current date set to Monday 3rd October 2016. 11AM. Week Number = 40
+        DateTime dt = new DateTime(2016,10,3,11, 0, 0, 0);
+        Boolean isTimely = IsTimely.check(dt, period);
 
-        PowerMockito.mockStatic(Calendar.class);
-        when(Calendar.getInstance()).thenReturn(calendar);
-
-        Boolean isTimely = IsTimely.check(calendar, period);
         assertThat(isTimely, is(false));
-        assertThat(Calendar.getInstance(), is(calendar));
-        PowerMockito.verifyStatic();
+    }
 
+    @Test
+    public void timelyCheckShouldReturnFalseIfPeriodWeekNumberIsGreaterThanCurrentYearWeekNumber(){
+        String period = "2016W41";
+        //Current date set to Monday 3rd October 2016. 11AM. Week Number = 40
+        DateTime dt = new DateTime(2016,10,3,11, 0, 0, 0);
+        Boolean isTimely = IsTimely.check(dt, period);
+
+        assertThat(isTimely, is(false));
+    }
+
+    @Test
+    public void timelyCheckShouldReturnFalseIfDifferenceBetweenPeriodWeekAndCurrentWeekExceeds7Days(){
+        String period = "2016W37";
+        //Current date set to Monday 3rd October 2016. 11AM. Week Number = 40
+        DateTime dt = new DateTime(2016,10,3,11, 0, 0, 0);
+        Boolean isTimely = IsTimely.check(dt, period);
+
+        assertThat(isTimely, is(false));
     }
 
 }

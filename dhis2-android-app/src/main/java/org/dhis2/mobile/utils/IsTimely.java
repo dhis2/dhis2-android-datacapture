@@ -3,6 +3,9 @@ package org.dhis2.mobile.utils;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.MutableDateTime;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,23 +22,23 @@ public class IsTimely {
     public IsTimely(){
 
     }
-    public static Boolean check(Calendar calendar, String period){
+    public static Boolean check(DateTime currentDateTime, String period){
         Boolean timely = false;
+
+        MutableDateTime periodTime = new MutableDateTime();
         int periodWeek = Integer.parseInt(period.substring(5));
         int periodYear = Integer.parseInt(period.substring(0,4));
-        int weekNumber = calendar.get(Calendar.WEEK_OF_YEAR);
-        int currentDay = calendar.get(Calendar.DAY_OF_WEEK);
-        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int year = calendar.get(Calendar.YEAR);
+        periodTime.setYear(periodYear);
+        periodTime.setWeekOfWeekyear(periodWeek);
 
-        if(!(periodYear < year) &&
-                periodWeek == (weekNumber -2 < 0 ? 52 : weekNumber-2) &&
-                currentDay == Calendar.MONDAY && currentHour < 12){
+        if(currentDateTime.isAfter(periodTime) && Days.daysBetween(periodTime, currentDateTime).isLessThan(Days.SEVEN) &&
+                currentDateTime.dayOfWeek().getAsText().equals("Monday") && currentDateTime.hourOfDay().get() < 12){
             timely = true;
         }
 
         return timely;
     }
+
     public static Boolean hasBeenSet(ArrayList<Group> groups){
 
         for(Group group : groups){

@@ -71,15 +71,7 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
     //Mock Web Server
     androidTestCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
-    //PowerMock
-    testCompile ('org.powermock:powermock-api-mockito:1.6.2') {
-        exclude module: 'hamcrest-core'
-        exclude module: 'objenesis'
-    }
-    testCompile ('org.powermock:powermock-module-junit4:1.6.2') {
-        exclude module: 'hamcrest-core'
-        exclude module: 'objenesis'
-    }
+
 }
 
 
