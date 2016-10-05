@@ -172,7 +172,11 @@ public class PosOrZeroIntegerRow2 implements Row {
     private void showCriticalValidation(final EditTextHolder holder,Context context ){
         if(!alertDialog.isShowing()){
             criticalDiseaseAlertDialog.setTitle(context.getString(R.string.validation_alert_dialog_title));
-            criticalDiseaseAlertDialog.setMessage("You are about to submit "+ holder.editText.getText()+" death(s) for "+ field.getLabel().split(PREFIX)[0].substring(6));
+            if(holder.isCasesField){
+                criticalDiseaseAlertDialog.setMessage("You are about to submit "+ holder.editText.getText()+" cases(s) for "+ field.getLabel().split(PREFIX)[0].substring(6));
+            }else{
+                criticalDiseaseAlertDialog.setMessage("You are about to submit "+ holder.editText.getText()+" death(s) for "+ field.getLabel().split(PREFIX)[0].substring(6));
+            }
             criticalDiseaseAlertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.validation_alert_dialog_confirmation), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int position) {

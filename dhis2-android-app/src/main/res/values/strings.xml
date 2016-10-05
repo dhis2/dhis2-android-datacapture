@@ -107,7 +107,7 @@
 
     <!-- Validation strings -->
     <string name="validation_alert_dialog_title">Validation</string>
-    <string name="validation_alert_dialog_confirmation">Yes</string>
+    <string name="validation_alert_dialog_confirmation">Confirm</string>
     <string name="validation_alert_dialog_rejection">Delete Value</string>
 
 </resources>
