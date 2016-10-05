@@ -29,7 +29,9 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import android.support.design.widget.TextInputLayout;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -39,16 +41,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
+import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.IsDisabled;
 
 import java.util.ArrayList;
 
 public class PosOrZeroIntegerRow2 implements Row {
+    public static final String TAG = PosOrZeroIntegerRow2.class.getSimpleName();
+    public static final String PREFIX = " EIDSR-";
     private final LayoutInflater inflater;
-    private final Field field, field2, field3, field4;
+    private final Field field,field2, field3, field4;
+    private AlertDialog alertDialog;
+    private AlertDialog criticalDiseaseAlertDialog;
+    private IsCritical isCritical;
+    private final String defaultValue = "0";
 
-    public PosOrZeroIntegerRow2(LayoutInflater inflater, Field field, Field field2, Field field3, Field field4 ) {
+
+
+    public PosOrZeroIntegerRow2(LayoutInflater inflater, Field field, Field field2, Field field3, Field field4) {
         this.inflater = inflater;
         this.field = field;
         this.field2 = field2;
@@ -59,10 +71,8 @@ public class PosOrZeroIntegerRow2 implements Row {
     @Override
     public View getView(View convertView) {
         View view;
-        EditTextHolder holder;
-        EditTextHolder holder2;
-        EditTextHolder holder3;
-        EditTextHolder holder4;
+
+        ArrayList<EditTextHolder> holders = new ArrayList<>();
 
         ArrayList<Field> fields = new ArrayList<>();
         fields.add(field);
@@ -73,68 +83,45 @@ public class PosOrZeroIntegerRow2 implements Row {
 
         if (convertView == null) {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_integer_positive_or_zero_3, null);
-            TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
-            EditText editText = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row);
+            final EditText editText = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row);
             EditText editText2 = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row_2);
             EditText editText3 = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row_3);
             EditText editText4 = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row_4);
 
-            TextInputLayout inputLayout = (TextInputLayout) rowRoot.findViewById(R.id.edit_integer_pos_layout);
-            TextInputLayout inputLayout2 = (TextInputLayout) rowRoot.findViewById(R.id.edit_integer_pos_layout_2);
-            TextInputLayout inputLayout3 = (TextInputLayout) rowRoot.findViewById(R.id.edit_integer_pos_layout_3);
-            TextInputLayout inputLayout4 = (TextInputLayout) rowRoot.findViewById(R.id.edit_integer_pos_layout_4);
 
 
-            editText.setFilters(new InputFilter[]{new InpFilter()});
-            editText2.setFilters(new InputFilter[]{new InpFilter()});
-            editText3.setFilters(new InputFilter[]{new InpFilter()});
-            editText4.setFilters(new InputFilter[]{new InpFilter()});
+            ArrayList<EditText> editTexts = new ArrayList<>();
+            editTexts.add(editText);
+            editTexts.add(editText2);
+            editTexts.add(editText3); editTexts.add(editText4);
 
 
-            EditTextWatcher watcher = new EditTextWatcher(field);
-            editText.addTextChangedListener(watcher);
-
-            EditTextWatcher watcher2 = new EditTextWatcher(field2);
-            editText2.addTextChangedListener(watcher2);
-
-            EditTextWatcher watcher3 = new EditTextWatcher(field3);
-            editText3.addTextChangedListener(watcher3);
-
-            EditTextWatcher watcher4 = new EditTextWatcher(field4);
-            editText4.addTextChangedListener(watcher4);
-
-
-            holder = new EditTextHolder(label, editText, watcher,inputLayout);
-
-
-            holder2 = new EditTextHolder(label, editText2, watcher2,inputLayout2);
-            holder3 = new EditTextHolder(label, editText3, watcher3,inputLayout3);
-            holder4 = new EditTextHolder(label, editText4, watcher4,inputLayout4);
-            rowRoot.setTag(R.id.TAG_HOLDER1_ID, holder);
-            rowRoot.setTag(R.id.TAG_HOLDER2_ID, holder2);
-            rowRoot.setTag(R.id.TAG_HOLDER3_ID, holder3);
-            rowRoot.setTag(R.id.TAG_HOLDER4_ID, holder4);
-
-
+            initializeEditTextHolders(editTexts, fields, rowRoot, holders);
 
             view = rowRoot;
+
+            alertDialog = new AlertDialog.Builder(view.getContext()).create();
+            criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isCritical = new IsCritical(view.getContext());
         } else {
             view = convertView;
-            holder = (EditTextHolder) view.getTag(R.id.TAG_HOLDER1_ID);
-            holder2 = (EditTextHolder) view.getTag(R.id.TAG_HOLDER2_ID);
-            holder3 = (EditTextHolder) view.getTag(R.id.TAG_HOLDER3_ID);
-            holder4 = (EditTextHolder) view.getTag(R.id.TAG_HOLDER4_ID);
-        }
 
-        ArrayList<EditTextHolder> holders = new ArrayList<>();
-        holders.add(holder);
-        holders.add(holder2);
-        holders.add(holder3);
-        holders.add(holder4);
+            holders.add((EditTextHolder) view.getTag(R.id.TAG_HOLDER1_ID));
+            holders.add((EditTextHolder) view.getTag(R.id.TAG_HOLDER2_ID));
+            holders.add((EditTextHolder) view.getTag(R.id.TAG_HOLDER3_ID));
+            holders.add((EditTextHolder) view.getTag(R.id.TAG_HOLDER4_ID));
+
+            alertDialog = new AlertDialog.Builder(view.getContext()).create();
+            criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isCritical = new IsCritical(view.getContext());
+        }
 
 
         setupEditTextHolders(holders, fields, view);
 
+        setOnFocusChangeListeners(holders, view.getContext());
+
+        view.setTag(field.getDataElement());
 
         return view;
     }
@@ -148,7 +135,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
         @Override
         public CharSequence filter(CharSequence str, int start, int end,
-                Spanned spn, int spStart, int spEnd) {
+                                   Spanned spn, int spStart, int spEnd) {
 
             if ((str.length() > 0) && (spn.length() > 0) && (spn.charAt(0) == '0')) {
                 return Field.EMPTY_FIELD;
@@ -161,10 +148,97 @@ public class PosOrZeroIntegerRow2 implements Row {
             return str;
         }
     }
+
+    private void setOnFocusChangeListeners(final ArrayList<EditTextHolder> editTextHolders, final Context context){
+        for( int i = 0; i < editTextHolders.size(); i++){
+            final int finalI = i;
+            editTextHolders.get(i).editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
+                        setupValidations(editTextHolders.get(finalI), context);
+                    }
+                }
+            });
+        }
+    }
+
+    private void setupValidations(EditTextHolder editTextHolder, Context context){
+        if(editTextHolder.textWatcher.hasChanged()  && Integer.parseInt(editTextHolder.editText.getText().toString()) > 0 ){
+            editTextHolder.textWatcher.setChanged(false);
+            if(isCritical.check(field)){
+                showCriticalValidation(editTextHolder, context);
+            }
+        }
+    }
+
+    private void showCriticalValidation(final EditTextHolder holder,Context context ){
+        if(!alertDialog.isShowing()){
+            criticalDiseaseAlertDialog.setTitle(context.getString(R.string.validation_alert_dialog_title));
+            if(holder.isCasesField){
+                criticalDiseaseAlertDialog.setMessage(getValidationMessage(holder.editText, "case"));
+            }else{
+                criticalDiseaseAlertDialog.setMessage(getValidationMessage(holder.editText, "death"));
+            }
+            criticalDiseaseAlertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.validation_alert_dialog_confirmation), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int position) {
+                    dialogInterface.dismiss();
+                }
+            });
+
+            criticalDiseaseAlertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, context.getString(R.string.validation_alert_dialog_rejection), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int position) {
+                    holder.editText.setText(defaultValue);
+                    dialogInterface.dismiss();
+                }
+            });
+            criticalDiseaseAlertDialog.setCanceledOnTouchOutside(false);
+            if (!criticalDiseaseAlertDialog.isShowing()) {
+                criticalDiseaseAlertDialog.show();
+            }
+        }
+
+    }
+
+    /**
+     * Rather than initializing everything line by line, the filters, holders and watchers are put in a list
+     * and iterated over initializing every editText and editTextHolder accordingly.
+     * @param editTexts ArrayList<EditText>
+     * @param fields ArrayList<Field>
+     * @param rowRoot ViewGroup
+     * @param holders ArrayList<EditTextHolder>
+     */
+    private void initializeEditTextHolders(ArrayList<EditText> editTexts, ArrayList<Field> fields, ViewGroup rowRoot, final ArrayList<EditTextHolder> holders){
+        TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
+
+        ArrayList<Integer> tagsIds = new ArrayList<>();
+        tagsIds.add(R.id.TAG_HOLDER1_ID);
+        tagsIds.add(R.id.TAG_HOLDER2_ID);
+        tagsIds.add(R.id.TAG_HOLDER3_ID);
+        tagsIds.add(R.id.TAG_HOLDER4_ID);
+
+        for(int i = 0; i < editTexts.size(); i++){
+            editTexts.get(i).setFilters(new InputFilter[]{new InpFilter()});
+            EditTextWatcher watcher = new EditTextWatcher(fields.get(i));
+            editTexts.get(i).addTextChangedListener(watcher);
+            holders.add(new EditTextHolder(label, editTexts.get(i), watcher, isCasesField(fields.get(i))));
+            rowRoot.setTag(tagsIds.get(i), holders.get(i));
+        }
+    }
+
+    /**
+     * Sets up the editTextHolders that have been initialized in an array list.
+     * It then iterates over the list and sets properties and checks accordingly.
+     * This is so we don't have repeating lines of code doing the same thing.
+     * @param holders ArrayList<EditTextHolder>
+     * @param fields ArrayList<Field>
+     * @param view View
+     */
     private void setupEditTextHolders(ArrayList<EditTextHolder> holders, ArrayList<Field> fields, View view){
         for(int i = 0; i < holders.size(); i++){
-
-            String[] label = fields.get(i).getLabel().split("<");
+            String[] label = fields.get(i).getLabel().split(PREFIX);
 
             holders.get(i).textLabel.setText(label[0].substring(6));
             holders.get(i).textWatcher.setField(fields.get(i));
@@ -176,6 +250,42 @@ public class PosOrZeroIntegerRow2 implements Row {
             IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
 
         }
-
     }
+
+    private Boolean isCasesField(Field field){
+        Boolean isCasesField = false;
+        if(field.getCategoryOptionCombo().equals(Constants.UNDER_FIVE_CASES)
+                || field.getCategoryOptionCombo().equals(Constants.OVER_FIVE_CASES)){
+            isCasesField = true;
+        }
+        return isCasesField;
+    }
+
+    private Boolean hasLostFocusAndIsNotEmpty(Boolean hasFocus, EditText editText){
+        Boolean hasLostFocusAndNotIsEmpty = false;
+        if(!hasFocus && !isEmptyEditText(editText)){
+            hasLostFocusAndNotIsEmpty = true;
+        }
+        return hasLostFocusAndNotIsEmpty;
+    }
+
+    private Boolean isEmptyEditText(EditText editText){
+        Boolean isEmpty = false;
+        if(editText.getText().toString().equals("")){
+            isEmpty = true;
+        }
+        return isEmpty;
+    }
+
+    private String getValidationMessage(EditText editText, String type){
+        String message;
+        if(Integer.parseInt(editText.getText().toString()) > 1){
+            message = "You are about to submit "+ editText.getText()+" "+type+"s for "+ field.getLabel().split(PREFIX)[0].substring(6);
+        }else{
+            message = "You are about to submit "+ editText.getText()+" "+type+" for "+ field.getLabel().split(PREFIX)[0].substring(6);
+        }
+
+        return message;
+    }
+
 }

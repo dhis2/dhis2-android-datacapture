@@ -105,4 +105,9 @@
     <string name="swipe_to_update">Swipe to update</string>
     <string name="no_forms_found">No forms found assigned to current user</string>
 
+    <!-- Validation strings -->
+    <string name="validation_alert_dialog_title">Validation</string>
+    <string name="validation_alert_dialog_confirmation">Confirm</string>
+    <string name="validation_alert_dialog_rejection">Delete Value</string>
+
 </resources>
