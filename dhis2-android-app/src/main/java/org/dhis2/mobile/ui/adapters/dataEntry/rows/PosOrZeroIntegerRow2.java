@@ -103,7 +103,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             EditTextWatcher watcher4 = new EditTextWatcher(field4);
             editText4.addTextChangedListener(watcher4);
 
-            
+
             holder = new EditTextHolder(label, editText, watcher,inputLayout);
 
 
@@ -143,23 +143,23 @@ public class PosOrZeroIntegerRow2 implements Row {
     public int getViewType() {
         return RowTypes.INTEGER_ZERO_OR_POSITIVE.ordinal();
     }
-    
+
     private class InpFilter implements InputFilter {
 
         @Override
         public CharSequence filter(CharSequence str, int start, int end,
                 Spanned spn, int spStart, int spEnd) {
-            
+
             if ((str.length() > 0) && (spn.length() > 0) && (spn.charAt(0) == '0')) {
                 return Field.EMPTY_FIELD;
             }
-            
+
             if ((spn.length() > 0) && (spStart == 0) && (str.length() > 0) && (str.charAt(0) == '0')) {
                 return Field.EMPTY_FIELD;
             }
-           
+
             return str;
-        }       
+        }
     }
     private void setupEditTextHolders(ArrayList<EditTextHolder> holders, ArrayList<Field> fields, View view){
         for(int i = 0; i < holders.size(); i++){
