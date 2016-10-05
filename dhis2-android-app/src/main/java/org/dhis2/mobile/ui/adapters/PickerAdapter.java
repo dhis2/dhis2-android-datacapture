@@ -102,8 +102,10 @@ public class PickerAdapter extends RecyclerView.Adapter {
 
     //Sets Picker to first child on the tree.
     public void selectFirstItem(Picker pickerTree){
-        pickerTree.setSelectedChild(pickerTree.getChildren().get(0));
-        swapData(pickerTree);
+        if(pickerTree != null) {
+            pickerTree.setSelectedChild(pickerTree.getChildren().get(0));
+            swapData(pickerTree);
+        }
     }
 
     public void onSaveInstanceState(Bundle outState) {
