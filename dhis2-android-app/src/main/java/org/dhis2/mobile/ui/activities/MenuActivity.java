@@ -30,6 +30,9 @@
 package org.dhis2.mobile.ui.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -38,11 +41,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.WorkService;
+import org.dhis2.mobile.io.handlers.UserAccountHandler;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
+import org.dhis2.mobile.utils.LetterAvatar;
+import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.TextFileUtils;
 
 public class MenuActivity extends BaseActivity implements OnNavigationItemSelectedListener {
     private static final String STATE_TOOLBAR_TITLE = "state:toolbarTitle";
@@ -62,6 +74,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         if (navigationView != null) {
             navigationView.inflateMenu(R.menu.menu_drawer);
             navigationView.setNavigationItemSelectedListener(this);
+            setupUserDetailsForSideNav();
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -142,5 +155,42 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         startActivity(startLoginActivity);
         overridePendingTransition(R.anim.activity_close_enter, R.anim.activity_close_exit);
         finish();
+    }
+
+    private void setupUserDetailsForSideNav(){
+        View navHeader = navigationView.getHeaderView(0);
+        TextView username = (TextView) navHeader.findViewById(R.id.side_nav_username);
+        username.setText(PrefUtils.getUserName(getApplicationContext()));
+        String userAccountDetails = TextFileUtils.readTextFile(getApplicationContext(),
+                TextFileUtils.Directory.ROOT,
+                TextFileUtils.FileNames.ACCOUNT_INFO);
+        //Initial(s) used if user account details is unavailable
+        String initials = getFirstLetterInUpperCase(username.getText().toString());
+
+        if(userAccountDetails != null){
+            JsonObject info = (new JsonParser()).parse(userAccountDetails).getAsJsonObject();
+            String email = UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.EMAIL));
+            TextView mEmail = (TextView) navHeader.findViewById(R.id.side_nav_email);
+            mEmail.setText(email);
+
+            initials = getUserInitials(info);
+
+        }
+
+        ImageView avatar = (ImageView) navHeader.findViewById(R.id.side_nav_photo);
+        Bitmap bm = Bitmap.createBitmap(150, 150,Bitmap.Config.ARGB_8888); Canvas cv = new Canvas(bm);
+        LetterAvatar ava = new LetterAvatar(getApplicationContext(), Color.parseColor("#FF0000"), initials, 10 );
+        ava.draw(cv);
+        avatar.setImageBitmap(bm);
+
+    }
+
+    private String getFirstLetterInUpperCase(String string){
+        return string.substring(0,1).toUpperCase();
+    }
+
+    private String getUserInitials(JsonObject info){
+        return getFirstLetterInUpperCase(UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.FIRST_NAME))) +
+                getFirstLetterInUpperCase(UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.SURNAME)));
     }
 }
