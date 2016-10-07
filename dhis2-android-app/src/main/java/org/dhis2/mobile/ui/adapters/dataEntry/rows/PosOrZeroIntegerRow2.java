@@ -156,20 +156,61 @@ public class PosOrZeroIntegerRow2 implements Row {
                 @Override
                 public void onFocusChange(View view, boolean hasFocus) {
                     if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
-                        setupValidations(editTextHolders.get(finalI), context);
+                        setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
                 }
             });
         }
     }
 
-    private void setupValidations(EditTextHolder editTextHolder, Context context){
+    private void setupValidations(EditTextHolder editTextHolder, final ArrayList<EditTextHolder> editTextHolders, int currentIndex, Context context){
+        if(!editTextHolder.isCasesField  && editTextHolder.textWatcher.hasChanged()
+                && !alertDialog.isShowing()){
+            showDeathsGreaterValidation(getCasesField(editTextHolders, currentIndex), editTextHolders.get(currentIndex), context);
+        }
         if(editTextHolder.textWatcher.hasChanged()  && Integer.parseInt(editTextHolder.editText.getText().toString()) > 0 ){
             editTextHolder.textWatcher.setChanged(false);
             if(isCritical.check(field)){
                 showCriticalValidation(editTextHolder, context);
             }
         }
+    }
+
+    private void showDeathsGreaterValidation(EditTextHolder casesEditTextHolder, final EditTextHolder deathsEditTextHolder, final Context context){
+        int deaths, cases;
+        deaths = getValueFromEditText(deathsEditTextHolder.editText);
+        cases = getValueFromEditText(casesEditTextHolder.editText);
+
+        if(deaths > cases){
+
+            alertDialog.setTitle(context.getString(R.string.validation_alert_dialog_title));
+            alertDialog.setMessage("You are about to submit more deaths than cases for "+field.getLabel().split(PREFIX)[0].substring(6));
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.validation_alert_dialog_confirmation), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int position) {
+                    dialogInterface.dismiss();
+                    //Also need to check if death field belongs to a critical disease. If it does show validation
+                    if(isCritical.check(field)){
+                        showCriticalValidation(deathsEditTextHolder, context);
+                    }
+                }
+            });
+
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, context.getString(R.string.validation_alert_dialog_rejection), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int position) {
+                    deathsEditTextHolder.editText.setText(defaultValue);
+                    dialogInterface.dismiss();
+                }
+            });
+
+            alertDialog.setCanceledOnTouchOutside(false);
+            if (!alertDialog.isShowing()) {
+                alertDialog.show();
+            }
+
+        }
+
     }
 
     private void showCriticalValidation(final EditTextHolder holder,Context context ){
@@ -261,6 +302,10 @@ public class PosOrZeroIntegerRow2 implements Row {
         return isCasesField;
     }
 
+    private EditTextHolder getCasesField(ArrayList<EditTextHolder> holders, int currentIndex){
+        return holders.get(currentIndex -1);
+    }
+
     private Boolean hasLostFocusAndIsNotEmpty(Boolean hasFocus, EditText editText){
         Boolean hasLostFocusAndNotIsEmpty = false;
         if(!hasFocus && !isEmptyEditText(editText)){
@@ -286,6 +331,18 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
 
         return message;
+    }
+
+    private int getValueFromEditText(EditText editText){
+        int value;
+
+        if(editText.getText().toString().equals("")) {
+            value = 0;
+        }else{
+            value = Integer.parseInt(editText.getText().toString());
+        }
+
+        return value;
     }
 
 }
