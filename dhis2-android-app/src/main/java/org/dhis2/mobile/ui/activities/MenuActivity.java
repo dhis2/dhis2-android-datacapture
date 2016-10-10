@@ -170,18 +170,21 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         if(userAccountDetails != null){
             JsonObject info = (new JsonParser()).parse(userAccountDetails).getAsJsonObject();
             String email = UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.EMAIL));
+            String firstName = UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.FIRST_NAME));
+            String surname = UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.SURNAME));
             TextView mEmail = (TextView) navHeader.findViewById(R.id.side_nav_email);
             mEmail.setText(email);
 
-            initials = getUserInitials(info);
+            initials = getUserInitials(firstName, surname);
 
         }
 
         ImageView avatar = (ImageView) navHeader.findViewById(R.id.side_nav_photo);
-        Bitmap bm = Bitmap.createBitmap(150, 150,Bitmap.Config.ARGB_8888); Canvas cv = new Canvas(bm);
-        LetterAvatar ava = new LetterAvatar(getApplicationContext(), Color.parseColor("#FF0000"), initials, 10 );
-        ava.draw(cv);
-        avatar.setImageBitmap(bm);
+        Bitmap bitmap = Bitmap.createBitmap(150, 150,Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        LetterAvatar letterAvatar = new LetterAvatar(getApplicationContext(), Color.parseColor("#FF0000"), initials, 10 );
+        letterAvatar.draw(canvas);
+        avatar.setImageBitmap(bitmap);
 
     }
 
@@ -189,8 +192,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         return string.substring(0,1).toUpperCase();
     }
 
-    private String getUserInitials(JsonObject info){
-        return getFirstLetterInUpperCase(UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.FIRST_NAME))) +
-                getFirstLetterInUpperCase(UserAccountHandler.getString(info.getAsJsonPrimitive(UserAccountHandler.SURNAME)));
+    private String getUserInitials(String firstName, String surname){
+        return getFirstLetterInUpperCase(firstName) + getFirstLetterInUpperCase(surname);
     }
 }
