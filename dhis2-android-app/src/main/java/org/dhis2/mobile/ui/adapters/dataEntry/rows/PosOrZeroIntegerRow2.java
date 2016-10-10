@@ -82,7 +82,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
 
         if (convertView == null) {
-            ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_integer_positive_or_zero_3, null);
+            ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_integer_positive_or_zero_4, null);
             final EditText editText = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row);
             EditText editText2 = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row_2);
             EditText editText3 = (EditText) rowRoot.findViewById(R.id.edit_integer_pos_row_3);
