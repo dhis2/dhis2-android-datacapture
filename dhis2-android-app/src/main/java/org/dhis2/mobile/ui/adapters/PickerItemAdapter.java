@@ -1,8 +1,6 @@
 package org.dhis2.mobile.ui.adapters;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,20 +167,21 @@ public class PickerItemAdapter extends BaseAdapter {
             this.textViewLabel = (TextView) itemView.findViewById(R.id.text_item);
             this.onTextViewLabelClickListener = new OnClickListener();
 
-            ColorStateList colorStateList = new ColorStateList(
-                    new int[][]{
-                            // for selected state
-                            new int[]{android.R.attr.state_selected},
+            // TODO fix the problem with clicks
+            // ColorStateList colorStateList = new ColorStateList(
+            //        new int[][]{
+            //                // for selected state
+            //                new int[]{android.R.attr.state_selected},
+            //
+            //                // default color state
+            //                new int[]{}
+            //        },
+            //        new int[]{
+            //                ContextCompat.getColor(context, R.color.dark_navy_blue),
+            //                textViewLabel.getCurrentTextColor()
+            //        });
+            // this.textViewLabel.setTextColor(colorStateList);
 
-                            // default color state
-                            new int[]{}
-                    },
-                    new int[]{
-                            ContextCompat.getColor(context, R.color.dark_navy_blue),
-                            textViewLabel.getCurrentTextColor()
-                    });
-
-            this.textViewLabel.setTextColor(colorStateList);
             this.textViewLabel.setOnClickListener(onTextViewLabelClickListener);
         }
 
