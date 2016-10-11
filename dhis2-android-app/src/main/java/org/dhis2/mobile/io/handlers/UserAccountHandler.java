@@ -43,9 +43,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 public class UserAccountHandler {
-	private static final String FIRST_NAME = "firstName";
-	private static final String SURNAME = "surname";
-	private static final String EMAIL = "email";
+	public static final String FIRST_NAME = "firstName";
+	public static final String SURNAME = "surname";
+	public static final String EMAIL = "email";
 	private static final String PHONE_NUMBER = "phoneNumber";
 	private static final String INTRODUCTION = "introduction";
 	private static final String JOB_TITLE = "jobTitle";
@@ -114,7 +114,7 @@ public class UserAccountHandler {
 		return fields;
 	}
 	
-	private static String getString(JsonPrimitive primitive) {
+	public static String getString(JsonPrimitive primitive) {
 		return primitive != null ? primitive.getAsString() : Field.EMPTY_FIELD;
 	}
 	

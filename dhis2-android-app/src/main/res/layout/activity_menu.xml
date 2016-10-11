@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:weightSum="1">
 
@@ -22,7 +23,8 @@
             android:id="@+id/navigation_view"
             android:layout_width="@dimen/navigation_drawer_width"
             android:layout_height="match_parent"
-            android:layout_gravity="start" />
+            android:layout_gravity="start"
+            app:headerLayout="@layout/nav_header_main"/>
 
     </android.support.v4.widget.DrawerLayout>
 
