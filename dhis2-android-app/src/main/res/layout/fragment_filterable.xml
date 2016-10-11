@@ -45,7 +45,7 @@
         android:drawableLeft="@drawable/ic_search_black"
         android:drawablePadding="4dp"
         android:drawableStart="@drawable/ic_search_black"
-        android:hint="@string/choose_period"
+        android:hint="@string/choose_item"
         android:textSize="14sp"
         app:font="@string/regular_font_name" />
 
@@ -53,6 +53,6 @@
         android:id="@+id/listview_picker_items"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:cacheColorHint="@android:color/transparent"/>
+        android:cacheColorHint="@android:color/transparent" />
 
 </LinearLayout>

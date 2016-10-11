@@ -76,6 +76,7 @@
 
     <!-- String resources for aggregate report fragment -->
     <string name="choose">Choose</string>
+    <string name="choose_item">Choose item</string>
     <string name="choose_data_set">Choose data set</string>
     <string name="choose_program">Choose program</string>
     <string name="choose_unit">Choose organisation unit</string>
