@@ -21,6 +21,12 @@
             android:layout_weight="1"
             >
 
+            <Button
+                android:id="@+id/delete_button"
+                android:background="@drawable/ic_clear_black_24dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+
             <TextView
                 android:layout_height="match_parent"
                 android:textStyle="bold"

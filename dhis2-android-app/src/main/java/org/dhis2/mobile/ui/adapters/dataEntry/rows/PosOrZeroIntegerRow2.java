@@ -31,18 +31,22 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.IsDisabled;
 
@@ -52,20 +56,23 @@ public class PosOrZeroIntegerRow2 implements Row {
     public static final String TAG = PosOrZeroIntegerRow2.class.getSimpleName();
     public static final String PREFIX = " EIDSR-";
     private final LayoutInflater inflater;
-    private final Field field,field2, field3, field4;
+    public final Field field,field2, field3, field4;
     private AlertDialog alertDialog;
     private AlertDialog criticalDiseaseAlertDialog;
     private IsCritical isCritical;
+    private final Boolean isAdditionalDisease;
     private final String defaultValue = "0";
+    private Button deleteButton;
 
 
 
-    public PosOrZeroIntegerRow2(LayoutInflater inflater, Field field, Field field2, Field field3, Field field4) {
+    public PosOrZeroIntegerRow2(LayoutInflater inflater, ArrayList<Field> fields, Boolean isAdditionalDisease) {
         this.inflater = inflater;
-        this.field = field;
-        this.field2 = field2;
-        this.field3 = field3;
-        this.field4 = field4;
+        this.field = fields.get(fields.size()-4);
+        this.field2 = fields.get(fields.size()-3);
+        this.field3 = fields.get(fields.size()-2);
+        this.field4 = fields.get(fields.size()-1);
+        this.isAdditionalDisease = isAdditionalDisease;
     }
 
     @Override
@@ -93,7 +100,8 @@ public class PosOrZeroIntegerRow2 implements Row {
             ArrayList<EditText> editTexts = new ArrayList<>();
             editTexts.add(editText);
             editTexts.add(editText2);
-            editTexts.add(editText3); editTexts.add(editText4);
+            editTexts.add(editText3);
+            editTexts.add(editText4);
 
 
             initializeEditTextHolders(editTexts, fields, rowRoot, holders);
@@ -281,6 +289,7 @@ public class PosOrZeroIntegerRow2 implements Row {
         for(int i = 0; i < holders.size(); i++){
             String[] label = fields.get(i).getLabel().split(PREFIX);
 
+            setupDeleteButton(view);
             holders.get(i).textLabel.setText(label[0].substring(6));
             holders.get(i).textWatcher.setField(fields.get(i));
             holders.get(i).editText.addTextChangedListener(holders.get(i).textWatcher);
@@ -291,6 +300,24 @@ public class PosOrZeroIntegerRow2 implements Row {
             IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
 
         }
+    }
+
+    private void setupDeleteButton(View view){
+        deleteButton = (Button) view.findViewById(R.id.delete_button);
+        deleteButton.setVisibility(View.GONE);
+        if(isAdditionalDisease){
+            deleteButton.setVisibility(View.VISIBLE);
+        }
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(DataEntryActivity.TAG);
+                intent.putExtra(TAG, field.getDataElement());
+                //Tell the DataEntryActivity that holds the listView with all the diseases that a disease's delete button has been clicked
+                LocalBroadcastManager.getInstance(view.getContext()).sendBroadcast(intent);
+            }
+        });
+
     }
 
     private Boolean isCasesField(Field field){

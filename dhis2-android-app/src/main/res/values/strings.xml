@@ -110,4 +110,9 @@
     <string name="validation_alert_dialog_confirmation">Confirm</string>
     <string name="validation_alert_dialog_rejection">Delete Value</string>
 
+    <!-- Additional Diseases -->
+    <string name="additional_diseases_title">Additional Diseases</string>
+    <string name="add_disease_title">Add Disease</string>
+    <string name="submit_button_title">Submit</string>
+
 </resources>

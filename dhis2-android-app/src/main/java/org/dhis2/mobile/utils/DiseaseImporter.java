@@ -25,9 +25,10 @@ import java.util.Map;
  * Imports the diseases object in the diseases json file
  */
 public class DiseaseImporter {
-    public static final String ID = "id";
-    public static final String IS_CRITICAL_FIELD = "isCritical";
-    public static final String DISABLED_FIELDS = "disabledFields";
+    private static final String ID = "id";
+    private static final String IS_CRITICAL_FIELD = "isCritical";
+    private static final String DISABLED_FIELDS = "disabledFields";
+    private static final String IS_ADDITIONAL_DISEASE = "isAdditionalDisease";
 
 
     /**
@@ -81,6 +82,7 @@ public class DiseaseImporter {
                             entry.getKey(),
                             entry.getValue().getAsJsonObject().get(ID).getAsString(),
                             entry.getValue().getAsJsonObject().get(IS_CRITICAL_FIELD).getAsBoolean(),
+                            entry.getValue().getAsJsonObject().get(IS_ADDITIONAL_DISEASE).getAsBoolean(),
                             disabledFieldsIds
                     );
 
