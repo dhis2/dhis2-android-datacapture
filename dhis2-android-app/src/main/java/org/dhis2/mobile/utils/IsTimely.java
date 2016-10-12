@@ -42,7 +42,8 @@ public class IsTimely {
 
         for(Group group : groups){
             for(Field field : group.getFields()){
-                if(field.getDataElement().equals(Constants.TIMELY) && field.getValue() != null){
+                if(field.getDataElement().equals(Constants.TIMELY) && field.getValue() != null &&
+                        !field.getValue().equals("")){
                     return true;
                 }
             }
