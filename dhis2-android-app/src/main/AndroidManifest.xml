@@ -21,6 +21,18 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".utils.SMSBroadcastReceiver">
+            <intent-filter>
+                <action android:name="org.dhis2.mobile.SEND_SMS"/>
+            </intent-filter >
+            <intent-filter>
+                <action android:name="org.dhis2.mobile.DELIVERED_SMS"/>
+            </intent-filter >
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".ui.activities.LauncherActivity"
             android:noHistory="true">
