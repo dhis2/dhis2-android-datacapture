@@ -101,6 +101,9 @@ public class ReportUploadProcessor {
             NotificationBuilder.fireNotification(context, title, message);
         } else {
             saveDataset(context, data, info);
+            if(response.getCode() != 401 || response.getCode() != 403){
+                SendSmsProcessor.send(context, info, groups);
+            }
         }
     }
 
