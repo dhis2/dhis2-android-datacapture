@@ -102,25 +102,9 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.INTEGER_ZERO_OR_POSITIVE.name())) {
                 //Changed from the others to support grouping of Diseases
                 //Specific test case for eidsr form
-                if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0
-                        && !isAdditionalDisease.check(previousFieldId)){
-                    //each disease has four fields.
-                    Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
-                    rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields, isAnAdditionalDisease));
 
-                }
-                //check if its an additional disease and has values.
-                if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0 && isAdditionalDisease.check(previousFieldId)
-                        && groupedFieldsHasValue(groupedFields))
-                {
-                    //if it is an additional disease and does have value then we add it to a map of additional diseases rows
-                    //we later iterate over the map and add these additional diseases to the bottom of the listView
-                    Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
-                    additionalDiseasesRows.put(previousFieldId, new HashMap<String, PosOrZeroIntegerRow2>());
-                    additionalDiseasesRows.get(previousFieldId).put(groupedFields.get(groupedFields.size()-1).getLabel(),
-                            new PosOrZeroIntegerRow2(inflater, groupedFields, isAnAdditionalDisease));
+                handleIntegerOrZeroRow2(field, groupedFields, previousFieldId);
 
-                }
                 groupedFields.add(field);
                 previousFieldId = field.getDataElement();
             } else if (field.getType().equals(RowTypes.INTEGER_POSITIVE.name())) {
@@ -223,15 +207,16 @@ public class FieldAdapter extends BaseAdapter {
     }
 
     private Boolean groupedFieldsHasValue(ArrayList<Field> groupedFields){
-        Boolean hasValue  = false;
         int size = groupedFields.size();
 
-        if(!isFieldValueEmpty(groupedFields.get(size - 4))|| !isFieldValueEmpty(groupedFields.get(size - 3)) ||
-                !isFieldValueEmpty(groupedFields.get(size - 2)) ||  !isFieldValueEmpty(groupedFields.get(size - 1))){
-            hasValue = true;
+        for(int i = 1; i < 5; i ++){
+            if(!isFieldValueEmpty(groupedFields.get(size - i))){
+               return true;
+            }
         }
 
-        return hasValue;
+
+        return false;
     }
 
     private void clearPosOrZeroIntegerRow2Fields(PosOrZeroIntegerRow2 row){
@@ -246,6 +231,28 @@ public class FieldAdapter extends BaseAdapter {
             isEmpty = true;
         }
         return isEmpty;
+    }
+
+    private void handleIntegerOrZeroRow2(Field field, ArrayList<Field> groupedFields, String previousFieldId){
+        if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0
+                && !isAdditionalDisease.check(previousFieldId)){
+            //each disease has four fields.
+            Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
+            rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields, isAnAdditionalDisease));
+
+        }
+        //check if its an additional disease and has values.
+        if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0 && isAdditionalDisease.check(previousFieldId)
+                && groupedFieldsHasValue(groupedFields))
+        {
+            //if it is an additional disease and does have value then we add it to a map of additional diseases rows
+            //we later iterate over the map and add these additional diseases to the bottom of the listView
+            Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
+            additionalDiseasesRows.put(previousFieldId, new HashMap<String, PosOrZeroIntegerRow2>());
+            additionalDiseasesRows.get(previousFieldId).put(groupedFields.get(groupedFields.size()-1).getLabel(),
+                    new PosOrZeroIntegerRow2(inflater, groupedFields, isAnAdditionalDisease));
+
+        }
     }
 
 }

@@ -67,8 +67,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     // views
     private View uploadButton;
-    private View addDiseaseBtn;
-    private View persistentBtnsFooter;
+    private View addDiseaseButton;
+    private View persistentButtonsFooter;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
 
@@ -115,7 +115,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupProgressBar(savedInstanceState);
 
         setupListView();
-        persistentBtnsFooter = findViewById(R.id.persistent_buttons_footer);
+        persistentButtonsFooter = findViewById(R.id.persistent_buttons_footer);
         setupUploadButton();
         setupAddDiseaseBtn();
         setupDeleteDialog();
@@ -258,8 +258,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void setupAddDiseaseBtn(){
-        addDiseaseBtn = findViewById(R.id.add_button);
-        addDiseaseBtn.setOnClickListener(new View.OnClickListener() {
+        addDiseaseButton = findViewById(R.id.add_button);
+        addDiseaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AdditionalDiseasesFragment additionalDiseasesFragment = new AdditionalDiseasesFragment();
@@ -277,10 +277,13 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void showDeleteDiseaseDialog(final String tag, final int pos){
-        deleteDiseaseDialog.setTitle("Delete disease?");
+        String title = getResources().getString(R.string.delete_disease_dialog_title);
+        String confirmationText = getResources().getString(R.string.delete_disease_dialog_confirmation);
+        String rejectionText = getResources().getString(R.string.delete_disease_dialog_rejection);
+        deleteDiseaseDialog.setTitle(title);
         deleteDiseaseDialog.setMessage("Are you sure you want to delete "+
                 additionalDiseaseIds.get(tag).toString().split("EIDSR-")[1]+" and all its values");
-        deleteDiseaseDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+        deleteDiseaseDialog.setButton(DialogInterface.BUTTON_POSITIVE, confirmationText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 additionalDiseaseIds.remove(tag);
@@ -288,7 +291,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 deleteDiseaseDialog.dismiss();
             }
         });
-        deleteDiseaseDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+        deleteDiseaseDialog.setButton(DialogInterface.BUTTON_NEGATIVE, rejectionText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 deleteDiseaseDialog.dismiss();
@@ -337,12 +340,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void showProgressBar() {
-        ViewUtils.hideAndDisableViews(persistentBtnsFooter, uploadButton, dataEntryListView);
+        ViewUtils.hideAndDisableViews(persistentButtonsFooter, uploadButton, dataEntryListView);
         ViewUtils.enableViews(progressBarLayout);
     }
 
     private void hideProgressBar() {
-        ViewUtils.enableViews(persistentBtnsFooter, uploadButton, dataEntryListView);
+        ViewUtils.enableViews(persistentButtonsFooter, uploadButton, dataEntryListView);
         ViewUtils.hideAndDisableViews(progressBarLayout);
     }
 
@@ -456,6 +459,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         public void onReceive(Context cxt, Intent intent) {
             hideProgressBar();
 
+            //check if intent has a server response code. This would mean the WorkService has finished making its API call
             if(intent.getExtras().containsKey(Response.CODE)) {
                 int code = intent.getExtras().getInt(Response.CODE);
                 if (HTTPClient.isError(code)) {
@@ -473,12 +477,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     }
                 }
             }
-
-            if(intent.getExtras().containsKey(PosOrZeroIntegerRow2.TAG)){
+            //if not check if intent was called from a row in the listView. Meaning that the delete button was clicked.
+            else if(intent.getExtras().containsKey(PosOrZeroIntegerRow2.TAG)){
+                //Get tag (unique ID belonging to every row)
                 String tag = intent.getExtras().getString(PosOrZeroIntegerRow2.TAG);
+                ///get the view (Row) based on the TAG (unique ID)
                 View view = dataEntryListView.findViewWithTag(tag);
-                int pos = dataEntryListView.getPositionForView(view);
-                showDeleteDiseaseDialog(tag, pos);
+                //Get the position of that view (Row) in the listView.
+                int position = dataEntryListView.getPositionForView(view);
+                showDeleteDiseaseDialog(tag, position);
 
             }
         }
