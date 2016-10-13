@@ -21,6 +21,7 @@ public class IsTimelyTest {
         Field field = new Field();
         field.setLabel("Timely");
         field.setDataElement(Constants.TIMELY);
+        field.setValue("false");
         ArrayList<Field> fields = new ArrayList<>();
         fields.add(field);
         ArrayList<Group> data = new ArrayList<>();
