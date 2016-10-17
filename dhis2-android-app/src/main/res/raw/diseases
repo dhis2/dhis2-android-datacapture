@@ -13,13 +13,13 @@
   },
   "EIDSR-Maternal deaths":{
     "id": "JyHy4B7myv9",
-    "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
+    "disabledFields": ["UNDER_FIVE_CASES", "UNDER_FIVE_DEATHS", "OVER_FIVE_CASES"],
     "isCritical": false,
     "isAdditionalDisease": false
   },
   "EIDSR-Neonatal tetanus":{
     "id":"zSzK3FHsJOy",
-    "disabledFields": ["UNDER_FIVE_CASES", "UNDER_FIVE_DEATHS", "OVER_FIVE_DEATHS"],
+    "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
     "isCritical": false,
     "isAdditionalDisease": false
   },
