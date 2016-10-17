@@ -3,16 +3,15 @@ package org.dhis2.mobile.ui.activities;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.DataSetObservable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -40,8 +39,9 @@ import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
-import org.dhis2.mobile.processors.ReportUploadProcessor;
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
+import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
+import org.dhis2.mobile.ui.fragments.AdditionalDiseasesFragment;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
@@ -67,12 +67,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     // views
     private View uploadButton;
+    private View addDiseaseButton;
+    private View persistentButtonsFooter;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
 
     // data entry view
     private ListView dataEntryListView;
-    private List<FieldAdapter> adapters;
+    public List<FieldAdapter> adapters;
 
     // state
     private boolean downloadAttempted;
@@ -80,12 +82,20 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     //info
     private static DatasetInfoHolder infoHolder;
 
+    //delete disease alert dialog
+    private AlertDialog deleteDiseaseDialog;
+
+    // key for additional diseases that have been displayed on the list.
+    public static final String ALREADY_DISPLAYED = "alreadyDisplayed";
+
+    private Map additionalDiseaseIds = new HashMap();
+
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
             infoHolder = info;
             Intent intent = new Intent(activity, DataEntryActivity.class);
             intent.putExtra(DatasetInfoHolder.TAG, info);
-            
+
 
 
             activity.startActivity(intent);
@@ -105,7 +115,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupProgressBar(savedInstanceState);
 
         setupListView();
+        persistentButtonsFooter = findViewById(R.id.persistent_buttons_footer);
         setupUploadButton();
+        setupAddDiseaseBtn();
+        setupDeleteDialog();
 
         // let's try to get latest values from API
         attemptToDownloadReport(savedInstanceState);
@@ -234,7 +247,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void setupUploadButton() {
-        uploadButton = findViewById(R.id.upload_button);
+        uploadButton = findViewById(R.id.send_button);
         uploadButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -242,6 +255,50 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 upload();
             }
         });
+    }
+
+    private void setupAddDiseaseBtn(){
+        addDiseaseButton = findViewById(R.id.add_button);
+        addDiseaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AdditionalDiseasesFragment additionalDiseasesFragment = new AdditionalDiseasesFragment();
+                Bundle args = new Bundle();
+                args.putString(ALREADY_DISPLAYED, additionalDiseaseIds.keySet().toString());
+                additionalDiseasesFragment.setArguments(args);
+                additionalDiseasesFragment.show(getSupportFragmentManager(), TAG);
+
+            }
+        });
+    }
+
+    private void setupDeleteDialog(){
+        deleteDiseaseDialog =  new AlertDialog.Builder(this).create();
+    }
+
+    private void showDeleteDiseaseDialog(final String tag, final int pos){
+        String title = getResources().getString(R.string.delete_disease_dialog_title);
+        String confirmationText = getResources().getString(R.string.delete_disease_dialog_confirmation);
+        String rejectionText = getResources().getString(R.string.delete_disease_dialog_rejection);
+        deleteDiseaseDialog.setTitle(title);
+        deleteDiseaseDialog.setMessage("Are you sure you want to delete "+
+                additionalDiseaseIds.get(tag).toString().split("EIDSR-")[1]+" and all its values");
+        deleteDiseaseDialog.setButton(DialogInterface.BUTTON_POSITIVE, confirmationText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                additionalDiseaseIds.remove(tag);
+                adapters.get(0).removeItemAtPosition(pos);
+                deleteDiseaseDialog.dismiss();
+            }
+        });
+        deleteDiseaseDialog.setButton(DialogInterface.BUTTON_NEGATIVE, rejectionText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteDiseaseDialog.dismiss();
+            }
+        });
+        deleteDiseaseDialog.setCanceledOnTouchOutside(false);
+        deleteDiseaseDialog.show();
     }
 
     private void attemptToDownloadReport(Bundle savedInstanceState) {
@@ -283,12 +340,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void showProgressBar() {
-        ViewUtils.hideAndDisableViews(uploadButton, dataEntryListView);
+        ViewUtils.hideAndDisableViews(persistentButtonsFooter, uploadButton, dataEntryListView);
         ViewUtils.enableViews(progressBarLayout);
     }
 
     private void hideProgressBar() {
-        ViewUtils.enableViews(uploadButton, dataEntryListView);
+        ViewUtils.enableViews(persistentButtonsFooter, uploadButton, dataEntryListView);
         ViewUtils.hideAndDisableViews(progressBarLayout);
     }
 
@@ -402,20 +459,34 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         public void onReceive(Context cxt, Intent intent) {
             hideProgressBar();
 
-            int code = intent.getExtras().getInt(Response.CODE);
-            if (HTTPClient.isError(code)) {
-                // load form from disk
-                getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null,
-                        DataEntryActivity.this).forceLoad();
-                return;
-            }
-
-            if (intent.getExtras().containsKey(Response.BODY)) {
-                Form form = intent.getExtras().getParcelable(Response.BODY);
-
-                if (form != null) {
-                    loadGroupsIntoAdapters(form.getGroups());
+            //check if intent has a server response code. This would mean the WorkService has finished making its API call
+            if(intent.getExtras().containsKey(Response.CODE)) {
+                int code = intent.getExtras().getInt(Response.CODE);
+                if (HTTPClient.isError(code)) {
+                    // load form from disk
+                    getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null,
+                            DataEntryActivity.this).forceLoad();
+                    return;
                 }
+
+                if (intent.getExtras().containsKey(Response.BODY)) {
+                    Form form = intent.getExtras().getParcelable(Response.BODY);
+
+                    if (form != null) {
+                        loadGroupsIntoAdapters(form.getGroups());
+                    }
+                }
+            }
+            //if not check if intent was called from a row in the listView. Meaning that the delete button was clicked.
+            else if(intent.getExtras().containsKey(PosOrZeroIntegerRow2.TAG)){
+                //Get tag (unique ID belonging to every row)
+                String tag = intent.getExtras().getString(PosOrZeroIntegerRow2.TAG);
+                ///get the view (Row) based on the TAG (unique ID)
+                View view = dataEntryListView.findViewWithTag(tag);
+                //Get the position of that view (Row) in the listView.
+                int position = dataEntryListView.getPositionForView(view);
+                showDeleteDiseaseDialog(tag, position);
+
             }
         }
     };
@@ -557,5 +628,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             return null;
         }
+    }
+    public void addToDiseasesShown(String id, String label ){
+        this.additionalDiseaseIds.put(id, label);
+    }
+
+    public void scrollToBottomOfListView(){
+        this.dataEntryListView.smoothScrollToPosition(adapters.get(0).getCount());
     }
 }

@@ -11,12 +11,14 @@ public class Disease {
     private String id;
     private Boolean isCritical;
     private ArrayList<String> disabledFields;
+    private Boolean isAdditional;
 
-    public Disease(String label, String id, Boolean isCritical, ArrayList<String> disabledFields){
+    public Disease(String label, String id, Boolean isCritical, Boolean isAdditional, ArrayList<String> disabledFields){
         this.label = label;
         this.id = id;
         this.isCritical = isCritical;
         this.disabledFields = disabledFields;
+        this.isAdditional = isAdditional;
     }
 
     public String getLabel(){
@@ -30,6 +32,9 @@ public class Disease {
     }
     public ArrayList<String> getDisabledFields(){
         return this.disabledFields;
+    }
+    public Boolean isAdditionalDisease(){
+        return isAdditional;
     }
 
 }
