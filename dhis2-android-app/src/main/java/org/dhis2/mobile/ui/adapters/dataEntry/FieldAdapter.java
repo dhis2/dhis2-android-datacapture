@@ -61,6 +61,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.Row;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.RowTypes;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.TextRow;
 import org.dhis2.mobile.utils.IsAdditionalDisease;
+import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class FieldAdapter extends BaseAdapter {
     private final String adapterLabel;
     private final Group group;
     private LayoutInflater inflater;
+    private IsCritical isCritical;
     private IsAdditionalDisease isAdditionalDisease;
     private Map<String, Map<String, PosOrZeroIntegerRow2>> additionalDiseasesRows = new HashMap<>();
 
@@ -85,6 +87,7 @@ public class FieldAdapter extends BaseAdapter {
         this.rows = new ArrayList<Row>();
         this.adapterLabel = group.getLabel();
         inflater = LayoutInflater.from(context);
+        isCritical = new IsCritical(context);
         isAdditionalDisease = new IsAdditionalDisease(context);
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
@@ -195,7 +198,7 @@ public class FieldAdapter extends BaseAdapter {
             }
         }
 
-        this.rows.add(new PosOrZeroIntegerRow2(inflater, additionalDiseaseFields, true));
+        this.rows.add(new PosOrZeroIntegerRow2(inflater, additionalDiseaseFields,false, true));
         notifyDataSetChanged();
     }
 
@@ -237,8 +240,9 @@ public class FieldAdapter extends BaseAdapter {
         if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0
                 && !isAdditionalDisease.check(previousFieldId)){
             //each disease has four fields.
+            Boolean isCriticalDisease = isCritical.check(previousFieldId);
             Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
-            rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields, isAnAdditionalDisease));
+            rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields,isCriticalDisease, isAnAdditionalDisease));
 
         }
         //check if its an additional disease and has values.
@@ -250,7 +254,7 @@ public class FieldAdapter extends BaseAdapter {
             Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
             additionalDiseasesRows.put(previousFieldId, new HashMap<String, PosOrZeroIntegerRow2>());
             additionalDiseasesRows.get(previousFieldId).put(groupedFields.get(groupedFields.size()-1).getLabel(),
-                    new PosOrZeroIntegerRow2(inflater, groupedFields, isAnAdditionalDisease));
+                    new PosOrZeroIntegerRow2(inflater, groupedFields,false, isAnAdditionalDisease));
 
         }
     }

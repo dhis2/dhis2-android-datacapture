@@ -41,6 +41,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.dhis2.mobile.R;
@@ -49,6 +50,7 @@ import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.IsDisabled;
+import org.dhis2.mobile.utils.ViewUtils;
 
 import java.util.ArrayList;
 
@@ -59,19 +61,21 @@ public class PosOrZeroIntegerRow2 implements Row {
     public final Field field,field2, field3, field4;
     private AlertDialog alertDialog;
     private AlertDialog criticalDiseaseAlertDialog;
-    private IsCritical isCritical;
+    private final Boolean isCriticalDisease;
     private final Boolean isAdditionalDisease;
     private final String defaultValue = "0";
     private Button deleteButton;
+    private ImageView criticalDiseaseIcon;
 
 
 
-    public PosOrZeroIntegerRow2(LayoutInflater inflater, ArrayList<Field> fields, Boolean isAdditionalDisease) {
+    public PosOrZeroIntegerRow2(LayoutInflater inflater, ArrayList<Field> fields,Boolean isCriticalDisease, Boolean isAdditionalDisease) {
         this.inflater = inflater;
         this.field = fields.get(fields.size()-4);
         this.field2 = fields.get(fields.size()-3);
         this.field3 = fields.get(fields.size()-2);
         this.field4 = fields.get(fields.size()-1);
+        this.isCriticalDisease = isCriticalDisease;
         this.isAdditionalDisease = isAdditionalDisease;
     }
 
@@ -110,7 +114,6 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
-            isCritical = new IsCritical(view.getContext());
         } else {
             view = convertView;
 
@@ -121,7 +124,6 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
-            isCritical = new IsCritical(view.getContext());
         }
 
 
@@ -178,7 +180,7 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
         if(editTextHolder.textWatcher.hasChanged()  && Integer.parseInt(editTextHolder.editText.getText().toString()) > 0 ){
             editTextHolder.textWatcher.setChanged(false);
-            if(isCritical.check(field)){
+            if(isCriticalDisease){
                 showCriticalValidation(editTextHolder, context);
             }
         }
@@ -198,7 +200,7 @@ public class PosOrZeroIntegerRow2 implements Row {
                 public void onClick(DialogInterface dialogInterface, int position) {
                     dialogInterface.dismiss();
                     //Also need to check if death field belongs to a critical disease. If it does show validation
-                    if(isCritical.check(field)){
+                    if(isCriticalDisease){
                         showCriticalValidation(deathsEditTextHolder, context);
                     }
                 }
@@ -299,6 +301,8 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
 
+            setIsCriticalDiseaseIcon(view);
+
         }
     }
 
@@ -370,6 +374,15 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
 
         return value;
+    }
+
+    private void setIsCriticalDiseaseIcon(View view){
+        criticalDiseaseIcon = (ImageView) view.findViewById(R.id.criticalDiseaseIcon);
+        if(this.isCriticalDisease){
+            ViewUtils.enableViews(criticalDiseaseIcon);
+        }else{
+            ViewUtils.hideAndDisableViews(criticalDiseaseIcon);
+        }
     }
 
 }
