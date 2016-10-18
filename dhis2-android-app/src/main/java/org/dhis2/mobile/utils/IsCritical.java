@@ -2,7 +2,6 @@ package org.dhis2.mobile.utils;
 
 import android.content.Context;
 
-import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.eidsr.Disease;
 
 import java.util.Map;
@@ -21,16 +20,14 @@ public class IsCritical {
         this.diseases = DiseaseImporter.importDiseases(context);
     }
 
-    public Boolean check(Field field){
+    public Boolean check(String id){
         Boolean isCritical = false;
 
         assert diseases != null;
-        if(diseases.get(field.getDataElement()) != null) {
-            Disease disease = (Disease) diseases.get(field.getDataElement());
+        Disease disease = (Disease) diseases.get(id);
 
-            if (disease.isCritical()) {
-                isCritical = true;
-            }
+        if (disease != null && disease.isCritical()) {
+            isCritical = true;
         }
 
         return isCritical;

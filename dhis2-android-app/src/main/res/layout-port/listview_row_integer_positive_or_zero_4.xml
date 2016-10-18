@@ -35,13 +35,22 @@
                     android:layout_height="30dp" />
 
                 <TextView
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:id="@+id/text_label"
                     android:padding="8dp"
-                    android:layout_width="wrap_content"
-                    android:maxWidth="160dp" />
+                    android:maxWidth="160dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_report_teal_24dp"
+                    android:id="@+id/criticalDiseaseIcon"
+                    android:paddingTop="8dp"
+                    />
             </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
