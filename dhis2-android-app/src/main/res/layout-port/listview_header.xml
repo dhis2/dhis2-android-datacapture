@@ -6,7 +6,9 @@
         android:layout_height="100dp"
         android:background="#E0ECEA"
         android:paddingTop="30dp"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="20dp"
+        android:id="@+id/listViewHeader"
+    >
 
         <TableRow
             android:id="@+id/tableRow"
@@ -42,6 +44,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:textStyle="bold"
+                        android:paddingTop="10dp"
                         />
 
                 </TableRow>
@@ -91,6 +94,7 @@
                         android:layout_weight="1"
                         android:textStyle="bold"
                         android:gravity="center"
+                        android:paddingTop="10dp"
                         />
 
                 </TableRow>

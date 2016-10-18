@@ -47,5 +47,6 @@ public class Constants {
     public static final String OVER_FIVE_DEATHS = "Ciavs7v4qYa";
     public static final String UNDER_FIVE_DEATHS = "C5qLGpw4uet";
     public static final String COMMAND_NAME = "command";
+    public static final String RECEIPT_OF_FORM = "drTNlzVEJP5";
 
 }

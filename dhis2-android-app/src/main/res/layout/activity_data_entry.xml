@@ -36,14 +36,14 @@
             android:id="@+id/data_entry_frame">
 
             <include layout="@layout/listview_header"/>
+            <include layout="@layout/submission_details_view"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="100dp">
 
-                <include layout="@layout/listview"
-                    />
+                <include layout="@layout/listview" />
             </LinearLayout>
 
             <include layout="@layout/progress_bar_label" />
