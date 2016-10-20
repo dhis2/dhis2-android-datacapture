@@ -115,7 +115,7 @@
     <string name="add_disease_title">Add Disease</string>
     <string name="submit_button_title">Submit</string>
     <string name="delete_disease_dialog_title">Delete disease?</string>
-    <string name="delete_disease_dialog_confirmation">Confirm</string>
-    <string name="delete_disease_dialog_rejection">Delete Value</string>
+    <string name="delete_disease_dialog_confirmation">OK</string>
+    <string name="delete_disease_dialog_rejection">Cancel</string>
 
 </resources>
