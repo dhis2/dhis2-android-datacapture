@@ -132,6 +132,7 @@ public class PosOrZeroIntegerRow2 implements Row {
         setOnFocusChangeListeners(holders, view.getContext());
 
         view.setTag(field.getDataElement());
+        view.setContentDescription(field.getDataElement());
 
         return view;
     }
@@ -298,6 +299,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             holders.get(i).editText.setText(fields.get(i).getValue());
             holders.get(i).editText.setSelectAllOnFocus(true);
             holders.get(i).editText.clearFocus();
+            holders.get(i).editText.setContentDescription(fields.get(i).getCategoryOptionCombo());
 
             IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
 
