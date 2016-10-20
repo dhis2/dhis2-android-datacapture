@@ -27,7 +27,8 @@ import java.util.ArrayList;
  */
 public class SendSmsProcessor {
     public static final String TAG = SendSmsProcessor.class.getSimpleName();
-    private static String receiptOfFormKey = "rof";
+    private static final String receiptOfFormKey = "rof";
+    private static final String separator = "=";
 
     public static void send (Context context, DatasetInfoHolder info, ArrayList<Group> groups){
         String data = prepareContent(groups);
@@ -51,15 +52,15 @@ public class SendSmsProcessor {
         for (Group group : submissionData) {
             for (Field field : group.getFields()) {
                 if(!field.getValue().equals("")) {
-                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2)+"=";
-                    message += field.getValue()+",";
+                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2)+ separator;
+                    message += field.getValue()+"|";
 
                 }
             }
         }
 
         //Fill out submission method as SMS.
-        message += receiptOfFormKey+"="+Constants.SMS_SUBMISSION;
+        message += receiptOfFormKey+ separator +Constants.SMS_SUBMISSION;
 
         return message;
     }
