@@ -100,7 +100,7 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
             String year = checkDate.year().getAsString();
             String cWeekNumber = checkDate.weekOfWeekyear().getAsString();
             String cDate = checkDate.toString();
-            String nDate = checkDate.plusWeeks(1).toString();
+            String nDate = checkDate.plusDays(6).toString();
 
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
