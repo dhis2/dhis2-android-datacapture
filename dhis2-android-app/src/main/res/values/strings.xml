@@ -36,6 +36,12 @@
     <string name="log_out">Log out</string>
     <string name="save">Save</string>
 
+    <string name="list_view_header_title">Disease/Condition/Event</string>
+    <string name="list_view_header_under_5_title">Under Five</string>
+    <string name="list_view_header_case_title">Case</string>
+    <string name="list_view_header_death_title">Death</string>
+    <string name="list_view_header_over_5_title">Over Five</string>
+
     <!-- account -->
     <string name="first_name">First name</string>
     <string name="surname">Surname</string>
@@ -117,10 +123,5 @@
     <string name="delete_disease_dialog_title">Delete disease?</string>
     <string name="delete_disease_dialog_confirmation">OK</string>
     <string name="delete_disease_dialog_rejection">Cancel</string>
-    <string name="list_view_header_title">Disease/Condition/Event</string>
-    <string name="list_view_header_under_5_title">Under Five</string>
-    <string name="list_view_header_case_title">Case</string>
-    <string name="list_view_header_death_title">Death</string>
-    <string name="list_view_header_over_5_title">Over Five</string>
 
 </resources>
