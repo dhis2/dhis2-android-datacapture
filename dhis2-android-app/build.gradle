@@ -72,6 +72,7 @@ dependencies {
     //Mock Web Server
     androidTestCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
 
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta1'
 }
 
 
