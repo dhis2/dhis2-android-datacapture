@@ -212,7 +212,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
             toolbar.setTitle(infoHolder.getOrgUnitLabel());
-            toolbar.setSubtitle(infoHolder.getPeriodLabel().substring(0,3));
+            String weekNumber = getString(R.string.toolbar_week_prefix) +" "+ infoHolder.getPeriodLabel().substring(1,3);
+            toolbar.setSubtitle(weekNumber);
         }
     }
 
