@@ -32,6 +32,7 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
@@ -48,7 +49,6 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
-import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.IsDisabled;
 import org.dhis2.mobile.utils.ViewUtils;
 
@@ -169,9 +169,31 @@ public class PosOrZeroIntegerRow2 implements Row {
                     if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
                         setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
+                    //Highlight disease label if all fields have a value meaning the row is complete.
+                    highlightLabelIfIsRowComplete(context, editTextHolders, editTextHolders.get(finalI));
                 }
             });
         }
+    }
+
+    private void highlightLabelIfIsRowComplete(Context context, ArrayList<EditTextHolder> editTextHolders, EditTextHolder editTextHolder){
+        if(isRowComplete(editTextHolders)){
+            editTextHolder.textLabel.setTextColor(ContextCompat.getColor(context, R.color.disease_label_highlight));
+        }else{
+            editTextHolder.textLabel.setTextColor(ContextCompat.getColor(context, R.color.disease_label_default));
+        }
+    }
+
+    private Boolean isRowComplete(ArrayList<EditTextHolder> editTextHolders){
+
+        //Check for empty fields.
+        for(EditTextHolder holder: editTextHolders){
+            if(holder.editText.getText().toString().equals("")){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void setupValidations(EditTextHolder editTextHolder, final ArrayList<EditTextHolder> editTextHolders, int currentIndex, Context context){

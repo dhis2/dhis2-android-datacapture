@@ -21,5 +21,8 @@
     
     <color name="upload_button_state_unpressed">#C01f70c3</color>
     <color name="upload_button_state_pressed">#C01d5288</color>
+
+    <color name="disease_label_default">#808080</color>
+    <color name="disease_label_highlight">@color/actionbar_blue</color>
     
 </resources>
