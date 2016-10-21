@@ -132,6 +132,12 @@ public class ReportUploadProcessor {
             values.add(jField);
         }
 
+        //Fill out submission method
+        JsonObject jField = new JsonObject();
+        jField.addProperty(Field.DATA_ELEMENT, Constants.RECEIPT_OF_FORM);
+        jField.addProperty(Field.VALUE, Constants.INTERNET_SUBMISSION);
+        values.add(jField);
+
 
         // Retrieve current date
         LocalDate currentDate = new LocalDate();
