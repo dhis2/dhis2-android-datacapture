@@ -77,7 +77,6 @@ public class FieldAdapter extends BaseAdapter {
     private IsCritical isCritical;
     private IsAdditionalDisease isAdditionalDisease;
     private Map<String, Map<String, PosOrZeroIntegerRow2>> additionalDiseasesRows = new HashMap<>();
-    private LongTextRow commentRow;
 
 
     public FieldAdapter(Group group, Context context) {
@@ -99,9 +98,7 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.TEXT.name())) {
                 rows.add(new TextRow(inflater, field));
             } else if (field.getType().equals(RowTypes.LONG_TEXT.name())) {
-                if(field.getDataElement().equals(Constants.COMMENT_FIELD)){
-                    commentRow =new LongTextRow(inflater, field);
-                }else {
+                if(!field.getDataElement().equals(Constants.COMMENT_FIELD)){
                     rows.add(new LongTextRow(inflater, field));
                 }
             } else if (field.getType().equals(RowTypes.NUMBER.name())) {
@@ -141,9 +138,6 @@ public class FieldAdapter extends BaseAdapter {
                 }
             }
         }
-
-        //Add comment field to the bottom of the list.
-        this.rows.add(commentRow);
 
     }
 
@@ -207,9 +201,7 @@ public class FieldAdapter extends BaseAdapter {
             }
         }
 
-        //Add field to one before the bottom of the list so that the comment field is always last.
-        int lastDisease = this.rows.size() -1;
-        this.rows.add(lastDisease, new PosOrZeroIntegerRow2(inflater, additionalDiseaseFields,false, true));
+        this.rows.add(new PosOrZeroIntegerRow2(inflater, additionalDiseaseFields,false, true));
         notifyDataSetChanged();
     }
 
