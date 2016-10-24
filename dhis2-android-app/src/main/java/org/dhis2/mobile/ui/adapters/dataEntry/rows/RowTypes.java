@@ -41,7 +41,8 @@ public enum RowTypes {
     TRUE_ONLY,
     DATE,
     AUTO_COMPLETE,
-    GENDER
+    GENDER,
+    LABEL
 }
 
 

@@ -48,8 +48,8 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
-import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.IsDisabled;
+import org.dhis2.mobile.utils.IsMalaria;
 import org.dhis2.mobile.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -133,6 +133,8 @@ public class PosOrZeroIntegerRow2 implements Row {
 
         view.setTag(field.getDataElement());
         view.setContentDescription(field.getDataElement());
+
+        adjustViewIfMalariaRelated(view, holders);
 
         return view;
     }
@@ -384,6 +386,21 @@ public class PosOrZeroIntegerRow2 implements Row {
             ViewUtils.enableViews(criticalDiseaseIcon);
         }else{
             ViewUtils.hideAndDisableViews(criticalDiseaseIcon);
+        }
+    }
+
+    private void adjustViewIfMalariaRelated(View view, ArrayList<EditTextHolder> holders){
+        //Offset the view to the left by 30dp if field is related to or is malaria. Why? Because design.
+        if(IsMalaria.check(field.getDataElement())){
+            view.setX(30);
+            //compensate for offset by adjusting the padding on the right.
+            view.setPadding(8,8,85,8);
+            //Reduce alpha to differentiate malaria labels.
+            holders.get(0).textLabel.setAlpha(0.8f);
+        }else{
+            view.setX(0);
+            view.setPadding(8,8,40,8);
+            holders.get(0).textLabel.setAlpha(1.0f);
         }
     }
 
