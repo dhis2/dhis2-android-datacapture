@@ -37,10 +37,10 @@
     <string name="save">Save</string>
 
     <string name="list_view_header_title">Disease/Condition/Event</string>
-    <string name="list_view_header_under_5_title">Under Five</string>
-    <string name="list_view_header_case_title">Case</string>
-    <string name="list_view_header_death_title">Death</string>
-    <string name="list_view_header_over_5_title">Over Five</string>
+    <string name="list_view_header_under_5_title">&lt; 5 Years old</string>
+    <string name="list_view_header_case_title">Cases</string>
+    <string name="list_view_header_death_title">Deaths</string>
+    <string name="list_view_header_over_5_title">&gt; 5 Years old</string>
 
     <!-- account -->
     <string name="first_name">First name</string>
