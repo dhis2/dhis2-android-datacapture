@@ -133,6 +133,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
         view.setTag(field.getDataElement());
         view.setContentDescription(field.getDataElement());
+        highlightLabelIfIsRowComplete(view.getContext(), holders, holders.get(0));
 
         return view;
     }
