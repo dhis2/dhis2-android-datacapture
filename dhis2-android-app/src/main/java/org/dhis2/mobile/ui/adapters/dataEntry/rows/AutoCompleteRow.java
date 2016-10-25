@@ -70,7 +70,7 @@ public class AutoCompleteRow implements Row {
     }
 
     @Override
-    public View getView(View convertView) {
+    public View getView(int position, View convertView) {
         View view;
         AutoCompleteRowHolder holder;
 

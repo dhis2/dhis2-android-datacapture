@@ -165,7 +165,7 @@ public class FieldAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return rows.get(position).getView(convertView);
+        return rows.get(position).getView(position, convertView);
     }
 
     public String getLabel() {
