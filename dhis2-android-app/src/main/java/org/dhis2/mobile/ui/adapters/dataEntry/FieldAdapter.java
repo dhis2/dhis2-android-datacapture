@@ -78,9 +78,9 @@ public class FieldAdapter extends BaseAdapter {
     private IsAdditionalDisease isAdditionalDisease;
     private Map<String, Map<String, PosOrZeroIntegerRow2>> additionalDiseasesRows = new HashMap<>();
 
+
     public FieldAdapter(Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
-        Collections.sort(fields, Field.COMPARATOR);
         ArrayList<Field> groupedFields = new ArrayList<Field>();
         String previousFieldId = "";
         this.group = group;
@@ -97,7 +97,9 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.TEXT.name())) {
                 rows.add(new TextRow(inflater, field));
             } else if (field.getType().equals(RowTypes.LONG_TEXT.name())) {
-                rows.add(new LongTextRow(inflater, field));
+                if(!field.getDataElement().equals(Constants.COMMENT_FIELD)){
+                    rows.add(new LongTextRow(inflater, field));
+                }
             } else if (field.getType().equals(RowTypes.NUMBER.name())) {
                 rows.add(new NumberRow(inflater, field));
             } else if (field.getType().equals(RowTypes.INTEGER.name())) {
@@ -165,7 +167,7 @@ public class FieldAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return rows.get(position).getView(convertView);
+        return rows.get(position).getView(position, convertView);
     }
 
     public String getLabel() {
