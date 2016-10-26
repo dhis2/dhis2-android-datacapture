@@ -189,7 +189,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
         //Check for empty fields.
         for(EditTextHolder holder: editTextHolders){
-            if(holder.editText.getText().toString().equals("")){
+            if(holder.editText.getText().toString().equals("") && holder.editText.isEnabled()){
                 return false;
             }
         }
