@@ -61,9 +61,9 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.Row;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.RowTypes;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.TextRow;
+import org.dhis2.mobile.utils.DiseaseGroupLabels;
 import org.dhis2.mobile.utils.IsAdditionalDisease;
 import org.dhis2.mobile.utils.IsCritical;
-import org.dhis2.mobile.utils.IsMalaria;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.util.ArrayList;
@@ -79,7 +79,9 @@ public class FieldAdapter extends BaseAdapter {
     private IsCritical isCritical;
     private IsAdditionalDisease isAdditionalDisease;
     private Map<String, Map<String, PosOrZeroIntegerRow2>> additionalDiseasesRows = new HashMap<>();
-    private LabelRow malariaLabel;
+    private LabelRow diseaseLabel;
+    private DiseaseGroupLabels diseaseGroupLabels;
+    private ArrayList<String> labelsAdded = new ArrayList<>();
 
     public FieldAdapter(Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
@@ -92,7 +94,8 @@ public class FieldAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
         isCritical = new IsCritical(context);
         isAdditionalDisease = new IsAdditionalDisease(context);
-        malariaLabel = new LabelRow(inflater, Constants.MALARIA_LABEL_TEXT);
+        diseaseGroupLabels = new DiseaseGroupLabels(context);
+
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
             if (field.hasOptionSet()) {
@@ -248,10 +251,13 @@ public class FieldAdapter extends BaseAdapter {
             Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
             rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields,isCriticalDisease, isAnAdditionalDisease));
 
-            //check if field is related to malaria and and label malaria label if not already added.
-            if(IsMalaria.check(field.getDataElement())){
-                if(!rows.contains(malariaLabel)){
-                    rows.add(malariaLabel);
+            //handle diseases that belong to groups.
+            if(diseaseGroupLabels.hasGroup(field.getDataElement())){
+                String label = diseaseGroupLabels.getLabel(field.getDataElement());
+                diseaseLabel = new LabelRow(inflater, label);
+                if(!labelsAdded.contains(label)){
+                    rows.add(diseaseLabel);
+                    labelsAdded.add(label);
                 }
             }
 

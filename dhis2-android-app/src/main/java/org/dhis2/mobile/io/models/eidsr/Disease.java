@@ -12,13 +12,15 @@ public class Disease {
     private Boolean isCritical;
     private ArrayList<String> disabledFields;
     private Boolean isAdditional;
+    private String groupLabel;
 
-    public Disease(String label, String id, Boolean isCritical, Boolean isAdditional, ArrayList<String> disabledFields){
+    public Disease(String label, String id, Boolean isCritical, Boolean isAdditional, ArrayList<String> disabledFields, String groupLabel){
         this.label = label;
         this.id = id;
         this.isCritical = isCritical;
         this.disabledFields = disabledFields;
         this.isAdditional = isAdditional;
+        this.groupLabel = groupLabel;
     }
 
     public String getLabel(){
@@ -36,5 +38,6 @@ public class Disease {
     public Boolean isAdditionalDisease(){
         return isAdditional;
     }
+    public String getGroupLabel(){return this.groupLabel;}
 
 }

@@ -25,7 +25,6 @@ public class LabelRow implements Row {
         View view;
         TextView labelView;
 
-
         if (convertView == null) {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_label_row, null);
             labelView = (TextView) rowRoot.findViewById(R.id.text_label);
@@ -39,7 +38,7 @@ public class LabelRow implements Row {
 
        labelView.setText(label);
 
-        //Offset view 30dp from the left. Why? Because design.
+        //Offset view 30dp from the left.
         view.setX(30);
 
         return view;
@@ -49,4 +48,5 @@ public class LabelRow implements Row {
     public int getViewType(){
         return RowTypes.LABEL.ordinal();
     }
+
 }

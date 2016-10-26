@@ -48,8 +48,8 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
+import org.dhis2.mobile.utils.DiseaseGroupLabels;
 import org.dhis2.mobile.utils.IsDisabled;
-import org.dhis2.mobile.utils.IsMalaria;
 import org.dhis2.mobile.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -66,6 +66,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private final String defaultValue = "0";
     private Button deleteButton;
     private ImageView criticalDiseaseIcon;
+    private DiseaseGroupLabels diseaseGroupLabels;
 
 
 
@@ -114,6 +115,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         } else {
             view = convertView;
 
@@ -124,6 +126,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         }
 
 
@@ -134,7 +137,7 @@ public class PosOrZeroIntegerRow2 implements Row {
         view.setTag(field.getDataElement());
         view.setContentDescription(field.getDataElement());
 
-        adjustViewIfMalariaRelated(view, holders);
+        adjustViewIfGrouped(view, holders);
 
         return view;
     }
@@ -389,9 +392,9 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
     }
 
-    private void adjustViewIfMalariaRelated(View view, ArrayList<EditTextHolder> holders){
+    private void adjustViewIfGrouped(View view, ArrayList<EditTextHolder> holders){
         //Offset the view to the left by 30dp if field is related to or is malaria. Why? Because design.
-        if(IsMalaria.check(field.getDataElement())){
+        if(diseaseGroupLabels.hasGroup(field.getDataElement())){
             view.setX(30);
             //compensate for offset by adjusting the padding on the right.
             view.setPadding(8,8,85,8);

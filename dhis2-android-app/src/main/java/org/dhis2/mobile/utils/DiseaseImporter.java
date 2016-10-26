@@ -29,6 +29,7 @@ public class DiseaseImporter {
     private static final String IS_CRITICAL_FIELD = "isCritical";
     private static final String DISABLED_FIELDS = "disabledFields";
     private static final String IS_ADDITIONAL_DISEASE = "isAdditionalDisease";
+    private static final String GROUP_LABEL = "groupLabel";
 
 
     /**
@@ -83,7 +84,9 @@ public class DiseaseImporter {
                             entry.getValue().getAsJsonObject().get(ID).getAsString(),
                             entry.getValue().getAsJsonObject().get(IS_CRITICAL_FIELD).getAsBoolean(),
                             entry.getValue().getAsJsonObject().get(IS_ADDITIONAL_DISEASE).getAsBoolean(),
-                            disabledFieldsIds
+                            disabledFieldsIds,
+                            entry.getValue().getAsJsonObject().get(GROUP_LABEL).getAsString()
+
                     );
 
             mapOfDiseases.put(disease.getId(), disease);

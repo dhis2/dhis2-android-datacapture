@@ -3,175 +3,225 @@
     "id": "PcFw3MoOC94",
     "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
     "isCritical": false,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel": ""
   },
   "EIDSR-Severe malnutrition":{
     "id": "FHfwXBYnhhl",
     "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
     "isCritical":false,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Maternal deaths":{
     "id": "JyHy4B7myv9",
     "disabledFields": ["UNDER_FIVE_CASES", "UNDER_FIVE_DEATHS", "OVER_FIVE_CASES"],
     "isCritical": false,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Neonatal tetanus":{
     "id":"zSzK3FHsJOy",
     "disabledFields": ["OVER_FIVE_CASES", "OVER_FIVE_DEATHS"],
     "isCritical": false,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Acute flaccid paralysis":{
     "id": "ZybYDdwk3O2",
     "disabledFields":[],
     "isCritical": true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Acute viral hemorrhagic fever": {
     "id": "gqQhU8INQKw",
     "disabledFields":[],
     "isCritical":true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Cholera":{
     "id":"BR2cqsVasFd",
     "disabledFields":[],
     "isCritical": true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Dracunculiasis":{
     "id":"u67EkxdKDbQ",
     "disabledFields":[],
     "isCritical":true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Monkey pox": {
     "id": "FtexyU70UDV",
     "disabledFields":[],
     "isCritical":true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Plague": {
     "id": "dx9dXyT0Gt8",
     "disabledFields":[],
     "isCritical":true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Small pox": {
     "id": "dx9dXyT0Gt8",
     "disabledFields":[],
     "isCritical": true,
-    "isAdditionalDisease": false
+    "isAdditionalDisease": false,
+    "groupLabel":  ""
   },
   "EIDSR-Diabetes":{
     "id": "nPmRU2oQYGR",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Epilepsy":{
     "id": "m2D66oBDCaG",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Foodborne illness":{
     "id":"iHJsq3zGWvM",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Hypertension":{
     "id":"LQcqkOQpqXI",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Injuries (Road traffic Accidents)":{
     "id":"awBga0pRKHC",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Leprosy":{
     "id":"roJDKBmrcAR",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Lymphatic Filariasis":{
     "id":"JHTMpgA6tKx",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-New AIDS Cases":{
     "id":"TnUlk4wfZn6",
     "disabledFields":[],
     "isCritical": false,
-    "isAdditionalDisease": true
+    "isAdditionalDisease": true,
+    "groupLabel":  ""
   },
   "EIDSR-Noma (cancrum oris,stomatitis gangrenosa)": {
   "id":"Yv5YPbW1nSm",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Onchocerciasis":{
   "id":"aGcZn7tzrHi",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Rift Valley Fever (RVF)":{
   "id":"WpGaZjboso2",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Severe Acute Respiratory Infection/Syndrome":{
   "id":"MdtUwshSizB",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Sexual transmitted infection":{
   "id":"EtFHpEg4O5O",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Trachoma":{
   "id":"jqm7dL4WR9M",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Trapanosomiasis":{
   "id":"DzNUwdUSJnH",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Tuberculosis":{
   "id":"fmreXE7kfhh",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-West Nile Fever":{
   "id":"hce3vMg8Dgv",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
   },
   "EIDSR-Yaws":{
   "id":"zbMtKBOM5AZ",
   "disabledFields":[],
   "isCritical":false,
-  "isAdditionalDisease":true
+  "isAdditionalDisease":true,
+    "groupLabel":  ""
+  },
+  "EIDSR-Total Clinical Malaria cases":{
+    "id":"KnYtrL5s7vH",
+    "disabledFields":[],
+    "isCritical":false,
+    "isAdditionalDisease":false,
+    "groupLabel": "Malaria"
+  },
+  "EIDSR-Total Malaria tested":{
+    "id":"RZstMMX0Mnl",
+    "disabledFields":[],
+    "isCritical":false,
+    "isAdditionalDisease":false,
+    "groupLabel": "Malaria"
+  },
+  "EIDSR-Total Malaria positive	":{
+    "id":"wWScmbz9N2G",
+    "disabledFields":[],
+    "isCritical":false,
+    "isAdditionalDisease":false,
+    "groupLabel": "Malaria"
   }
 }
 
