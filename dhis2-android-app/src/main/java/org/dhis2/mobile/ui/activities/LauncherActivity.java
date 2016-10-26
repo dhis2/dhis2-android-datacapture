@@ -33,8 +33,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.PrefUtils;
+
+import io.fabric.sdk.android.Fabric;
 
 /* LauncherActivity is entry point in application */
 public class LauncherActivity extends AppCompatActivity {
@@ -42,6 +46,7 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_launcher);
 
         // JodaTime has to load a lot of data on initialization
