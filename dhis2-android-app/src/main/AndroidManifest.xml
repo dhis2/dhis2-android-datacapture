@@ -40,7 +40,7 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="675a9594416771c25d42f8d5fc0b21402f9ac800"
+            android:value="@string/crashlytics_id"
             />
     </application>
 
