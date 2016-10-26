@@ -77,10 +77,13 @@ dependencies {
     //Mock Web Server
     androidTestCompile 'com.squareup.okhttp:mockwebserver:2.7.5'
 
+
     //Crashlytics
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
+
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta1'
 
 }
 

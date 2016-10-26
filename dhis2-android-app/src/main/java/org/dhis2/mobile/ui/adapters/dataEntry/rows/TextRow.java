@@ -52,7 +52,7 @@ public class TextRow implements Row {
     }
 
     @Override
-    public View getView(View convertView) {
+    public View getView(int position, View convertView) {
         View view;
         EditTextHolder holder;
 
@@ -132,16 +132,18 @@ class EditTextWatcher implements TextWatcher {
 }
 
 class EditTextHolder {
+    final TextView numberLabel;
     final TextView textLabel;
     final EditText editText;
     final EditTextWatcher textWatcher;
     final Boolean isCasesField;
 
-    EditTextHolder(TextView textLabel, EditText editText, EditTextWatcher textWatcher, Boolean isCasesField) {
+    EditTextHolder(TextView numberLabel, TextView textLabel, EditText editText, EditTextWatcher textWatcher, Boolean isCasesField) {
         this.textLabel = textLabel;
         this.editText = editText;
         this.textWatcher = textWatcher;
         this.isCasesField = isCasesField;
+        this.numberLabel = numberLabel;
     }
 
 
@@ -150,6 +152,8 @@ class EditTextHolder {
         this.editText = editText;
         this.textWatcher = textWatcher;
         isCasesField = null;
+        numberLabel = null;
     }
+
 
 }
