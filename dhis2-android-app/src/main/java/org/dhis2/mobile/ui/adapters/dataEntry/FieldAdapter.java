@@ -78,6 +78,7 @@ public class FieldAdapter extends BaseAdapter {
     private IsAdditionalDisease isAdditionalDisease;
     private Map<String, Map<String, PosOrZeroIntegerRow2>> additionalDiseasesRows = new HashMap<>();
 
+
     public FieldAdapter(Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
         Collections.sort(fields, Field.COMPARATOR);
@@ -97,7 +98,9 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.TEXT.name())) {
                 rows.add(new TextRow(inflater, field));
             } else if (field.getType().equals(RowTypes.LONG_TEXT.name())) {
-                rows.add(new LongTextRow(inflater, field));
+                if(!field.getDataElement().equals(Constants.COMMENT_FIELD)){
+                    rows.add(new LongTextRow(inflater, field));
+                }
             } else if (field.getType().equals(RowTypes.NUMBER.name())) {
                 rows.add(new NumberRow(inflater, field));
             } else if (field.getType().equals(RowTypes.INTEGER.name())) {
