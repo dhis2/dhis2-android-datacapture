@@ -36,6 +36,8 @@
     <string name="log_out">Log out</string>
     <string name="save">Save</string>
 
+    <string name="toolbar_week_prefix">Week</string>
+
     <!-- account -->
     <string name="first_name">First name</string>
     <string name="surname">Surname</string>
