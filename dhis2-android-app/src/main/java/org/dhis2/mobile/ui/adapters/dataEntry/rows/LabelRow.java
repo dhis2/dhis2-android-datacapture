@@ -21,7 +21,7 @@ public class LabelRow implements Row {
         this.label = label;
     }
     @Override
-    public View getView(View convertView) {
+    public View getView(int position, View convertView) {
         View view;
         TextView labelView;
 

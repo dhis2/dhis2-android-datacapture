@@ -50,6 +50,7 @@ public class Constants {
     public static final String RECEIPT_OF_FORM = "drTNlzVEJP5";
     public static final String INTERNET_SUBMISSION = "Mobile_Internet";
     public static final String SMS_SUBMISSION = "Mobile_SMS";
+    public static final String COMMENT_FIELD = "S3rFf2qxuah";
 
     //Malaria
     public static final String MALARIA_LABEL_TEXT = "Malaria:";

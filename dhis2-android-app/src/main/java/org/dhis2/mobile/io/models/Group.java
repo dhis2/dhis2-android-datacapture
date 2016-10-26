@@ -83,4 +83,8 @@ public class Group implements Serializable, Parcelable {
     public ArrayList<Field> getFields() {
         return fields;
     }
+
+    public void addField(Field field){
+        this.fields.add(field);
+    }
 }
