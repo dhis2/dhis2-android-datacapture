@@ -80,7 +80,6 @@ public class FieldAdapter extends BaseAdapter {
 
     public FieldAdapter(Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
-        Collections.sort(fields, Field.COMPARATOR);
         ArrayList<Field> groupedFields = new ArrayList<Field>();
         String previousFieldId = "";
         this.group = group;
