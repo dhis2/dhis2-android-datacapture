@@ -81,7 +81,6 @@ public class FieldAdapter extends BaseAdapter {
 
     public FieldAdapter(Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
-        Collections.sort(fields, Field.COMPARATOR);
         ArrayList<Field> groupedFields = new ArrayList<Field>();
         String previousFieldId = "";
         this.group = group;
@@ -168,7 +167,7 @@ public class FieldAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return rows.get(position).getView(convertView);
+        return rows.get(position).getView(position, convertView);
     }
 
     public String getLabel() {
