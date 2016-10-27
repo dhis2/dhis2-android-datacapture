@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/card_background"
     android:padding="8dp">
 
     <TextView
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:textStyle="normal"
+        android:id="@+id/text_label_number"
+        android:padding="2dp"
+        android:layout_width="wrap_content"
+        />
+
+    <TextView
+        android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="16sp"
         android:id="@+id/text_label"
         android:padding="8dp"
-        android:layout_weight="4"
-        android:layout_width="match_parent" />
+        android:layout_width="wrap_content"
+        />
 
 </LinearLayout>

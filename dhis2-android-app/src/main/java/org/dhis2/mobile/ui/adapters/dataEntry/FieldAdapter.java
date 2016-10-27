@@ -67,7 +67,6 @@ import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -174,7 +173,7 @@ public class FieldAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return rows.get(position).getView(position, convertView);
+        return rows.get(position).getView(getAdjustedPosition(position), convertView);
     }
 
     public String getLabel() {
@@ -256,7 +255,7 @@ public class FieldAdapter extends BaseAdapter {
             //handle diseases that belong to groups.
             if(diseaseGroupLabels.hasGroup(field.getDataElement())){
                 String label = diseaseGroupLabels.getLabel(field.getDataElement());
-                diseaseLabel = new LabelRow(inflater, label);
+                diseaseLabel = new LabelRow(inflater, label, true);
                 if(!labelsAdded.contains(label)){
                     rows.add(diseaseLabel);
                     labelsAdded.add(label);
@@ -276,6 +275,31 @@ public class FieldAdapter extends BaseAdapter {
                     new PosOrZeroIntegerRow2(inflater, groupedFields,false, isAnAdditionalDisease));
 
         }
+    }
+
+
+    /**
+     * Checks whether a labelRow has been added at a position prior to the current on provided
+     * If so it then checks the size of that group and returns it.
+     * @param position int
+     * @return int The size of a group with a specific label.
+     */
+    private int getPositionDifference(int position){
+        int size = 0;
+        int i = 0;
+            for(Row row: this.rows) {
+                if (row instanceof LabelRow && position > i) {
+                    LabelRow rowAdded = (LabelRow) this.rows.get(i);
+                    size += diseaseGroupLabels.getGroupSize(rowAdded.label);
+                }
+                i++;
+            }
+        return size;
+    }
+
+    //Returns position of a view after adjusting for groups. **Grouped views are treated as one.**
+    private int getAdjustedPosition(int position){
+        return position - getPositionDifference(position);
     }
 
 }

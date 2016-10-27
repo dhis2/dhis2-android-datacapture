@@ -36,4 +36,17 @@ public class DiseaseGroupLabels {
         }
         return label;
     }
+
+    public int getGroupSize(String label){
+        int count = 0;
+
+        assert diseases != null;
+        for (Object key : diseases.keySet()) {
+            Disease disease = (Disease) diseases.get(key);
+            if(disease.getGroupLabel().equals(label)){
+                count++;
+            }
+        }
+        return count;
+    }
 }

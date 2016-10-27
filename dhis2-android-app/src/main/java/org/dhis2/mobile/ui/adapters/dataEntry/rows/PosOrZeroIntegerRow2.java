@@ -140,6 +140,8 @@ public class PosOrZeroIntegerRow2 implements Row {
         highlightLabelIfIsRowComplete(view.getContext(), holders, holders.get(0));
 
         adjustViewIfGrouped(view, holders);
+        hidePositionIfGroupedOrAdditional(holders.get(0));
+
 
         return view;
     }
@@ -432,5 +434,14 @@ public class PosOrZeroIntegerRow2 implements Row {
             holders.get(0).textLabel.setAlpha(1.0f);
         }
     }
+
+    private void hidePositionIfGroupedOrAdditional(EditTextHolder holder){
+        if(diseaseGroupLabels.hasGroup(field.getDataElement()) || isAdditionalDisease){
+            ViewUtils.hideAndDisableViews(holder.numberLabel);
+        }else{
+            ViewUtils.enableViews(holder.numberLabel);
+        }
+    }
+
 
 }
