@@ -77,6 +77,12 @@ public class DiseaseImporter {
                 }
 
             }
+            String group;
+            if(entry.getValue().getAsJsonObject().get(GROUP_LABEL) != null){
+                group = entry.getValue().getAsJsonObject().get(GROUP_LABEL).getAsString();
+            }else{
+                group ="";
+            }
             //Create a new disease object
             Disease disease =
                     new Disease(
@@ -85,7 +91,7 @@ public class DiseaseImporter {
                             entry.getValue().getAsJsonObject().get(IS_CRITICAL_FIELD).getAsBoolean(),
                             entry.getValue().getAsJsonObject().get(IS_ADDITIONAL_DISEASE).getAsBoolean(),
                             disabledFieldsIds,
-                            entry.getValue().getAsJsonObject().get(GROUP_LABEL).getAsString()
+                            group
 
                     );
 
