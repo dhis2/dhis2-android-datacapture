@@ -39,6 +39,7 @@ import android.util.Log;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
+import org.dhis2.mobile.processors.CompulsoryDataProcessor;
 import org.dhis2.mobile.processors.FormsDownloadProcessor;
 import org.dhis2.mobile.processors.LoginProcessor;
 import org.dhis2.mobile.processors.MyProfileProcessor;
@@ -65,6 +66,7 @@ public class WorkService extends Service {
     public static final String METHOD_OFFLINE_DATA_UPLOAD = "offlineDataUploading";
     public static final String METHOD_REMOVE_ALL_DATA = "removeAllData";
     public static final String METHOD_SEND_VIA_SMS = "sendViaSms";
+    public static final String METHOD_DOWNLOAD_COMPULSORY_DATA = "downloadCompulsoryData";
 
     // maximum number of threads in thread pool
     private static final int QUANTITY_OF_THREADS = 3;
@@ -171,6 +173,10 @@ public class WorkService extends Service {
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             ArrayList<Group> groups = extras.getParcelableArrayList(Group.TAG);
             SendSmsProcessor.send(context, info, groups);
+        }
+        if(METHOD_DOWNLOAD_COMPULSORY_DATA.equals(methodName)){
+            DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
+            CompulsoryDataProcessor.download(context, info);
         }
     }
 

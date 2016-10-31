@@ -126,4 +126,8 @@
     <string name="delete_disease_dialog_confirmation">OK</string>
     <string name="delete_disease_dialog_rejection">Cancel</string>
 
+    <!-- Compulsory Data -->
+    <string name="compulsory_data_dialog_title">Compulsory Data</string>
+    <string name="compulsory_data_dialog_message">Submission of the form with blank fields is not possible.</string>
+    <string name="compulsory_data_dialog_confirmation">OK</string>
 </resources>

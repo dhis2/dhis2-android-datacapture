@@ -44,9 +44,12 @@ import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
+import org.dhis2.mobile.processors.CompulsoryDataProcessor;
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
 import org.dhis2.mobile.ui.fragments.AdditionalDiseasesFragment;
+import org.dhis2.mobile.utils.IsDisabled;
+import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
@@ -66,6 +69,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static final String STATE_REPORT = "state:report";
     private static final String STATE_DOWNLOAD_ATTEMPTED = "state:downloadAttempted";
     private static final String STATE_DOWNLOAD_IN_PROGRESS = "state:downloadInProgress";
+
+    private String compulsoryData;
 
     // loader ids
     private static final int LOADER_FORM_ID = 896927645;
@@ -89,6 +94,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     //delete disease alert dialog
     private AlertDialog deleteDiseaseDialog;
+    //compulsory disease alert dialog;
+    private AlertDialog compulsoryDataDialog;
 
     // key for additional diseases that have been displayed on the list.
     public static final String ALREADY_DISPLAYED = "alreadyDisplayed";
@@ -96,6 +103,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private Map additionalDiseaseIds = new HashMap();
 
     private EditText commentField;
+    private IsDisabled isDisabled;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -126,6 +134,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupUploadButton();
         setupAddDiseaseBtn();
         setupDeleteDialog();
+        setupCompulsoryFieldsDialog();
+        isDisabled = new IsDisabled(getApplicationContext());
 
         // let's try to get latest values from API
         attemptToDownloadReport(savedInstanceState);
@@ -309,6 +319,24 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         deleteDiseaseDialog.show();
     }
 
+    private void setupCompulsoryFieldsDialog(){
+        compulsoryDataDialog = new AlertDialog.Builder(this).create();
+    }
+
+    private void showCompulsoryFieldsDialog(){
+        compulsoryDataDialog.setTitle(getResources().getString(R.string.compulsory_data_dialog_title));
+        compulsoryDataDialog.setMessage(getResources().getString(R.string.compulsory_data_dialog_message));
+        compulsoryDataDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.compulsory_data_dialog_confirmation),
+                new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                compulsoryDataDialog.dismiss();
+            }
+        });
+        compulsoryDataDialog.setCanceledOnTouchOutside(false);
+        compulsoryDataDialog.show();
+    }
+
     private void attemptToDownloadReport(Bundle savedInstanceState) {
         // first, we need to check if previous instances of
         // activities already tried to download values
@@ -323,6 +351,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             // we need to check if connection is there first
             if (NetworkUtils.checkConnection(this)) {
                 getLatestValues();
+                getCompulsoryData();
+            }else{
+                compulsoryData = PrefUtils.getCompulsoryData(getApplicationContext(), infoHolder.getFormId());
             }
         }
     }
@@ -444,10 +475,26 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         intent.putExtra(DatasetInfoHolder.TAG, info);
         intent.putExtra(Group.TAG, groups);
 
-        startService(intent);
-        finish();
+        if(isInvalidForm(groups)){
+            showCompulsoryFieldsDialog();
+        }else {
+            startService(intent);
+            finish();
+        }
 
 
+    }
+
+    private Boolean isInvalidForm(ArrayList<Group> groups){
+        for(Group group: groups){
+            for(Field field : group.getFields()){
+                if(compulsoryData != null && compulsoryData.contains(field.getDataElement()) && !isDisabled.check(field)
+                        && field.getValue().equals("")){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void getLatestValues() {
@@ -460,6 +507,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         Intent intent = new Intent(this, WorkService.class);
         intent.putExtra(WorkService.METHOD,
                 WorkService.METHOD_DOWNLOAD_LATEST_DATASET_VALUES);
+        intent.putExtra(DatasetInfoHolder.TAG, info);
+        startService(intent);
+    }
+
+    private void getCompulsoryData(){
+        DatasetInfoHolder info = getIntent().getExtras()
+                .getParcelable(DatasetInfoHolder.TAG);
+        Intent intent = new Intent(this, WorkService.class);
+        intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_COMPULSORY_DATA);
         intent.putExtra(DatasetInfoHolder.TAG, info);
         startService(intent);
     }
@@ -487,6 +543,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                         loadGroupsIntoAdapters(form.getGroups());
                         setupCommentRowAsFooter(form);
                     }
+                }
+
+                if(intent.getExtras().containsKey(CompulsoryDataProcessor.COMPULSORY_DATA)){
+                    compulsoryData = intent.getExtras().getString(CompulsoryDataProcessor.COMPULSORY_DATA);
                 }
             }
             //if not check if intent was called from a row in the listView. Meaning that the delete button was clicked.
@@ -661,7 +721,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     dataEntryListView.addFooterView(footer, null, false);
                     TextView label = (TextView) footer.findViewById(R.id.text_label);
                     label.setText(title);
-                    commentField = (EditText) footer.findViewById(R.id.edit_long_text_row);
+                    commentField = (EditText) findViewById(R.id.edit_long_text_row);
                     commentField.setText(field.getValue());
                 }
             }
@@ -670,9 +730,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void addFooterCommentToGroup(Group group){
         Field comment = new Field();
-        comment.setDataElement(Constants.COMMENT_FIELD);
-        comment.setValue(commentField.getText().toString());
-        dataEntryListView.findViewById(R.id.edit_long_text_row);
-        group.addField(comment);
+        if(commentField != null) {
+            comment.setDataElement(Constants.COMMENT_FIELD);
+            comment.setValue(commentField.getText().toString());
+            dataEntryListView.findViewById(R.id.edit_long_text_row);
+            group.addField(comment);
+        }
     }
 }
