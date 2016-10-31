@@ -46,5 +46,6 @@ public class URLConstants {
 	public static final String PERIOD_PARAM = "&pe=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
 
-	public static final String DATA_STORE = "api/dataStore/eidsr/compulsory";
+	public static final String DATA_STORE = "api/dataStore";
+	public static final String COMPULSORY_URL = "compulsory";
 }

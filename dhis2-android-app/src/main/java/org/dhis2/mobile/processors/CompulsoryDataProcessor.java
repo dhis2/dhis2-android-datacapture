@@ -20,7 +20,7 @@ public class CompulsoryDataProcessor {
     public static String COMPULSORY_DATA = "compulsoryData";
 
     public static void download(Context context, DatasetInfoHolder info){
-        String url  = buildUrl(context);
+        String url  = buildUrl(context, info);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
 
@@ -33,9 +33,9 @@ public class CompulsoryDataProcessor {
         }
     }
 
-    private static String buildUrl(Context context){
+    private static String buildUrl(Context context, DatasetInfoHolder info){
         String server = PrefUtils.getServerURL(context);
-        return server + URLConstants.DATA_STORE;
+        return server + URLConstants.DATA_STORE + "/" +info.getFormId() + "/" + URLConstants.COMPULSORY_URL ;
     }
 
     private static void saveDataset(Context context, String data, DatasetInfoHolder info) {
