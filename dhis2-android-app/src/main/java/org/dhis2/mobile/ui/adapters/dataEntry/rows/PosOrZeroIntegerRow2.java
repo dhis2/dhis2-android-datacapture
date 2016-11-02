@@ -32,6 +32,7 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
@@ -48,7 +49,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
-import org.dhis2.mobile.utils.IsCritical;
+import org.dhis2.mobile.utils.DiseaseGroupLabels;
 import org.dhis2.mobile.utils.IsDisabled;
 import org.dhis2.mobile.utils.ViewUtils;
 
@@ -66,6 +67,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private final String defaultValue = "0";
     private Button deleteButton;
     private ImageView criticalDiseaseIcon;
+    private DiseaseGroupLabels diseaseGroupLabels;
 
 
 
@@ -80,7 +82,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     }
 
     @Override
-    public View getView(View convertView) {
+    public View getView(int position, View convertView) {
         View view;
 
         ArrayList<EditTextHolder> holders = new ArrayList<>();
@@ -114,6 +116,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         } else {
             view = convertView;
 
@@ -124,14 +127,21 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         }
 
 
-        setupEditTextHolders(holders, fields, view);
+        setupEditTextHolders(holders, fields, view, position);
 
         setOnFocusChangeListeners(holders, view.getContext());
 
         view.setTag(field.getDataElement());
+        view.setContentDescription(field.getDataElement());
+        highlightLabelIfIsRowComplete(view.getContext(), holders, holders.get(0));
+
+        adjustViewIfGrouped(view, holders);
+        hidePositionIfGroupedOrAdditional(holders.get(0));
+
 
         return view;
     }
@@ -168,9 +178,31 @@ public class PosOrZeroIntegerRow2 implements Row {
                     if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
                         setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
+                    //Highlight disease label if all fields have a value meaning the row is complete.
+                    highlightLabelIfIsRowComplete(context, editTextHolders, editTextHolders.get(finalI));
                 }
             });
         }
+    }
+
+    private void highlightLabelIfIsRowComplete(Context context, ArrayList<EditTextHolder> editTextHolders, EditTextHolder editTextHolder){
+        if(isRowComplete(editTextHolders)){
+            editTextHolder.textLabel.setTextColor(ContextCompat.getColor(context, R.color.disease_label_highlight));
+        }else{
+            editTextHolder.textLabel.setTextColor(ContextCompat.getColor(context, R.color.disease_label_default));
+        }
+    }
+
+    private Boolean isRowComplete(ArrayList<EditTextHolder> editTextHolders){
+
+        //Check for empty fields.
+        for(EditTextHolder holder: editTextHolders){
+            if(holder.editText.getText().toString().equals("") && holder.editText.isEnabled()){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void setupValidations(EditTextHolder editTextHolder, final ArrayList<EditTextHolder> editTextHolders, int currentIndex, Context context){
@@ -263,6 +295,7 @@ public class PosOrZeroIntegerRow2 implements Row {
      */
     private void initializeEditTextHolders(ArrayList<EditText> editTexts, ArrayList<Field> fields, ViewGroup rowRoot, final ArrayList<EditTextHolder> holders){
         TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
+        TextView diseaseNumber = (TextView) rowRoot.findViewById(R.id.diseaseNumber);
 
         ArrayList<Integer> tagsIds = new ArrayList<>();
         tagsIds.add(R.id.TAG_HOLDER1_ID);
@@ -274,7 +307,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             editTexts.get(i).setFilters(new InputFilter[]{new InpFilter()});
             EditTextWatcher watcher = new EditTextWatcher(fields.get(i));
             editTexts.get(i).addTextChangedListener(watcher);
-            holders.add(new EditTextHolder(label, editTexts.get(i), watcher, isCasesField(fields.get(i))));
+            holders.add(new EditTextHolder(diseaseNumber, label, editTexts.get(i), watcher, isCasesField(fields.get(i))));
             rowRoot.setTag(tagsIds.get(i), holders.get(i));
         }
     }
@@ -287,17 +320,19 @@ public class PosOrZeroIntegerRow2 implements Row {
      * @param fields ArrayList<Field>
      * @param view View
      */
-    private void setupEditTextHolders(ArrayList<EditTextHolder> holders, ArrayList<Field> fields, View view){
+    private void setupEditTextHolders(ArrayList<EditTextHolder> holders, ArrayList<Field> fields, View view, int position){
         for(int i = 0; i < holders.size(); i++){
             String[] label = fields.get(i).getLabel().split(PREFIX);
 
             setupDeleteButton(view);
+            holders.get(i).numberLabel.setText(String.valueOf(position+1));
             holders.get(i).textLabel.setText(label[0].substring(6));
             holders.get(i).textWatcher.setField(fields.get(i));
             holders.get(i).editText.addTextChangedListener(holders.get(i).textWatcher);
             holders.get(i).editText.setText(fields.get(i).getValue());
             holders.get(i).editText.setSelectAllOnFocus(true);
             holders.get(i).editText.clearFocus();
+            holders.get(i).editText.setContentDescription(fields.get(i).getCategoryOptionCombo());
 
             IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
 
@@ -384,5 +419,29 @@ public class PosOrZeroIntegerRow2 implements Row {
             ViewUtils.hideAndDisableViews(criticalDiseaseIcon);
         }
     }
+
+    private void adjustViewIfGrouped(View view, ArrayList<EditTextHolder> holders){
+        //Offset the view to the left by 30dp if field is related to or is malaria. Why? Because design.
+        if(diseaseGroupLabels.hasGroup(field.getDataElement())){
+            view.setX(30);
+            //compensate for offset by adjusting the padding on the right.
+            view.setPadding(8,8,85,8);
+            //Reduce alpha to differentiate malaria labels.
+            holders.get(0).textLabel.setAlpha(0.8f);
+        }else{
+            view.setX(0);
+            view.setPadding(8,8,40,8);
+            holders.get(0).textLabel.setAlpha(1.0f);
+        }
+    }
+
+    private void hidePositionIfGroupedOrAdditional(EditTextHolder holder){
+        if(diseaseGroupLabels.hasGroup(field.getDataElement()) || isAdditionalDisease){
+            ViewUtils.hideAndDisableViews(holder.numberLabel);
+        }else{
+            ViewUtils.enableViews(holder.numberLabel);
+        }
+    }
+
 
 }

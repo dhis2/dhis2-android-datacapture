@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -18,12 +19,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -106,6 +110,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public static final String ALREADY_DISPLAYED = "alreadyDisplayed";
 
     private Map additionalDiseaseIds = new HashMap();
+
+    private EditText commentField;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -228,7 +234,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
             toolbar.setTitle(infoHolder.getOrgUnitLabel());
-            toolbar.setSubtitle(infoHolder.getPeriodLabel().substring(0,3));
+            String weekNumber = getString(R.string.toolbar_week_prefix) +" "+ infoHolder.getPeriodLabel().substring(1,3);
+            toolbar.setSubtitle(weekNumber);
         }
     }
 
@@ -475,6 +482,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             for (FieldAdapter adapter : adapters) {
                 groups.add(adapter.getGroup());
             }
+
+            //Add the comment in list view footer to group data.
+            addFooterCommentToGroup(groups.get(0));
 
             DatasetInfoHolder info = getIntent().getExtras()
                     .getParcelable(DatasetInfoHolder.TAG);
@@ -769,4 +779,30 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         }
     }
 
+    private void setupCommentRowAsFooter(Form form){
+        String backgroundColor = "#E0ECEA";
+        final String title = "Comment";
+        for(Group group : form.getGroups()){
+            for(Field field: group.getFields()){
+                if(field.getDataElement().equals(Constants.COMMENT_FIELD)){
+                    LayoutInflater inflater = getLayoutInflater();
+                    ViewGroup footer = (ViewGroup)inflater.inflate(R.layout.listview_row_long_text, dataEntryListView, false);
+                    footer.setBackgroundColor(Color.parseColor(backgroundColor));
+                    dataEntryListView.addFooterView(footer, null, false);
+                    TextView label = (TextView) footer.findViewById(R.id.text_label);
+                    label.setText(title);
+                    commentField = (EditText) footer.findViewById(R.id.edit_long_text_row);
+                    commentField.setText(field.getValue());
+                }
+            }
+        }
+    }
+
+    private void addFooterCommentToGroup(Group group){
+        Field comment = new Field();
+        comment.setDataElement(Constants.COMMENT_FIELD);
+        comment.setValue(commentField.getText().toString());
+        dataEntryListView.findViewById(R.id.edit_long_text_row);
+        group.addField(comment);
+    }
 }

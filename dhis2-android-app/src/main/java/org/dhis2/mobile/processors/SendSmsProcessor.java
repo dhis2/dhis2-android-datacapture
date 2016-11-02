@@ -1,6 +1,8 @@
 package org.dhis2.mobile.processors;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.telephony.SmsManager;
@@ -14,6 +16,7 @@ import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.utils.KeyGenerator;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.SMSBroadcastReceiver;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.util.ArrayList;
@@ -27,13 +30,14 @@ import java.util.ArrayList;
  */
 public class SendSmsProcessor {
     public static final String TAG = SendSmsProcessor.class.getSimpleName();
+    private static final String receiptOfFormKey = "rof";
+    private static final String separator = "=";
 
     public static void send (Context context, DatasetInfoHolder info, ArrayList<Group> groups){
         String data = prepareContent(groups);
         //insert destination number
         sendSMS(context, Constants.SMS_NUMBER, data);
 
-        saveDataset(context, data, info);
 
     }
     private static String prepareContent(ArrayList<Group> submissionData){
@@ -50,12 +54,15 @@ public class SendSmsProcessor {
         for (Group group : submissionData) {
             for (Field field : group.getFields()) {
                 if(!field.getValue().equals("")) {
-                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2)+",";
-                    message += field.getValue()+",";
+                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2)+ separator;
+                    message += field.getValue()+"|";
 
                 }
             }
         }
+
+        //Fill out submission method as SMS.
+        message += receiptOfFormKey+ separator +Constants.SMS_SUBMISSION;
 
         return message;
     }
@@ -69,17 +76,21 @@ public class SendSmsProcessor {
     private static void sendSMS(final Context context, String phoneNumber, String message) {
         SmsManager sms = SmsManager.getDefault();
         ArrayList<String> parts = sms.divideMessage(message);
-        sms.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+        ArrayList<PendingIntent> sentMessagePIs = new ArrayList<>();
+        ArrayList<PendingIntent> deliveredMessagePIs = new ArrayList<>();
 
-        //Display a toast when the sms has been sent. A handler is used so as not to run on the main thread.
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
+        final PendingIntent sentPI = PendingIntent.getBroadcast(context, 0,
+                new Intent(SMSBroadcastReceiver.SEND_SMS_ACTION), 0);
 
-            @Override
-            public void run() {
-                Toast.makeText(context,"SMS sent!",Toast.LENGTH_SHORT).show();
-            }
-        });
+        final PendingIntent deliveredPI = PendingIntent.getBroadcast(context, 0,
+                new Intent(SMSBroadcastReceiver.DELIVERED_SMS_ACTION), 0);
+
+        for(String msg: parts){
+            sentMessagePIs.add(sentPI);
+            deliveredMessagePIs.add(deliveredPI);
+        }
+
+        sms.sendMultipartTextMessage(phoneNumber, null, parts, sentMessagePIs, deliveredMessagePIs);
 
     }
 

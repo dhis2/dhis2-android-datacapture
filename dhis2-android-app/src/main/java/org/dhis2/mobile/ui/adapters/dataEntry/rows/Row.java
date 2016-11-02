@@ -32,6 +32,6 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 import android.view.View;
 
 public interface Row {
-    public View getView(View convertView);
+    public View getView(int position, View convertView);
     public int getViewType();
 }

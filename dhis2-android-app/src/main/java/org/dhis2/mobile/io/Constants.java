@@ -46,7 +46,17 @@ public class Constants {
     public static final String OVER_FIVE_CASES = "jpmVF8rhBNA";
     public static final String OVER_FIVE_DEATHS = "Ciavs7v4qYa";
     public static final String UNDER_FIVE_DEATHS = "C5qLGpw4uet";
-    public static final String COMMAND_NAME = "command";
+    public static final String COMMAND_NAME = "idsr";
     public static final String RECEIPT_OF_FORM = "drTNlzVEJP5";
+    public static final String INTERNET_SUBMISSION = "Mobile_Internet";
+    public static final String SMS_SUBMISSION = "Mobile_SMS";
+    public static final String COMMENT_FIELD = "S3rFf2qxuah";
+
+    //Malaria
+    public static final String MALARIA_LABEL_TEXT = "Malaria:";
+    public static final String TOTAL_CLINICAL_MALARIA_CASES = "KnYtrL5s7vH";
+    public static final String TOTAL_MALARIA_TESTED = "RZstMMX0Mnl";
+    public static final String TOTAL_MALARIA_POSITIVE = "wWScmbz9N2G";
+
 
 }
