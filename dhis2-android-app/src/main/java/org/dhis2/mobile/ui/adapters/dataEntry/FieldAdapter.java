@@ -52,6 +52,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.CheckBoxRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.DatePickerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.GenderRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.IntegerRow;
+import org.dhis2.mobile.ui.adapters.dataEntry.rows.LabelRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.LongTextRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.NegativeIntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.NumberRow;
@@ -60,12 +61,12 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.Row;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.RowTypes;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.TextRow;
+import org.dhis2.mobile.utils.DiseaseGroupLabels;
 import org.dhis2.mobile.utils.IsAdditionalDisease;
 import org.dhis2.mobile.utils.IsCritical;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,6 +78,9 @@ public class FieldAdapter extends BaseAdapter {
     private IsCritical isCritical;
     private IsAdditionalDisease isAdditionalDisease;
     private Map<String, Map<String, PosOrZeroIntegerRow2>> additionalDiseasesRows = new HashMap<>();
+    private LabelRow diseaseLabel;
+    private DiseaseGroupLabels diseaseGroupLabels;
+    private ArrayList<String> labelsAdded = new ArrayList<>();
 
 
     public FieldAdapter(Group group, Context context) {
@@ -89,6 +93,8 @@ public class FieldAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
         isCritical = new IsCritical(context);
         isAdditionalDisease = new IsAdditionalDisease(context);
+        diseaseGroupLabels = new DiseaseGroupLabels(context);
+
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
             if (field.hasOptionSet()) {
@@ -167,7 +173,7 @@ public class FieldAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return rows.get(position).getView(position, convertView);
+        return rows.get(position).getView(getAdjustedPosition(position), convertView);
     }
 
     public String getLabel() {
@@ -246,6 +252,16 @@ public class FieldAdapter extends BaseAdapter {
             Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
             rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields,isCriticalDisease, isAnAdditionalDisease));
 
+            //handle diseases that belong to groups.
+            if(diseaseGroupLabels.hasGroup(field.getDataElement())){
+                String label = diseaseGroupLabels.getLabel(field.getDataElement());
+                diseaseLabel = new LabelRow(inflater, label, true);
+                if(!labelsAdded.contains(label)){
+                    rows.add(diseaseLabel);
+                    labelsAdded.add(label);
+                }
+            }
+
         }
         //check if its an additional disease and has values.
         if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0 && isAdditionalDisease.check(previousFieldId)
@@ -259,6 +275,31 @@ public class FieldAdapter extends BaseAdapter {
                     new PosOrZeroIntegerRow2(inflater, groupedFields,false, isAnAdditionalDisease));
 
         }
+    }
+
+
+    /**
+     * Checks whether a labelRow has been added at a position prior to the current on provided
+     * If so it then checks the size of that group and returns it.
+     * @param position int
+     * @return int The size of a group with a specific label.
+     */
+    private int getPositionDifference(int position){
+        int size = 0;
+        int i = 0;
+            for(Row row: this.rows) {
+                if (row instanceof LabelRow && position > i) {
+                    LabelRow rowAdded = (LabelRow) this.rows.get(i);
+                    size += diseaseGroupLabels.getGroupSize(rowAdded.label);
+                }
+                i++;
+            }
+        return size;
+    }
+
+    //Returns position of a view after adjusting for groups. **Grouped views are treated as one.**
+    private int getAdjustedPosition(int position){
+        return position - getPositionDifference(position);
     }
 
 }

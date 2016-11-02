@@ -49,6 +49,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
+import org.dhis2.mobile.utils.DiseaseGroupLabels;
 import org.dhis2.mobile.utils.IsDisabled;
 import org.dhis2.mobile.utils.ViewUtils;
 
@@ -67,6 +68,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private Button deleteButton;
     private ImageView criticalDiseaseIcon;
     private IsDisabled isDisabled;
+    private DiseaseGroupLabels diseaseGroupLabels;
 
 
 
@@ -116,6 +118,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
             isDisabled = new IsDisabled(view.getContext());
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         } else {
             view = convertView;
 
@@ -127,6 +130,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
             isDisabled = new IsDisabled(view.getContext());
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         }
 
 
@@ -137,6 +141,10 @@ public class PosOrZeroIntegerRow2 implements Row {
         view.setTag(field.getDataElement());
         view.setContentDescription(field.getDataElement());
         highlightLabelIfIsRowComplete(view.getContext(), holders, holders.get(0));
+
+        adjustViewIfGrouped(view, holders);
+        hidePositionIfGroupedOrAdditional(holders.get(0));
+
 
         return view;
     }
@@ -414,5 +422,29 @@ public class PosOrZeroIntegerRow2 implements Row {
             ViewUtils.hideAndDisableViews(criticalDiseaseIcon);
         }
     }
+
+    private void adjustViewIfGrouped(View view, ArrayList<EditTextHolder> holders){
+        //Offset the view to the left by 30dp if field is related to or is malaria. Why? Because design.
+        if(diseaseGroupLabels.hasGroup(field.getDataElement())){
+            view.setX(30);
+            //compensate for offset by adjusting the padding on the right.
+            view.setPadding(8,8,85,8);
+            //Reduce alpha to differentiate malaria labels.
+            holders.get(0).textLabel.setAlpha(0.8f);
+        }else{
+            view.setX(0);
+            view.setPadding(8,8,40,8);
+            holders.get(0).textLabel.setAlpha(1.0f);
+        }
+    }
+
+    private void hidePositionIfGroupedOrAdditional(EditTextHolder holder){
+        if(diseaseGroupLabels.hasGroup(field.getDataElement()) || isAdditionalDisease){
+            ViewUtils.hideAndDisableViews(holder.numberLabel);
+        }else{
+            ViewUtils.enableViews(holder.numberLabel);
+        }
+    }
+
 
 }

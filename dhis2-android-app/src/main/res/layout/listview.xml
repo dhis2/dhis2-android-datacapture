@@ -13,5 +13,5 @@
     android:paddingStart="0dp"
     android:paddingTop="0dp"
     android:scrollbarSize="5dp"
-    android:scrollbarStyle="outsideInset"
+    android:scrollbarStyle="outsideOverlay"
     android:scrollbarThumbVertical="@drawable/listview_scrollbar_shape" />
