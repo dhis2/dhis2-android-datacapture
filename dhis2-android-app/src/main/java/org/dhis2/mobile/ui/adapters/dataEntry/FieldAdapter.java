@@ -99,6 +99,7 @@ public class FieldAdapter extends BaseAdapter {
             Field field = fields.get(i);
             if (field.hasOptionSet()) {
                 OptionSet optionSet = getOptionSet(context, field.getOptionSet());
+                if(!field.getDataElement().equals(Constants.RECEIPT_OF_FORM))
                 rows.add(new AutoCompleteRow(inflater, field, optionSet, context));
             } else if (field.getType().equals(RowTypes.TEXT.name())) {
                 rows.add(new TextRow(inflater, field));
@@ -129,6 +130,7 @@ public class FieldAdapter extends BaseAdapter {
             } else if (field.getType().equals(RowTypes.TRUE_ONLY.name())) {
                 rows.add(new CheckBoxRow(inflater, field));
             } else if (field.getType().equals(RowTypes.DATE.name())) {
+                if(!field.getDataElement().equals(Constants.DATE_RECEIVED))
                 rows.add(new DatePickerRow(inflater, field, this, context));
             } else if (field.getType().equals(RowTypes.GENDER.name())) {
                 rows.add(new GenderRow(inflater, field));
