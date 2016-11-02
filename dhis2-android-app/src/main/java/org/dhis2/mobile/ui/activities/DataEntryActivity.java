@@ -201,6 +201,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
             loadGroupsIntoAdapters(form.getGroups());
+            setupCommentRowAsFooter(form);
         }
     }
 
@@ -485,7 +486,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
                     if (form != null) {
                         loadGroupsIntoAdapters(form.getGroups());
-                        setupCommentRowAsFooter(form);
                     }
                 }
             }
