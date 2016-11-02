@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/card_background"
@@ -26,7 +27,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:measureWithLargestChild="true"
-                android:layout_width="130dp">
+                android:layout_width="130dp"
+                android:gravity="center_vertical"
+                android:layout_gravity="center_vertical">
 
                 <Button
                     android:id="@+id/delete_button"
@@ -39,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/diseaseNumber"
-                    android:padding="2dp"/>
+                    android:padding="2dp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -49,7 +52,9 @@
                     android:id="@+id/text_label"
                     android:padding="8dp"
                     android:maxWidth="160dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:foregroundGravity="center_vertical"
+                    android:gravity="center_vertical" />
 
                 <ImageView
                     android:layout_width="20dp"
