@@ -90,6 +90,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private TextView completionDate;
     private TextView submissionMethod;
     private ImageView isTimelyIcon;
+    private View listViewHeader;
     //expands the submission details view on click
     private Button expandButton;
 
@@ -333,12 +334,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         isTimelyIcon = (ImageView) findViewById(R.id.isTimelyIcon);
         expandButton = (Button) findViewById(R.id.expandButton);
 
-        final View listViewHeader = findViewById(R.id.listViewHeader);
+        listViewHeader = findViewById(R.id.listViewHeader);
 
-        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 200);
+        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 250);
         headerAnimator.setDuration(200);
 
-        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 200);
+        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 250);
         listViewAnimator.setDuration(200);
 
         final ObjectAnimator buttonAnimator = ObjectAnimator.ofFloat(expandButton, "x", 180);
@@ -727,7 +728,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
         String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
         completionDate.setText(text);
+        setTopMargin(listViewHeader, 90);
+        setTopMargin(dataEntryListView, 90);
 
+    }
+
+    private void setTopMargin(View view, int top){
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        params.topMargin = top;
+        view.setLayoutParams(params);
     }
 
     private void handleSubmissionDetails(ArrayList<Group> groups){
@@ -800,9 +809,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void addFooterCommentToGroup(Group group){
         Field comment = new Field();
-        comment.setDataElement(Constants.COMMENT_FIELD);
-        comment.setValue(commentField.getText().toString());
-        dataEntryListView.findViewById(R.id.edit_long_text_row);
-        group.addField(comment);
+        if(commentField != null) {
+            comment.setDataElement(Constants.COMMENT_FIELD);
+            comment.setValue(commentField.getText().toString());
+            dataEntryListView.findViewById(R.id.edit_long_text_row);
+            group.addField(comment);
+        }
     }
 }

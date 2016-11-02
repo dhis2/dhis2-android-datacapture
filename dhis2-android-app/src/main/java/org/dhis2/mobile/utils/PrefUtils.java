@@ -44,6 +44,7 @@ public class PrefUtils {
 	private static final String ACCOUNT_NEEDS_UPDATE = "accountNeedsUpdate";
 	private static final String URL = "url";
 	private static final String USER_NAME = "userName";
+    private static final String SMS= "sms";
 
 	private PrefUtils() { }
 
@@ -114,6 +115,11 @@ public class PrefUtils {
 
     public static void resetResourcesState(Context context) {
         context.getSharedPreferences(RESOURCE_STATE, Context.MODE_PRIVATE).edit().clear().commit();
+    }
+
+    public static void saveSMSStatus(Context context, String id, String status){
+        Editor editor = context.getSharedPreferences(SMS, context.MODE_PRIVATE).edit();
+        editor.putString(id, status).commit();
     }
 
     @Deprecated
