@@ -25,5 +25,3 @@ build
 #Windows
 *.db
 
-#Api Keys
-**/*/res/values/secrets.xml
