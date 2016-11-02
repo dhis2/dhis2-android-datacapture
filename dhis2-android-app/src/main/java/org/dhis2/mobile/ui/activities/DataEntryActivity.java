@@ -486,6 +486,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
                     if (form != null) {
                         loadGroupsIntoAdapters(form.getGroups());
+                        setupCommentRowAsFooter(form);
                     }
                 }
             }
