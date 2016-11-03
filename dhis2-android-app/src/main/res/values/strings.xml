@@ -126,4 +126,10 @@
     <string name="delete_disease_dialog_confirmation">OK</string>
     <string name="delete_disease_dialog_rejection">Cancel</string>
 
+    <!--Submission details -->
+    <string name="completion_date_prefix">Last submission on:</string>
+    <string name="submission_method_prefix">"Form submission via "</string>
+    <string name="completion_date_example">Completed on: 13th October 2016</string>
+    <string name="timely_title">Timely</string>
+
 </resources>
