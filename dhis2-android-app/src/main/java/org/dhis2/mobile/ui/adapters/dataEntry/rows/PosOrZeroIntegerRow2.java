@@ -176,13 +176,51 @@ public class PosOrZeroIntegerRow2 implements Row {
                 @Override
                 public void onFocusChange(View view, boolean hasFocus) {
                     if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
+                        setAutoZero(editTextHolders);
                         setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
+                    ifHasFocusAndHasZeroMakeEmpty(hasFocus,  editTextHolders.get(finalI).editText);
+                    ifLostFocusAndBlankAddZero(hasFocus, editTextHolders.get(finalI).editText, editTextHolders);
                     //Highlight disease label if all fields have a value meaning the row is complete.
                     highlightLabelIfIsRowComplete(context, editTextHolders, editTextHolders.get(finalI));
                 }
             });
         }
+    }
+
+    private void setAutoZero(final ArrayList<EditTextHolder> holders) {
+        for(int i = 0; i < holders.size(); i++){
+            if (isEmptyEditText(holders.get(i).editText)) {
+                if (holders.get(i).editText.isEnabled()) {
+                    holders.get(i).editText.setText(defaultValue);
+                }
+            }
+        }
+    }
+
+    private void ifHasFocusAndHasZeroMakeEmpty(Boolean hasFocus, EditText editText){
+        if(hasFocus && editText.getText().toString().equals(defaultValue)){
+            if (editText.isEnabled()) {
+                editText.setText("");
+            }
+        }
+    }
+
+    private void ifLostFocusAndBlankAddZero(Boolean hasFocus, EditText editText, final ArrayList<EditTextHolder> holders){
+        if(!hasFocus && isEmptyEditText(editText)){
+            if (editText.isEnabled()) {
+                editText.setText("0");
+            }
+        }
+        //check if other field don't have values.. if they don't then leave this field blank
+        for(int i = 0; i < holders.size(); i++){
+            if (isEmptyEditText(holders.get(i).editText)) {
+                if (holders.get(i).editText.isEnabled()) {
+                    editText.setText("");
+                }
+            }
+        }
+
     }
 
     private void highlightLabelIfIsRowComplete(Context context, ArrayList<EditTextHolder> editTextHolders, EditTextHolder editTextHolder){
