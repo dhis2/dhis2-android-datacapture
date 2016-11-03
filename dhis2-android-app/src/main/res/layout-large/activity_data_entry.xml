@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <android.support.v7.widget.AppCompatSpinner
+                style="@style/Widget.AppCompat.Spinner.DropDown.ActionBar"
+                android:id="@+id/spinner_drop_down"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        </android.support.v7.widget.Toolbar>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/data_entry_frame">
+
+            <include layout="@layout/listview_header"/>
+            <include layout="@layout/submission_details_view"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="60dp">
+
+                <include layout="@layout/listview" />
+            </LinearLayout>
+
+            <include layout="@layout/progress_bar_label" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:background="@drawable/persistent_footer_background"
+                android:layout_gravity="bottom"
+                android:layout_height="48dp"
+                android:id="@+id/persistent_buttons_footer">
+
+                <Button
+                    android:text="@string/add_disease_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/add_button"
+                    android:layout_weight="1"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    />
+
+                <Button
+                    android:text="@string/submit_button_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/send_button"
+                    android:layout_weight="1"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    />
+            </LinearLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

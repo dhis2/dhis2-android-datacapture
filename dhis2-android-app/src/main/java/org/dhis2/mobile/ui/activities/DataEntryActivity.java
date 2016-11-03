@@ -19,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -337,10 +338,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         listViewHeader = findViewById(R.id.listViewHeader);
 
-        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 250);
+        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 115);
         headerAnimator.setDuration(200);
 
-        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 250);
+        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 115);
         listViewAnimator.setDuration(200);
 
         final ObjectAnimator buttonAnimator = ObjectAnimator.ofFloat(expandButton, "x", 180);
@@ -730,14 +731,17 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
         String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
         completionDate.setText(text);
-        setTopMargin(listViewHeader, 90);
-        setTopMargin(dataEntryListView, 90);
+        setTopMargin(listViewHeader, 30);
+        setTopMargin(dataEntryListView, 30);
 
     }
 
     private void setTopMargin(View view, int top){
+        int marginInDp = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, top, getResources()
+                        .getDisplayMetrics());
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-        params.topMargin = top;
+        params.topMargin = marginInDp;
         view.setLayoutParams(params);
     }
 
