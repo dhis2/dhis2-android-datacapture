@@ -46,6 +46,9 @@ public class URLConstants {
 	public static final String PERIOD_PARAM = "&pe=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
 
+	public static final String DATA_STORE = "api/dataStore";
+	public static final String COMPULSORY_URL = "compulsory";
+
 	public static final String DATASET_PARAM = "dataSet=";
 	public static final String ORG_UNIT_PARAM =  "orgUnit=";
 	public static final String PERIOD_PARAM_2 = "&period=";

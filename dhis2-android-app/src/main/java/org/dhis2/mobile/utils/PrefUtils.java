@@ -32,6 +32,8 @@ package org.dhis2.mobile.utils;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 
+import org.dhis2.mobile.processors.CompulsoryDataProcessor;
+
 public class PrefUtils {
 	private static final String APP_DATA = "APP_DATA";
 	private static final String USER_DATA = "USER_DATA";
@@ -115,6 +117,18 @@ public class PrefUtils {
 
     public static void resetResourcesState(Context context) {
         context.getSharedPreferences(RESOURCE_STATE, Context.MODE_PRIVATE).edit().clear().commit();
+    }
+
+    public static void saveCompulsoryData(Context context, String key, String data){
+        Editor editor = context.getSharedPreferences(CompulsoryDataProcessor.COMPULSORY_DATA, Context.MODE_PRIVATE).edit();
+        editor.putString(key, data);
+        editor.apply();
+    }
+
+    public static String getCompulsoryData(Context context, String key){
+        String data = context.getSharedPreferences(CompulsoryDataProcessor.COMPULSORY_DATA, Context.MODE_PRIVATE)
+                .getString(key, null);
+        return data;
     }
 
     public static void saveSMSStatus(Context context, String id, String status){

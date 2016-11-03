@@ -67,6 +67,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private final String defaultValue = "0";
     private Button deleteButton;
     private ImageView criticalDiseaseIcon;
+    private IsDisabled isDisabled;
     private DiseaseGroupLabels diseaseGroupLabels;
 
 
@@ -116,6 +117,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isDisabled = new IsDisabled(view.getContext());
             diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         } else {
             view = convertView;
@@ -127,6 +129,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isDisabled = new IsDisabled(view.getContext());
             diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         }
 
@@ -176,13 +179,43 @@ public class PosOrZeroIntegerRow2 implements Row {
                 @Override
                 public void onFocusChange(View view, boolean hasFocus) {
                     if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
+                        setAutoZero(editTextHolders);
                         setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
+                    ifHasFocusAndHasZeroMakeEmpty(hasFocus,  editTextHolders.get(finalI).editText);
+                    ifLostFocusAndBlankAddZero(hasFocus, editTextHolders.get(finalI).editText, editTextHolders);
                     //Highlight disease label if all fields have a value meaning the row is complete.
                     highlightLabelIfIsRowComplete(context, editTextHolders, editTextHolders.get(finalI));
                 }
             });
         }
+    }
+
+    private void setAutoZero(final ArrayList<EditTextHolder> holders) {
+        for(int i = 0; i < holders.size(); i++){
+            if (isEmptyEditText(holders.get(i).editText) && holders.get(i).editText.isEnabled()) {
+                    holders.get(i).editText.setText(defaultValue);
+            }
+        }
+    }
+
+    private void ifHasFocusAndHasZeroMakeEmpty(Boolean hasFocus, EditText editText){
+        if(hasFocus && editText.getText().toString().equals(defaultValue) && editText.isEnabled()){
+                editText.setText("");
+        }
+    }
+
+    private void ifLostFocusAndBlankAddZero(Boolean hasFocus, EditText editText, final ArrayList<EditTextHolder> holders){
+        if(!hasFocus && isEmptyEditText(editText) && editText.isEnabled()){
+                editText.setText("0");
+        }
+        //check if other field don't have values.. if they don't then leave this field blank
+        for(int i = 0; i < holders.size(); i++){
+            if (isEmptyEditText(holders.get(i).editText) && holders.get(i).editText.isEnabled()) {
+                    editText.setText("");
+            }
+        }
+
     }
 
     private void highlightLabelIfIsRowComplete(Context context, ArrayList<EditTextHolder> editTextHolders, EditTextHolder editTextHolder){
@@ -334,7 +367,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             holders.get(i).editText.clearFocus();
             holders.get(i).editText.setContentDescription(fields.get(i).getCategoryOptionCombo());
 
-            IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
+            isDisabled.setEnabled(holders.get(i).editText, fields.get(i));
 
             setIsCriticalDiseaseIcon(view);
 
