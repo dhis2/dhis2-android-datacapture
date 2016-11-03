@@ -67,6 +67,7 @@ public class PosOrZeroIntegerRow2 implements Row {
     private final String defaultValue = "0";
     private Button deleteButton;
     private ImageView criticalDiseaseIcon;
+    private IsDisabled isDisabled;
     private DiseaseGroupLabels diseaseGroupLabels;
 
 
@@ -116,6 +117,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isDisabled = new IsDisabled(view.getContext());
             diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         } else {
             view = convertView;
@@ -127,6 +129,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
+            isDisabled = new IsDisabled(view.getContext());
             diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
         }
 
@@ -364,7 +367,7 @@ public class PosOrZeroIntegerRow2 implements Row {
             holders.get(i).editText.clearFocus();
             holders.get(i).editText.setContentDescription(fields.get(i).getCategoryOptionCombo());
 
-            IsDisabled.setEnabled(holders.get(i).editText, fields.get(i), view.getContext());
+            isDisabled.setEnabled(holders.get(i).editText, fields.get(i));
 
             setIsCriticalDiseaseIcon(view);
 

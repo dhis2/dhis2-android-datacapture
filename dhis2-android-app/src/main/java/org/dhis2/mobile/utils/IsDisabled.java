@@ -19,18 +19,21 @@ import java.util.Map;
  * Utility class that checks whether a field is disabled or not
  */
 public class IsDisabled {
+    private final Map diseases;
+
+    public IsDisabled(Context context){
+        this.diseases = DiseaseImporter.importDiseases(context);
+    }
 
     /**
      * Disables fields based on the disabled fields in the diseases json file
      * @param editText EditText
      * @param field Field {@see Field}
-     * @param context Context
      *
      */
-    public static void setEnabled(final EditText editText, Field field, Context context){
+    public void setEnabled(final EditText editText, Field field){
         Boolean isEnabled = true;
 
-        Map diseases = DiseaseImporter.importDiseases(context);
         assert diseases != null;
         Disease disease = (Disease) diseases.get(field.getDataElement());
         if(diseases.containsKey(field.getDataElement()) && disease.getDisabledFields().contains(field.getCategoryOptionCombo())){
@@ -38,5 +41,17 @@ public class IsDisabled {
         }
 
         editText.setEnabled(isEnabled);
+    }
+
+    public Boolean check(Field field){
+        Boolean isEnabled = false;
+
+        assert diseases != null;
+        Disease disease = (Disease) diseases.get(field.getDataElement());
+        if(diseases.containsKey(field.getDataElement()) && disease.getDisabledFields().contains(field.getCategoryOptionCombo())){
+            isEnabled = true;
+        }
+
+        return isEnabled;
     }
 }
