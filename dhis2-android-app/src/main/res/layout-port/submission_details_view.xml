@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/actionbar_blue"
+    android:layout_marginBottom="80dp"
+    android:layout_height="wrap_content"
+    android:paddingLeft="20dp"
+    android:paddingStart="20dp"
+    android:paddingRight="20dp"
+    android:paddingEnd="20dp"
+    android:id="@+id/submissionDetails">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="@string/completion_date_example"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/completionDate"
+            android:padding="4dp"
+            android:textColor="@android:color/white"
+            android:layout_weight="1" />
+
+        <Button
+            android:text=""
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:id="@+id/expandButton"
+            android:layout_weight="1"
+            android:background="@drawable/ic_expand_more_white_24dp"
+            />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/submissionDetailsExpandable"
+        android:animateLayoutChanges="true"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/submissionMethod"
+            android:padding="4dp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:text="@string/timely_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/isTimelyTextView"
+            android:padding="4dp"
+            android:textColor="@android:color/white"
+            android:layout_below="@+id/submissionMethod"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_clear_red_24dp"
+            android:id="@+id/isTimelyIcon"
+            android:paddingTop="2dp"
+            android:layout_below="@+id/submissionMethod"
+            android:layout_toRightOf="@+id/isTimelyTextView"
+            android:layout_toEndOf="@+id/isTimelyTextView" />
+    </RelativeLayout>
+
+</LinearLayout>

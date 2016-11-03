@@ -8,7 +8,8 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="#E0ECEA">
+        android:background="#E0ECEA"
+        android:id="@+id/listViewHeader">
 
         <TextView
             android:layout_height="55dp"

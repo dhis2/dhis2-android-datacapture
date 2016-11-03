@@ -10,6 +10,8 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.dhis2.mobile.processors.SendSmsProcessor;
+
 public class SMSBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = SMSBroadcastReceiver.class.getSimpleName();
     private static final String SMS_RECEIVED_ACTION = "android.provider.Telephony.SMS_RECEIVED";
@@ -19,13 +21,15 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, intent.getAction());
-        if(intent.getAction().equals("org.dhis2.mobile.SEND_SMS")) {
+        if(intent.getAction().equals(SEND_SMS_ACTION)) {
             switch (getResultCode()) {
                 case Activity.RESULT_OK:
                     Log.i(TAG, "Result Okay");
+                    PrefUtils.saveSMSStatus(context, intent.getExtras().getString(SendSmsProcessor.SMS_KEY), "Sent");
                     makeToast(context, "SMS Sent!");
                     break;
                 case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                    Log.i(TAG, "SMS Error");
                     makeToast(context, "SMS Error");
                     break;
                 case SmsManager.RESULT_ERROR_NO_SERVICE:
@@ -39,6 +43,20 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 case SmsManager.RESULT_ERROR_RADIO_OFF:
                     Log.i(TAG, "Result error radio off");
                     makeToast(context, "SMS Error. Radio switched off.");
+                    break;
+            }
+        }
+
+        if(intent.getAction().equals(DELIVERED_SMS_ACTION)){
+            switch (getResultCode()){
+                case Activity.RESULT_OK:
+                    PrefUtils.saveSMSStatus(context, intent.getExtras().getString(SendSmsProcessor.SMS_KEY), "Delivered");
+                    Log.i(TAG, "Result Okay");
+                    makeToast(context, "SMS Delivered");
+                    break;
+                case Activity.RESULT_CANCELED:
+                    Log.i(TAG, "Result Cancelled");
+                    makeToast(context, "SMS delivery failed");
                     break;
             }
         }

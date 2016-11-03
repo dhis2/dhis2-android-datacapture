@@ -1,15 +1,18 @@
 package org.dhis2.mobile.ui.activities;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -44,12 +49,16 @@ import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
+import org.dhis2.mobile.processors.SubmissionDetailsProcessor;
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
 import org.dhis2.mobile.ui.fragments.AdditionalDiseasesFragment;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +85,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private View persistentButtonsFooter;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
+    private View submissionDetailsLayout;
+    private View submissionDetailsExpandableLayout;
+    private TextView completionDate;
+    private TextView submissionMethod;
+    private ImageView isTimelyIcon;
+    private View listViewHeader;
+    //expands the submission details view on click
+    private Button expandButton;
 
     // data entry view
     private ListView dataEntryListView;
@@ -126,6 +143,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupUploadButton();
         setupAddDiseaseBtn();
         setupDeleteDialog();
+        setupSubmissionDetailsViews();
 
         // let's try to get latest values from API
         attemptToDownloadReport(savedInstanceState);
@@ -212,8 +230,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -310,6 +326,45 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         deleteDiseaseDialog.show();
     }
 
+    private void setupSubmissionDetailsViews(){
+        String rotation = "rotation";
+        submissionDetailsLayout = findViewById(R.id.submissionDetails);
+        submissionDetailsExpandableLayout = findViewById(R.id.submissionDetailsExpandable);
+        completionDate = (TextView) findViewById(R.id.completionDate);
+        submissionMethod = (TextView) findViewById(R.id.submissionMethod);
+        isTimelyIcon = (ImageView) findViewById(R.id.isTimelyIcon);
+        expandButton = (Button) findViewById(R.id.expandButton);
+
+        listViewHeader = findViewById(R.id.listViewHeader);
+
+        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 250);
+        headerAnimator.setDuration(200);
+
+        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 250);
+        listViewAnimator.setDuration(200);
+
+        final ObjectAnimator buttonAnimator = ObjectAnimator.ofFloat(expandButton, "x", 180);
+        buttonAnimator.setPropertyName(rotation);
+        listViewAnimator.setDuration(200);
+
+        expandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(submissionDetailsExpandableLayout.isEnabled()){
+                    //hide views and adjust layout
+                    ViewUtils.perfomOutAnimation(getApplicationContext(), R.anim.fade_out,true, submissionDetailsExpandableLayout);
+                    reverseAnimators(buttonAnimator, headerAnimator, listViewAnimator);
+                }else {
+                    //show views and adjust layout
+                    ViewUtils.perfomInAnimation(getApplicationContext(), R.anim.fade_in, submissionDetailsExpandableLayout);
+                    startAnimators(buttonAnimator, headerAnimator, listViewAnimator);
+                }
+            }
+        });
+
+        ViewUtils.hideAndDisableViews(submissionDetailsLayout, submissionDetailsExpandableLayout);
+    }
+
     private void attemptToDownloadReport(Bundle savedInstanceState) {
         // first, we need to check if previous instances of
         // activities already tried to download values
@@ -324,6 +379,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             // we need to check if connection is there first
             if (NetworkUtils.checkConnection(this)) {
                 getLatestValues();
+                getCompletionDate();
             }
         }
     }
@@ -465,6 +521,17 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         startService(intent);
     }
 
+    private void getCompletionDate(){
+        DatasetInfoHolder info = getIntent().getExtras()
+                .getParcelable(DatasetInfoHolder.TAG);
+
+        Intent intent = new Intent(this, WorkService.class);
+        intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_SUBMISSION_DETAILS);
+        intent.putExtra(DatasetInfoHolder.TAG, info);
+
+        startService(intent);
+    }
+
     private final BroadcastReceiver RECEIVER = new BroadcastReceiver() {
 
         @Override
@@ -486,7 +553,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
                     if (form != null) {
                         loadGroupsIntoAdapters(form.getGroups());
+                        handleSubmissionDetails(form.getGroups());
                         setupCommentRowAsFooter(form);
+                    }
+                }
+
+                if (intent.getExtras().containsKey(SubmissionDetailsProcessor.SUBMISSION_DETAILS)) {
+                    if(intent.getExtras().getString(SubmissionDetailsProcessor.SUBMISSION_DETAILS) != null){
+                        handleCompletionDate(intent.getExtras().getString(SubmissionDetailsProcessor.SUBMISSION_DETAILS));
                     }
                 }
             }
@@ -650,6 +724,72 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         this.dataEntryListView.smoothScrollToPosition(adapters.get(0).getCount());
     }
 
+    private void handleCompletionDate(String details){
+        DateTime dateTime = new DateTime(details);
+        ViewUtils.enableViews(submissionDetailsLayout);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
+        String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
+        completionDate.setText(text);
+        setTopMargin(listViewHeader, 90);
+        setTopMargin(dataEntryListView, 90);
+
+    }
+
+    private void setTopMargin(View view, int top){
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        params.topMargin = top;
+        view.setLayoutParams(params);
+    }
+
+    private void handleSubmissionDetails(ArrayList<Group> groups){
+        String submissionMethodValue = null;
+        String isTimely = null;
+        String submissionMethodText;
+        Drawable isTimelyDrawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_done_teal_24dp);
+        Drawable notTimelyDrawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_clear_red_24dp);
+
+        for(Group group: groups){
+            for(Field field: group.getFields()){
+                if(field.getDataElement().equals(Constants.RECEIPT_OF_FORM)){
+                    submissionMethodValue = field.getValue();
+                }
+                if(field.getDataElement().equals(Constants.TIMELY)){
+                    isTimely = field.getValue();
+                }
+            }
+        }
+
+        assert isTimely != null;
+        //Timely value not stored as boolean for some reason even though the data element is type boolean ¯\_(ツ)_/¯
+        if(isTimely.equals("true")){
+            isTimelyIcon.setImageDrawable(isTimelyDrawable);
+        }else{
+            isTimelyIcon.setImageDrawable(notTimelyDrawable);
+        }
+
+        assert submissionMethodValue != null;
+        if(!submissionMethodValue.equals("")){
+            submissionMethodText = getString(R.string.submission_method_prefix)+" "+submissionMethodValue;
+            submissionMethod.setText(submissionMethodText);
+        }else{
+            submissionMethodText = getString(R.string.submission_method_prefix)+" Unknown";
+            submissionMethod.setText(submissionMethodText);
+        }
+
+    }
+
+    private void reverseAnimators(ObjectAnimator... animators){
+        for(ObjectAnimator animator: animators){
+            animator.reverse();
+        }
+    }
+
+    private void startAnimators(ObjectAnimator... animators){
+        for(ObjectAnimator animator: animators){
+            animator.start();
+        }
+    }
+
     private void setupCommentRowAsFooter(Form form){
         String backgroundColor = "#E0ECEA";
         final String title = "Comment";
@@ -671,9 +811,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void addFooterCommentToGroup(Group group){
         Field comment = new Field();
-        comment.setDataElement(Constants.COMMENT_FIELD);
-        comment.setValue(commentField.getText().toString());
-        dataEntryListView.findViewById(R.id.edit_long_text_row);
-        group.addField(comment);
+        if(commentField != null) {
+            comment.setDataElement(Constants.COMMENT_FIELD);
+            comment.setValue(commentField.getText().toString());
+            dataEntryListView.findViewById(R.id.edit_long_text_row);
+            group.addField(comment);
+        }
     }
 }
