@@ -21,6 +21,19 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".utils.SMSBroadcastReceiver">
+            <intent-filter>
+                <action android:name="org.dhis2.mobile.SEND_SMS"/>
+            </intent-filter >
+            <intent-filter>
+                <action android:name="org.dhis2.mobile.DELIVERED_SMS"/>
+            </intent-filter >
+            <!-- Highest priority so that other apps don't receive the intent instead-->
+            <intent-filter android:priority="1000">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".ui.activities.LauncherActivity"
             android:noHistory="true">
@@ -37,6 +50,11 @@
             android:name=".ui.activities.DataEntryActivity"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"/>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="675a9594416771c25d42f8d5fc0b21402f9ac800"
+            />
     </application>
 
 </manifest>

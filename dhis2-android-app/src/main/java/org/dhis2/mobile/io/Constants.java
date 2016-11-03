@@ -51,11 +51,7 @@ public class Constants {
     public static final String INTERNET_SUBMISSION = "Mobile_Internet";
     public static final String SMS_SUBMISSION = "Mobile_SMS";
     public static final String COMMENT_FIELD = "S3rFf2qxuah";
+    public static final String DATE_RECEIVED = "ETiug23P1Ns";
 
-    //Malaria
-    public static final String MALARIA_LABEL_TEXT = "Malaria:";
-    public static final String TOTAL_CLINICAL_MALARIA_CASES = "KnYtrL5s7vH";
-    public static final String TOTAL_MALARIA_TESTED = "RZstMMX0Mnl";
-    public static final String TOTAL_MALARIA_POSITIVE = "wWScmbz9N2G";
 
 }

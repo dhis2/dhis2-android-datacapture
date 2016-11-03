@@ -48,6 +48,7 @@ import org.dhis2.mobile.processors.RemoveDataProcessor;
 import org.dhis2.mobile.processors.ReportDownloadProcessor;
 import org.dhis2.mobile.processors.ReportUploadProcessor;
 import org.dhis2.mobile.processors.SendSmsProcessor;
+import org.dhis2.mobile.processors.SubmissionDetailsProcessor;
 import org.dhis2.mobile.ui.activities.LoginActivity;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 
@@ -67,6 +68,7 @@ public class WorkService extends Service {
     public static final String METHOD_REMOVE_ALL_DATA = "removeAllData";
     public static final String METHOD_SEND_VIA_SMS = "sendViaSms";
     public static final String METHOD_DOWNLOAD_COMPULSORY_DATA = "downloadCompulsoryData";
+    public static final String METHOD_DOWNLOAD_SUBMISSION_DETAILS = "downloadSubmissionDetails";
 
     // maximum number of threads in thread pool
     private static final int QUANTITY_OF_THREADS = 3;
@@ -177,6 +179,10 @@ public class WorkService extends Service {
         if(METHOD_DOWNLOAD_COMPULSORY_DATA.equals(methodName)){
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             CompulsoryDataProcessor.download(context, info);
+        }
+        if(METHOD_DOWNLOAD_SUBMISSION_DETAILS.equals(methodName)){
+            DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
+            SubmissionDetailsProcessor.download(context, info);
         }
     }
 
