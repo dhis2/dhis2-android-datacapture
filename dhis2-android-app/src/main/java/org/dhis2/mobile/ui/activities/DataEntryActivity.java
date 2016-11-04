@@ -874,7 +874,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if(commentField != null) {
             comment.setDataElement(Constants.COMMENT_FIELD);
             comment.setValue(commentField.getText().toString());
-            dataEntryListView.findViewById(R.id.edit_long_text_row);
+            comment.setCategoryOptionCombo(Constants.DEFAULT_CATEGORY_COMBO);
             group.addField(comment);
         }
     }
