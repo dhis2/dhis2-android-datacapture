@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -26,8 +26,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -539,7 +539,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             finish();
         }
 
-
     }
 
     private Boolean isInvalidForm(ArrayList<Group> groups){
@@ -756,6 +755,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     JsonElement jsonValue = (jsonElement.getAsJsonObject())
                             .get(Field.VALUE);
 
+                    Log.d("JSSONDATA", jsonDataElement.getAsString());
                     String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
                             jsonCategoryCombination.getAsString());
                     String value = jsonValue != null ? jsonValue.getAsString() : "";
@@ -874,7 +874,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if(commentField != null) {
             comment.setDataElement(Constants.COMMENT_FIELD);
             comment.setValue(commentField.getText().toString());
-            dataEntryListView.findViewById(R.id.edit_long_text_row);
             group.addField(comment);
         }
     }

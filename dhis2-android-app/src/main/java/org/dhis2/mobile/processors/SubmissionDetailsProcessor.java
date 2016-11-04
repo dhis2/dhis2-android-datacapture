@@ -3,6 +3,7 @@ package org.dhis2.mobile.processors;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.google.gson.JsonObject;
 
@@ -26,15 +27,23 @@ public class SubmissionDetailsProcessor {
         String url  = buildUrl(context, info);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
+        String completionDate = null;
 
         if (response.getCode() >= 200 && response.getCode() < 300) {
-            String completionDate = getCompletionDate(response.getBody());
+            completionDate = getCompletionDate(response.getBody());
             Intent intent  = new Intent(DataEntryActivity.TAG);
             intent.putExtra(Response.CODE, response.getCode());
             intent.putExtra(SUBMISSION_DETAILS, completionDate);
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
+
+        if(completionDate != null){
+            String id = info.getFormId()+info.getPeriod();
+            PrefUtils.saveCompletionDate(context, id, completionDate);
+        }
+
     }
+    
 
     private static String buildUrl(Context context, DatasetInfoHolder info){
          String server = PrefUtils.getServerURL(context);
