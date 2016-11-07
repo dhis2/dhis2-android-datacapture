@@ -12,7 +12,7 @@
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tableLayout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="46dp" >
 
 
         <TableRow
@@ -66,44 +66,46 @@
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
+                    android:layout_height="match_parent"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
-                    style="@style/ListViewEditTextStyle"
-                    android:layout_width="45dp"
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_width="48dp"
                     />
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row_2"
+                    android:background="@drawable/editbox_background"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
-                    style="@style/ListViewEditTextStyle"
-
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
                     android:layout_height="match_parent"
-                    android:layout_width="45dp" />
+                    android:layout_width="48dp" />
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row_3"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
+                    android:layout_height="match_parent"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:selectAllOnFocus="true"
-                    style="@style/ListViewEditTextStyle"
-
-                    android:layout_width="45dp" />
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_width="48dp" />
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row_4"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
+                    android:layout_height="match_parent"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:selectAllOnFocus="true"
-                    style="@style/ListViewEditTextStyle"
-
-
-                    android:layout_margin="0dp"
-                    android:layout_weight="0"
-                    android:layout_width="45dp" />
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_width="48dp" />
 
             </LinearLayout>
 
