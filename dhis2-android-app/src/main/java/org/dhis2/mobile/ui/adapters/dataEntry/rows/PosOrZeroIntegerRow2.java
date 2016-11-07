@@ -458,12 +458,12 @@ public class PosOrZeroIntegerRow2 implements Row {
         if(diseaseGroupLabels.hasGroup(field.getDataElement())){
             view.setX(30);
             //compensate for offset by adjusting the padding on the right.
-            view.setPadding(8,8,85,8);
+            view.setPadding(8,8,40,8);
             //Reduce alpha to differentiate malaria labels.
             holders.get(0).textLabel.setAlpha(0.8f);
         }else{
             view.setX(0);
-            view.setPadding(8,8,40,8);
+            view.setPadding(8,8,0,8);
             holders.get(0).textLabel.setAlpha(1.0f);
         }
     }

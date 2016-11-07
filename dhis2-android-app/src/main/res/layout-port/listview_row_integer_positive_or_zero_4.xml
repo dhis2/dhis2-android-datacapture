@@ -50,7 +50,7 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:id="@+id/text_label"
-                    android:padding="8dp"
+                    android:padding="2dp"
                     android:maxWidth="160dp"
                     android:layout_weight="1"
                     android:foregroundGravity="center_vertical"
@@ -63,84 +63,51 @@
                     android:id="@+id/criticalDiseaseIcon"
                     android:paddingTop="8dp"
                     />
-            </LinearLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/edit_integer_pos_layout"
-                android:layout_weight="1"
-
-                >
-                <!-- cases integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
-                    android:selectAllOnFocus="true"
+                    style="@style/ListViewEditTextStyle"
+                    android:layout_width="45dp"
                     />
 
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/edit_integer_pos_layout_2"
-                android:layout_weight="1"
-                >
-                <!-- deaths integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
-                    android:selectAllOnFocus="true"
+                    style="@style/ListViewEditTextStyle"
 
-                    />
+                    android:layout_height="match_parent"
+                    android:layout_width="45dp" />
 
-            </android.support.design.widget.TextInputLayout>
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/edit_integer_pos_layout_3"
-                android:layout_weight="1"
-                >
-                <!-- cases integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row_3"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:selectAllOnFocus="true"
+                    style="@style/ListViewEditTextStyle"
 
-                    />
+                    android:layout_width="45dp" />
 
-            </android.support.design.widget.TextInputLayout>
-
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/edit_integer_pos_layout_4"
-                android:layout_weight="1"
-                >
-                <!-- deaths integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row_4"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:selectAllOnFocus="true"
+                    style="@style/ListViewEditTextStyle"
 
 
-                    />
+                    android:layout_margin="0dp"
+                    android:layout_weight="0"
+                    android:layout_width="45dp" />
 
-            </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
         </TableRow>
 
     </TableLayout>
