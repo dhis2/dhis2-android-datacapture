@@ -43,10 +43,10 @@ public class IsDisabled {
 
         if(check(field)){
             isEnabled = false;
-           editText.setBackgroundDrawable(ContextCompat.getDrawable(context,R.color));
-           // editText.setAlpha(0.2f);
+            editText.setBackgroundDrawable(ContextCompat.getDrawable(context,R.drawable.ic_cancel));
+            editText.setAlpha(0.2f);
         }else {
-           // editText.setAlpha(1f);
+            editText.setAlpha(1f);
             editText.setBackgroundResource(R.drawable.editbox_background);
         }
 
