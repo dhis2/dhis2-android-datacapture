@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -28,8 +28,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -72,7 +72,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import static android.text.TextUtils.isEmpty;
-import static org.dhis2.mobile.R.id.view;
 
 public class DataEntryActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Form> {
     public static final String TAG = DataEntryActivity.class.getSimpleName();
