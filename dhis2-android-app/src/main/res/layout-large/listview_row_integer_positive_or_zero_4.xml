@@ -80,8 +80,7 @@
                     android:selectAllOnFocus="true"
                     android:background="@drawable/editbox_background"
                     android:layout_width="65dp"
-                    android:paddingLeft="10dp"
-                    android:layout_marginRight="2dp" />
+                    android:layout_marginRight="10dp" />
 
 
                 <EditText
@@ -91,9 +90,7 @@
                     android:inputType="number"
                     android:selectAllOnFocus="true"
                     android:background="@drawable/editbox_background"
-                    android:layout_width="65dp"
-                    android:paddingStart="10dp"
-                    android:layout_marginLeft="5dp" />
+                    android:layout_width="65dp" />
 
 
                 <EditText
@@ -103,7 +100,8 @@
                     android:inputType="number"
                     android:selectAllOnFocus="true"
                     android:background="@drawable/editbox_background"
-                    android:layout_width="65dp" />
+                    android:layout_width="65dp"
+                    android:layout_marginRight="15dp" />
 
 
             </LinearLayout>
