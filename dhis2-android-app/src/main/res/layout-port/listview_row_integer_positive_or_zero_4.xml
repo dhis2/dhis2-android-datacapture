@@ -48,13 +48,15 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:textStyle="bold"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:id="@+id/text_label"
                     android:padding="2dp"
                     android:maxWidth="160dp"
                     android:layout_weight="1"
                     android:foregroundGravity="center_vertical"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:contextClickable="false"
+                    android:lines="2" />
 
                 <ImageView
                     android:layout_width="20dp"
@@ -72,8 +74,8 @@
                     android:inputType="number"
                     android:paddingBottom="11dp"
                     android:paddingTop="11dp"
-                    android:layout_width="48dp"
-                    />
+                    android:layout_width="45dp"
+                    android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row_2"
@@ -83,7 +85,8 @@
                     android:paddingBottom="11dp"
                     android:paddingTop="11dp"
                     android:layout_height="match_parent"
-                    android:layout_width="48dp" />
+                    android:layout_width="45dp"
+                    android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row_3"
@@ -94,7 +97,8 @@
                     android:selectAllOnFocus="true"
                     android:paddingBottom="11dp"
                     android:paddingTop="11dp"
-                    android:layout_width="48dp" />
+                    android:layout_width="45dp"
+                    android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/edit_integer_pos_row_4"
@@ -105,7 +109,9 @@
                     android:selectAllOnFocus="true"
                     android:paddingBottom="11dp"
                     android:paddingTop="11dp"
-                    android:layout_width="48dp" />
+                    android:layout_width="45dp"
+                    android:layout_marginRight="2dp"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
