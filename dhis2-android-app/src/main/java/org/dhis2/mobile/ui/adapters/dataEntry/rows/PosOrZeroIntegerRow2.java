@@ -178,12 +178,10 @@ public class PosOrZeroIntegerRow2 implements Row {
             editTextHolders.get(i).editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean hasFocus) {
+                    autoZeroChecks(hasFocus, editTextHolders, finalI);
                     if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
-                        setAutoZero(editTextHolders);
                         setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
-                    ifHasFocusAndHasZeroMakeEmpty(hasFocus,  editTextHolders.get(finalI).editText);
-                    ifLostFocusAndBlankAddZero(hasFocus, editTextHolders.get(finalI).editText, editTextHolders);
                     //Highlight disease label if all fields have a value meaning the row is complete.
                     highlightLabelIfIsRowComplete(context, editTextHolders, editTextHolders.get(finalI));
                 }
@@ -191,31 +189,36 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
     }
 
-    private void setAutoZero(final ArrayList<EditTextHolder> holders) {
-        for(int i = 0; i < holders.size(); i++){
-            if (isEmptyEditText(holders.get(i).editText) && holders.get(i).editText.isEnabled()) {
-                    holders.get(i).editText.setText(defaultValue);
+    private void autoZeroChecks(Boolean hasFocus, final ArrayList<EditTextHolder> holders, int finalI) {
+        EditText currentEditText = holders.get(finalI).editText;
+
+        if (hasLostFocusAndIsNotEmpty(hasFocus, currentEditText)) {
+            for (EditTextHolder holder: holders) {
+                if (isEmptyEditText(holder.editText) && holder.editText.isEnabled()) {
+                    holder.editText.setText(defaultValue);
+                }
             }
         }
+
+        ifHasFocusAndHasZeroMakeEmpty(hasFocus, currentEditText);
+        ifLostFocusAndBlankAddZero(hasFocus, currentEditText, holders);
     }
 
     private void ifHasFocusAndHasZeroMakeEmpty(Boolean hasFocus, EditText editText){
         if(hasFocus && editText.getText().toString().equals(defaultValue) && editText.isEnabled()){
-                editText.setText("");
+                editText.getText().clear();
         }
     }
 
     private void ifLostFocusAndBlankAddZero(Boolean hasFocus, EditText editText, final ArrayList<EditTextHolder> holders){
         if(!hasFocus && isEmptyEditText(editText) && editText.isEnabled()){
-                editText.setText("0");
-        }
-        //check if other field don't have values.. if they don't then leave this field blank
-        for(int i = 0; i < holders.size(); i++){
-            if (isEmptyEditText(holders.get(i).editText) && holders.get(i).editText.isEnabled()) {
-                    editText.setText("");
+            for(EditTextHolder holder: holders){
+                if(!isEmptyEditText(holder.editText) && holder.editText.isEnabled()){
+                    editText.getText().append(defaultValue);
+                }
             }
-        }
 
+        }
     }
 
     private void highlightLabelIfIsRowComplete(Context context, ArrayList<EditTextHolder> editTextHolders, EditTextHolder editTextHolder){
@@ -458,12 +461,12 @@ public class PosOrZeroIntegerRow2 implements Row {
         if(diseaseGroupLabels.hasGroup(field.getDataElement())){
             view.setX(30);
             //compensate for offset by adjusting the padding on the right.
-            view.setPadding(8,8,85,8);
+            view.setPadding(8,8,25,8);
             //Reduce alpha to differentiate malaria labels.
             holders.get(0).textLabel.setAlpha(0.8f);
         }else{
             view.setX(0);
-            view.setPadding(8,8,40,8);
+            view.setPadding(8,8,0,8);
             holders.get(0).textLabel.setAlpha(1.0f);
         }
     }

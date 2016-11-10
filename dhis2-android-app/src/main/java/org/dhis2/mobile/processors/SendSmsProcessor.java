@@ -130,6 +130,7 @@ public class SendSmsProcessor {
             JsonObject jField = new JsonObject();
             jField.addProperty(Field.DATA_ELEMENT, Constants.TIMELY);
             jField.addProperty(Field.VALUE, isTimely);
+            jField.addProperty(Field.CATEGORY_OPTION_COMBO, Constants.DEFAULT_CATEGORY_COMBO);
             values.add(jField);
         }
 
@@ -137,6 +138,7 @@ public class SendSmsProcessor {
         JsonObject jField = new JsonObject();
         jField.addProperty(Field.DATA_ELEMENT, Constants.RECEIPT_OF_FORM);
         jField.addProperty(Field.VALUE, Constants.SMS_SUBMISSION);
+        jField.addProperty(Field.CATEGORY_OPTION_COMBO, Constants.DEFAULT_CATEGORY_COMBO);
         values.add(jField);
 
 

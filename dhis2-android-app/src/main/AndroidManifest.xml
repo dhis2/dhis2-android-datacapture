@@ -45,7 +45,8 @@
         <activity android:name=".ui.activities.LoginActivity" />
         <activity
             android:name=".ui.activities.MenuActivity"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.DataEntryActivity"
             android:windowSoftInputMode="adjustPan"

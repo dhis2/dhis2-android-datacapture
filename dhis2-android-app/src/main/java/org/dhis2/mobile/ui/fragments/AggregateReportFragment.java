@@ -114,6 +114,7 @@ public class AggregateReportFragment extends Fragment
     public void onPause() {
         LocalBroadcastManager.getInstance(getActivity())
                 .unregisterReceiver(onFormsUpdateListener);
+        swipeRefreshLayout.clearAnimation();
         super.onPause();
     }
 
