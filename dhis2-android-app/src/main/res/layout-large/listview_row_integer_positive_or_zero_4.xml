@@ -101,7 +101,7 @@
                     android:selectAllOnFocus="true"
                     android:background="@drawable/editbox_background"
                     android:layout_width="65dp"
-                    android:layout_marginRight="15dp" />
+                    android:layout_marginRight="10dp" />
 
 
             </LinearLayout>
