@@ -47,8 +47,8 @@ public class SendSmsProcessor {
 
         saveDataset(context, offlineData, info);
 
-        String key = info.getFormId()+info.getPeriod();
-        if(!hasBeenCompleted(context, key)){
+        String submissionId = info.getFormId()+info.getPeriod();
+        if(!hasBeenCompleted(context, submissionId)){
             sendSMS(context, Constants.SMS_NUMBER, data, info);
         }else{
             String title = context.getString(R.string.form_completion_dialog_title);
@@ -204,9 +204,9 @@ public class SendSmsProcessor {
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.OFFLINE_DATASETS, key, data);
     }
 
-    private static Boolean hasBeenCompleted(Context context, String info){
+    private static Boolean hasBeenCompleted(Context context, String submissionId){
         Boolean hasBeenCompleted = false;
-        if(PrefUtils.getCompletionDate(context, info) != null ){
+        if(PrefUtils.getCompletionDate(context, submissionId) != null ){
             hasBeenCompleted  = true;
         }
 

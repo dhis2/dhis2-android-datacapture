@@ -137,14 +137,14 @@ public class PrefUtils {
         editor.putString(id, status).commit();
     }
 
-    public static void saveCompletionDate(Context context, String id, String date){
+    public static void saveCompletionDate(Context context, String submissionId, String date){
         Editor editor = context.getSharedPreferences(COMPLETION_DATE, context.MODE_PRIVATE).edit();
-        editor.putString(id, date).commit();
+        editor.putString(submissionId, date).commit();
     }
 
-    public static String getCompletionDate(Context context, String key){
+    public static String getCompletionDate(Context context, String submissionId){
         String date = context.getSharedPreferences(COMPLETION_DATE, Context.MODE_PRIVATE)
-                .getString(key, null);
+                .getString(submissionId, null);
         return date;
     }
 
