@@ -114,32 +114,10 @@ public class ReportUploadProcessor {
      * @return String
      */
 
-    private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups) {
+    public static String prepareContent(DatasetInfoHolder info, ArrayList<Group> groups) {
         JsonObject content = new JsonObject();
-        JsonArray values = putFieldValuesInJson(groups);
-
-        //Check whether a timely report has already been sent
-        if(!IsTimely.hasBeenSet(groups)) {
-            //Check whether the report was timely or not
-            //substring is used so as to only get the week number
-            String period = info.getPeriod();
-            Boolean isTimely = IsTimely.check(new DateTime(), period);
-
-            //Fill out timely dataElement
-            JsonObject jField = new JsonObject();
-            jField.addProperty(Field.DATA_ELEMENT, Constants.TIMELY);
-            jField.addProperty(Field.VALUE, isTimely);
-            jField.addProperty(Field.CATEGORY_OPTION_COMBO, Constants.DEFAULT_CATEGORY_COMBO);
-            values.add(jField);
-        }
-
-        //Fill out submission method
-        JsonObject jField = new JsonObject();
-        jField.addProperty(Field.DATA_ELEMENT, Constants.RECEIPT_OF_FORM);
-        jField.addProperty(Field.VALUE, Constants.INTERNET_SUBMISSION);
-        jField.addProperty(Field.CATEGORY_OPTION_COMBO, Constants.DEFAULT_CATEGORY_COMBO);
-        values.add(jField);
-
+        String period = info.getPeriod();
+        JsonArray values = putFieldValuesInJson(groups, period);
 
         // Retrieve current date
         LocalDate currentDate = new LocalDate();
@@ -173,17 +151,22 @@ public class ReportUploadProcessor {
         return null;
     }
 
-    private static JsonArray putFieldValuesInJson(ArrayList<Group> groups) {
+    private static JsonArray putFieldValuesInJson(ArrayList<Group> groups, String period) {
         JsonArray jFields = new JsonArray();
         for (Group group : groups) {
             for (Field field : group.getFields()) {
-                JsonObject jField = new JsonObject();
-                jField.addProperty(Field.DATA_ELEMENT, field.getDataElement());
-                jField.addProperty(Field.CATEGORY_OPTION_COMBO, field.getCategoryOptionCombo());
-                jField.addProperty(Field.VALUE, field.getValue());
-                jFields.add(jField);
+                if(!field.getDataElement().equals(Constants.RECEIPT_OF_FORM)){
+                    JsonObject jField = new JsonObject();
+                    jField.addProperty(Field.DATA_ELEMENT, field.getDataElement());
+                    addCategoryComboToField(field, jField);
+                    jField.addProperty(Field.VALUE, getValue(field, period));
+                    jFields.add(jField);
+                }
             }
         }
+
+        jFields.add(createDataElementObject(Constants.RECEIPT_OF_FORM,"", Constants.INTERNET_SUBMISSION));
+
         return jFields;
     }
 
@@ -195,5 +178,47 @@ public class ReportUploadProcessor {
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.OFFLINE_DATASETS, key, data);
     }
 
+    private static String getValue(Field field, String period){
+        String value;
+        switch (field.getDataElement()){
+            case Constants.DATE_RECEIVED:
+                // Retrieve current date
+                LocalDate currentDate = new LocalDate();
+                value = currentDate.toString(Constants.DATE_FORMAT);
+                break;
+            case Constants.TIMELY:
+                //Check whether a timely report has already been sent
+                if(!IsTimely.hasBeenSet(field)) {
+                    //Check whether the report was timely or not
+                    Boolean isTimely = IsTimely.check(new DateTime(), period);
+                    value =  String.valueOf(isTimely);
+                }else{
+                    value = field.getValue();
+                }
+                break;
+            default:
+                value = field.getValue();
+                break;
+        }
+        return value;
+
+    }
+
+    private static void addCategoryComboToField(Field field, JsonObject jField){
+        if(!field.getCategoryOptionCombo().equals(Constants.DEFAULT_CATEGORY_COMBO)){
+            jField.addProperty(Field.CATEGORY_OPTION_COMBO, field.getCategoryOptionCombo());
+        }else{
+            jField.addProperty(Field.CATEGORY_OPTION_COMBO, "");
+        }
+    }
+
+    private static JsonObject createDataElementObject(String dataElement, String categoryCombo, String value){
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(Field.DATA_ELEMENT, dataElement);
+        jsonObject.addProperty(Field.CATEGORY_OPTION_COMBO, categoryCombo);
+        jsonObject.addProperty(Field.VALUE, value);
+
+        return jsonObject;
+    }
 
 }

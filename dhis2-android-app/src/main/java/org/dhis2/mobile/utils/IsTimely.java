@@ -38,15 +38,11 @@ public class IsTimely {
         return timely;
     }
 
-    public static Boolean hasBeenSet(ArrayList<Group> groups){
+    public static Boolean hasBeenSet(Field field){
 
-        for(Group group : groups){
-            for(Field field : group.getFields()){
-                if(field.getDataElement().equals(Constants.TIMELY) && field.getValue() != null &&
-                        !field.getValue().equals("")){
-                    return true;
-                }
-            }
+        if(field.getDataElement().equals(Constants.TIMELY) && field.getValue() != null &&
+                !field.getValue().equals("")){
+            return true;
         }
 
         return false;
