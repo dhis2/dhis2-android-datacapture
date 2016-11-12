@@ -47,6 +47,7 @@ public class PrefUtils {
 	private static final String URL = "url";
 	private static final String USER_NAME = "userName";
     private static final String SMS= "sms";
+    private static final String COMPLETION_DATE = "completionDate";
 
 	private PrefUtils() { }
 
@@ -134,6 +135,17 @@ public class PrefUtils {
     public static void saveSMSStatus(Context context, String id, String status){
         Editor editor = context.getSharedPreferences(SMS, context.MODE_PRIVATE).edit();
         editor.putString(id, status).commit();
+    }
+
+    public static void saveCompletionDate(Context context, String submissionId, String date){
+        Editor editor = context.getSharedPreferences(COMPLETION_DATE, context.MODE_PRIVATE).edit();
+        editor.putString(submissionId, date).commit();
+    }
+
+    public static String getCompletionDate(Context context, String submissionId){
+        String date = context.getSharedPreferences(COMPLETION_DATE, Context.MODE_PRIVATE)
+                .getString(submissionId, null);
+        return date;
     }
 
     @Deprecated

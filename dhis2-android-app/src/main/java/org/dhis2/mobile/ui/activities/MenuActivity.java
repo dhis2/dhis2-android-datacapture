@@ -29,6 +29,7 @@
 
 package org.dhis2.mobile.ui.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -38,13 +39,13 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -54,6 +55,7 @@ import org.dhis2.mobile.io.handlers.UserAccountHandler;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 import org.dhis2.mobile.utils.LetterAvatar;
+import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 
@@ -94,6 +96,15 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
                     .findItem(R.id.drawer_item_aggregate_report));
         } else if (savedInstanceState.containsKey(STATE_TOOLBAR_TITLE) && toolbar != null) {
             toolbar.setTitle(savedInstanceState.getString(STATE_TOOLBAR_TITLE));
+        }
+
+
+        if(getIntent().hasExtra(NotificationBuilder.NOTIFICATION_TITLE)
+                && getIntent().hasExtra(NotificationBuilder.NOTIFICATION_MESSAGE)){
+            String title = getIntent().getStringExtra(NotificationBuilder.NOTIFICATION_TITLE);
+            String message = getIntent().getStringExtra(NotificationBuilder.NOTIFICATION_MESSAGE);
+            showNotificationDialog(title, message);
+
         }
     }
 
@@ -195,5 +206,20 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
 
     private String getUserInitials(String firstName, String surname){
         return getFirstLetterInUpperCase(firstName) + getFirstLetterInUpperCase(surname);
+    }
+
+    private void showNotificationDialog(String title, String message){
+        String confirmationText = getString(R.string.form_completion_dialog_confirmation);
+        final AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle(title);
+        dialog.setMessage(message);
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, confirmationText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialog.dismiss();
+            }
+        });
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
     }
 }

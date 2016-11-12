@@ -136,4 +136,9 @@
     <string name="completion_date_example">Completed on: 13th October 2016</string>
     <string name="timely_title">Timely</string>
 
+
+    <!-- Completed Form submission dialog -->
+    <string name="form_completion_dialog_title">Form submission info</string>
+    <string name="form_completion_message">Submission of a form which is already completed is not possible via SMS. This form will be submitted the next time you connect to the internet.</string>
+    <string name="form_completion_dialog_confirmation">OK</string>
 </resources>
