@@ -3,16 +3,13 @@ package org.dhis2.mobile.processors;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.telephony.SmsManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.models.CategoryOption;
@@ -20,6 +17,7 @@ import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.utils.IsTimely;
 import org.dhis2.mobile.utils.KeyGenerator;
+import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.SMSBroadcastReceiver;
 import org.dhis2.mobile.utils.TextFileUtils;
@@ -43,14 +41,21 @@ public class SendSmsProcessor {
     private static final String separator = "=";
     public static final String SMS_KEY = "SMSKey";
 
-    public static void send (Context context, DatasetInfoHolder info, ArrayList<Group> groups){
+    public static void send (final Context context, DatasetInfoHolder info, ArrayList<Group> groups){
         String data = prepareContent(groups);
         String offlineData = ReportUploadProcessor.prepareContent(info, groups);
 
 
         saveDataset(context, offlineData, info);
-        //insert destination number
-        sendSMS(context, Constants.SMS_NUMBER, data, info);
+
+        String submissionId = info.getFormId()+info.getPeriod();
+        if(!hasBeenCompleted(context, submissionId)){
+            sendSMS(context, Constants.SMS_NUMBER, data, info);
+        }else{
+            String title = context.getString(R.string.form_completion_dialog_title);
+            String message = context.getString(R.string.form_completion_message);
+            NotificationBuilder.fireNotificationWithReturnDialog(context, title , message );
+        }
 
 
     }
@@ -123,6 +128,15 @@ public class SendSmsProcessor {
         String jsonReportInfo = gson.toJson(info);
         PrefUtils.saveOfflineReportInfo(context, key, jsonReportInfo);
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.OFFLINE_DATASETS, key, data);
+    }
+
+    private static Boolean hasBeenCompleted(Context context, String submissionId){
+        Boolean hasBeenCompleted = false;
+        if(PrefUtils.getCompletionDate(context, submissionId) != null ){
+            hasBeenCompleted  = true;
+        }
+
+        return hasBeenCompleted;
     }
 
 }

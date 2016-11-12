@@ -12,7 +12,7 @@
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tableLayout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="46dp" >
 
 
         <TableRow
@@ -48,13 +48,15 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:textStyle="bold"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:id="@+id/text_label"
-                    android:padding="8dp"
+                    android:padding="2dp"
                     android:maxWidth="160dp"
                     android:layout_weight="1"
                     android:foregroundGravity="center_vertical"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:contextClickable="false"
+                    android:lines="2" />
 
                 <ImageView
                     android:layout_width="20dp"
@@ -63,84 +65,57 @@
                     android:id="@+id/criticalDiseaseIcon"
                     android:paddingTop="8dp"
                     />
-            </LinearLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/edit_integer_pos_layout"
-                android:layout_weight="1"
-
-                >
-                <!-- cases integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
+                    android:layout_height="match_parent"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
-                    android:selectAllOnFocus="true"
-                    />
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_width="45dp"
+                    android:textSize="14sp" />
 
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/edit_integer_pos_layout_2"
-                android:layout_weight="1"
-                >
-                <!-- deaths integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
-                    android:selectAllOnFocus="true"
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_height="match_parent"
+                    android:layout_width="45dp"
+                    android:textSize="14sp" />
 
-                    />
-
-            </android.support.design.widget.TextInputLayout>
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/edit_integer_pos_layout_3"
-                android:layout_weight="1"
-                >
-                <!-- cases integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
+                    android:layout_height="match_parent"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:selectAllOnFocus="true"
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_width="45dp"
+                    android:textSize="14sp" />
 
-                    />
-
-            </android.support.design.widget.TextInputLayout>
-
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/edit_integer_pos_layout_4"
-                android:layout_weight="1"
-                >
-                <!-- deaths integer row-->
                 <EditText
                     android:id="@+id/edit_integer_pos_row_4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:background="@drawable/editbox_background"
+                    android:layout_height="match_parent"
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="number"
                     android:selectAllOnFocus="true"
+                    android:paddingBottom="11dp"
+                    android:paddingTop="11dp"
+                    android:layout_width="45dp"
+                    android:layout_marginRight="2dp"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
 
 
-                    />
-
-            </android.support.design.widget.TextInputLayout>
         </TableRow>
 
     </TableLayout>

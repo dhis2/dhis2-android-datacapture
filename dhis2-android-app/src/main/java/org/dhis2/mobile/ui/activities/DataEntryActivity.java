@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -23,11 +23,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -279,6 +281,24 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
+        /**
+         *         When the focused view (EditText) goes off screen, the keyboard which would be in number mode switches to full qwerty mode.
+         *         Now when the focused view goes off screen we want to hide the keyboard instead.
+         */
+
+        dataEntryListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if(!(getCurrentFocus() instanceof EditText)){
+                    hideKeyboard();
+                }
+            }
+        });
     }
 
     private void setupUploadButton() {
@@ -539,7 +559,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             finish();
         }
 
-
     }
 
     private Boolean isInvalidForm(ArrayList<Group> groups){
@@ -756,6 +775,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     JsonElement jsonValue = (jsonElement.getAsJsonObject())
                             .get(Field.VALUE);
 
+                    Log.d("JSSONDATA", jsonDataElement.getAsString());
                     String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
                             jsonCategoryCombination.getAsString());
                     String value = jsonValue != null ? jsonValue.getAsString() : "";
@@ -877,5 +897,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             comment.setCategoryOptionCombo(Constants.DEFAULT_CATEGORY_COMBO);
             group.addField(comment);
         }
+    }
+
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = getCurrentFocus();
+        if(view == null){
+            view = new View(getApplicationContext());
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

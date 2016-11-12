@@ -29,9 +29,6 @@
 
 package org.dhis2.mobile.utils;
 
-import org.dhis2.mobile.ui.activities.LauncherActivity;
-import org.dhis2.mobile.R;
-
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -40,7 +37,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.ui.activities.LauncherActivity;
+import org.dhis2.mobile.ui.activities.MenuActivity;
+
 public class NotificationBuilder {
+	public static final String NOTIFICATION_TITLE = "notificationTitle";
+	public static final String NOTIFICATION_MESSAGE = "notificationMessage";
 	private NotificationBuilder() { }
 	
 	public static void fireNotification(Context context, String title, String message) {
@@ -49,19 +52,42 @@ public class NotificationBuilder {
 		PendingIntent contentIntent = PendingIntent.getActivity(context,
 		        id, notificationIntent,
 		        PendingIntent.FLAG_CANCEL_CURRENT);
-		
-		 Notification notification = new  NotificationCompat.Builder(context)
-		 		.setContentIntent(contentIntent)
+
+		Notification notification = buildNotification(context, contentIntent, title,message);
+
+		showNotification(context, notification, id);
+	}
+
+	public static void fireNotificationWithReturnDialog(Context context, String title, String message) {
+		int id = (title + message).hashCode();
+		Intent notificationIntent = new Intent(context, MenuActivity.class);
+		notificationIntent.putExtra(NOTIFICATION_TITLE, title);
+		notificationIntent.putExtra(NOTIFICATION_MESSAGE, message);
+		PendingIntent contentIntent = PendingIntent.getActivity(context,
+				id, notificationIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+
+		Notification notification = buildNotification(context, contentIntent, title,message);
+
+		showNotification(context, notification, id);
+	}
+
+	private static Notification buildNotification(Context context, PendingIntent contentIntent, String title, String message){
+		return new  NotificationCompat.Builder(context)
+				.setContentIntent(contentIntent)
 				.setContentTitle(title)
 				.setContentText(message)
 				.setSmallIcon(R.drawable.ic_notification)
 				.setAutoCancel(true)
-				.build(); 
+				.build();
 
+	}
+
+	private static void showNotification(Context context, Notification notification, int id){
 		NotificationManager notificationManager = (NotificationManager) context
 				.getSystemService(Activity.NOTIFICATION_SERVICE);
 		notification.flags |=  Notification.FLAG_AUTO_CANCEL;
-		
+
 		notificationManager.notify(id, notification);
 	}
 
