@@ -38,13 +38,13 @@
             android:textStyle="bold"
             android:paddingTop="10dp"
             android:id="@+id/under5Label"
-            tools:layout_editor_absoluteY="25dp"
+            tools:layout_editor_absoluteY="50dp"
             app:layout_constraintRight_toLeftOf="@+id/over5Label"
             android:layout_marginEnd="72dp"
             android:layout_marginRight="72dp" />
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/list_view_header_case_title"
             android:textSize="12sp"
@@ -54,7 +54,8 @@
             android:id="@+id/under5Case"
             app:layout_constraintRight_toLeftOf="@+id/under5Death"
             android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp" />
+            android:layout_marginRight="32dp"
+            app:layout_constraintVertical_bias="0.42000002" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -79,7 +80,7 @@
             android:gravity="center"
             android:paddingTop="10dp"
             android:id="@+id/over5Label"
-            tools:layout_editor_absoluteY="25dp"
+            tools:layout_editor_absoluteY="50dp"
             android:layout_marginEnd="48dp"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginRight="48dp" />
@@ -144,12 +145,12 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/under5Case"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:id="@+id/view3" />
 
         <View
-            android:layout_width="1dp"
+            android:layout_width="2dp"
             android:layout_height="70dp"
             android:background="@android:color/darker_gray"
             app:layout_constraintTop_toTopOf="parent"
