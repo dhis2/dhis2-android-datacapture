@@ -37,9 +37,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -136,7 +138,7 @@ public class PosOrZeroIntegerRow2 implements Row {
 
         setupEditTextHolders(holders, fields, view, position);
 
-        setOnFocusChangeListeners(holders, view.getContext());
+        setOnFocusChangeListeners(holders, view);
 
         view.setTag(field.getDataElement());
         view.setContentDescription(field.getDataElement());
@@ -172,14 +174,19 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
     }
 
-    private void setOnFocusChangeListeners(final ArrayList<EditTextHolder> editTextHolders, final Context context){
+    private void setOnFocusChangeListeners(final ArrayList<EditTextHolder> editTextHolders, View view){
+        final Context context = view.getContext();
         for( int i = 0; i < editTextHolders.size(); i++){
             final int finalI = i;
             editTextHolders.get(i).editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View view, boolean hasFocus) {
+                    EditText editText = editTextHolders.get(finalI).editText;
+                    if(hasFocus && !editText.isEnabled()){
+                        hideKeyboard(context, view);
+                    }
                     autoZeroChecks(hasFocus, editTextHolders, finalI);
-                    if (hasLostFocusAndIsNotEmpty(hasFocus,editTextHolders.get(finalI).editText)) {
+                    if (hasLostFocusAndIsNotEmpty(hasFocus,editText)) {
                         setupValidations(editTextHolders.get(finalI),editTextHolders, finalI, context);
                     }
                     //Highlight disease label if all fields have a value meaning the row is complete.
@@ -479,5 +486,12 @@ public class PosOrZeroIntegerRow2 implements Row {
         }
     }
 
+    private void hideKeyboard(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(view == null){
+            view = new View(context);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
 }
