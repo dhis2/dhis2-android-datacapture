@@ -1,7 +1,7 @@
-import org.dhis2.mobile.io.Constants;
-import org.dhis2.mobile.io.models.Field;
-import org.dhis2.mobile.io.models.Group;
-import org.dhis2.mobile.utils.IsTimely;
+import org.dhis2.ehealthMobile.io.Constants;
+import org.dhis2.ehealthMobile.io.models.Field;
+import org.dhis2.ehealthMobile.io.models.Group;
+import org.dhis2.ehealthMobile.utils.IsTimely;
 import org.joda.time.DateTime;
 import org.junit.Test;
 

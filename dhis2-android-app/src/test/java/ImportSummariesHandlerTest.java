@@ -1,4 +1,4 @@
-import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
+import org.dhis2.ehealthMobile.io.handlers.ImportSummariesHandler;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;

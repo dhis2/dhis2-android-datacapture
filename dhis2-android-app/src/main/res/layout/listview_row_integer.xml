@@ -9,7 +9,7 @@
 
     <include layout="@layout/listview_row_label" />
 
-    <org.dhis2.mobile.ui.views.FontEditText
+    <org.dhis2.ehealthMobile.ui.views.FontEditText
         android:id="@+id/edit_integer_row"
         style="@style/ListViewEditTextStyle"
         android:hint="@string/enter_integer"

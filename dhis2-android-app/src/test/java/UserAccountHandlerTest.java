@@ -1,7 +1,7 @@
 import android.content.Context;
 
-import org.dhis2.mobile.io.handlers.UserAccountHandler;
-import org.dhis2.mobile.io.models.Field;
+import org.dhis2.ehealthMobile.io.handlers.UserAccountHandler;
+import org.dhis2.ehealthMobile.io.models.Field;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

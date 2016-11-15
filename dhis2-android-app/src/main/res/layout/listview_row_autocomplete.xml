@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <org.dhis2.mobile.ui.views.FontAutoCompleteTextView
+        <org.dhis2.ehealthMobile.ui.views.FontAutoCompleteTextView
             android:id="@+id/chooseOption"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

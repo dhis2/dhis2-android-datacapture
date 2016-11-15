@@ -10,6 +10,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
+        applicationId "org.dhis2.ehealthMobile"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 14
