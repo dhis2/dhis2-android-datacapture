@@ -2,14 +2,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.dhis2.mobile.io.json.JsonHandler;
-import org.dhis2.mobile.io.json.ParsingException;
-import org.dhis2.mobile.io.models.OrganizationUnit;
-import org.dhis2.mobile.network.Response;
+import org.dhis2.ehealthMobile.io.json.JsonHandler;
+import org.dhis2.ehealthMobile.io.json.ParsingException;
+import org.dhis2.ehealthMobile.io.models.OrganizationUnit;
+import org.dhis2.ehealthMobile.network.Response;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
+import static org.dhis2.ehealthMobile.io.json.JsonHandler.fromJson;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;

@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="horizontal" >
 
-        <org.dhis2.mobile.ui.views.FontRadioButton
+        <org.dhis2.ehealthMobile.ui.views.FontRadioButton
             android:id="@+id/true_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             android:text="@string/yes_button"
             app:font="@string/regular_font_name"/>
 
-        <org.dhis2.mobile.ui.views.FontRadioButton
+        <org.dhis2.ehealthMobile.ui.views.FontRadioButton
             android:id="@+id/false_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
             android:text="@string/no_button"
             app:font="@string/regular_font_name" />
 
-        <org.dhis2.mobile.ui.views.FontRadioButton
+        <org.dhis2.ehealthMobile.ui.views.FontRadioButton
             android:id="@+id/none_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

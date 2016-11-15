@@ -22,7 +22,7 @@
         android:contentDescription="@string/desc"
         android:src="@drawable/dhis2_logo" />
 
-    <org.dhis2.mobile.ui.views.FontEditText
+    <org.dhis2.ehealthMobile.ui.views.FontEditText
         android:id="@+id/server_url"
         style="@style/LoginEditTextProperies"
         android:layout_below="@id/dhis2_logo"
@@ -32,7 +32,7 @@
         android:inputType="textUri"
         app:font="@string/regular_font_name" />
 
-    <org.dhis2.mobile.ui.views.FontEditText
+    <org.dhis2.ehealthMobile.ui.views.FontEditText
         android:id="@+id/username"
         style="@style/LoginEditTextProperies"
         android:layout_below="@+id/server_url"
@@ -41,7 +41,7 @@
         android:hint="@string/username"
         app:font="@string/regular_font_name" />
 
-    <org.dhis2.mobile.ui.views.FontEditText
+    <org.dhis2.ehealthMobile.ui.views.FontEditText
         android:id="@+id/password"
         style="@style/LoginEditTextProperies"
         android:layout_below="@+id/username"
@@ -51,7 +51,7 @@
         android:inputType="textPassword"
         app:font="@string/regular_font_name" />
 
-    <org.dhis2.mobile.ui.views.FontButton
+    <org.dhis2.ehealthMobile.ui.views.FontButton
         android:id="@+id/login_button"
         android:layout_width="180dp"
         android:layout_height="40dp"

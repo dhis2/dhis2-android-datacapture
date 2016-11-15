@@ -1,4 +1,4 @@
-import org.dhis2.mobile.io.models.Field;
+import org.dhis2.ehealthMobile.io.models.Field;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
