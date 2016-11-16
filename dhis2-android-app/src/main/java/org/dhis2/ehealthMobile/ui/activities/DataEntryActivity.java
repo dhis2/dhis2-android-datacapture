@@ -1,5 +1,6 @@
 package org.dhis2.ehealthMobile.ui.activities;
 
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -287,6 +289,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private void setupScrollView(){
         NestedScrollView scroll = (NestedScrollView)findViewById(R.id.scrollView);
         if(scroll != null){
+            //Solves random editTexts getting focus error
             scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
             scroll.setFocusable(true);
             scroll.setFocusableInTouchMode(true);
@@ -310,7 +313,13 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         dataEntryListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
-
+                //Solves parameter must be a descendant of this view error
+                if (SCROLL_STATE_TOUCH_SCROLL == scrollState) {
+                    View currentFocus = getCurrentFocus();
+                    if (currentFocus != null && !(currentFocus instanceof EditText)) {
+                        currentFocus.clearFocus();
+                    }
+                }
             }
 
             @Override
@@ -798,7 +807,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     JsonElement jsonValue = (jsonElement.getAsJsonObject())
                             .get(Field.VALUE);
 
-                    Log.d("JSSONDATA", jsonDataElement.getAsString());
                     String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
                             jsonCategoryCombination.getAsString());
                     String value = jsonValue != null ? jsonValue.getAsString() : "";
@@ -833,18 +841,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
         String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
         completionDate.setText(text);
-//        setTopMargin(listViewHeader, 30);
-//        setTopMargin(dataEntryListView, 30);
 
-    }
-
-    private void setTopMargin(View view, int top){
-        int marginInDp = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, top, getResources()
-                        .getDisplayMetrics());
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-        params.topMargin = marginInDp;
-        view.setLayoutParams(params);
     }
 
     private void handleSubmissionDetails(ArrayList<Group> groups){
