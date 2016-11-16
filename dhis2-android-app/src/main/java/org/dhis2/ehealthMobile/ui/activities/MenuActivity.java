@@ -41,6 +41,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -191,8 +192,12 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
 
         }
 
+        int sizeInDp = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 60, getResources()
+                        .getDisplayMetrics());
+
         ImageView avatar = (ImageView) navHeader.findViewById(R.id.side_nav_photo);
-        Bitmap bitmap = Bitmap.createBitmap(150, 150,Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(sizeInDp, sizeInDp,Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         LetterAvatar letterAvatar = new LetterAvatar(getApplicationContext(), Color.parseColor("#FF0000"), initials, 10 );
         letterAvatar.draw(canvas);
