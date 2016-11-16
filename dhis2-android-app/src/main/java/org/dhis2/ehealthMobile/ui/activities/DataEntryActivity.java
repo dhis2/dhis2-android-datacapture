@@ -15,6 +15,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -33,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -150,6 +153,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupProgressBar(savedInstanceState);
 
         setupListView();
+        setupScrollView();
         persistentButtonsFooter = findViewById(R.id.persistent_buttons_footer);
         setupUploadButton();
         setupAddDiseaseBtn();
@@ -280,6 +284,22 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         }
     }
 
+    private void setupScrollView(){
+        NestedScrollView scroll = (NestedScrollView)findViewById(R.id.scrollView);
+        if(scroll != null){
+            scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+            scroll.setFocusable(true);
+            scroll.setFocusableInTouchMode(true);
+            scroll.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    v.requestFocusFromTouch();
+                    return false;
+                }
+            });
+        }
+    }
+
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
         /**
@@ -298,8 +318,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 if(!(getCurrentFocus() instanceof EditText)){
                     hideKeyboard();
                 }
+
             }
         });
+
     }
 
     private void setupUploadButton() {
@@ -386,10 +408,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         listViewHeader = findViewById(R.id.listViewHeader);
 
-        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 115);
+        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 1);
         headerAnimator.setDuration(200);
 
-        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 115);
+        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 1);
         listViewAnimator.setDuration(200);
 
         final ObjectAnimator buttonAnimator = ObjectAnimator.ofFloat(expandButton, "x", 180);
@@ -811,8 +833,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
         String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
         completionDate.setText(text);
-        setTopMargin(listViewHeader, 30);
-        setTopMargin(dataEntryListView, 30);
+//        setTopMargin(listViewHeader, 30);
+//        setTopMargin(dataEntryListView, 30);
 
     }
 
