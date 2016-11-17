@@ -50,7 +50,7 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name="org.dhis2.ehealthMobile.ui.activities.DataEntryActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"/>
 
         <meta-data
