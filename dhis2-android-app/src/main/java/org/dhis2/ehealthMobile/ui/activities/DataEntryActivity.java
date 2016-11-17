@@ -386,10 +386,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         listViewHeader = findViewById(R.id.listViewHeader);
 
-        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", 115);
+        int marginInDp = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 80, getResources()
+                        .getDisplayMetrics());
+
+        final ObjectAnimator headerAnimator = ObjectAnimator.ofFloat(listViewHeader, "y", marginInDp);
         headerAnimator.setDuration(200);
 
-        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", 115);
+        final ObjectAnimator listViewAnimator = ObjectAnimator.ofFloat(dataEntryListView, "y", marginInDp);
         listViewAnimator.setDuration(200);
 
         final ObjectAnimator buttonAnimator = ObjectAnimator.ofFloat(expandButton, "x", 180);
