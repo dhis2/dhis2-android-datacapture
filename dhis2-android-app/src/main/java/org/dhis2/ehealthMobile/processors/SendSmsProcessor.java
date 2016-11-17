@@ -32,7 +32,9 @@ public class SendSmsProcessor {
     public static final String TAG = SendSmsProcessor.class.getSimpleName();
     private static final String receiptOfFormKey = "rof";
     private static final String dateReceivedKey = "dr";
-    private static final String separator = "=";
+    private static final String kVSeparator = "=";
+    //Data value separator
+    private static final String dVSeparator = "|";
     public static final String SMS_KEY = "SMSKey";
 
     public static void send (final Context context, DatasetInfoHolder info, ArrayList<Group> groups){
@@ -67,22 +69,22 @@ public class SendSmsProcessor {
         for (Group group : submissionData) {
             for (Field field : group.getFields()) {
                 if(!field.getValue().equals("")) {
-                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2)+ separator;
-                    message += field.getValue()+"|";
+                    message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2) + kVSeparator;
+                    message += field.getValue() + dVSeparator;
 
                 }
             }
         }
 
         //Fill out submission method as SMS.
-        message += receiptOfFormKey+ separator +Constants.SMS_SUBMISSION;
+        message += receiptOfFormKey + kVSeparator + Constants.SMS_SUBMISSION;
 
         // Retrieve current date
         LocalDate currentDate = new LocalDate();
         String completeDate = currentDate.toString(Constants.DATE_FORMAT);
 
         //Fill out date received method
-        message += dateReceivedKey + separator + completeDate;
+        message += dVSeparator + dateReceivedKey + kVSeparator + completeDate;
 
         return message;
     }
