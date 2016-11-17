@@ -1,6 +1,6 @@
 package org.dhis2.ehealthMobile.ui.activities;
 
-import android.animation.LayoutTransition;
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -8,10 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
@@ -22,7 +24,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -37,7 +38,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +81,7 @@ import static android.text.TextUtils.isEmpty;
 
 public class DataEntryActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Form> {
     public static final String TAG = DataEntryActivity.class.getSimpleName();
+    private static final int MY_PERMISSIONS_SEND_SMS = 1;
 
     // state keys
     private static final String STATE_REPORT = "state:report";
@@ -129,6 +130,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private EditText commentField;
     private IsDisabled isDisabled;
+
+    private Boolean requested_permission_denied = false;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -244,6 +247,26 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<Form> loader) {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case MY_PERMISSIONS_SEND_SMS:{
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //Permission granted ヽ(´▽`)/
+                    upload();
+                } else {
+                    // permission denied, ¯\_(⊙︿⊙)_/¯
+                    //call the upload method again, but this time it'll call the report upload service.
+                    //Without an internet connection this will then store the data locally for upload when there is one.
+                    requested_permission_denied = true;
+                    upload();
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void setupToolbar() {
@@ -561,8 +584,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return;
         }
 
-
-
             ArrayList<Group> groups = new ArrayList<>();
             for (FieldAdapter adapter : adapters) {
                 groups.add(adapter.getGroup());
@@ -574,21 +595,25 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             DatasetInfoHolder info = getIntent().getExtras()
                     .getParcelable(DatasetInfoHolder.TAG);
 
-        Intent intent = new Intent(this, WorkService.class);
-        //Check if network is available. If not send via sms or else just upload via internet
-        if(!NetworkUtils.checkConnection(getApplicationContext())){
-            intent.putExtra(WorkService.METHOD, WorkService.METHOD_SEND_VIA_SMS);
-        }else {
-            intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
-        }
-        intent.putExtra(DatasetInfoHolder.TAG, info);
-        intent.putExtra(Group.TAG, groups);
-
         if(isInvalidForm(groups)){
             showCompulsoryFieldsDialog();
         }else {
-            startService(intent);
-            finish();
+            Intent intent = new Intent(this, WorkService.class);
+            intent.putExtra(DatasetInfoHolder.TAG, info);
+            intent.putExtra(Group.TAG, groups);
+
+            if(!NetworkUtils.checkConnection(getApplicationContext()) && PackageManager.PERMISSION_GRANTED == checkPermissions()){
+                intent.putExtra(WorkService.METHOD, WorkService.METHOD_SEND_VIA_SMS);
+                startService(intent);
+                finish();
+            }else if(!NetworkUtils.checkConnection(getApplicationContext()) && !requested_permission_denied){
+                //When a previous permissions request hasn't been made and rejected
+                showSMSPermissionExplanationDialog();
+            }else{
+                intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
+                startService(intent);
+                finish();
+            }
         }
 
     }
@@ -929,5 +954,35 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             view = new View(getApplicationContext());
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private int checkPermissions(){
+        return  ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS);
+    }
+
+    private void showSMSPermissionExplanationDialog(){
+        String title = getString(R.string.sms_permission_dialog_title);
+        String message = getString(R.string.sms_permission_dialog_message);
+        String confirmationText = getString(R.string.sms_permission_dialog_confirmation);
+
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setTitle(title);
+        dialog.setMessage(message);
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, confirmationText, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                requestPermission();
+            }
+        });
+
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
+    private void requestPermission(){
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.SEND_SMS},
+                MY_PERMISSIONS_SEND_SMS);
     }
 }

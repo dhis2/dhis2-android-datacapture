@@ -141,4 +141,9 @@
     <string name="form_completion_dialog_title">Form submission info</string>
     <string name="form_completion_message">Submission of a form which is already completed is not possible via SMS. This form will be submitted the next time you connect to the internet.</string>
     <string name="form_completion_dialog_confirmation">OK</string>
+
+    <!-- SMS permission dialog -->
+    <string name="sms_permission_dialog_title">Permission Required</string>
+    <string name="sms_permission_dialog_message">The DHIS2 eHealth app requires SMS permission in order to submit forms via SMS</string>
+    <string name="sms_permission_dialog_confirmation">OK</string>
 </resources>
