@@ -23,8 +23,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:singleLine="true"
-            android:textSize="17sp"
-            app:font="@string/regular_font_name" />
+            android:textSize="12sp"
+            app:font="@string/regular_font_name"
+            android:visibility="gone" />
 
         <org.dhis2.mobile.ui.views.FontTextView
             android:id="@+id/form_description"
@@ -33,8 +34,9 @@
             android:layout_marginBottom="4dp"
             android:singleLine="true"
             android:textColor="@drawable/organization_unit_textview_color_state"
-            android:textSize="14sp"
-            app:font="@string/regular_font_name" />
+            android:textSize="10sp"
+            app:font="@string/regular_font_name"
+            android:visibility="gone" />
 
         <org.dhis2.mobile.ui.views.FontTextView
             android:id="@+id/choosen_unit"
@@ -42,8 +44,20 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textColor="@drawable/organization_unit_textview_color_state"
-            android:textSize="14sp"
-            app:font="@string/regular_font_name" />
+            android:textSize="10sp"
+            app:font="@string/regular_font_name"
+            android:visibility="gone" />
+
+        <TextView
+            android:text="Open Form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:textColor="@color/actionbar_blue"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal|bold" />
 
     </LinearLayout>
 
