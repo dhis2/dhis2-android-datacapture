@@ -265,7 +265,7 @@ public class PosOrZeroIntegerRow2 implements Row {
         deaths = getValueFromEditText(deathsEditTextHolder.editText);
         cases = getValueFromEditText(casesEditTextHolder.editText);
 
-        if(deaths > cases){
+        if(deaths > cases && casesEditTextHolder.editText.isEnabled()){
 
             alertDialog.setTitle(context.getString(R.string.validation_alert_dialog_title));
             alertDialog.setMessage("You are about to submit more deaths than cases for "+field.getLabel().split(PREFIX)[0].substring(6));
