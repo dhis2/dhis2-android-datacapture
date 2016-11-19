@@ -190,21 +190,28 @@ public class ReportUploadProcessor {
                 value = currentDate.toString(Constants.DATE_FORMAT);
                 break;
             case Constants.TIMELY:
-                //Check whether a timely report has already been sent
-                if(!IsTimely.hasBeenSet(field)) {
-                    //Check whether the report was timely or not
-                    Boolean isTimely = IsTimely.check(new DateTime(), period);
-                    value =  String.valueOf(isTimely);
-                }else{
-                    value = field.getValue();
-                }
+                value = getTimeliness(field, period);
                 break;
             default:
                 value = field.getValue();
                 break;
         }
         return value;
+    }
 
+    private static String getTimeliness(Field field, String period) {
+        String value = null;
+
+        //Check whether a timely report has already been sent
+        if(!IsTimely.hasBeenSet(field)) {
+            //Check whether the report was timely or not
+            Boolean isTimely = IsTimely.check(new DateTime(), period);
+            value = String.valueOf(isTimely);
+        } else {
+            value = field.getValue();
+        }
+
+        return value;
     }
 
     private static void addCategoryComboToField(Field field, JsonObject jField){

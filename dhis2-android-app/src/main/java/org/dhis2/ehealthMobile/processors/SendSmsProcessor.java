@@ -12,11 +12,13 @@ import org.dhis2.ehealthMobile.io.Constants;
 import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.Field;
 import org.dhis2.ehealthMobile.io.models.Group;
+import org.dhis2.ehealthMobile.utils.IsTimely;
 import org.dhis2.ehealthMobile.utils.KeyGenerator;
 import org.dhis2.ehealthMobile.utils.NotificationBuilder;
 import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.dhis2.ehealthMobile.utils.SMSBroadcastReceiver;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
@@ -32,13 +34,14 @@ public class SendSmsProcessor {
     public static final String TAG = SendSmsProcessor.class.getSimpleName();
     private static final String receiptOfFormKey = "rof";
     private static final String dateReceivedKey = "dr";
-    private static final String kVSeparator = "=";
-    //Data value separator
-    private static final String dVSeparator = "|";
+    private static final String timelyKey = "tr";
+    private static final String cmdSeparator = " ";  //SMS command separator
+    private static final String kVSeparator = "=";  //Key value separator
+    private static final String dVSeparator = "|";  //Data value separator
     public static final String SMS_KEY = "SMSKey";
 
     public static void send (final Context context, DatasetInfoHolder info, ArrayList<Group> groups){
-        String data = prepareContent(groups);
+        String data = prepareContent(info, groups);
         String offlineData = ReportUploadProcessor.prepareContent(info, groups);
 
 
@@ -55,12 +58,13 @@ public class SendSmsProcessor {
 
 
     }
-    private static String prepareContent(ArrayList<Group> submissionData){
+
+    private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> submissionData){
         KeyGenerator keyGenerator = new KeyGenerator();
         String commandName = Constants.COMMAND_NAME;
 
         String message = "";
-        message += commandName+" ";
+        message += commandName + cmdSeparator;
         //TODO: insert period
         //TODO: insert org unit
 
@@ -70,8 +74,7 @@ public class SendSmsProcessor {
             for (Field field : group.getFields()) {
                 if(!field.getValue().equals("")) {
                     message += keyGenerator.generate(field.getDataElement(), field.getCategoryOptionCombo(), 2) + kVSeparator;
-                    message += field.getValue() + dVSeparator;
-
+                    message += sanitiseValue(field.getValue()) + dVSeparator;
                 }
             }
         }
@@ -86,7 +89,24 @@ public class SendSmsProcessor {
         //Fill out date received method
         message += dVSeparator + dateReceivedKey + kVSeparator + completeDate;
 
+        // Add Timeliness
+        Boolean isTimely = IsTimely.check(new DateTime(), info.getPeriod());
+        message += dVSeparator + timelyKey + kVSeparator + String.valueOf(isTimely);
+
         return message;
+    }
+
+    /**
+     * Ensures none of the dataValues include a separator character
+     * @param dataValue String The dataValue to sanitise.
+     */
+    private static String sanitiseValue(final String dataValue) {
+        String sanitisedValue = dataValue;
+        sanitisedValue = sanitisedValue.replace(cmdSeparator, "_");
+        sanitisedValue = sanitisedValue.replace(dVSeparator, "_");
+        sanitisedValue = sanitisedValue.replace(kVSeparator, "_");
+
+        return sanitisedValue;
     }
 
     /**
