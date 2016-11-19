@@ -44,19 +44,16 @@ public class SendSmsProcessor {
         String data = prepareContent(info, groups);
         String offlineData = ReportUploadProcessor.prepareContent(info, groups);
 
-
         saveDataset(context, offlineData, info);
 
         String submissionId = info.getFormId()+info.getPeriod();
-        if(!hasBeenCompleted(context, submissionId)){
-            sendSMS(context, Constants.SMS_NUMBER, data, info);
-        }else{
+        if (!hasBeenCompleted(context, submissionId)) {
+            sendSMS(context, PrefUtils.getSmsNumber(context), data, info);
+        } else {
             String title = context.getString(R.string.form_completion_dialog_title);
             String message = context.getString(R.string.form_completion_message);
             NotificationBuilder.fireNotificationWithReturnDialog(context, title , message );
         }
-
-
     }
 
     private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> submissionData){
