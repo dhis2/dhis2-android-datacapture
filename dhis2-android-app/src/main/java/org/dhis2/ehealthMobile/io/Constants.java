@@ -41,7 +41,6 @@ public class Constants {
     public static final String DATA_VALUES = "dataValues";
     public static final String DATE_FORMAT = "YYYY-MM-dd";
     public static final String TIMELY = "BpG5Yq4EWMT";
-//    public static final String SMS_NUMBER = "";
     public static final String UNDER_FIVE_CASES = "e079rjYqlMH";
     public static final String OVER_FIVE_CASES = "jpmVF8rhBNA";
     public static final String OVER_FIVE_DEATHS = "Ciavs7v4qYa";

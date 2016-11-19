@@ -12,38 +12,39 @@ import org.dhis2.ehealthMobile.network.Response;
 import org.dhis2.ehealthMobile.network.URLConstants;
 import org.dhis2.ehealthMobile.ui.activities.DataEntryActivity;
 import org.dhis2.ehealthMobile.utils.PrefUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by jasper on 10/31/16.
  */
 
 public class SMSNumberProcessor {
+    public static final String TAG = SMSNumberProcessor.class.getSimpleName();
 
     public static String SMS_NUMBER = "smsNumber";
 
     public static void download(Context context){
-        Log.d("SMSNumerProcessor", "downloading sms number...");
-
         String url  = buildUrl(context);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
 
         if (response.getCode() >= 200 && response.getCode() < 300) {
-            saveDataset(context, response.getBody());
-//            Intent intent  = new Intent(DataEntryActivity.TAG);
-//            intent.putExtra(Response.CODE, response.getCode());
-//            intent.putExtra(SMS_NUMBER, response.getBody());
-//            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            String smsNumber;
+            try {
+                JSONObject obj = new JSONObject(response.getBody());
+                smsNumber = obj.getString(SMS_NUMBER);
+            } catch (JSONException e) {
+                Log.e(TAG, e.getMessage());
+                return;
+            }
+
+            PrefUtils.saveSmsNumber(context, smsNumber);
         }
     }
 
     private static String buildUrl(Context context){
         String server = PrefUtils.getServerURL(context);
         return server + URLConstants.DATA_STORE + "/" + URLConstants.SMS_NUMBER_URL ;
-    }
-
-    private static void saveDataset(Context context, String data) {
-        Log.d("SMSNumerProcessor", "saveDataset: data is " + data);
-        PrefUtils.saveSmsNumber(context, data);
     }
 }
