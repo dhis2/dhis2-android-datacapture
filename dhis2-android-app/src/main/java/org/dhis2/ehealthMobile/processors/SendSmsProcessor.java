@@ -46,7 +46,7 @@ public class SendSmsProcessor {
 
         String submissionId = info.getFormId()+info.getPeriod();
         if(!hasBeenCompleted(context, submissionId)){
-            sendSMS(context, Constants.SMS_NUMBER, data, info);
+            sendSMS(context, PrefUtils.getSmsNumber(context), data, info);
         }else{
             String title = context.getString(R.string.form_completion_dialog_title);
             String message = context.getString(R.string.form_completion_message);
