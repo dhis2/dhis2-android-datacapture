@@ -807,6 +807,13 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     JsonElement jsonValue = (jsonElement.getAsJsonObject())
                             .get(Field.VALUE);
 
+                    //Temporary fix
+                    if(jsonCategoryCombination.getAsString().equals("")){
+                        JsonObject defaultCombo = new JsonObject();
+                        defaultCombo.addProperty(Field.CATEGORY_OPTION_COMBO, Constants.DEFAULT_CATEGORY_COMBO);
+                        jsonCategoryCombination = defaultCombo.getAsJsonObject().get(Field.CATEGORY_OPTION_COMBO);
+                    }
+
                     String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
                             jsonCategoryCombination.getAsString());
                     String value = jsonValue != null ? jsonValue.getAsString() : "";
