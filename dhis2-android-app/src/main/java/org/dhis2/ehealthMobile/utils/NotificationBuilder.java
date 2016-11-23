@@ -35,6 +35,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import org.dhis2.ehealthMobile.R;
@@ -73,17 +75,22 @@ public class NotificationBuilder {
 	}
 
 	private static Notification buildNotification(Context context, PendingIntent contentIntent, String title, String message){
+		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		long[] vibrationPattern = new long[] { 500, 2000, 500, 2000, 500, 2000 };
 		return new  NotificationCompat.Builder(context)
 				.setContentIntent(contentIntent)
 				.setContentTitle(title)
 				.setContentText(message)
 				.setSmallIcon(R.drawable.ic_notification)
 				.setAutoCancel(true)
+				.setSound(soundUri)
+				.setVibrate(vibrationPattern)
 				.build();
 
 	}
 
 	private static void showNotification(Context context, Notification notification, int id){
+		//Define sound URI
 		NotificationManager notificationManager = (NotificationManager) context
 				.getSystemService(Activity.NOTIFICATION_SERVICE);
 		notification.flags |=  Notification.FLAG_AUTO_CANCEL;
