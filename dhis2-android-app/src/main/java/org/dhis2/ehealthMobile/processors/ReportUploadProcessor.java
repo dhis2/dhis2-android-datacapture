@@ -125,12 +125,11 @@ public class ReportUploadProcessor {
 
         // Retrieve current date
         LocalDateTime currentDate = new LocalDateTime();
-        String completeDate = currentDate.toString(Constants.DATE_COMPLETED_FORMAT);
 
         content.addProperty(Constants.ORG_UNIT_ID, info.getOrgUnitId());
         content.addProperty(Constants.DATA_SET_ID, info.getFormId());
         content.addProperty(Constants.PERIOD, info.getPeriod());
-        content.addProperty(Constants.COMPLETE_DATE, completeDate);
+        content.addProperty(Constants.COMPLETE_DATE, currentDate.toString());
         content.add(Constants.DATA_VALUES, values);
 
         JsonArray categoryOptions = putCategoryOptionsInJson(info.getCategoryOptions());
