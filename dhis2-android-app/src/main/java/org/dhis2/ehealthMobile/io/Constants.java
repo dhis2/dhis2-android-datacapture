@@ -52,6 +52,7 @@ public class Constants {
     public static final String COMMENT_FIELD = "S3rFf2qxuah";
     public static final String DATE_RECEIVED = "ETiug23P1Ns";
     public static final String DEFAULT_CATEGORY_COMBO = "DAv5bv9oqMW";
+    public static final String DATE_COMPLETED_FORMAT = "dd MMM yyyy HH:mm:ss";
 
 
 
