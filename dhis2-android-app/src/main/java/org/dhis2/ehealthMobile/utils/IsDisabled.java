@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.EditText;
 
 import org.dhis2.ehealthMobile.R;
+import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.Field;
 import org.dhis2.ehealthMobile.io.models.eidsr.Disease;
 
@@ -22,8 +23,8 @@ public class IsDisabled {
     private final Map diseases;
     private final Context context;
 
-    public IsDisabled(Context context){
-        this.diseases = DiseaseImporter.importDiseases(context);
+    public IsDisabled(Context context, DatasetInfoHolder info){
+        this.diseases = DiseaseImporter.importDiseases(context, info.getFormId());
         this.context = context;
     }
 

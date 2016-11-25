@@ -1,6 +1,5 @@
 package org.dhis2.ehealthMobile.ui.activities;
 
-import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -10,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -22,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -37,7 +34,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +53,6 @@ import org.dhis2.ehealthMobile.io.models.Group;
 import org.dhis2.ehealthMobile.network.HTTPClient;
 import org.dhis2.ehealthMobile.network.NetworkUtils;
 import org.dhis2.ehealthMobile.network.Response;
-import org.dhis2.ehealthMobile.processors.CompulsoryDataProcessor;
 import org.dhis2.ehealthMobile.processors.SubmissionDetailsProcessor;
 import org.dhis2.ehealthMobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.ehealthMobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow2;
@@ -161,7 +156,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupAddDiseaseBtn();
         setupDeleteDialog();
         setupCompulsoryFieldsDialog();
-        isDisabled = new IsDisabled(getApplicationContext());
+        isDisabled = new IsDisabled(getApplicationContext(), infoHolder);
         setupSubmissionDetailsViews();
 
         // let's try to get latest values from API
@@ -345,6 +340,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void setupAddDiseaseBtn(){
+        final DatasetInfoHolder info = getIntent().getExtras()
+                .getParcelable(DatasetInfoHolder.TAG);
         addDiseaseButton = findViewById(R.id.add_button);
         addDiseaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -352,6 +349,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 AdditionalDiseasesFragment additionalDiseasesFragment = new AdditionalDiseasesFragment();
                 Bundle args = new Bundle();
                 args.putString(ALREADY_DISPLAYED, additionalDiseaseIds.keySet().toString());
+                args.putString(Form.TAG, info.getFormId());
                 additionalDiseasesFragment.setArguments(args);
                 additionalDiseasesFragment.show(getSupportFragmentManager(), TAG);
 
@@ -459,11 +457,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             // we need to check if connection is there first
             if (NetworkUtils.checkConnection(this)) {
                 getLatestValues();
-                getCompulsoryData();
                 getCompletionDate();
-            }else{
-                compulsoryData = PrefUtils.getCompulsoryData(getApplicationContext(), infoHolder.getFormId());
             }
+
+            compulsoryData = PrefUtils.getCompulsoryDiseases(getApplicationContext(), infoHolder.getFormId());
+
         }
     }
 
@@ -502,12 +500,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void loadGroupsIntoAdapters(List<Group> groups) {
+        DatasetInfoHolder info = getIntent().getExtras()
+                .getParcelable(DatasetInfoHolder.TAG);
         if (groups != null) {
             List<FieldAdapter> adapters = new ArrayList<>();
 
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this));
+                    adapters.add(new FieldAdapter(info, group, this));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -560,8 +560,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                     Toast.LENGTH_SHORT).show();
             return;
         }
-
-
 
             ArrayList<Group> groups = new ArrayList<>();
             for (FieldAdapter adapter : adapters) {
@@ -619,15 +617,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         startService(intent);
     }
 
-    private void getCompulsoryData(){
-        DatasetInfoHolder info = getIntent().getExtras()
-                .getParcelable(DatasetInfoHolder.TAG);
-        Intent intent = new Intent(this, WorkService.class);
-        intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_COMPULSORY_DATA);
-        intent.putExtra(DatasetInfoHolder.TAG, info);
-        startService(intent);
-    }
-
     private void getCompletionDate(){
         DatasetInfoHolder info = getIntent().getExtras()
                 .getParcelable(DatasetInfoHolder.TAG);
@@ -663,10 +652,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                         handleSubmissionDetails(form.getGroups());
                         setupCommentRowAsFooter(form);
                     }
-                }
-
-                if(intent.getExtras().containsKey(CompulsoryDataProcessor.COMPULSORY_DATA)){
-                    compulsoryData = intent.getExtras().getString(CompulsoryDataProcessor.COMPULSORY_DATA);
                 }
 
                 if (intent.getExtras().containsKey(SubmissionDetailsProcessor.SUBMISSION_DETAILS)) {

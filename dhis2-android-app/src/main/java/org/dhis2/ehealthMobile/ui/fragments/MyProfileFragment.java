@@ -275,7 +275,7 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
 
     private void onLoadFinished(Group group, boolean withAnimation) {
         Log.i("onLoadFinished()", "isCalled");
-        mAdapter = new FieldAdapter(group, getActivity());
+        mAdapter = new FieldAdapter(null, group, getActivity());
         mList.setAdapter(mAdapter);
 
         hideProgressBar(withAnimation);
