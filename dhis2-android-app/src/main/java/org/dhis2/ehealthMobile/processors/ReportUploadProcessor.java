@@ -53,6 +53,7 @@ import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,13 +124,12 @@ public class ReportUploadProcessor {
         JsonArray values = putFieldValuesInJson(groups, period);
 
         // Retrieve current date
-        LocalDate currentDate = new LocalDate();
-        String completeDate = currentDate.toString(Constants.DATE_FORMAT);
+        LocalDateTime currentDate = new LocalDateTime();
 
         content.addProperty(Constants.ORG_UNIT_ID, info.getOrgUnitId());
         content.addProperty(Constants.DATA_SET_ID, info.getFormId());
         content.addProperty(Constants.PERIOD, info.getPeriod());
-        content.addProperty(Constants.COMPLETE_DATE, completeDate);
+        content.addProperty(Constants.COMPLETE_DATE, currentDate.toString());
         content.add(Constants.DATA_VALUES, values);
 
         JsonArray categoryOptions = putCategoryOptionsInJson(info.getCategoryOptions());

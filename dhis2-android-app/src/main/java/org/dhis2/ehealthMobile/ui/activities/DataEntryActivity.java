@@ -838,7 +838,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private void handleCompletionDate(String details){
         DateTime dateTime = new DateTime(details);
         ViewUtils.enableViews(submissionDetailsLayout);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(Constants.DATE_COMPLETED_FORMAT);
         String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
         completionDate.setText(text);
 
