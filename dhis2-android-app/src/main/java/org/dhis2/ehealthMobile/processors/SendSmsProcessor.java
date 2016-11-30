@@ -20,6 +20,8 @@ import org.dhis2.ehealthMobile.utils.SMSBroadcastReceiver;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 
@@ -38,6 +40,7 @@ public class SendSmsProcessor {
     private static final String cmdSeparator = " ";  //SMS command separator
     private static final String kVSeparator = "=";  //Key value separator
     private static final String dVSeparator = "|";  //Data value separator
+    private static final String periodFormat = "ddMM";
     public static final String SMS_KEY = "SMSKey";
 
     public static void send (final Context context, DatasetInfoHolder info, ArrayList<Group> groups){
@@ -62,9 +65,15 @@ public class SendSmsProcessor {
 
         String message = "";
         message += commandName + cmdSeparator;
-        //TODO: insert period
-        //TODO: insert org unit
 
+        // The date generated here is the current day of the week within the
+        // given week number, which DHIS2 seems to be fine with.
+        int weekNumber = Integer.parseInt(info.getPeriodLabel().substring(1,3));
+        DateTime period = new DateTime().withWeekOfWeekyear(weekNumber);
+        DateTimeFormatter format = DateTimeFormat.forPattern(periodFormat);
+        message += period.toString(format) + cmdSeparator;
+
+        //TODO: insert org unit
 
         //This is for the data elements and their values
         for (Group group : submissionData) {
@@ -81,9 +90,8 @@ public class SendSmsProcessor {
 
         // Retrieve current date
         LocalDate currentDate = new LocalDate();
-        String completeDate = currentDate.toString(Constants.DATE_FORMAT);
-
         //Fill out date received method
+        String completeDate = currentDate.toString(Constants.DATE_FORMAT);
         message += dVSeparator + dateReceivedKey + kVSeparator + completeDate;
 
         // Add Timeliness
