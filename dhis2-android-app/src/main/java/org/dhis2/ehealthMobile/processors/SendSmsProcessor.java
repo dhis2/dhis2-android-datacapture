@@ -66,6 +66,8 @@ public class SendSmsProcessor {
         String message = "";
         message += commandName + cmdSeparator;
 
+        // The date generated here is the current day of the week within the
+        // given week number, which DHIS2 seems to be fine with.
         int weekNumber = Integer.parseInt(info.getPeriodLabel().substring(1,3));
         DateTime period = new DateTime().withWeekOfWeekyear(weekNumber);
         DateTimeFormatter format = DateTimeFormat.forPattern(periodFormat);
