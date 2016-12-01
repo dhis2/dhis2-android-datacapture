@@ -1,6 +1,5 @@
 package org.dhis2.ehealthMobile.ui.activities;
 
-import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -10,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -22,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -37,7 +34,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -748,7 +744,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 JsonObject jsonReport = JsonHandler.buildJsonObject(report);
                 JsonArray jsonElements = jsonReport.getAsJsonArray(Constants.DATA_VALUES);
 
-                fieldMap = buildFieldMap(jsonElements);
+                fieldMap = buildFieldsMap(jsonElements);
             } catch (ParsingException e) {
                 e.printStackTrace();
             }
@@ -792,7 +788,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return null;
         }
 
-        private Map<String, String> buildFieldMap(JsonArray jsonFields) {
+        private Map<String, String> buildFieldsMap(JsonArray jsonFields) {
             Map<String, String> fieldMap = new HashMap<>();
             if (jsonFields == null) {
                 return fieldMap;
@@ -800,23 +796,25 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             for (JsonElement jsonElement : jsonFields) {
                 if (jsonElement instanceof JsonObject) {
-                    JsonElement jsonDataElement = (jsonElement.getAsJsonObject())
-                            .get(Field.DATA_ELEMENT);
-                    JsonElement jsonCategoryCombination = (jsonElement.getAsJsonObject())
-                            .get(Field.CATEGORY_OPTION_COMBO);
-                    JsonElement jsonValue = (jsonElement.getAsJsonObject())
-                            .get(Field.VALUE);
-
-                    //Temporary fix
-                    if(jsonCategoryCombination.getAsString().equals("")){
-                        JsonObject defaultCombo = new JsonObject();
-                        defaultCombo.addProperty(Field.CATEGORY_OPTION_COMBO, Constants.DEFAULT_CATEGORY_COMBO);
-                        jsonCategoryCombination = defaultCombo.getAsJsonObject().get(Field.CATEGORY_OPTION_COMBO);
+                    String dataElement = (jsonElement.getAsJsonObject())
+                            .get(Field.DATA_ELEMENT).getAsString();
+                    String categoryCombination = (jsonElement.getAsJsonObject())
+                            .get(Field.CATEGORY_OPTION_COMBO).getAsString();
+                    /*
+                        TEMPORARY FIX
+                        When the app tries to load the form, if there are any blank category combinations
+                        an error will be thrown causing the app to crash.
+                        At the moment there will be blank category combinations stored in offline data because the user authorities
+                        needed to post with a default category combo is unknown to us. ¯\_(ツ)_/¯
+                     */
+                    if(categoryCombination.equals("")){
+                        categoryCombination = Constants.DEFAULT_CATEGORY_COMBO;
                     }
 
-                    String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
-                            jsonCategoryCombination.getAsString());
+                    JsonElement jsonValue = (jsonElement.getAsJsonObject()).get(Field.VALUE);
                     String value = jsonValue != null ? jsonValue.getAsString() : "";
+
+                    String fieldKey = buildFieldKey(dataElement, categoryCombination);
 
                     fieldMap.put(fieldKey, value);
                 }
