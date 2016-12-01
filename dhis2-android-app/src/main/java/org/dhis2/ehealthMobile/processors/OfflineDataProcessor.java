@@ -111,7 +111,8 @@ public class OfflineDataProcessor {
                     String title = description;
 
                     // Firing notification to statusbar
-                    NotificationBuilder.fireNotification(context, title, message);
+                    long[] vibrationPattern = new long[] { 500, 2000, 500, 2000, 500, 2000 };
+                    NotificationBuilder.fireNotification(context, title, message,vibrationPattern);
 
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
