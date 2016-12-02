@@ -35,6 +35,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import org.dhis2.ehealthMobile.R;
@@ -47,13 +49,18 @@ public class NotificationBuilder {
 	private NotificationBuilder() { }
 	
 	public static void fireNotification(Context context, String title, String message) {
+		long[] vibrationPattern = new long[] {0,1000};
+		fireNotification(context, title, message, vibrationPattern);
+	}
+
+	public static void fireNotification(Context context, String title, String message, long[] vibrationPattern) {
 		int id = (title + message).hashCode();
 		Intent notificationIntent = new Intent(context, LauncherActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context,
-		        id, notificationIntent,
-		        PendingIntent.FLAG_CANCEL_CURRENT);
+				id, notificationIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
 
-		Notification notification = buildNotification(context, contentIntent, title,message);
+		Notification notification = buildNotification(context, contentIntent, title, message, vibrationPattern );
 
 		showNotification(context, notification, id);
 	}
@@ -67,27 +74,30 @@ public class NotificationBuilder {
 				id, notificationIntent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 
-		Notification notification = buildNotification(context, contentIntent, title,message);
+		long[] vibrationPattern = new long[] {0,1000};
+		Notification notification = buildNotification(context, contentIntent, title,message, vibrationPattern);
 
 		showNotification(context, notification, id);
 	}
 
-	private static Notification buildNotification(Context context, PendingIntent contentIntent, String title, String message){
+	private static Notification buildNotification(Context context, PendingIntent contentIntent, String title, String message, long[] vibrationPattern){
+		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		return new  NotificationCompat.Builder(context)
 				.setContentIntent(contentIntent)
 				.setContentTitle(title)
 				.setContentText(message)
 				.setSmallIcon(R.drawable.ic_notification)
 				.setAutoCancel(true)
+				.setSound(soundUri)
+				.setVibrate(vibrationPattern)
 				.build();
-
 	}
 
 	private static void showNotification(Context context, Notification notification, int id){
+		//Define sound URI
 		NotificationManager notificationManager = (NotificationManager) context
 				.getSystemService(Activity.NOTIFICATION_SERVICE);
 		notification.flags |=  Notification.FLAG_AUTO_CANCEL;
-
 		notificationManager.notify(id, notification);
 	}
 

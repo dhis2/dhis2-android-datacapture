@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.SharedPreferences.Editor;
 
 import org.dhis2.ehealthMobile.processors.CompulsoryDataProcessor;
+import org.dhis2.ehealthMobile.processors.SMSNumberProcessor;
 
 public class PrefUtils {
 	private static final String APP_DATA = "APP_DATA";
@@ -129,6 +130,18 @@ public class PrefUtils {
     public static String getCompulsoryData(Context context, String key){
         String data = context.getSharedPreferences(CompulsoryDataProcessor.COMPULSORY_DATA, Context.MODE_PRIVATE)
                 .getString(key, null);
+        return data;
+    }
+
+    public static void saveSmsNumber(Context context, String data){
+        Editor editor = context.getSharedPreferences(SMSNumberProcessor.SMS_NUMBER, Context.MODE_PRIVATE).edit();
+        editor.putString(SMSNumberProcessor.SMS_NUMBER, data);
+        editor.apply();
+    }
+
+    public static String getSmsNumber(Context context){
+        String data = context.getSharedPreferences(SMSNumberProcessor.SMS_NUMBER, Context.MODE_PRIVATE)
+                .getString(SMSNumberProcessor.SMS_NUMBER, null);
         return data;
     }
 

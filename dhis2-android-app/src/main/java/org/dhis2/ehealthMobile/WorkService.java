@@ -47,6 +47,7 @@ import org.dhis2.ehealthMobile.processors.OfflineDataProcessor;
 import org.dhis2.ehealthMobile.processors.RemoveDataProcessor;
 import org.dhis2.ehealthMobile.processors.ReportDownloadProcessor;
 import org.dhis2.ehealthMobile.processors.ReportUploadProcessor;
+import org.dhis2.ehealthMobile.processors.SMSNumberProcessor;
 import org.dhis2.ehealthMobile.processors.SendSmsProcessor;
 import org.dhis2.ehealthMobile.processors.SubmissionDetailsProcessor;
 import org.dhis2.ehealthMobile.ui.activities.LoginActivity;
@@ -68,6 +69,7 @@ public class WorkService extends Service {
     public static final String METHOD_REMOVE_ALL_DATA = "removeAllData";
     public static final String METHOD_SEND_VIA_SMS = "sendViaSms";
     public static final String METHOD_DOWNLOAD_COMPULSORY_DATA = "downloadCompulsoryData";
+    public static final String METHOD_DOWNLOAD_SMS_NUMBER = "downloadSmsNumber";
     public static final String METHOD_DOWNLOAD_SUBMISSION_DETAILS = "downloadSubmissionDetails";
 
     // maximum number of threads in thread pool
@@ -176,13 +178,20 @@ public class WorkService extends Service {
             ArrayList<Group> groups = extras.getParcelableArrayList(Group.TAG);
             SendSmsProcessor.send(context, info, groups);
         }
+
         if(METHOD_DOWNLOAD_COMPULSORY_DATA.equals(methodName)){
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             CompulsoryDataProcessor.download(context, info);
         }
+
         if(METHOD_DOWNLOAD_SUBMISSION_DETAILS.equals(methodName)){
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             SubmissionDetailsProcessor.download(context, info);
+        }
+
+        if(METHOD_DOWNLOAD_SMS_NUMBER.equals(methodName)){
+            DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
+            SMSNumberProcessor.download(context);
         }
     }
 

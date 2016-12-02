@@ -60,7 +60,7 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
         if (openFuturePeriods > 0) {
             return true;
         } else {
-            return currentDate.isAfter(date.plusWeeks(1));
+            return currentDate.isAfter(date.plusDays(6));
         }
     }
 

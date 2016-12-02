@@ -13,8 +13,8 @@ android {
         applicationId "org.dhis2.ehealthMobile"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 14
-        versionName "1.6"
+        versionCode 21
+        versionName "1.9.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // Enabling multidex support.
@@ -27,7 +27,7 @@ android {
     buildTypes {
         debug {
             // Run code coverage reports by default on debug builds.
-            testCoverageEnabled = true
+            testCoverageEnabled = false
         }
     }
     configurations.all {

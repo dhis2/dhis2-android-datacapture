@@ -53,6 +53,7 @@ import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,13 +124,12 @@ public class ReportUploadProcessor {
         JsonArray values = putFieldValuesInJson(groups, period);
 
         // Retrieve current date
-        LocalDate currentDate = new LocalDate();
-        String completeDate = currentDate.toString(Constants.DATE_FORMAT);
+        LocalDateTime currentDate = new LocalDateTime();
 
         content.addProperty(Constants.ORG_UNIT_ID, info.getOrgUnitId());
         content.addProperty(Constants.DATA_SET_ID, info.getFormId());
         content.addProperty(Constants.PERIOD, info.getPeriod());
-        content.addProperty(Constants.COMPLETE_DATE, completeDate);
+        content.addProperty(Constants.COMPLETE_DATE, currentDate.toString());
         content.add(Constants.DATA_VALUES, values);
 
         JsonArray categoryOptions = putCategoryOptionsInJson(info.getCategoryOptions());
@@ -190,21 +190,28 @@ public class ReportUploadProcessor {
                 value = currentDate.toString(Constants.DATE_FORMAT);
                 break;
             case Constants.TIMELY:
-                //Check whether a timely report has already been sent
-                if(!IsTimely.hasBeenSet(field)) {
-                    //Check whether the report was timely or not
-                    Boolean isTimely = IsTimely.check(new DateTime(), period);
-                    value =  String.valueOf(isTimely);
-                }else{
-                    value = field.getValue();
-                }
+                value = getTimeliness(field, period);
                 break;
             default:
                 value = field.getValue();
                 break;
         }
         return value;
+    }
 
+    private static String getTimeliness(Field field, String period) {
+        String value = null;
+
+        //Check whether a timely report has already been sent
+        if(!IsTimely.hasBeenSet(field)) {
+            //Check whether the report was timely or not
+            Boolean isTimely = IsTimely.check(new DateTime(), period);
+            value = String.valueOf(isTimely);
+        } else {
+            value = field.getValue();
+        }
+
+        return value;
     }
 
     private static void addCategoryComboToField(Field field, JsonObject jField){

@@ -40,11 +40,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import org.dhis2.ehealthMobile.R;
 import org.dhis2.ehealthMobile.WorkService;
 import org.dhis2.ehealthMobile.io.Constants;
@@ -70,7 +68,6 @@ import org.dhis2.ehealthMobile.utils.ViewUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -773,7 +770,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 JsonObject jsonReport = JsonHandler.buildJsonObject(report);
                 JsonArray jsonElements = jsonReport.getAsJsonArray(Constants.DATA_VALUES);
 
-                fieldMap = buildFieldMap(jsonElements);
+                fieldMap = buildFieldsMap(jsonElements);
             } catch (ParsingException e) {
                 e.printStackTrace();
             }
@@ -817,7 +814,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return null;
         }
 
-        private Map<String, String> buildFieldMap(JsonArray jsonFields) {
+        private Map<String, String> buildFieldsMap(JsonArray jsonFields) {
             Map<String, String> fieldMap = new HashMap<>();
             if (jsonFields == null) {
                 return fieldMap;
@@ -825,16 +822,25 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             for (JsonElement jsonElement : jsonFields) {
                 if (jsonElement instanceof JsonObject) {
-                    JsonElement jsonDataElement = (jsonElement.getAsJsonObject())
-                            .get(Field.DATA_ELEMENT);
-                    JsonElement jsonCategoryCombination = (jsonElement.getAsJsonObject())
-                            .get(Field.CATEGORY_OPTION_COMBO);
-                    JsonElement jsonValue = (jsonElement.getAsJsonObject())
-                            .get(Field.VALUE);
+                    String dataElement = (jsonElement.getAsJsonObject())
+                            .get(Field.DATA_ELEMENT).getAsString();
+                    String categoryCombination = (jsonElement.getAsJsonObject())
+                            .get(Field.CATEGORY_OPTION_COMBO).getAsString();
+                    /*
+                        TEMPORARY FIX
+                        When the app tries to load the form, if there are any blank category combinations
+                        an error will be thrown causing the app to crash.
+                        At the moment there will be blank category combinations stored in offline data because the user authorities
+                        needed to post with a default category combo is unknown to us. ¯\_(ツ)_/¯
+                     */
+                    if(categoryCombination.equals("")){
+                        categoryCombination = Constants.DEFAULT_CATEGORY_COMBO;
+                    }
 
-                    String fieldKey = buildFieldKey(jsonDataElement.getAsString(),
-                            jsonCategoryCombination.getAsString());
+                    JsonElement jsonValue = (jsonElement.getAsJsonObject()).get(Field.VALUE);
                     String value = jsonValue != null ? jsonValue.getAsString() : "";
+
+                    String fieldKey = buildFieldKey(dataElement, categoryCombination);
 
                     fieldMap.put(fieldKey, value);
                 }
@@ -863,7 +869,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private void handleCompletionDate(String details){
         DateTime dateTime = new DateTime(details);
         ViewUtils.enableViews(submissionDetailsLayout);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.mediumDate();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(Constants.DATE_COMPLETED_FORMAT);
         String text = getResources().getString(R.string.completion_date_prefix) +" "+ dateTime.toString(dateTimeFormatter);
         completionDate.setText(text);
 
