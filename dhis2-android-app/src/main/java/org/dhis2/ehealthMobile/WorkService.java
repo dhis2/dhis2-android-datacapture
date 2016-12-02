@@ -190,8 +190,7 @@ public class WorkService extends Service {
         }
 
         if(METHOD_DOWNLOAD_CONFIG_FILE.equals(methodName)){
-            String formId = extras.getString(Form.TAG);
-            ConfigFileProcessor.download(context, formId);
+            ConfigFileProcessor.download(context);
         }
     }
 

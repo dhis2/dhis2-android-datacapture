@@ -10,17 +10,20 @@ import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 /**
  * Created by george on 11/25/16.
  */
 
 public class ConfigFileProcessor {
     public static final String TAG = ConfigFileProcessor.class.getSimpleName();
-    public static String COMPULSORY_DISEASES = "compulsoryDiseases";
-    public static String DISEASE_CONFIGS = "diseaseConfigs";
+    public static final String COMPULSORY_DISEASES = "compulsoryDiseases";
+    public static final String DISEASE_CONFIGS = "diseaseConfigs";
+    private static final String ID = "id";
 
-    public static void download(Context context, String formId){
-        String url  = buildUrl(context, formId);
+    public static void download(Context context){
+        String url  = buildUrl(context);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
 
@@ -28,20 +31,24 @@ public class ConfigFileProcessor {
             String compulsoryDiseases, diseaseConfigs;
             try {
                 JSONObject obj = new JSONObject(response.getBody());
-                compulsoryDiseases = obj.getString(COMPULSORY_DISEASES);
-                diseaseConfigs = obj.getString(DISEASE_CONFIGS);
+                Iterator<String> keys = obj.keys();
+                while(keys.hasNext()){
+                    String key = keys.next();
+                    String formId = obj.getJSONObject(key).getString(ID);
+                    compulsoryDiseases = obj.getJSONObject(key).getString(COMPULSORY_DISEASES);
+                    diseaseConfigs = obj.getJSONObject(key).getString(DISEASE_CONFIGS);
+                    PrefUtils.saveCompulsoryDiseases(context, formId, compulsoryDiseases);
+                    PrefUtils.saveDiseaseConfigs(context, formId, diseaseConfigs);
+                }
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage());
-                return;
             }
-            PrefUtils.saveCompulsoryDiseases(context, formId, compulsoryDiseases);
-            PrefUtils.saveDiseaseConfigs(context, formId, diseaseConfigs);
         }
     }
 
-    private static String buildUrl(Context context, String formId){
+    private static String buildUrl(Context context){
         String server = PrefUtils.getServerURL(context);
-        return server + URLConstants.DATA_STORE + "/" + formId + "/" + URLConstants.CONFIG_URL;
+        return server + URLConstants.DATA_STORE + "/" + URLConstants.CONFIG_URL;
     }
 
 }

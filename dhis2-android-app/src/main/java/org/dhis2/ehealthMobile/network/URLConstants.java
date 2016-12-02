@@ -48,7 +48,7 @@ public class URLConstants {
 
 	public static final String DATA_STORE = "api/dataStore";
 	public static final String SMS_NUMBER_URL = "sms/smsNumber";
-	public static final String CONFIG_URL = "config";
+	public static final String CONFIG_URL = "android/config";
 
 	public static final String DATASET_PARAM = "dataSet=";
 	public static final String ORG_UNIT_PARAM =  "orgUnit=";

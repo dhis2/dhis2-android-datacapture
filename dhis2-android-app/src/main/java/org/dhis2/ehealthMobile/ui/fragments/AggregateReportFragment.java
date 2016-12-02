@@ -543,6 +543,9 @@ public class AggregateReportFragment extends Fragment
             Intent intent = new Intent(getActivity(), WorkService.class);
             intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPDATE_DATASETS);
             getActivity().startService(intent);
+
+            //download config file for all org units and their forms
+            downloadConfigFile();
         } else {
             String message = getString(R.string.check_connection);
             ToastManager.makeToast(context, message, Toast.LENGTH_LONG).show();
@@ -603,9 +606,6 @@ public class AggregateReportFragment extends Fragment
             } catch (ParsingException e) {
                 e.printStackTrace();
             }
-
-            //download config file for all org units and their forms
-            downloadConfigFile(units);
 
             String chooseOrganisationUnit = getContext().getString(R.string.choose_unit);
             String chooseDataSet = getContext().getString(R.string.choose_data_set);
@@ -685,16 +685,12 @@ public class AggregateReportFragment extends Fragment
 
             return rootNode;
         }
+    }
 
-        private void downloadConfigFile(ArrayList<OrganizationUnit> units){
-            for(OrganizationUnit unit: units){
-                for(Form form: unit.getForms()){
-                    Intent intent = new Intent(getContext(), WorkService.class);
-                    intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_CONFIG_FILE);
-                    intent.putExtra(Form.TAG, form.getId());
-                    getContext().startService(intent);
-                }
-            }
-        }
+
+    private void downloadConfigFile(){
+        Intent intent = new Intent(getContext(), WorkService.class);
+        intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_CONFIG_FILE);
+        getContext().startService(intent);
     }
 }
