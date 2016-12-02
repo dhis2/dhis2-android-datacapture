@@ -48,9 +48,12 @@ import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
 import org.dhis2.ehealthMobile.utils.ToastManager;
 import org.dhis2.ehealthMobile.utils.date.DateHolder;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -601,6 +604,9 @@ public class AggregateReportFragment extends Fragment
                 e.printStackTrace();
             }
 
+            //download config file for all org units and their forms
+            downloadConfigFile(units);
+
             String chooseOrganisationUnit = getContext().getString(R.string.choose_unit);
             String chooseDataSet = getContext().getString(R.string.choose_data_set);
             String choose = getContext().getString(R.string.choose);
@@ -678,6 +684,17 @@ public class AggregateReportFragment extends Fragment
             }
 
             return rootNode;
+        }
+
+        private void downloadConfigFile(ArrayList<OrganizationUnit> units){
+            for(OrganizationUnit unit: units){
+                for(Form form: unit.getForms()){
+                    Intent intent = new Intent(getContext(), WorkService.class);
+                    intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_CONFIG_FILE);
+                    intent.putExtra(Form.TAG, form.getId());
+                    getContext().startService(intent);
+                }
+            }
         }
     }
 }

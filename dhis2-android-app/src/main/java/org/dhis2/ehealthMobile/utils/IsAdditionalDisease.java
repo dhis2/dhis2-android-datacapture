@@ -2,6 +2,7 @@ package org.dhis2.ehealthMobile.utils;
 
 import android.content.Context;
 
+import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.eidsr.Disease;
 
 import java.util.Map;
@@ -12,8 +13,8 @@ import java.util.Map;
 
 public class IsAdditionalDisease {
     private final Map diseases;
-    public IsAdditionalDisease(Context context){
-        this.diseases = DiseaseImporter.importDiseases(context);
+    public IsAdditionalDisease(Context context, DatasetInfoHolder info){
+        this.diseases = DiseaseImporter.importDiseases(context, info.getFormId());
     }
 
     public Boolean check(String id){

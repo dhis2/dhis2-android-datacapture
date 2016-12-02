@@ -1,6 +1,7 @@
 package org.dhis2.ehealthMobile.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,20 +39,10 @@ public class DiseaseImporter {
      * @param context Context
      * @return Map A map of diseases.
      */
-    public static Map importDiseases(Context context) {
+    public static Map importDiseases(Context context, String formId) {
         String json;
-        try {
-            //get diseases json file and open an input stream.
-            InputStream is = context.getResources().openRawResource(R.raw.diseases);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        json = PrefUtils.getDiseaseConfigs(context, formId);
+
         JsonObject obj;
         try {
             obj = JsonHandler.buildJsonObject(json);
