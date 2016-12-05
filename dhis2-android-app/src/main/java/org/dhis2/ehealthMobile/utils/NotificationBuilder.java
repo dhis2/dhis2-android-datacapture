@@ -65,21 +65,6 @@ public class NotificationBuilder {
 		showNotification(context, notification, id);
 	}
 
-	public static void fireNotificationWithReturnDialog(Context context, String title, String message) {
-		int id = (title + message).hashCode();
-		Intent notificationIntent = new Intent(context, MenuActivity.class);
-		notificationIntent.putExtra(NOTIFICATION_TITLE, title);
-		notificationIntent.putExtra(NOTIFICATION_MESSAGE, message);
-		PendingIntent contentIntent = PendingIntent.getActivity(context,
-				id, notificationIntent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
-
-		long[] vibrationPattern = new long[] {0,1000};
-		Notification notification = buildNotification(context, contentIntent, title,message, vibrationPattern);
-
-		showNotification(context, notification, id);
-	}
-
 	private static Notification buildNotification(Context context, PendingIntent contentIntent, String title, String message, long[] vibrationPattern){
 		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		return new  NotificationCompat.Builder(context)
