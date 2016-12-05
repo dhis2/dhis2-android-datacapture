@@ -29,11 +29,15 @@
 
 package org.dhis2.ehealthMobile.ui.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -52,6 +56,7 @@ import org.dhis2.ehealthMobile.WorkService;
 import org.dhis2.ehealthMobile.network.HTTPClient;
 import org.dhis2.ehealthMobile.network.NetworkUtils;
 import org.dhis2.ehealthMobile.network.Response;
+import org.dhis2.ehealthMobile.utils.AppPermissions;
 import org.dhis2.ehealthMobile.utils.ToastManager;
 import org.dhis2.ehealthMobile.utils.ViewUtils;
 
@@ -143,6 +148,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        if(!AppPermissions.isSMSPermissionGranted(getApplicationContext())){
+            AppPermissions.requestSMSPermission(this);
+        }
+
         // Restoring state of activity from saved bundle
         if (savedInstanceState != null) {
             boolean loginInProcess = savedInstanceState.getBoolean(TAG, false);
@@ -161,6 +170,10 @@ public class LoginActivity extends AppCompatActivity {
 
         // Registering BroadcastReceiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter(TAG));
+
+        if(!AppPermissions.isSMSPermissionGranted(getApplicationContext())){
+            AppPermissions.requestSMSPermission(this);
+        }
     }
 
     @Override
@@ -179,6 +192,30 @@ public class LoginActivity extends AppCompatActivity {
             outState.putBoolean(TAG, mProgressBar.isShown());
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case AppPermissions.MY_PERMISSIONS_SEND_SMS:{
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //Permission granted ヽ(´▽`)/
+
+                } else {
+                    // permission denied, ¯\_(⊙︿⊙)_/¯
+                    //call the upload method again, but this time it'll call the report upload service.
+                    //Without an internet connection this will then store the data locally for upload when there is one.
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
+                        AppPermissions.showSMSPermissionExplanationDialog(getApplicationContext(), this);
+                    }else {
+
+                    }
+
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     // Activates *login button*,
