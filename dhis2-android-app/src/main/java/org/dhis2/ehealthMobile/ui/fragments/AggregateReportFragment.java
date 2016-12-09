@@ -48,9 +48,12 @@ import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
 import org.dhis2.ehealthMobile.utils.ToastManager;
 import org.dhis2.ehealthMobile.utils.date.DateHolder;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -540,6 +543,9 @@ public class AggregateReportFragment extends Fragment
             Intent intent = new Intent(getActivity(), WorkService.class);
             intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPDATE_DATASETS);
             getActivity().startService(intent);
+
+            //download config file for all org units and their forms
+            downloadConfigFile();
         } else {
             String message = getString(R.string.check_connection);
             ToastManager.makeToast(context, message, Toast.LENGTH_LONG).show();
@@ -679,5 +685,12 @@ public class AggregateReportFragment extends Fragment
 
             return rootNode;
         }
+    }
+
+
+    private void downloadConfigFile(){
+        Intent intent = new Intent(getContext(), WorkService.class);
+        intent.putExtra(WorkService.METHOD, WorkService.METHOD_DOWNLOAD_CONFIG_FILE);
+        getContext().startService(intent);
     }
 }

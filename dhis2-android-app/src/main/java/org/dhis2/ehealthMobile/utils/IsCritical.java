@@ -2,6 +2,7 @@ package org.dhis2.ehealthMobile.utils;
 
 import android.content.Context;
 
+import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.eidsr.Disease;
 
 import java.util.Map;
@@ -16,8 +17,8 @@ import java.util.Map;
 public class IsCritical {
     private final Map diseases;
 
-    public IsCritical(Context context){
-        this.diseases = DiseaseImporter.importDiseases(context);
+    public IsCritical(Context context, DatasetInfoHolder info){
+        this.diseases = DiseaseImporter.importDiseases(context, info.getFormId());
     }
 
     public Boolean check(String id){

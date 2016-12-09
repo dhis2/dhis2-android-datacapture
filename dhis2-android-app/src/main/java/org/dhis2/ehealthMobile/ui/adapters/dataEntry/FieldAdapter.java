@@ -39,6 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import org.dhis2.ehealthMobile.io.Constants;
+import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.json.JsonHandler;
 import org.dhis2.ehealthMobile.io.json.ParsingException;
 import org.dhis2.ehealthMobile.io.models.Field;
@@ -81,19 +82,21 @@ public class FieldAdapter extends BaseAdapter {
     private LabelRow diseaseLabel;
     private DiseaseGroupLabels diseaseGroupLabels;
     private ArrayList<String> labelsAdded = new ArrayList<>();
+    private final DatasetInfoHolder info;
 
 
-    public FieldAdapter(Group group, Context context) {
+    public FieldAdapter(DatasetInfoHolder info, Group group, Context context) {
         ArrayList<Field> fields = group.getFields();
         ArrayList<Field> groupedFields = new ArrayList<Field>();
         String previousFieldId = "";
+        this.info = info;
         this.group = group;
         this.rows = new ArrayList<Row>();
         this.adapterLabel = group.getLabel();
         inflater = LayoutInflater.from(context);
-        isCritical = new IsCritical(context);
-        isAdditionalDisease = new IsAdditionalDisease(context);
-        diseaseGroupLabels = new DiseaseGroupLabels(context);
+        isCritical = new IsCritical(context, info);
+        isAdditionalDisease = new IsAdditionalDisease(context, info);
+        diseaseGroupLabels = new DiseaseGroupLabels(context, info);
 
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
@@ -115,7 +118,7 @@ public class FieldAdapter extends BaseAdapter {
                 //Changed from the others to support grouping of Diseases
                 //Specific test case for eidsr form
 
-                handleIntegerOrZeroRow2(field, groupedFields, previousFieldId);
+                handleIntegerOrZeroRow2(info, field, groupedFields, previousFieldId);
 
                 groupedFields.add(field);
                 previousFieldId = field.getDataElement();
@@ -208,7 +211,7 @@ public class FieldAdapter extends BaseAdapter {
             }
         }
 
-        this.rows.add(new PosOrZeroIntegerRow2(inflater, additionalDiseaseFields,false, true));
+        this.rows.add(new PosOrZeroIntegerRow2(inflater, info, additionalDiseaseFields,false, true));
         notifyDataSetChanged();
     }
 
@@ -246,13 +249,13 @@ public class FieldAdapter extends BaseAdapter {
         return isEmpty;
     }
 
-    private void handleIntegerOrZeroRow2(Field field, ArrayList<Field> groupedFields, String previousFieldId){
+    private void handleIntegerOrZeroRow2(DatasetInfoHolder info,  Field field, ArrayList<Field> groupedFields, String previousFieldId){
         if(!field.getDataElement().equals(previousFieldId) && groupedFields.size() > 0
                 && !isAdditionalDisease.check(previousFieldId)){
             //each disease has four fields.
             Boolean isCriticalDisease = isCritical.check(previousFieldId);
             Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
-            rows.add(new PosOrZeroIntegerRow2(inflater, groupedFields,isCriticalDisease, isAnAdditionalDisease));
+            rows.add(new PosOrZeroIntegerRow2(inflater, info,  groupedFields,isCriticalDisease, isAnAdditionalDisease));
 
             //handle diseases that belong to groups.
             if(diseaseGroupLabels.hasGroup(field.getDataElement())){
@@ -274,7 +277,7 @@ public class FieldAdapter extends BaseAdapter {
             Boolean isAnAdditionalDisease = isAdditionalDisease.check(previousFieldId);
             additionalDiseasesRows.put(previousFieldId, new HashMap<String, PosOrZeroIntegerRow2>());
             additionalDiseasesRows.get(previousFieldId).put(groupedFields.get(groupedFields.size()-1).getLabel(),
-                    new PosOrZeroIntegerRow2(inflater, groupedFields,false, isAnAdditionalDisease));
+                    new PosOrZeroIntegerRow2(inflater, info,  groupedFields,false, isAnAdditionalDisease));
 
         }
     }

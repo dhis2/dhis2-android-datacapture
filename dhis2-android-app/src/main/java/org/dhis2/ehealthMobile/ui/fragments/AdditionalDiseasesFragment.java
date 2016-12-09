@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import org.dhis2.ehealthMobile.R;
+import org.dhis2.ehealthMobile.io.models.Form;
 import org.dhis2.ehealthMobile.io.models.eidsr.Disease;
 import org.dhis2.ehealthMobile.ui.activities.DataEntryActivity;
 import org.dhis2.ehealthMobile.utils.DiseaseImporter;
@@ -28,6 +29,7 @@ public class AdditionalDiseasesFragment extends BottomSheetDialogFragment {
     private Map diseases;
     //Diseases already displayed in the DataEntryActivity listView.
     private String alreadyDisplayed;
+    private String formId;
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
@@ -35,6 +37,7 @@ public class AdditionalDiseasesFragment extends BottomSheetDialogFragment {
         dialog.setContentView(contentView);
 
         alreadyDisplayed = getArguments().getString(DataEntryActivity.ALREADY_DISPLAYED);
+        formId = getArguments().getString(Form.TAG);
         listview = (ListView) dialog.findViewById(R.id.additional_diseases_listview);
         setupListView();
         setupListViewOnclickListener();
@@ -44,7 +47,7 @@ public class AdditionalDiseasesFragment extends BottomSheetDialogFragment {
     private void setupListView(){
         additionalDiseases = new ArrayList<>();
         additionalDiseasesIds = new ArrayList<>();
-        diseases = DiseaseImporter.importDiseases(getContext());
+        diseases = DiseaseImporter.importDiseases(getContext(), formId);
 
         assert diseases != null;
         for (Object key : diseases.keySet()) {
