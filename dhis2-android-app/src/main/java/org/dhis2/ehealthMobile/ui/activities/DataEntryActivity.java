@@ -8,12 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
@@ -40,9 +38,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.dhis2.ehealthMobile.R;
 import org.dhis2.ehealthMobile.WorkService;
 import org.dhis2.ehealthMobile.io.Constants;
@@ -69,6 +69,7 @@ import org.dhis2.ehealthMobile.utils.ViewUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,7 +129,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private EditText commentField;
     private IsDisabled isDisabled;
 
-    private Boolean requested_permission_denied = false;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -248,26 +248,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case AppPermissions.MY_PERMISSIONS_SEND_SMS:{
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //Permission granted ヽ(´▽`)/
-                    upload();
-                } else {
-                    // permission denied, ¯\_(⊙︿⊙)_/¯
-                    //call the upload method again, but this time it'll call the report upload service.
-                    //Without an internet connection this will then store the data locally for upload when there is one.
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
-                        AppPermissions.showSMSPermissionExplanationDialog(getApplicationContext(), this);
-                    }else {
-                        requested_permission_denied = true;
-                        upload();
-                    }
-
-                }
-            }
-        }
+        AppPermissions.handleRequestResults(requestCode, permissions, grantResults, this);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -579,7 +560,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         });
     }
 
-    private void upload() {
+    public void upload() {
         if (adapters == null) {
             ToastManager.makeToast(this, getString(R.string.something_went_wrong),
                     Toast.LENGTH_SHORT).show();
@@ -609,9 +590,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 intent.putExtra(WorkService.METHOD, WorkService.METHOD_SEND_VIA_SMS);
                 startService(intent);
                 finish();
-            }else if(!NetworkUtils.checkConnection(getApplicationContext()) && !requested_permission_denied){
-                //When a previous permissions request hasn't been made and rejected
-                AppPermissions.requestSMSPermission(this);
+            }else if(!NetworkUtils.checkConnection(getApplicationContext()) && AppPermissions.canShowRationale(this, Manifest.permission.SEND_SMS)){
+                //When a previous requiredPermissions request hasn't been made and rejected
+                AppPermissions.requestPermission(this);
             }else{
                 intent.putExtra(WorkService.METHOD, WorkService.METHOD_UPLOAD_DATASET);
                 startService(intent);
