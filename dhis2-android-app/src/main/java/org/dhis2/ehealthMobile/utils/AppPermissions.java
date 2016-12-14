@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import org.dhis2.ehealthMobile.R;
 import org.dhis2.ehealthMobile.ui.activities.DataEntryActivity;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -35,8 +36,8 @@ public class AppPermissions {
                 permission);
     }
 
-    public static boolean isSMSPermissionGranted(Context context){
-        return PackageManager.PERMISSION_GRANTED == checkPermission(context, Manifest.permission.SEND_SMS);
+    public static boolean isPermissionGranted(Context context, String permission){
+        return PackageManager.PERMISSION_GRANTED == checkPermission(context, permission);
     }
 
     private static void showPermissionRationaleDialog(final Activity activity, HashMap dialogText){
@@ -66,10 +67,11 @@ public class AppPermissions {
     public static void handleRequestResults(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, Activity activity){
         switch (requestCode){
             case AppPermissions.MY_PERMISSIONS:{
+                int index = 0;
                 for(String permission: permissions){
                     if(permission.equals(Manifest.permission.SEND_SMS)){
                         if (grantResults.length > 0
-                                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                                && grantResults[index] == PackageManager.PERMISSION_GRANTED) {
                             //Permission granted ヽ(´▽`)/
                             DataEntryActivity dataEntryActivity = (DataEntryActivity) activity;
                             dataEntryActivity.upload();
@@ -90,6 +92,7 @@ public class AppPermissions {
                             }
                         }
                     }
+                    index++;
                 }
             }
         }

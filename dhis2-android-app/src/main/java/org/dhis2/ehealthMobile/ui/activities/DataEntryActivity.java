@@ -585,12 +585,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             intent.putExtra(DatasetInfoHolder.TAG, info);
             intent.putExtra(Group.TAG, groups);
 
-            if(!NetworkUtils.checkConnection(getApplicationContext()) &&
-                    AppPermissions.isSMSPermissionGranted(getApplicationContext())){
+            boolean hasInternet = NetworkUtils.checkConnection(getApplicationContext());
+            boolean hasPermission = AppPermissions.isPermissionGranted(getApplicationContext(),
+                    Manifest.permission.SEND_SMS);
+            boolean canShowRationale = AppPermissions.canShowRationale(this, Manifest.permission.SEND_SMS);
+            if(!hasInternet && hasPermission){
                 intent.putExtra(WorkService.METHOD, WorkService.METHOD_SEND_VIA_SMS);
                 startService(intent);
                 finish();
-            }else if(!NetworkUtils.checkConnection(getApplicationContext()) && AppPermissions.canShowRationale(this, Manifest.permission.SEND_SMS)){
+            }else if(!hasInternet && canShowRationale){
                 //When a previous requiredPermissions request hasn't been made and rejected
                 AppPermissions.requestPermission(this);
             }else{

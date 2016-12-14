@@ -29,6 +29,7 @@
 
 package org.dhis2.ehealthMobile.ui.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -145,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        if(!AppPermissions.isSMSPermissionGranted(getApplicationContext())){
+        if(!AppPermissions.isPermissionGranted(getApplicationContext(), Manifest.permission.SEND_SMS)){
             AppPermissions.requestPermission(this);
         }
 
