@@ -49,14 +49,7 @@ public class SendSmsProcessor {
 
         saveDataset(context, offlineData, info);
 
-        String submissionId = info.getFormId()+info.getPeriod();
-        if (!hasBeenCompleted(context, submissionId)) {
-            sendSMS(context, PrefUtils.getSmsNumber(context), data, info);
-        } else {
-            String title = context.getString(R.string.form_completion_dialog_title);
-            String message = context.getString(R.string.form_completion_message);
-            NotificationBuilder.fireNotificationWithReturnDialog(context, title , message );
-        }
+        sendSMS(context, PrefUtils.getSmsNumber(context), data, info);
     }
 
     private static String prepareContent(DatasetInfoHolder info, ArrayList<Group> submissionData){
@@ -149,15 +142,6 @@ public class SendSmsProcessor {
         String jsonReportInfo = gson.toJson(info);
         PrefUtils.saveOfflineReportInfo(context, key, jsonReportInfo);
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.OFFLINE_DATASETS, key, data);
-    }
-
-    private static Boolean hasBeenCompleted(Context context, String submissionId){
-        Boolean hasBeenCompleted = false;
-        if(PrefUtils.getCompletionDate(context, submissionId) != null ){
-            hasBeenCompleted  = true;
-        }
-
-        return hasBeenCompleted;
     }
 
 }

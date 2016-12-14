@@ -36,11 +36,6 @@ public class SubmissionDetailsProcessor {
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
 
-        if(completionDate != null){
-            String id = info.getFormId()+info.getPeriod();
-            PrefUtils.saveCompletionDate(context, id, completionDate);
-        }
-
     }
     
 
