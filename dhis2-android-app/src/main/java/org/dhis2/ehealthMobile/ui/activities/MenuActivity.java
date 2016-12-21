@@ -29,7 +29,6 @@
 
 package org.dhis2.ehealthMobile.ui.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -39,7 +38,6 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -53,11 +51,9 @@ import com.google.gson.JsonParser;
 import org.dhis2.ehealthMobile.R;
 import org.dhis2.ehealthMobile.WorkService;
 import org.dhis2.ehealthMobile.io.handlers.UserAccountHandler;
-import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.ehealthMobile.ui.fragments.MyProfileFragment;
 import org.dhis2.ehealthMobile.utils.LetterAvatar;
-import org.dhis2.ehealthMobile.utils.NotificationBuilder;
 import org.dhis2.ehealthMobile.utils.PrefUtils;
 import org.dhis2.ehealthMobile.utils.TextFileUtils;
 
@@ -100,14 +96,6 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
             toolbar.setTitle(savedInstanceState.getString(STATE_TOOLBAR_TITLE));
         }
 
-
-        if(getIntent().hasExtra(NotificationBuilder.NOTIFICATION_TITLE)
-                && getIntent().hasExtra(NotificationBuilder.NOTIFICATION_MESSAGE)){
-            String title = getIntent().getStringExtra(NotificationBuilder.NOTIFICATION_TITLE);
-            String message = getIntent().getStringExtra(NotificationBuilder.NOTIFICATION_MESSAGE);
-            showNotificationDialog(title, message);
-
-        }
 
         //Download the SMS Number from the Data Store and save in PrefUtils
         downloadSmsNumber();
@@ -215,21 +203,6 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
 
     private String getUserInitials(String firstName, String surname){
         return getFirstLetterInUpperCase(firstName) + getFirstLetterInUpperCase(surname);
-    }
-
-    private void showNotificationDialog(String title, String message){
-        String confirmationText = getString(R.string.form_completion_dialog_confirmation);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle(title);
-        dialog.setMessage(message);
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, confirmationText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialog.dismiss();
-            }
-        });
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
     }
 
     private void downloadSmsNumber() {

@@ -92,9 +92,6 @@ public class ReportUploadProcessor {
             if (ImportSummariesHandler.isSuccess(response.getBody())) {
                 description = ImportSummariesHandler.getDescription(response.getBody(),
                         context.getString(R.string.import_successfully_completed));
-                String submissionId = info.getFormId()+info.getPeriod();
-                DateTime dateTime = new DateTime();
-                PrefUtils.saveCompletionDate(context, submissionId, dateTime.toString());
             } else {
                 description = ImportSummariesHandler.getDescription(response.getBody(),
                         context.getString(R.string.import_failed));

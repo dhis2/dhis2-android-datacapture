@@ -38,8 +38,9 @@ import android.util.Log;
 
 import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.Field;
+import org.dhis2.ehealthMobile.io.models.Form;
 import org.dhis2.ehealthMobile.io.models.Group;
-import org.dhis2.ehealthMobile.processors.CompulsoryDataProcessor;
+import org.dhis2.ehealthMobile.processors.ConfigFileProcessor;
 import org.dhis2.ehealthMobile.processors.FormsDownloadProcessor;
 import org.dhis2.ehealthMobile.processors.LoginProcessor;
 import org.dhis2.ehealthMobile.processors.MyProfileProcessor;
@@ -68,9 +69,9 @@ public class WorkService extends Service {
     public static final String METHOD_OFFLINE_DATA_UPLOAD = "offlineDataUploading";
     public static final String METHOD_REMOVE_ALL_DATA = "removeAllData";
     public static final String METHOD_SEND_VIA_SMS = "sendViaSms";
-    public static final String METHOD_DOWNLOAD_COMPULSORY_DATA = "downloadCompulsoryData";
     public static final String METHOD_DOWNLOAD_SMS_NUMBER = "downloadSmsNumber";
     public static final String METHOD_DOWNLOAD_SUBMISSION_DETAILS = "downloadSubmissionDetails";
+    public static final String METHOD_DOWNLOAD_CONFIG_FILE = "downloadConfigFile";
 
     // maximum number of threads in thread pool
     private static final int QUANTITY_OF_THREADS = 3;
@@ -179,19 +180,17 @@ public class WorkService extends Service {
             SendSmsProcessor.send(context, info, groups);
         }
 
-        if(METHOD_DOWNLOAD_COMPULSORY_DATA.equals(methodName)){
-            DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
-            CompulsoryDataProcessor.download(context, info);
-        }
-
         if(METHOD_DOWNLOAD_SUBMISSION_DETAILS.equals(methodName)){
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             SubmissionDetailsProcessor.download(context, info);
         }
 
         if(METHOD_DOWNLOAD_SMS_NUMBER.equals(methodName)){
-            DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             SMSNumberProcessor.download(context);
+        }
+
+        if(METHOD_DOWNLOAD_CONFIG_FILE.equals(methodName)){
+            ConfigFileProcessor.download(context);
         }
     }
 

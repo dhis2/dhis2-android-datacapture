@@ -48,6 +48,7 @@ import android.widget.TextView;
 
 import org.dhis2.ehealthMobile.R;
 import org.dhis2.ehealthMobile.io.Constants;
+import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.Field;
 import org.dhis2.ehealthMobile.ui.activities.DataEntryActivity;
 import org.dhis2.ehealthMobile.utils.DiseaseGroupLabels;
@@ -70,10 +71,11 @@ public class PosOrZeroIntegerRow2 implements Row {
     private ImageView criticalDiseaseIcon;
     private IsDisabled isDisabled;
     private DiseaseGroupLabels diseaseGroupLabels;
+    private final DatasetInfoHolder info;
 
 
 
-    public PosOrZeroIntegerRow2(LayoutInflater inflater, ArrayList<Field> fields,Boolean isCriticalDisease, Boolean isAdditionalDisease) {
+    public PosOrZeroIntegerRow2(LayoutInflater inflater, DatasetInfoHolder info, ArrayList<Field> fields, Boolean isCriticalDisease, Boolean isAdditionalDisease) {
         this.inflater = inflater;
         this.field = fields.get(fields.size()-4);
         this.field2 = fields.get(fields.size()-3);
@@ -81,6 +83,7 @@ public class PosOrZeroIntegerRow2 implements Row {
         this.field4 = fields.get(fields.size()-1);
         this.isCriticalDisease = isCriticalDisease;
         this.isAdditionalDisease = isAdditionalDisease;
+        this.info = info;
     }
 
     @Override
@@ -118,8 +121,8 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
-            isDisabled = new IsDisabled(view.getContext());
-            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
+            isDisabled = new IsDisabled(view.getContext(), info);
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext(), info);
         } else {
             view = convertView;
 
@@ -130,8 +133,8 @@ public class PosOrZeroIntegerRow2 implements Row {
 
             alertDialog = new AlertDialog.Builder(view.getContext()).create();
             criticalDiseaseAlertDialog = new AlertDialog.Builder(view.getContext()).create();
-            isDisabled = new IsDisabled(view.getContext());
-            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext());
+            isDisabled = new IsDisabled(view.getContext(), info);
+            diseaseGroupLabels = new DiseaseGroupLabels(view.getContext(), info);
         }
 
 

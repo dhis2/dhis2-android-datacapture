@@ -32,7 +32,7 @@ package org.dhis2.ehealthMobile.utils;
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 
-import org.dhis2.ehealthMobile.processors.CompulsoryDataProcessor;
+import org.dhis2.ehealthMobile.processors.ConfigFileProcessor;
 import org.dhis2.ehealthMobile.processors.SMSNumberProcessor;
 
 public class PrefUtils {
@@ -121,14 +121,14 @@ public class PrefUtils {
         context.getSharedPreferences(RESOURCE_STATE, Context.MODE_PRIVATE).edit().clear().commit();
     }
 
-    public static void saveCompulsoryData(Context context, String key, String data){
-        Editor editor = context.getSharedPreferences(CompulsoryDataProcessor.COMPULSORY_DATA, Context.MODE_PRIVATE).edit();
+    public static void saveCompulsoryDiseases(Context context, String key, String data){
+        Editor editor = context.getSharedPreferences(ConfigFileProcessor.COMPULSORY_DISEASES, Context.MODE_PRIVATE).edit();
         editor.putString(key, data);
         editor.apply();
     }
 
-    public static String getCompulsoryData(Context context, String key){
-        String data = context.getSharedPreferences(CompulsoryDataProcessor.COMPULSORY_DATA, Context.MODE_PRIVATE)
+    public static String getCompulsoryDiseases(Context context, String key){
+        String data = context.getSharedPreferences(ConfigFileProcessor.COMPULSORY_DISEASES, Context.MODE_PRIVATE)
                 .getString(key, null);
         return data;
     }
@@ -150,15 +150,16 @@ public class PrefUtils {
         editor.putString(id, status).commit();
     }
 
-    public static void saveCompletionDate(Context context, String submissionId, String date){
-        Editor editor = context.getSharedPreferences(COMPLETION_DATE, context.MODE_PRIVATE).edit();
-        editor.putString(submissionId, date).commit();
+    public static void saveDiseaseConfigs(Context context, String key, String data){
+        Editor editor = context.getSharedPreferences(ConfigFileProcessor.DISEASE_CONFIGS, Context.MODE_PRIVATE).edit();
+        editor.putString(key, data);
+        editor.apply();
     }
 
-    public static String getCompletionDate(Context context, String submissionId){
-        String date = context.getSharedPreferences(COMPLETION_DATE, Context.MODE_PRIVATE)
-                .getString(submissionId, null);
-        return date;
+    public static String getDiseaseConfigs(Context context, String key){
+        String data = context.getSharedPreferences(ConfigFileProcessor.DISEASE_CONFIGS, Context.MODE_PRIVATE)
+                .getString(key, null);
+        return data;
     }
 
     @Deprecated
