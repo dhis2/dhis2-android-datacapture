@@ -29,11 +29,13 @@
 
 package org.dhis2.ehealthMobile.ui.activities;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -52,6 +54,7 @@ import org.dhis2.ehealthMobile.WorkService;
 import org.dhis2.ehealthMobile.network.HTTPClient;
 import org.dhis2.ehealthMobile.network.NetworkUtils;
 import org.dhis2.ehealthMobile.network.Response;
+import org.dhis2.ehealthMobile.utils.AppPermissions;
 import org.dhis2.ehealthMobile.utils.ToastManager;
 import org.dhis2.ehealthMobile.utils.ViewUtils;
 
@@ -143,6 +146,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        if(!AppPermissions.isPermissionGranted(getApplicationContext(), Manifest.permission.SEND_SMS)){
+            AppPermissions.requestPermission(this);
+        }
+
         // Restoring state of activity from saved bundle
         if (savedInstanceState != null) {
             boolean loginInProcess = savedInstanceState.getBoolean(TAG, false);
@@ -161,6 +168,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Registering BroadcastReceiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter(TAG));
+
     }
 
     @Override
@@ -179,6 +187,12 @@ public class LoginActivity extends AppCompatActivity {
             outState.putBoolean(TAG, mProgressBar.isShown());
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        AppPermissions.handleRequestResults(requestCode, permissions, grantResults, this);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     // Activates *login button*,

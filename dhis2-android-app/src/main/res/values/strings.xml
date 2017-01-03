@@ -130,10 +130,15 @@
     <string name="compulsory_data_dialog_title">Compulsory Data</string>
     <string name="compulsory_data_dialog_message">Submission of the form with blank fields is not possible.</string>
     <string name="compulsory_data_dialog_confirmation">OK</string>
+
     <!--Submission details -->
     <string name="completion_date_prefix">Last submission on:</string>
     <string name="submission_method_prefix">"Form submission via "</string>
     <string name="completion_date_example">Completed on: 13th October 2016</string>
     <string name="timely_title">Timely</string>
 
+    <!-- SMS permission dialog -->
+    <string name="sms_permission_dialog_title">Permission Required</string>
+    <string name="sms_permission_dialog_message">The DHIS2 eHealth app requires SMS permission in order to submit forms via SMS</string>
+    <string name="sms_permission_dialog_confirmation">OK</string>
 </resources>
