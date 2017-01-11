@@ -30,163 +30,37 @@
 package org.dhis2.ehealthMobile.ui.activities;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Base64;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import org.dhis2.ehealthMobile.R;
-import org.dhis2.ehealthMobile.WorkService;
 import org.dhis2.ehealthMobile.network.HTTPClient;
-import org.dhis2.ehealthMobile.network.NetworkUtils;
-import org.dhis2.ehealthMobile.network.Response;
+import org.dhis2.ehealthMobile.ui.fragments.LoginFragment;
 import org.dhis2.ehealthMobile.utils.AppPermissions;
-import org.dhis2.ehealthMobile.utils.ToastManager;
-import org.dhis2.ehealthMobile.utils.ViewUtils;
 
-public class LoginActivity extends AppCompatActivity {
-    public static final String TAG = LoginActivity.class.getSimpleName();
-    public static final String USERNAME = "username";
-    public static final String SERVER = "server";
-    public static final String CREDENTIALS = "creds";
 
-    private Button mLoginButton;
-    private EditText mUsername;
-    private EditText mPassword;
-    private ImageView mDhis2Logo;
-
-    // Disabled serverUrl EditText in order to allow
-    // developers to build app with custom server address
-    private EditText mServerUrl;
-    private ProgressBar mProgressBar;
-
-    // BroadcastReceiver which aim is to listen
-    // for network response on login post request
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int code = intent.getExtras().getInt(Response.CODE);
-
-            // If response code is 200, then MenuActivity is started
-            // If not, user is notified with error message
-            if (!HTTPClient.isError(code)) {
-                Intent menuActivity = new Intent(LoginActivity.this, MenuActivity.class);
-                startActivity(menuActivity);
-                overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
-                finish();
-            } else {
-                hideProgress();
-                String message = HTTPClient.getErrorMessage(LoginActivity.this, code);
-                showMessage(message);
-            }
-        }
-    };
+public class LoginActivity extends AppCompatActivity implements LoginFragment.LoginFragmentListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        mDhis2Logo = (ImageView) findViewById(R.id.dhis2_logo);
-        mLoginButton = (Button) findViewById(R.id.login_button);
-
-        mServerUrl = (EditText) findViewById(R.id.server_url);
-        mUsername = (EditText) findViewById(R.id.username);
-        mPassword = (EditText) findViewById(R.id.password);
-
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        mProgressBar.setVisibility(View.GONE);
-
-        // textwatcher is responsible for watching
-        // after changes in all fields
-        final TextWatcher textWatcher = new TextWatcher() {
-
-            @Override
-            public void afterTextChanged(Editable edit) {
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                checkEditTextFields();
-            }
-        };
-
-        mServerUrl.addTextChangedListener(textWatcher);
-        mUsername.addTextChangedListener(textWatcher);
-        mPassword.addTextChangedListener(textWatcher);
-
-        // Call method in order to check the fields
-        // and change state of login button
-        checkEditTextFields();
-
-        mLoginButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                loginUser();
-            }
-        });
+        setContentView(R.layout.activity_single_fragment);
 
         if(!AppPermissions.isPermissionGranted(getApplicationContext(), Manifest.permission.SEND_SMS)){
             AppPermissions.requestPermission(this);
         }
 
-        // Restoring state of activity from saved bundle
-        if (savedInstanceState != null) {
-            boolean loginInProcess = savedInstanceState.getBoolean(TAG, false);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-            if (loginInProcess) {
-                ViewUtils.hideAndDisableViews(mDhis2Logo, mServerUrl, mUsername, mPassword, mLoginButton);
-                //ViewUtils.hideAndDisableViews(mDhis2Logo, mUsername, mPassword, mLoginButton);
-                showProgress();
-            }
+        if(fragment == null){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container, new LoginFragment())
+                    .commit();
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Registering BroadcastReceiver
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter(TAG));
-
-    }
-
-    @Override
-    public void onPause() {
-
-        // Unregistering BroadcastReceiver in
-        // onPause() in order to prevent leaks
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
-        super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        // Saving state of activity
-        if (mProgressBar != null) {
-            outState.putBoolean(TAG, mProgressBar.isShown());
-        }
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -195,65 +69,22 @@ public class LoginActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    // Activates *login button*,
-    // if all necessary fields are full
-    private void checkEditTextFields() {
-        String tempUrl = mServerUrl.getText().toString();
-        //Server address will be retrieved from .xml resources
-        //String tempUrl = getString(R.string.default_server_url);
-        String tempUsername = mUsername.getText().toString();
-        String tempPassword = mPassword.getText().toString();
 
-        if (tempUrl.equals("") || tempUsername.equals("") || tempPassword.equals("")) {
-            mLoginButton.setEnabled(false);
-        } else {
-            mLoginButton.setEnabled(true);
-        }
+    @Override
+    public void onLoginSuccess() {
+        Intent menuActivity = new Intent(LoginActivity.this, MenuActivity.class);
+        startActivity(menuActivity);
+        overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
+        finish();
     }
 
-    // loginUser() is called when user clicks *LoginButton*
-    private void loginUser() {
-        String tmpServer = mServerUrl.getText().toString();
-        //Server address will be retrieved from .xml resources
-        //String tmpServer = getString(R.string.default_server_url);
+    @Override
+    public void onLoginError(int code) {
+        LoginFragment fragment = (LoginFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if(fragment == null) return;
 
-        String user = mUsername.getText().toString();
-        String pass = mPassword.getText().toString();
-        String pair = String.format("%s:%s", user, pass);
-
-        if (NetworkUtils.checkConnection(LoginActivity.this)) {
-            showProgress();
-
-            String server = tmpServer + (tmpServer.endsWith("/") ? "" : "/");
-            String creds = Base64.encodeToString(pair.getBytes(), Base64.NO_WRAP);
-
-            // Preparing data to be sent to WorkService
-            Intent intent = new Intent(LoginActivity.this, WorkService.class);
-            intent.putExtra(WorkService.METHOD, WorkService.METHOD_LOGIN_USER);
-            intent.putExtra(SERVER, server);
-            intent.putExtra(USERNAME, user);
-            intent.putExtra(CREDENTIALS, creds);
-
-            // Starting WorkService
-            startService(intent);
-        } else {
-            showMessage(getString(R.string.check_connection));
-        }
-    }
-
-    private void showMessage(String message) {
-        ToastManager.makeToast(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    private void showProgress() {
-        ViewUtils.perfomOutAnimation(this, R.anim.out_up, true,
-                mDhis2Logo, mServerUrl, mUsername, mPassword, mLoginButton);
-        ViewUtils.enableViews(mProgressBar);
-    }
-
-    private void hideProgress() {
-        ViewUtils.perfomInAnimation(this, R.anim.in_down,
-                mDhis2Logo, mServerUrl, mUsername, mPassword, mLoginButton);
-        ViewUtils.hideAndDisableViews(mProgressBar);
+        fragment.hideProgress();
+        String message = HTTPClient.getErrorMessage(LoginActivity.this, code);
+        fragment.showMessage(message);
     }
 }

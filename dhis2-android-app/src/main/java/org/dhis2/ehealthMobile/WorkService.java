@@ -38,11 +38,9 @@ import android.util.Log;
 
 import org.dhis2.ehealthMobile.io.holders.DatasetInfoHolder;
 import org.dhis2.ehealthMobile.io.models.Field;
-import org.dhis2.ehealthMobile.io.models.Form;
 import org.dhis2.ehealthMobile.io.models.Group;
 import org.dhis2.ehealthMobile.processors.ConfigFileProcessor;
 import org.dhis2.ehealthMobile.processors.FormsDownloadProcessor;
-import org.dhis2.ehealthMobile.processors.LoginProcessor;
 import org.dhis2.ehealthMobile.processors.MyProfileProcessor;
 import org.dhis2.ehealthMobile.processors.OfflineDataProcessor;
 import org.dhis2.ehealthMobile.processors.RemoveDataProcessor;
@@ -62,7 +60,6 @@ public class WorkService extends Service {
     public static final String METHOD = "method";
     public static final String METHOD_UPDATE_PROFILE_INFO = "updateProfileInfo";
     public static final String METHOD_UPLOAD_PROFILE_INFO = "uploadProfileInfo";
-    public static final String METHOD_LOGIN_USER = "loginUser";
     public static final String METHOD_UPDATE_DATASETS = "updateDatasets";
     public static final String METHOD_DOWNLOAD_LATEST_DATASET_VALUES = "downloadLatestDatasetValues";
     public static final String METHOD_UPLOAD_DATASET = "aggregateReportUploadProcessor";
@@ -142,13 +139,6 @@ public class WorkService extends Service {
 
         if (METHOD_UPDATE_PROFILE_INFO.equals(methodName)) {
             MyProfileProcessor.updateProfileInfo(context);
-        }
-
-        if (METHOD_LOGIN_USER.equals(methodName)) {
-            String username = extras.getString(LoginActivity.USERNAME);
-            String server = extras.getString(LoginActivity.SERVER);
-            String creds = extras.getString(LoginActivity.CREDENTIALS);
-            LoginProcessor.loginUser(context, server, creds, username);
         }
 
         if (METHOD_UPDATE_DATASETS.equals(methodName)) {
