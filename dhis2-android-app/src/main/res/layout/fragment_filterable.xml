@@ -42,9 +42,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="13dp"
-        android:drawableLeft="@drawable/ic_search_black"
+        android:drawableLeft="@drawable/ic_search"
         android:drawablePadding="4dp"
-        android:drawableStart="@drawable/ic_search_black"
+        android:drawableStart="@drawable/ic_search"
         android:hint="@string/choose_item"
         android:textSize="14sp"
         app:font="@string/regular_font_name" />
