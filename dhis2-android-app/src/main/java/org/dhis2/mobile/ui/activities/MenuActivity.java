@@ -65,6 +65,8 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         if (toolbar != null) {
             toolbar.setNavigationIcon(R.drawable.ic_menu);
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -79,7 +81,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
             onNavigationItemSelected(navigationView.getMenu()
                     .findItem(R.id.drawer_item_aggregate_report));
         } else if (savedInstanceState.containsKey(STATE_TOOLBAR_TITLE) && toolbar != null) {
-            toolbar.setTitle(savedInstanceState.getString(STATE_TOOLBAR_TITLE));
+            setTitle(savedInstanceState.getString(STATE_TOOLBAR_TITLE));
         }
     }
 
@@ -100,7 +102,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
             }
         }
 
-        toolbar.setTitle(item.getTitle());
+        setTitle(item.getTitle());
         navigationView.setCheckedItem(R.id.drawer_item_aggregate_report);
         drawerLayout.closeDrawers();
 

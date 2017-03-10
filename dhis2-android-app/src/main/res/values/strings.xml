@@ -75,6 +75,7 @@
     <string name="server_url">Enter server URL</string>
 
     <!-- String resources for aggregate report fragment -->
+    <string name="sync">Sync</string>
     <string name="choose">Choose</string>
     <string name="choose_item">Choose item</string>
     <string name="choose_data_set">Choose data set</string>
