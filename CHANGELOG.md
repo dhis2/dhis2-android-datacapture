@@ -1,0 +1,2 @@
+ - Aligned to the latest version of SDK
+ - Refresh button in aggregate report and profile fragment
