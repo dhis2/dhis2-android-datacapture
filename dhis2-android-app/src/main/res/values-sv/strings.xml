@@ -79,6 +79,5 @@
   <string name="period">Period</string>
   <string name="swipe_to_update">Dra för att uppdatera</string>
   <string name="no_forms_found">Inga blanketter finns för aktuell användare</string>
-  <string name="drawer_item_placeholder">Éléments</string>
   <string name="placeholder">Something important goes here</string>
 </resources>
