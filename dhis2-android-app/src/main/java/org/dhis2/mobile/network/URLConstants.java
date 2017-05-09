@@ -43,6 +43,7 @@ public class URLConstants {
 	public static final String DATASET_VALUES_URL = "api/dataSets";
 	
 	public static final String FORM_PARAM = "form?ou=";
+	public static final String COMPULSORY_DATA_ELEMENTS_PARAM = "fields=compulsoryDataElementOperands[dataElement[id]]";
 	public static final String PERIOD_PARAM = "&pe=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
 }
