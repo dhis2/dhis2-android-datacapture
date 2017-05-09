@@ -65,6 +65,7 @@
     <string name="import_successfully_completed">Import successfully completed</string>
     <string name="import_failed">Import failed</string>
     <string name="something_went_wrong">Something went wrong</string>
+    <string name="compulsory_empty_error">Form not saved. One or more compulsory question are empty.</string>
 
     <string name="profile_changes_saved">Changes have been successfully saved</string>
     <string name="profile_changes_uploaded">Changes have been successfully uploaded</string>
