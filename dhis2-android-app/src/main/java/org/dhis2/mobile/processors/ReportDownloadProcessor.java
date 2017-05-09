@@ -34,19 +34,24 @@ import android.content.Intent;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryOption;
+import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
+import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.ToastManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +69,13 @@ public class ReportDownloadProcessor {
         Form form = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
             form = parseForm(response.getBody());
+            List<String> compulsoryUIds = downloadCompulsoryDataelementUids(context, info);
+            if (compulsoryUIds == null) {
+                ToastManager.makeToast(context, context.getString(R.string.something_went_wrong),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+            addCompulsoryDataElements(compulsoryUIds, form);
         }
 
         Intent intent = new Intent(DataEntryActivity.TAG);
@@ -74,6 +86,33 @@ public class ReportDownloadProcessor {
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private static List<String> downloadCompulsoryDataelementUids(Context context,
+            DatasetInfoHolder info) {
+        CompulsoryDataElementUIdsDownloadProcessor
+                compulsoryDataElementUIdsDownloadProcessor = new CompulsoryDataElementUIdsDownloadProcessor();
+
+        return compulsoryDataElementUIdsDownloadProcessor.download(context, info);
+    }
+
+    private static void addCompulsoryDataElements(List<String> compulsoryUIds, Form form) {
+        if (form == null && compulsoryUIds == null) {
+            return;
+        }
+        for (String uid : compulsoryUIds) {
+            for (Group group : form.getGroups()) {
+                addCompulsoryDataElements(uid, group);
+            }
+        }
+    }
+
+    private static void addCompulsoryDataElements(String uid, Group group) {
+        for (Field field : group.getFields()) {
+            if (field.getDataElement().equals(uid)) {
+                field.setCompulsory(true);
+            }
+        }
     }
 
     private static String buildUrl(Context context, DatasetInfoHolder info) {
