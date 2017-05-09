@@ -69,7 +69,7 @@ public class ReportDownloadProcessor {
         Form form = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
             form = parseForm(response.getBody());
-            List<String> compulsoryUIds = downloadCompulsoryDataelementUids(context, info);
+            List<String> compulsoryUIds = downloadCompulsoryDataElementUIds(context, info);
             if (compulsoryUIds == null) {
                 ToastManager.makeToast(context, context.getString(R.string.something_went_wrong),
                         Toast.LENGTH_SHORT).show();
@@ -88,7 +88,7 @@ public class ReportDownloadProcessor {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private static List<String> downloadCompulsoryDataelementUids(Context context,
+    private static List<String> downloadCompulsoryDataElementUIds(Context context,
             DatasetInfoHolder info) {
         CompulsoryDataElementUIdsDownloadProcessor
                 compulsoryDataElementUIdsDownloadProcessor = new CompulsoryDataElementUIdsDownloadProcessor();

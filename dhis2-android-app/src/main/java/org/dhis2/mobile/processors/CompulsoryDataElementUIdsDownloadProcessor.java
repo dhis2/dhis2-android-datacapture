@@ -29,7 +29,7 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
 
         List<String> uIdList = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
-            uIdList = parseCompulsoryUIds(response.getBody());
+            uIdList = parseToUIdsList(response.getBody());
         }
         return uIdList;
     }
@@ -43,7 +43,7 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
         return url;
     }
 
-    private static List<String> parseCompulsoryUIds(String responseBody) {
+    private static List<String> parseToUIdsList(String responseBody) {
         if (responseBody != null) {
             try {
                 List<String> list = new ArrayList<>();
@@ -52,12 +52,7 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
                 if (jsonArray.size() == 0) {
                     return list;
                 }
-                for (JsonElement item : jsonArray) {
-                    JsonObject dataElement = ((JsonObject) item).get(
-                            "dataElement").getAsJsonObject();
-                    String uid = dataElement.get("id").getAsString();
-                    list.add(uid);
-                }
+                parseToUIdsList(list, jsonArray);
                 return list;
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -66,5 +61,14 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
             }
         }
         return null;
+    }
+
+    private static void parseToUIdsList(List<String> list, JsonArray jsonArray) {
+        for (JsonElement item : jsonArray) {
+            JsonObject dataElement = ((JsonObject) item).get(
+                    "dataElement").getAsJsonObject();
+            String uid = dataElement.get("id").getAsString();
+            list.add(uid);
+        }
     }
 }
