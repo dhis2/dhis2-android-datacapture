@@ -12,6 +12,7 @@ public class CategoryCombo implements Serializable, Parcelable {
 
     private String id;
     private List<Category> categories = new ArrayList<>();
+    private List<String> categoryOptionComboUIdList = new ArrayList<>();
 
     public static final Parcelable.Creator<CategoryCombo> CREATOR = new Parcelable.Creator<CategoryCombo>() {
 
@@ -33,6 +34,11 @@ public class CategoryCombo implements Serializable, Parcelable {
         in.readTypedList(categories, Category.CREATOR);
     }
 
+    public CategoryCombo(String UId, List<String> categoryOptionComboUIds) {
+        this.id = UId;
+        this.categoryOptionComboUIdList = categoryOptionComboUIds;
+    }
+
     public String getId() {
         return id;
     }
@@ -50,5 +56,17 @@ public class CategoryCombo implements Serializable, Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
         parcel.writeTypedList(categories);
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public List<String> getCategoryOptionComboUIdList() {
+        return categoryOptionComboUIdList;
+    }
+
+    public void setCategoryOptionComboUIdList(List<String> categoryOptionComboUIdList) {
+        this.categoryOptionComboUIdList = categoryOptionComboUIdList;
     }
 }

@@ -30,6 +30,7 @@
 package org.dhis2.mobile.network;
 
 public class URLConstants {
+
 	private URLConstants() { }
 	
 	public static final String API_USER_ACCOUNT_URL = "api/me/user-account";
@@ -41,8 +42,13 @@ public class URLConstants {
 	public static final String DATASETS_URL = "api/me/assignedDataSets";
 	public static final String DATASET_UPLOAD_URL = "api/dataValueSets";
 	public static final String DATASET_VALUES_URL = "api/dataSets";
-	
+	public static final String CATEGORY_COMBOS_URL = "api/categoryCombos";
+
 	public static final String FORM_PARAM = "form?ou=";
 	public static final String PERIOD_PARAM = "&pe=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
+	public static final String CATEGORY_OPTION_DATA_ELEMENTS_PARAM =
+			"fields=categoryCombo,dataSetElements[dataElement,categoryCombo[id,"
+					+ "categoryOptionCombos]],sections[name, categoryCombos[categoryOptionCombos]]";
+
 }
