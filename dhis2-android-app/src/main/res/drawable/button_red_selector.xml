@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2016, University of Oslo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015, University of Oslo
   ~
   ~ All rights reserved.
   ~ Redistribution and use in source and binary forms, with or without
@@ -26,33 +27,26 @@
   ~ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group
-        android:id="@+id/drawer_group_main"
-        android:checkableBehavior="single">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <item
-            android:id="@+id/drawer_item_aggregate_report"
-            android:icon="@drawable/ic_aggregate_report"
-            android:orderInCategory="110"
-            android:title="@string/aggregate_reporting" />
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="1dp"/>
+            <solid android:color="@color/button_log_out_state_enabled_false"/>
+        </shape>
+    </item>
 
-        <item
-            android:id="@+id/drawer_item_profile"
-            android:icon="@drawable/ic_username"
-            android:orderInCategory="120"
-            android:title="@string/profile" />
+    <item android:state_pressed="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="1dp"/>
+            <solid android:color="@color/button_log_out_state_unpressed"/>
+        </shape>
+    </item>
 
-        <item
-            android:id="@+id/drawer_item_sync_logs"
-            android:icon="@drawable/ic_notification"
-            android:orderInCategory="130"
-            android:title="@string/sync_logs" />
-
-        <item
-            android:id="@+id/drawer_item_logout"
-            android:icon="@drawable/ic_log_out"
-            android:orderInCategory="140"
-            android:title="@string/log_out" />
-    </group>
-</menu>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="1dp"/>
+            <solid android:color="@color/button_log_out_state_pressed"/>
+        </shape>
+    </item>
+</selector>

@@ -71,6 +71,7 @@
   <string name="choose_report_date">Choisir la date de rapport</string>
   <string name="download_forms">Télécharger les formulaires</string>
   <string name="aggregate_reporting">Rapport agrégé</string>
+  <string name="sync_logs">Synchroniser les journaux</string>
   <string name="profile">Profil</string>
   <string name="organization_unit">Unité d\'organisation</string>
   <string name="description">Description</string>
@@ -81,4 +82,5 @@
   <string name="no_forms_found">Pas de formulaire assigné à l\'utilisateur actuel</string>
   <string name="drawer_item_placeholder">Éléments</string>
   <string name="placeholder">Something important goes here</string>
+  <string name="delete_log">Réinitialiser</string>
 </resources>

@@ -96,6 +96,7 @@
     <!-- menu items -->
     <string name="aggregate_reporting">Aggregate Report</string>
     <string name="profile">Profile</string>
+    <string name="sync_logs">Sync logs</string>
 
     <!-- Basic strings -->
     <string name="organization_unit">Organisation Unit</string>
@@ -105,5 +106,7 @@
     <string name="period">Period</string>
     <string name="swipe_to_update">Swipe to update</string>
     <string name="no_forms_found">No forms found assigned to current user</string>
+    <string name="delete_log">Reset</string>
+
 
 </resources>

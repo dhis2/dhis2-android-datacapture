@@ -71,6 +71,7 @@
   <string name="choose_report_date">Välj rapport datum</string>
   <string name="download_forms">Ladda ner blanketter</string>
   <string name="aggregate_reporting">Aggregat Rapport</string>
+  <string name="sync_logs">Synkronisera loggar</string>
   <string name="profile">Profil</string>
   <string name="organization_unit">Organisationenhet</string>
   <string name="description">Beskrivning</string>
@@ -80,4 +81,5 @@
   <string name="swipe_to_update">Dra för att uppdatera</string>
   <string name="no_forms_found">Inga blanketter finns för aktuell användare</string>
   <string name="placeholder">Something important goes here</string>
+  <string name="delete_log">Återställa</string>
 </resources>

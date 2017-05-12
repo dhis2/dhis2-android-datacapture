@@ -37,18 +37,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Date;
 
 public final class TextFileUtils {
     private static final String TAG = TextFileUtils.class.getSimpleName();
 
     public enum FileNames {
-        ORG_UNITS_WITH_DATASETS, ACCOUNT_INFO
+        ORG_UNITS_WITH_DATASETS, ACCOUNT_INFO, LOG
     }
 
     public enum Directory {
         ROOT(""),
         DATASETS("datasets"),
         OFFLINE_DATASETS("offlineDatasets"),
+        LOG("log"),
         OPTION_SETS("optionSets");
 
         private String directory;
@@ -113,6 +115,32 @@ public final class TextFileUtils {
 
     public static void writeTextFile(Context context, Directory dir, FileNames name, String data) {
         writeTextFile(context, dir, name.toString(), data);
+    }
+
+
+
+    public static void writeLineIntoTextFile(Context context, Directory dir,
+            String filename, String message) throws IOException {
+        String path = getDirectoryPath(context, dir);
+        File directory = new File(path);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+
+        File file = new File(path, filename);
+        String fileContent = "";
+        if (!file.exists()) {
+            file.createNewFile();
+        } else {
+            fileContent = readTextFile(context, dir, filename);
+        }
+
+        Date date = new Date();
+        fileContent = message + " at " + String.valueOf(
+                date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "\n"
+                        + fileContent);
+
+        writeTextFile(context, dir, filename, fileContent);
     }
 
     /**

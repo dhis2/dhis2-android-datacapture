@@ -40,10 +40,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import java.io.IOException;
+
 public class NotificationBuilder {
 	private NotificationBuilder() { }
 	
 	public static void fireNotification(Context context, String title, String message) {
+		saveLogMessage(context, message);
+
 		int id = (title + message).hashCode();
 		Intent notificationIntent = new Intent(context, LauncherActivity.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context,
@@ -63,6 +67,15 @@ public class NotificationBuilder {
 		notification.flags |=  Notification.FLAG_AUTO_CANCEL;
 		
 		notificationManager.notify(id, notification);
+	}
+
+	private static void saveLogMessage(Context context, String message) {
+		try {
+			TextFileUtils.writeLineIntoTextFile(context, TextFileUtils.Directory.LOG,
+					TextFileUtils.FileNames.LOG.toString(), message);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
