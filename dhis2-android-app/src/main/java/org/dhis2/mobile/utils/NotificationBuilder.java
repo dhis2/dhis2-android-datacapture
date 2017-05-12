@@ -29,6 +29,9 @@
 
 package org.dhis2.mobile.utils;
 
+import org.dhis2.mobile.ui.activities.LauncherActivity;
+import org.dhis2.mobile.R;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -36,9 +39,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-
-import org.dhis2.mobile.R;
-import org.dhis2.mobile.ui.activities.LauncherActivity;
 
 public class NotificationBuilder {
 	private NotificationBuilder() { }
