@@ -216,7 +216,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
-        dataEntryListView.setItemsCanFocus(true);
     }
 
     private void setupUploadButton() {
