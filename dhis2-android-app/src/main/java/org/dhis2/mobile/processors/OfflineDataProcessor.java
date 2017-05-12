@@ -113,6 +113,10 @@ public class OfflineDataProcessor {
                     // Firing notification to statusbar
                     NotificationBuilder.fireNotification(context, title, message);
 
+                    message = String.format(context.getString(R.string.log_message_offline_report),
+                            info.getFormLabel(), info.getPeriodLabel());
+                    TextFileUtils.saveLogMessage(context, message);
+
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());

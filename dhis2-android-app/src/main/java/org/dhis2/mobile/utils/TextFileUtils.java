@@ -37,10 +37,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public final class TextFileUtils {
     private static final String TAG = TextFileUtils.class.getSimpleName();
+
+    public static void saveLogMessage(Context context, String message) {
+        try {
+            TextFileUtils.writeLineIntoTextFile(context, TextFileUtils.Directory.LOG,
+                    TextFileUtils.FileNames.LOG.toString(), message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public enum FileNames {
         ORG_UNITS_WITH_DATASETS, ACCOUNT_INFO, LOG
@@ -135,10 +145,10 @@ public final class TextFileUtils {
             fileContent = readTextFile(context, dir, filename);
         }
 
-        Date date = new Date();
-        fileContent = message + " at " + String.valueOf(
-                date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "\n"
-                        + fileContent);
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        fileContent = formattedDate + "-" + message + "\n"
+                + fileContent;
 
         writeTextFile(context, dir, filename, fileContent);
     }

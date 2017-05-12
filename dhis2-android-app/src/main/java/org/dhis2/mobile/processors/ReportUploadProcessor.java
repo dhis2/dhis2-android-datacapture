@@ -53,7 +53,6 @@ import org.dhis2.mobile.utils.TextFileUtils;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ReportUploadProcessor {
@@ -90,6 +89,11 @@ public class ReportUploadProcessor {
             String title = description;
             String message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
             NotificationBuilder.fireNotification(context, title, message);
+
+            message = String.format(context.getString(R.string.log_message), info.getFormLabel(),
+                    info.getPeriodLabel());
+            TextFileUtils.saveLogMessage(context, message);
+
         } else {
             saveDataset(context, data, info);
         }
