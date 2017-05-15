@@ -44,16 +44,26 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
+    private LocalDate maxDate;
 
     public WeekIterator(int openFP) {
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth());
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusWeeks(1);
+        }
     }
 
     @Override
     public boolean hasNext() {
         return hasNext(checkDate);
+    }
+
+    @Override
+    public boolean hasNextPeriods(){
+        return checkDate.isBefore(maxDate);
     }
 
     private boolean hasNext(LocalDate date) {
@@ -105,8 +115,10 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
 
             counter++;
             checkDate = checkDate.plusWeeks(1);

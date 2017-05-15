@@ -70,8 +70,11 @@ public class FinAprilYearIterator extends YearIterator {
             String dateStr = checkDate.minusYears(1).year().getAsString();
             String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, dateStr, MAR_STR, checkDate.year().getAsString());
             String date = dateStr + APRIL;
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
 
             checkDate = checkDate.plusYears(1);
             counter++;
