@@ -94,10 +94,14 @@ public class OfflineDataProcessor {
                 Response resp = HTTPClient.post(url, creds, report);
                 // If upload was successful, notify user and delete offline
                 // report
+                // Getting label of period and dataset
+                String jsonDatasetInfo = PrefUtils.getOfflineReportInfo(context,
+                        reportFile.getName());
+                DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
+                String message = String.format(context.getString(R.string.log_report_data),
+                        info.getFormLabel(), info.getPeriodLabel()) +" "+  context.getString(
+                        R.string.log_message_offline_report);
                 if (!HTTPClient.isError(resp.getCode())) {
-                    // Getting label of period and dataset
-                    String jsonDatasetInfo = PrefUtils.getOfflineReportInfo(context, reportFile.getName());
-                    DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
 
                     String description;
                     if (ImportSummariesHandler.isSuccess(resp.getBody())) {
@@ -107,19 +111,26 @@ public class OfflineDataProcessor {
                         description = ImportSummariesHandler.getDescription(resp.getBody(),
                                 context.getString(R.string.import_failed));
                     }
-                    String message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
+
+                    TextFileUtils.saveLogMessage(context, message +" "+ description);
+
+                    message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
                     String title = description;
 
                     // Firing notification to statusbar
                     NotificationBuilder.fireNotification(context, title, message);
 
-                    message = String.format(context.getString(R.string.log_message_offline_report),
-                            info.getFormLabel(), info.getPeriodLabel());
-                    TextFileUtils.saveLogMessage(context, message);
-
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
+                } else {
+                    message = message + context.getString(R.string.network_error) + ": "
+                            + HTTPClient.getErrorMessage(context, resp.getCode());
+
+                    NotificationBuilder.fireNotification(context,
+                            context.getString(R.string.network_error) + " " + resp.getCode(),
+                            message);
+                    TextFileUtils.saveLogMessage(context, message);
                 }
             }
         }

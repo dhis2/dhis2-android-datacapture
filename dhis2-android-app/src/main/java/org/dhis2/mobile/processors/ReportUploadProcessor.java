@@ -76,6 +76,8 @@ public class ReportUploadProcessor {
         String log = String.format("[%s] %s", response.getCode(), response.getBody());
         Log.i(TAG, log);
 
+        String message = String.format(context.getString(R.string.log_report_data), info.getFormLabel(),
+                info.getPeriodLabel());
         if (!HTTPClient.isError(response.getCode())) {
             String description;
             if (ImportSummariesHandler.isSuccess(response.getBody())) {
@@ -86,15 +88,22 @@ public class ReportUploadProcessor {
                         context.getString(R.string.import_failed));
             }
 
-            String title = description;
-            String message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
-            NotificationBuilder.fireNotification(context, title, message);
-
-            message = String.format(context.getString(R.string.log_message), info.getFormLabel(),
-                    info.getPeriodLabel());
+            message = message + description;
             TextFileUtils.saveLogMessage(context, message);
 
+            String title = description;
+            message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
+            NotificationBuilder.fireNotification(context, title, message);
+
+
         } else {
+            message = message + context.getString(R.string.network_error) + ": "
+                    + HTTPClient.getErrorMessage(context, response.getCode());
+
+            NotificationBuilder.fireNotification(context,
+                    context.getString(R.string.network_error) + " " + response.getCode(), message);
+            TextFileUtils.saveLogMessage(context, message);
+
             saveDataset(context, data, info);
         }
     }
