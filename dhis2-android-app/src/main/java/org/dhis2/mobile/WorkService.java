@@ -143,7 +143,6 @@ public class WorkService extends Service {
         }
 
         if (METHOD_UPDATE_DATASETS.equals(methodName)) {
-            OfflineDataProcessor.upload(context);
             FormsDownloadProcessor.updateDatasets(context);
         }
 

@@ -14,12 +14,6 @@
             android:name=".WorkService"
             android:exported="false" />
 
-        <receiver android:name=".NetworkStateReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".ui.activities.LauncherActivity"
             android:noHistory="true">
