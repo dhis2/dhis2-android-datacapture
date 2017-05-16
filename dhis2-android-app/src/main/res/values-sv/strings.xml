@@ -80,4 +80,9 @@
   <string name="swipe_to_update">Dra för att uppdatera</string>
   <string name="no_forms_found">Inga blanketter finns för aktuell användare</string>
   <string name="placeholder">Something important goes here</string>
+  <!-- last commit -->
+  <string name="about_this_app">"Om den här appen"</string>
+  <string name="app_version">Appversion: %s</string>
+  <string name="last_commit">"Commit hash: %s"</string>
+  <string name="unavailable">"Inte tillgänglig"</string>
 </resources>

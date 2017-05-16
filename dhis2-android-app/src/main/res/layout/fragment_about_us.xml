@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.NestedScrollView
+    android:fillViewport="true"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:gravity="center_horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/about_us_text_view_padding"
+            android:paddingRight="@dimen/about_us_text_view_padding">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:src="@drawable/ic_launcher" />
+
+            <TextView
+                android:id="@+id/app_name"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="@dimen/about_us_text_view_bottom_padding"
+                android:singleLine="true"
+                android:text="@string/app_name"
+                android:textColor="@color/light_font_grey"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/app_version"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingTop="@dimen/about_us_text_view_bottom_padding"
+                android:singleLine="true"
+                android:text="@string/unavailable"
+                android:textColor="@color/light_font_grey"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/commit_hash"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="@dimen/about_us_text_view_bottom_padding"
+                android:text="@string/unavailable"
+                android:textColor="@color/light_font_grey"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="@dimen/about_us_text_view_bottom_padding"
+                android:text="@string/unavailable"
+                android:textColor="@color/light_font_grey"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+</android.support.v4.widget.NestedScrollView>

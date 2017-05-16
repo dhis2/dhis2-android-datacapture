@@ -106,4 +106,10 @@
     <string name="swipe_to_update">Swipe to update</string>
     <string name="no_forms_found">No forms found assigned to current user</string>
 
+    <!-- last commit -->
+    <string name="about_this_app">About this app</string>
+    <string name="app_version">App version: %s</string>
+    <string name="last_commit">Commit hash: %s</string>
+    <string name="unavailable">Unavailable</string>
+
 </resources>

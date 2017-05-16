@@ -7,5 +7,7 @@
     <dimen name="activity_vertical_slim_margin">8dp</dimen>
 
     <dimen name="navigation_drawer_width">304dp</dimen>
+    <dimen name="about_us_text_view_bottom_padding">6dp</dimen>
+    <dimen name="about_us_text_view_padding">13dp</dimen>
 
 </resources>
