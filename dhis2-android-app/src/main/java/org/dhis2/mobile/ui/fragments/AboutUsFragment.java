@@ -1,7 +1,6 @@
 package org.dhis2.mobile.ui.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +10,6 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,6 @@ import android.widget.TextView;
 import org.dhis2.mobile.BuildConfig;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Group;
-import org.dhis2.mobile.ui.views.FontTextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +54,6 @@ public class AboutUsFragment extends Fragment implements LoaderManager.LoaderCal
                 stringBuilder.append(line + "\n");
             }
         } catch (IOException e) {
-            Log.d("AUtils", String.format("Error reading inputStream [%s]", inputStream));
             e.printStackTrace();
         }
 
