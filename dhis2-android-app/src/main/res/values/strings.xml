@@ -111,5 +111,6 @@
     <string name="app_version">App version: %s</string>
     <string name="last_commit">Commit hash: %s</string>
     <string name="unavailable">Unavailable</string>
+    <string name="est_about">This app is under the maintenance of EyeSeeTea Ltd (http://eyeseetea.com)</string>
 
 </resources>

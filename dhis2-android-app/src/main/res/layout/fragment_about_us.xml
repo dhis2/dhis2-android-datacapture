@@ -63,6 +63,21 @@
                 android:textColor="@color/light_font_grey"
                 android:textSize="15sp" />
 
+            <ImageView
+                android:id="@+id/est_logo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_eyeseetea_logo" />
+
+            <TextView
+                android:id="@+id/est_about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:paddingBottom="@dimen/about_us_text_view_bottom_padding"
+                android:text="@string/est_about"
+                android:textColor="@color/light_font_grey"
+                android:textSize="15sp" />
         </LinearLayout>
 
     </FrameLayout>
