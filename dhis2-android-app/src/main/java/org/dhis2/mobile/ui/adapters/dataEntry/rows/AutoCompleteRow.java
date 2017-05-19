@@ -103,9 +103,7 @@ public class AutoCompleteRow implements Row {
             view = convertView;
             holder = (AutoCompleteRowHolder) view.getTag();
         }
-
-        holder.textLabel.setText(field.getLabel());
-
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         holder.autoComplete.setAdapter(adapter);
         holder.onFocusListener.setValues(holder.autoComplete, adapter.getData());
         holder.autoComplete.setOnFocusChangeListener(holder.onFocusListener);

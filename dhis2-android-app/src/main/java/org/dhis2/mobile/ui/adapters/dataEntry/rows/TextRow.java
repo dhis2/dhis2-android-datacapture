@@ -70,8 +70,8 @@ public class TextRow implements Row {
             view = convertView;
             holder = (EditTextHolder) view.getTag();
         }
-        
-        holder.textLabel.setText(field.getLabel());
+
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         
         holder.textWatcher.setField(field);
         holder.editText.addTextChangedListener(holder.textWatcher);
