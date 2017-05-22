@@ -213,6 +213,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
+        dataEntryListView.addFooterView(dataEntryListView.inflate(getApplicationContext(), R.layout.listview_row_footer, null));
     }
 
     private void setupUploadButton() {
