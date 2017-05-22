@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
@@ -22,16 +23,16 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
     public CompulsoryDataElementUIdsDownloadProcessor() {
     }
 
-    public static List<String> download(Context context, DatasetInfoHolder info) {
+    public static List<DataElementOperand> download(Context context, DatasetInfoHolder info) {
         String url = buildUrl(context, info);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
 
-        List<String> uIdList = null;
+        List<DataElementOperand> dataElementOperandsList = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
-            uIdList = parseToUIdsList(response.getBody());
+            dataElementOperandsList = parseToDataElementOperandsList(response.getBody());
         }
-        return uIdList;
+        return dataElementOperandsList;
     }
 
     private static String buildUrl(Context context, DatasetInfoHolder info) {
@@ -43,17 +44,17 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
         return url;
     }
 
-    private static List<String> parseToUIdsList(String responseBody) {
+    private static List<DataElementOperand> parseToDataElementOperandsList(String responseBody) {
         if (responseBody != null) {
             try {
-                List<String> list = new ArrayList<>();
+                List<DataElementOperand> dataElementOperandList = new ArrayList<>();
                 JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
                 JsonArray jsonArray = jsonForm.getAsJsonArray("compulsoryDataElementOperands");
                 if (jsonArray.size() == 0) {
-                    return list;
+                    return dataElementOperandList;
                 }
-                parseToUIdsList(list, jsonArray);
-                return list;
+                parseToDataElementOperandsList(dataElementOperandList, jsonArray);
+                return dataElementOperandList;
             } catch (NullPointerException e) {
                 e.printStackTrace();
             } catch (ParsingException e) {
@@ -63,12 +64,15 @@ public class CompulsoryDataElementUIdsDownloadProcessor {
         return null;
     }
 
-    private static void parseToUIdsList(List<String> list, JsonArray jsonArray) {
+    private static void parseToDataElementOperandsList(List<DataElementOperand> list, JsonArray jsonArray) {
         for (JsonElement item : jsonArray) {
-            JsonObject dataElement = ((JsonObject) item).get(
+            JsonObject jsonDataElementOperand = (JsonObject) item;
+            JsonObject categoryOptionCombo = jsonDataElementOperand.get(
+                    "categoryOptionCombo").getAsJsonObject();
+            JsonObject dataElement = jsonDataElementOperand.get(
                     "dataElement").getAsJsonObject();
-            String uid = dataElement.get("id").getAsString();
-            list.add(uid);
+            DataElementOperand dataElementOperand = new DataElementOperand(categoryOptionCombo.get("id").getAsString(), dataElement.get("id").getAsString());
+            list.add(dataElementOperand);
         }
     }
 }

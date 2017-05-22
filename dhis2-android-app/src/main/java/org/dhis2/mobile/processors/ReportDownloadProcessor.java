@@ -34,11 +34,10 @@ import android.content.Intent;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
-import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
@@ -51,7 +50,6 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.PrefUtils;
-import org.dhis2.mobile.utils.ToastManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,13 +67,11 @@ public class ReportDownloadProcessor {
         Form form = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
             form = parseForm(response.getBody());
-            List<String> compulsoryUIds = downloadCompulsoryDataElementUIds(context, info);
-            if (compulsoryUIds == null) {
-                ToastManager.makeToast(context, context.getString(R.string.something_went_wrong),
-                        Toast.LENGTH_SHORT).show();
+            List<DataElementOperand> compulsoryDataElementOperandList = downloadCompulsoryDataElementUIds(context, info);
+            if (compulsoryDataElementOperandList == null) {
                 return;
             }
-            addCompulsoryDataElements(compulsoryUIds, form);
+            addCompulsoryDataElements(compulsoryDataElementOperandList, form);
         }
 
         Intent intent = new Intent(DataEntryActivity.TAG);
@@ -88,7 +84,7 @@ public class ReportDownloadProcessor {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private static List<String> downloadCompulsoryDataElementUIds(Context context,
+    private static List<DataElementOperand> downloadCompulsoryDataElementUIds(Context context,
             DatasetInfoHolder info) {
         CompulsoryDataElementUIdsDownloadProcessor
                 compulsoryDataElementUIdsDownloadProcessor = new CompulsoryDataElementUIdsDownloadProcessor();
@@ -96,21 +92,23 @@ public class ReportDownloadProcessor {
         return compulsoryDataElementUIdsDownloadProcessor.download(context, info);
     }
 
-    private static void addCompulsoryDataElements(List<String> compulsoryUIds, Form form) {
+    private static void addCompulsoryDataElements(List<DataElementOperand> compulsoryUIds, Form form) {
         if (form == null && compulsoryUIds == null) {
             return;
         }
-        for (String uid : compulsoryUIds) {
+        for (DataElementOperand dataElementOperand : compulsoryUIds) {
             for (Group group : form.getGroups()) {
-                addCompulsoryDataElements(uid, group);
+                addCompulsoryDataElements(dataElementOperand, group);
             }
         }
     }
 
-    private static void addCompulsoryDataElements(String uid, Group group) {
+    private static void addCompulsoryDataElements(DataElementOperand dataElementOperand, Group group) {
         for (Field field : group.getFields()) {
-            if (field.getDataElement().equals(uid)) {
-                field.setCompulsory(true);
+            if (field.getDataElement().equals(dataElementOperand.getDataElementUid())) {
+                if(field.getCategoryOptionCombo().equals(dataElementOperand.getCategoryOptionComboUid())) {
+                    field.setCompulsory(true);
+                }
             }
         }
     }
