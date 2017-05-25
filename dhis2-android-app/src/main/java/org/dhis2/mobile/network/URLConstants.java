@@ -50,6 +50,6 @@ public class URLConstants {
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
 	public static final String CATEGORY_OPTION_DATA_ELEMENTS_PARAM =
 			"fields=categoryCombo,dataSetElements[dataElement,categoryCombo[id,"
-					+ "categoryOptionCombos]],sections[name, categoryCombos[categoryOptionCombos]]";
+					+ "categoryOptionCombos]],sections[name,categoryCombos[categoryOptionCombos]]";
 
 }
