@@ -26,4 +26,4 @@ build
 *.db
 
 # Last commit file
-app/src/main/res/raw/lastcommit.txt
+dhis2-android-app/src/main/res/raw/lastcommit.txt
