@@ -197,7 +197,9 @@ public final class TextFileUtils {
     public static void removeFile(Context context, Directory dir, FileNames fileName) {
         String path = getDirectoryPath(context, dir);
         File file = new File(path, fileName.toString());
-        removeFile(file);
+        if(file.exists()) {
+            removeFile(file);
+        }
     }
 
     public static void removeFile(File file) {

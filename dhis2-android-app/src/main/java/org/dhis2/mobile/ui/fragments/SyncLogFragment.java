@@ -58,13 +58,13 @@ public class SyncLogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_sync_log, container, false);
-        try {
-            String content = TextFileUtils.readTextFile(getContext(), TextFileUtils.Directory.LOG,
+
+        logTextView = (FontTextView) root.findViewById(R.id.log_content);
+        if(TextFileUtils.doesFileExist(getContext(), TextFileUtils.Directory.LOG, TextFileUtils.FileNames.LOG)) {
+            String content = TextFileUtils.readTextFile(getContext(),
+                    TextFileUtils.Directory.LOG,
                     TextFileUtils.FileNames.LOG);
-            logTextView = (FontTextView) root.findViewById(R.id.log_content);
             logTextView.setText(content);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
         }
 
         FontButton fontButton = (FontButton) root.findViewById(R.id.delete_and_log_out_button);
