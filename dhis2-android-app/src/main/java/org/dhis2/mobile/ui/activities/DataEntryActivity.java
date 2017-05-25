@@ -1,5 +1,7 @@
 package org.dhis2.mobile.ui.activities;
 
+import static android.text.TextUtils.isEmpty;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,8 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import static android.text.TextUtils.isEmpty;
 
 public class DataEntryActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Form> {
     public static final String TAG = DataEntryActivity.class.getSimpleName();
@@ -213,6 +213,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
+        dataEntryListView.addFooterView(dataEntryListView.inflate(getApplicationContext(), R.layout.listview_row_footer, null));
     }
 
     private void setupUploadButton() {
@@ -339,6 +340,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             groups.add(adapter.getGroup());
         }
 
+        if(!validateFields(groups)){
+            ToastManager.makeToast(this, getString(R.string.compulsory_empty_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         DatasetInfoHolder info = getIntent().getExtras()
                 .getParcelable(DatasetInfoHolder.TAG);
 
@@ -349,6 +356,17 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         startService(intent);
         finish();
+    }
+
+    private boolean validateFields(ArrayList<Group> groups) {
+        for (Group group:groups){
+            for(Field field:group.getFields()){
+                if(field.isCompulsory() && (field.getValue()==null || field.getValue().equals(""))){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void getLatestValues() {

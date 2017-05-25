@@ -52,6 +52,7 @@
   <string name="import_successfully_completed">Importation réalisée avec succès</string>
   <string name="import_failed">Échec de l\'importation</string>
   <string name="something_went_wrong">Quelque chose s\'est mal passée.</string>
+  <string name="compulsory_empty_error">Le formulaire n\'est pas enregistré. Une ou plusieurs questions obligatoires sont vides.</string>
   <string name="profile_changes_saved">Les changements ont été sauvegardés avec succès.</string>
   <string name="profile_changes_uploaded">Les changements ont été téléchargés avec succès.</string>
   <string name="username">Nom d\'utilisateur</string>

@@ -60,8 +60,11 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.TextRow;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class FieldAdapter extends BaseAdapter {
+    public static final String FORM_WITHOUT_SECTION = "default";
     private ArrayList<Row> rows;
     private final String adapterLabel;
     private final Group group;
@@ -73,6 +76,16 @@ public class FieldAdapter extends BaseAdapter {
         this.adapterLabel = group.getLabel();
 
         LayoutInflater inflater = LayoutInflater.from(context);
+
+        if(group.getLabel().equals(FORM_WITHOUT_SECTION)) {
+            Collections.sort(fields, new Comparator<Field>() {
+                @Override
+                public int compare(Field o1, Field o2) {
+                    return o1.getLabel().toLowerCase().compareTo(o2.getLabel().toLowerCase());
+                }
+            });
+        }
+
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
             if (field.hasOptionSet()) {
