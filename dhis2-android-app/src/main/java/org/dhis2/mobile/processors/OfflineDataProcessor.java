@@ -98,9 +98,6 @@ public class OfflineDataProcessor {
                 String jsonDatasetInfo = PrefUtils.getOfflineReportInfo(context,
                         reportFile.getName());
                 DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
-                String message = String.format(context.getString(R.string.log_report_data),
-                        info.getFormLabel(), info.getPeriodLabel()) +" "+  context.getString(
-                        R.string.log_message_offline_report);
                 if (!HTTPClient.isError(resp.getCode())) {
 
                     String description;
@@ -112,25 +109,29 @@ public class OfflineDataProcessor {
                                 context.getString(R.string.import_failed));
                     }
 
-                    TextFileUtils.saveLogMessage(context, message +" "+ description);
-
-                    message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
+                    TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
+                            TextFileUtils.FileNames.LOG.toString(),
+                            info.getLogMessage(context, true) + " " + description,
+                            info.getFormattedDate());
                     String title = description;
 
                     // Firing notification to statusbar
-                    NotificationBuilder.fireNotification(context, title, message);
+                    NotificationBuilder.fireNotification(context, title, info.getNotification());
 
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
                 } else {
-                    message = message + context.getString(R.string.network_error) + ": "
-                            + HTTPClient.getErrorMessage(context, resp.getCode());
+
+                    String message = info.getErrorMessage(context, true, resp);
 
                     NotificationBuilder.fireNotification(context,
                             context.getString(R.string.network_error) + " " + resp.getCode(),
                             message);
-                    TextFileUtils.saveLogMessage(context, message);
+
+                    TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
+                            TextFileUtils.FileNames.LOG.toString(), message,
+                            info.getFormattedDate());
                 }
             }
         }

@@ -76,8 +76,6 @@ public class ReportUploadProcessor {
         String log = String.format("[%s] %s", response.getCode(), response.getBody());
         Log.i(TAG, log);
 
-        String message = String.format(context.getString(R.string.log_report_data), info.getFormLabel(),
-                info.getPeriodLabel());
         if (!HTTPClient.isError(response.getCode())) {
             String description;
             if (ImportSummariesHandler.isSuccess(response.getBody())) {
@@ -88,21 +86,24 @@ public class ReportUploadProcessor {
                         context.getString(R.string.import_failed));
             }
 
-            message = message + description;
-            TextFileUtils.saveLogMessage(context, message);
+            TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
+                    TextFileUtils.FileNames.LOG.toString(),
+                    info.getLogMessage(context, false) + description,
+                    info.getFormattedDate());
 
-            String title = description;
-            message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
-            NotificationBuilder.fireNotification(context, title, message);
+            NotificationBuilder.fireNotification(context, description, info.getNotification());
 
 
         } else {
-            message = message + context.getString(R.string.network_error) + ": "
-                    + HTTPClient.getErrorMessage(context, response.getCode());
+            String message = info.getErrorMessage(context, false, response);
 
             NotificationBuilder.fireNotification(context,
                     context.getString(R.string.network_error) + " " + response.getCode(), message);
-            TextFileUtils.saveLogMessage(context, message);
+
+            TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
+                    TextFileUtils.FileNames.LOG.toString(),
+                    message,
+                    info.getFormattedDate());
 
             saveDataset(context, data, info);
         }

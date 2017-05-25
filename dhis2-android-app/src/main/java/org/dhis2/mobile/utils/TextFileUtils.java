@@ -30,6 +30,7 @@
 package org.dhis2.mobile.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -37,16 +38,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public final class TextFileUtils {
     private static final String TAG = TextFileUtils.class.getSimpleName();
 
-    public static void saveLogMessage(Context context, String message) {
+    public static void writeTextFile(Context context, Directory dir, String name, String message,
+            String startOfLine) {
+        message = startOfLine + "-" + message + "\n";
         try {
-            TextFileUtils.writeLineIntoTextFile(context, TextFileUtils.Directory.LOG,
-                    TextFileUtils.FileNames.LOG.toString(), message);
+            writeLineIntoTextFile(context, dir, name, message);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -131,26 +131,23 @@ public final class TextFileUtils {
 
     public static void writeLineIntoTextFile(Context context, Directory dir,
             String filename, String message) throws IOException {
-        String path = getDirectoryPath(context, dir);
+        File file = getFile(context, dir, filename);
+
+        String fileContent = message;
+        if (!file.exists()) {
+            file.createNewFile();
+        } else {
+            fileContent += readTextFile(context, dir, filename);
+        }
+
+        writeTextFile(context, dir, filename, fileContent);
+    }
+
+    private static void createDirectoryIfNotExist(String path) {
         File directory = new File(path);
         if (!directory.exists()) {
             directory.mkdir();
         }
-
-        File file = new File(path, filename);
-        String fileContent = "";
-        if (!file.exists()) {
-            file.createNewFile();
-        } else {
-            fileContent = readTextFile(context, dir, filename);
-        }
-
-        String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
-        fileContent = formattedDate + "-" + message + "\n"
-                + fileContent;
-
-        writeTextFile(context, dir, filename, fileContent);
     }
 
     /**
@@ -163,13 +160,7 @@ public final class TextFileUtils {
      * @param data    String which will be written to text file.
      */
     public static void writeTextFile(Context context, Directory dir, String name, String data) {
-        String path = getDirectoryPath(context, dir);
-        File directory = new File(path);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-
-        File file = new File(path, name);
+        File file = getFile(context, dir, name);
         try {
             file.createNewFile();
             FileOutputStream output = new FileOutputStream(file);
@@ -181,6 +172,14 @@ public final class TextFileUtils {
         } catch (IOException e) {
             throw new RuntimeException(name + " IOException");
         }
+    }
+
+    @NonNull
+    private static File getFile(Context context, Directory dir, String name) {
+        String path = getDirectoryPath(context, dir);
+        createDirectoryIfNotExist(path);
+
+        return new File(path, name);
     }
 
     public static String getDirectoryPath(Context context, Directory dir) {

@@ -29,13 +29,19 @@
 
 package org.dhis2.mobile.io.holders;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.CategoryOption;
+import org.dhis2.mobile.network.HTTPClient;
+import org.dhis2.mobile.network.Response;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class DatasetInfoHolder extends BaseFormInfoHolder {
@@ -130,5 +136,29 @@ public class DatasetInfoHolder extends BaseFormInfoHolder {
         }
 
         return stringBuilder.toString();
+    }
+
+    public String getNotification() {
+        return String.format("(%s) %s", getPeriodLabel(), getFormLabel());
+    }
+
+    public String getLogMessage(Context context, boolean isOffline) {
+        String message = String.format(context.getString(R.string.log_report_data),
+                getFormLabel(), getPeriodLabel());
+        if (isOffline) {
+            return message + " " + context.getString(
+                    R.string.log_message_offline_report);
+        } else {
+            return message;
+        }
+    }
+
+    public String getErrorMessage(Context context, boolean isOffline, Response resp) {
+        return getLogMessage(context, isOffline) + context.getString(R.string.network_error) + ": "
+                + HTTPClient.getErrorMessage(context, resp.getCode());
+    }
+
+    public String getFormattedDate() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 }
