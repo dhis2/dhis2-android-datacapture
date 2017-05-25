@@ -104,6 +104,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
+        
+        setupKeyboardObserver();
+    }
+
+    private void setupKeyboardObserver() {
         final View rootView = findViewById(R.id.data_entry_container);
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
