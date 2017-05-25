@@ -14,12 +14,15 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -66,7 +69,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private AppCompatSpinner formGroupSpinner;
 
     // data entry view
-    private ListView dataEntryListView;
+    private static ListView dataEntryListView;
     private List<FieldAdapter> adapters;
 
     // state
@@ -543,6 +546,27 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             }
 
             return null;
+        }
+    }
+    public static class CustomOnEditorActionListener implements TextView.OnEditorActionListener{
+
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            final TextView view = v;
+            if(actionId == EditorInfo.IME_ACTION_NEXT) {
+                int position=dataEntryListView.getPositionForView(v);
+                dataEntryListView.smoothScrollToPosition(position+1);
+                dataEntryListView.postDelayed(new Runnable() {
+                    public void run() {
+                        TextView nextField = (TextView)view.focusSearch(View.FOCUS_DOWN);
+                        if(nextField != null) {
+                            nextField.requestFocus();
+                        }
+                    }
+                }, 200);
+                return true;
+            }
+            return false;
         }
     }
 }
