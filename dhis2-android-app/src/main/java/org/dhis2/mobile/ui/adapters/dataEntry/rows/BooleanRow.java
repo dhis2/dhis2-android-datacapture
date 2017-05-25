@@ -79,8 +79,8 @@ public class BooleanRow implements Row {
             view = convertView;
             holder = (BooleanRowHolder) convertView.getTag();
         }
-        
-        holder.textLabel.setText(field.getLabel());
+
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         
         holder.trueButtonListener.setField(field);
         holder.falseButtonListener.setField(field);

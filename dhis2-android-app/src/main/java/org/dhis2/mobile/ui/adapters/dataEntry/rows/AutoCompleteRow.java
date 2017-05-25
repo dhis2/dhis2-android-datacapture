@@ -43,6 +43,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Option;
 import org.dhis2.mobile.io.models.OptionSet;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.ui.adapters.dataEntry.AutoCompleteAdapter;
 
 import java.util.ArrayList;
@@ -103,8 +104,7 @@ public class AutoCompleteRow implements Row {
             view = convertView;
             holder = (AutoCompleteRowHolder) view.getTag();
         }
-
-        holder.textLabel.setText(field.getLabel());
+        RowCosmetics.setTextLabel(field, holder.textLabel);
 
         holder.autoComplete.setText(field.getValue());
         holder.autoComplete.setAdapter(adapter);
@@ -116,6 +116,7 @@ public class AutoCompleteRow implements Row {
         holder.listener.setAutoComplete(holder.autoComplete);
         holder.button.setOnClickListener(holder.listener);
         holder.autoComplete.clearFocus();
+        holder.autoComplete.setOnEditorActionListener(new DataEntryActivity.CustomOnEditorActionListener());
 
         return view;
     }

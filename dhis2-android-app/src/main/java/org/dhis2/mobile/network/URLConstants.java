@@ -45,6 +45,7 @@ public class URLConstants {
 	public static final String CATEGORY_COMBOS_URL = "api/categoryCombos";
 
 	public static final String FORM_PARAM = "form?ou=";
+	public static final String COMPULSORY_DATA_ELEMENTS_PARAM = "fields=compulsoryDataElementOperands[categoryOptionCombo,dataElement[id]]";
 	public static final String PERIOD_PARAM = "&pe=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
 	public static final String CATEGORY_OPTION_DATA_ELEMENTS_PARAM =

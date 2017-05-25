@@ -38,6 +38,7 @@ import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
@@ -52,6 +53,7 @@ import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.utils.PrefUtils;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,23 +71,57 @@ public class ReportDownloadProcessor {
         Form form = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
             form = parseForm(response.getBody());
+            if(form != null){
+                List<DataElementOperand> compulsoryDataElementOperandList =
+                        downloadCompulsoryDataElementUIds(context, info);
+                if (compulsoryDataElementOperandList == null) {
+                    return;
+                }
+                addCompulsoryDataElements(compulsoryDataElementOperandList, form);
+                }
+                CategoryOptionRelationsByDataSetDownloadProcessor
+                        categoryOptionRelationsByDataSetDownloadProcessor =
+                        new CategoryOptionRelationsByDataSetDownloadProcessor();
+                categoryOptionRelationsByDataSetDownloadProcessor.download(context, info);
+                removeFieldsWithInvalidCategoryOptionRelation(form, info);
         }
 
         Intent intent = new Intent(DataEntryActivity.TAG);
         intent.putExtra(Response.CODE, response.getCode());
 
         if (form != null) {
-            CategoryOptionRelationsByDataSetDownloadProcessor
-                    categoryOptionRelationsByDataSetDownloadProcessor =
-                    new CategoryOptionRelationsByDataSetDownloadProcessor();
-            categoryOptionRelationsByDataSetDownloadProcessor.download(context, info);
-
-            removeFieldsWithInvalidCategoryOptionRelation(form, info);
-
             intent.putExtra(Response.BODY, (Parcelable) form);
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+    private static List<DataElementOperand> downloadCompulsoryDataElementUIds(Context context,
+            DatasetInfoHolder info) {
+        CompulsoryDataElementUIdsDownloadProcessor
+                compulsoryDataElementUIdsDownloadProcessor = new CompulsoryDataElementUIdsDownloadProcessor();
+
+        return compulsoryDataElementUIdsDownloadProcessor.download(context, info);
+    }
+
+    private static void addCompulsoryDataElements(List<DataElementOperand> compulsoryUIds, Form form) {
+        if (form == null && compulsoryUIds == null) {
+            return;
+        }
+        for (DataElementOperand dataElementOperand : compulsoryUIds) {
+            for (Group group : form.getGroups()) {
+                addCompulsoryDataElements(dataElementOperand, group);
+            }
+        }
+    }
+
+    private static void addCompulsoryDataElements(DataElementOperand dataElementOperand, Group group) {
+        for (Field field : group.getFields()) {
+            if (field.getDataElement().equals(dataElementOperand.getDataElementUid())) {
+                if(field.getCategoryOptionCombo().equals(dataElementOperand.getCategoryOptionComboUid())) {
+                    field.setCompulsory(true);
+                }
+            }
+        }
     }
 
     private static Form removeFieldsWithInvalidCategoryOptionRelation(Form form,

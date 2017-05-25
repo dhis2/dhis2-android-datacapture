@@ -29,15 +29,15 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import org.dhis2.mobile.io.models.Field;
-
-import org.dhis2.mobile.R;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.models.Field;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
 public class IntegerRow implements Row {
     private final LayoutInflater inflater;
@@ -68,14 +68,15 @@ public class IntegerRow implements Row {
             view = convertView;
             holder = (EditTextHolder) view.getTag();
         }
-        
-        holder.textLabel.setText(field.getLabel());
+
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         
         holder.textWatcher.setField(field);
         holder.editText.addTextChangedListener(holder.textWatcher);
         holder.editText.setText(field.getValue());
         holder.editText.clearFocus();
-        
+        holder.editText.setOnEditorActionListener(new DataEntryActivity.CustomOnEditorActionListener());
+
         return view;
     }
 
