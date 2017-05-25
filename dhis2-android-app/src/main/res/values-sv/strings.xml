@@ -87,4 +87,5 @@
   <string name="last_commit">"Commit hash: %s"</string>
   <string name="unavailable">"Inte tillgänglig"</string>
   <string name="est_about">Den här appen är under underhåll av EyeSeeTea Ltd (http://eyeseetea.com)</string>
+  <string name="dialog_content_logout_confirmation">"Om du lämnar systemet kommer alla data som inte skickas att raderas. Vill du fortfarande avsluta?"</string>
 </resources>
