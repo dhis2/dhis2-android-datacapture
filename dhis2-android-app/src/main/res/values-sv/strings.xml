@@ -82,8 +82,15 @@
   <string name="swipe_to_update">Dra för att uppdatera</string>
   <string name="no_forms_found">Inga blanketter finns för aktuell användare</string>
   <string name="placeholder">Something important goes here</string>
+  <!-- last commit -->
+  <string name="about_this_app">"Om den här appen"</string>
+  <string name="app_version">Appversion: %s</string>
+  <string name="last_commit">"Commit hash: %s"</string>
+  <string name="unavailable">"Inte tillgänglig"</string>
+  <string name="est_about">Den här appen är under underhåll av EyeSeeTea Ltd (http://eyeseetea.com)</string>
   <string name="delete_log">Återställa</string>
   <string name="log_report_data">" %1$s (period:%2$s)"</string>
   <string name="log_message_offline_report">" offline rapport."</string>
   <string name="network_error">Nätverksfel</string>
+
 </resources>
