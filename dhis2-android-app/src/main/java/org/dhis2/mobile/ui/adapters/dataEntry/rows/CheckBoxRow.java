@@ -70,8 +70,8 @@ public class CheckBoxRow implements Row {
             view = convertView;
             holder = (CheckBoxHolder) view.getTag();
         }
-        
-        holder.textLabel.setText(field.getLabel());
+
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         holder.listener.setField(field);
         
         if (field.getValue().equals(Field.TRUE)) holder.checkBox.setChecked(true);

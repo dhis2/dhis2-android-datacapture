@@ -40,7 +40,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
-public class GenderRow implements Row {
+public class GenderRow extends RowCosmetics implements Row {
     public static final String FEMALE = "gender_female";
     public static final String MALE = "gender_male";
     public static final String OTHER = "gender_other";
@@ -84,7 +84,7 @@ public class GenderRow implements Row {
 			holder = (BooleanRowHolder) convertView.getTag();
 		}
 
-		holder.textLabel.setText(field.getLabel());
+		RowCosmetics.setTextLabel(field, holder.textLabel);
 
 		holder.optionMaleListener.setField(field);
 		holder.optionFemaleListener.setField(field);
