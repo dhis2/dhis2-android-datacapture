@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -17,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -90,7 +92,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_entry);
-
         setupToolbar();
         setupFormSpinner();
         setupProgressBar(savedInstanceState);
@@ -103,6 +104,27 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
+        final View rootView = findViewById(R.id.data_entry_container);
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                Rect r = new Rect();
+                rootView.getWindowVisibleDisplayFrame(r);
+                int screenHeight = rootView.getRootView().getHeight();
+
+                // r.bottom is the position above soft keypad or device button.
+                // if keypad is shown, the r.bottom is smaller than that before.
+                int keypadHeight = screenHeight - r.bottom;
+
+                if (keypadHeight > screenHeight * 0.15) {
+                    rootView.findViewById(R.id.upload_button).setVisibility(View.GONE);
+                }
+                else {
+                    rootView.findViewById(R.id.upload_button).setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override
