@@ -46,6 +46,7 @@ import org.dhis2.mobile.WorkService;
 import org.dhis2.mobile.ui.fragments.AboutUsFragment;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
+import org.dhis2.mobile.ui.fragments.SyncLogFragment;
 
 public class MenuActivity extends BaseActivity implements OnNavigationItemSelectedListener {
     private static final String STATE_TOOLBAR_TITLE = "state:toolbarTitle";
@@ -102,6 +103,10 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
             case R.id.drawer_item_about: {
                 attachFragment(new AboutUsFragment());
 
+                break;
+            }
+            case R.id.drawer_item_sync_logs: {
+                attachFragment(new SyncLogFragment());
                 break;
             }
             case R.id.drawer_item_logout: {

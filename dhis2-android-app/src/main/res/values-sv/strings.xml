@@ -72,6 +72,7 @@
   <string name="choose_report_date">Välj rapport datum</string>
   <string name="download_forms">Ladda ner blanketter</string>
   <string name="aggregate_reporting">Aggregat Rapport</string>
+  <string name="sync_logs">Synkronisera loggar</string>
   <string name="profile">Profil</string>
   <string name="organization_unit">Organisationenhet</string>
   <string name="description">Beskrivning</string>
@@ -87,5 +88,10 @@
   <string name="last_commit">"Commit hash: %s"</string>
   <string name="unavailable">"Inte tillgänglig"</string>
   <string name="est_about">Den här appen är under underhåll av EyeSeeTea Ltd (http://eyeseetea.com)</string>
+  <string name="delete_log">Återställa</string>
+  <string name="log_report_data">" %1$s (period:%2$s)"</string>
+  <string name="log_message_offline_report">" offline rapport."</string>
+  <string name="network_error">Nätverksfel</string>
+
   <string name="dialog_content_logout_confirmation">"Om du lämnar systemet kommer alla data som inte skickas att raderas. Vill du fortfarande avsluta?"</string>
 </resources>

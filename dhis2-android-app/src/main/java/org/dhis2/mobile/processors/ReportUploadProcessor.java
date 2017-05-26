@@ -49,11 +49,11 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.SyncLogger;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ReportUploadProcessor {
@@ -78,19 +78,19 @@ public class ReportUploadProcessor {
         Log.i(TAG, log);
 
         if (!HTTPClient.isError(response.getCode())) {
-            String description;
-            if (ImportSummariesHandler.isSuccess(response.getBody())) {
-                description = ImportSummariesHandler.getDescription(response.getBody(),
-                        context.getString(R.string.import_successfully_completed));
-            } else {
-                description = ImportSummariesHandler.getDescription(response.getBody(),
-                        context.getString(R.string.import_failed));
-            }
+            SyncLogger.log(context, response, info, false);
 
-            String title = description;
-            String message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
-            NotificationBuilder.fireNotification(context, title, message);
+            NotificationBuilder.fireNotification(context,
+                    SyncLogger.getResponseDescription(context,response),
+                    SyncLogger.getNotification(info));
         } else {
+
+            NotificationBuilder.fireNotification(context,
+                    context.getString(R.string.network_error) + " " + response.getCode(),
+                    SyncLogger.getErrorMessage(context, info, response, false));
+
+            SyncLogger.logNetworkError(context, response, info, false);
+
             saveDataset(context, data, info);
         }
     }
