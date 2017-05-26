@@ -73,14 +73,9 @@ public class QuarterYearIterator extends CustomDateIteratorClass<ArrayList<DateH
         return hasNext(checkDate);
     }
 
-    @Override
-    public boolean hasNextPeriods(){
-        return checkDate.isBefore(maxDate);
-    }
-
     private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(date.plusMonths(3));
         }
@@ -104,7 +99,7 @@ public class QuarterYearIterator extends CustomDateIteratorClass<ArrayList<DateH
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
 
-        while (hasNext(checkDate) && counter < 4) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(3))) && counter < 4) {
             String label;
             String date;
 

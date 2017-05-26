@@ -72,14 +72,10 @@ public class MonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>
 
     private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(date.plusMonths(1));
         }
-    }
-
-    public boolean hasNextPeriods(){
-        return checkDate.isBefore(maxDate);
     }
 
     @Override
@@ -100,7 +96,7 @@ public class MonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
 
-        while (hasNext(checkDate) && counter < 12) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(1)))  && counter < 12) {
             String month = checkDate.monthOfYear().getAsShortText();
             String year = checkDate.year().getAsString();
 

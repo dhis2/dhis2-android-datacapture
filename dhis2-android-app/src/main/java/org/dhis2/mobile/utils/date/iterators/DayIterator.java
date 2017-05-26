@@ -60,14 +60,9 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
         return hasNext(checkDate);
     }
 
-    @Override
-    public boolean hasNextPeriods(){
-        return checkDate.isBefore(maxDate);
-    }
-
     private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(date);
         }
@@ -102,7 +97,7 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
         int counter = 0;
         int quantity = checkDate.dayOfYear().getMaximumValue();
 
-        while (hasNext(checkDate) && counter < quantity) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate)) && counter < quantity) {
 
             String date = checkDate.toString(DATE_FORMAT);
 

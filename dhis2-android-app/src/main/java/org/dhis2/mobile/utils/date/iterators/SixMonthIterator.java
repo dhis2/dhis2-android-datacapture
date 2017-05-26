@@ -61,14 +61,9 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
         return hasNext(checkDate);
     }
 
-    @Override
-    public boolean hasNextPeriods(){
-        return checkDate.isBefore(maxDate);
-    }
-
     private boolean hasNext(LocalDate cDate) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(cDate.plusMonths(6));
         }
@@ -101,7 +96,8 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
 
-        while (hasNext(checkDate) && counter < 2) {
+
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(6))) && counter < 2) {
             String year = checkDate.year().getAsString();
             String label;
             String date;
