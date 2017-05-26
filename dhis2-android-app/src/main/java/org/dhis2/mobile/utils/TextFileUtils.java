@@ -42,16 +42,6 @@ import java.io.IOException;
 public final class TextFileUtils {
     private static final String TAG = TextFileUtils.class.getSimpleName();
 
-    public static void writeTextFile(Context context, Directory dir, String name, String message,
-            String startOfLine) {
-        message = startOfLine + "-" + message + "\n";
-        try {
-            writeLineIntoTextFile(context, dir, name, message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public enum FileNames {
         ORG_UNITS_WITH_DATASETS, ACCOUNT_INFO, LOG
     }
@@ -127,26 +117,13 @@ public final class TextFileUtils {
         writeTextFile(context, dir, name.toString(), data);
     }
 
-
-
-    public static void writeLineIntoTextFile(Context context, Directory dir,
-            String filename, String message) throws IOException {
-        File file = getFile(context, dir, filename);
-
-        String fileContent = message;
-        if (!file.exists()) {
-            file.createNewFile();
-        } else {
-            fileContent += readTextFile(context, dir, filename);
-        }
-
-        writeTextFile(context, dir, filename, fileContent);
-    }
-
-    private static void createDirectoryIfNotExist(String path) {
-        File directory = new File(path);
-        if (!directory.exists()) {
-            directory.mkdir();
+    public static void writeTextFile(Context context, Directory dir, String name, String message,
+            String startOfLine) {
+        message = startOfLine + "-" + message + "\n";
+        try {
+            writeLineIntoTextFile(context, dir, name, message);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -171,6 +148,27 @@ public final class TextFileUtils {
             }
         } catch (IOException e) {
             throw new RuntimeException(name + " IOException");
+        }
+    }
+
+    private static void writeLineIntoTextFile(Context context, Directory dir,
+            String filename, String message) throws IOException {
+        File file = getFile(context, dir, filename);
+
+        String fileContent = message;
+        if (!file.exists()) {
+            file.createNewFile();
+        } else {
+            fileContent += readTextFile(context, dir, filename);
+        }
+
+        writeTextFile(context, dir, filename, fileContent);
+    }
+
+    private static void createDirectoryIfNotExist(String path) {
+        File directory = new File(path);
+        if (!directory.exists()) {
+            directory.mkdir();
         }
     }
 
