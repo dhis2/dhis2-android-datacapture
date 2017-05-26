@@ -143,7 +143,11 @@ public class FormsDownloadProcessor {
 
         OrganizationUnit[] units = handleUnitsWithDatasets(jUnits, jDatasets);
         HashMap<String, Form> forms = handleForms(jDatasets);
-
+        for (Map.Entry<String, Form> entry : forms.entrySet()) {
+            Form form = forms.get(entry.getKey());
+            form = addMetaData(context, form, entry.getKey());
+            forms.put(entry.getKey(), form);
+        }
         HashSet<String> optionSetIds = getOptionSetIds(forms);
         updateOptionSets(context, optionSetIds);
 
@@ -216,6 +220,14 @@ public class FormsDownloadProcessor {
             e.printStackTrace();
             throw new ParsingException("The incoming Json is bad/malicious");
         }
+    }
+
+    private static Form addMetaData(Context context, Form form, String uid) {
+        String jsonContent = DataSetMetaData.download(context, uid);
+        DataSetMetaData.addCompulsoryDataElements(DataElementOperandParser.parse(jsonContent), form);
+        DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form, DataSetCategoryOptionParser.parse(jsonContent));
+        return form;
+
     }
 
     private static HashSet<String> getOptionSetIds(HashMap<String, Form> forms) throws ParsingException {
