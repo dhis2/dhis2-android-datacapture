@@ -3,6 +3,7 @@ package org.dhis2.mobile.utils;
 import android.content.Context;
 
 import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
@@ -14,12 +15,28 @@ public class SyncLogger {
 
     public static final String LOG_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    public static void log(Context context, String description,
+    public static void log(Context context, Response response,
             DatasetInfoHolder datasetInfoHolder, Boolean isOffline) {
+
+        String description = getResponseDescription(context, response);
+
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
                 TextFileUtils.FileNames.LOG.toString(),
                 getLogMessage(context, datasetInfoHolder, isOffline) + " " + description,
                 getFormattedDate());
+    }
+
+    public static String getResponseDescription(Context context, Response response) {
+        String description;
+        if (ImportSummariesHandler.isSuccess(response.getBody())) {
+            description = ImportSummariesHandler.getDescription(response.getBody(),
+                    context.getString(R.string.import_successfully_completed));
+        } else {
+            description = ImportSummariesHandler.getDescription(response.getBody(),
+                    context.getString(R.string.import_failed));
+        }
+
+        return description;
     }
 
     public static void logNetworkError(Context context, Response resp,

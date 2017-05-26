@@ -100,19 +100,9 @@ public class OfflineDataProcessor {
                         reportFile.getName());
                 DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
                 if (!HTTPClient.isError(resp.getCode())) {
+                    SyncLogger.log(context, resp, info, true);
 
-                    String description;
-                    if (ImportSummariesHandler.isSuccess(resp.getBody())) {
-                        description = ImportSummariesHandler.getDescription(resp.getBody(),
-                                context.getString(R.string.import_successfully_completed));
-                    } else {
-                        description = ImportSummariesHandler.getDescription(resp.getBody(),
-                                context.getString(R.string.import_failed));
-                    }
-
-                    SyncLogger.log(context, description, info, true);
-
-                    String title = description;
+                    String title = SyncLogger.getResponseDescription(context,resp);
 
                     // Firing notification to statusbar
                     NotificationBuilder.fireNotification(context, title,

@@ -78,21 +78,11 @@ public class ReportUploadProcessor {
         Log.i(TAG, log);
 
         if (!HTTPClient.isError(response.getCode())) {
-            String description;
-            if (ImportSummariesHandler.isSuccess(response.getBody())) {
-                description = ImportSummariesHandler.getDescription(response.getBody(),
-                        context.getString(R.string.import_successfully_completed));
-            } else {
-                description = ImportSummariesHandler.getDescription(response.getBody(),
-                        context.getString(R.string.import_failed));
-            }
+            SyncLogger.log(context, response, info, false);
 
-            SyncLogger.log(context, description, info, false);
-
-            NotificationBuilder.fireNotification(context, description,
+            NotificationBuilder.fireNotification(context,
+                    SyncLogger.getResponseDescription(context,response),
                     SyncLogger.getNotification(info));
-
-
         } else {
 
             NotificationBuilder.fireNotification(context,
