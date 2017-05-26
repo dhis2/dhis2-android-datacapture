@@ -9,53 +9,33 @@ import static org.dhis2.mobile.network.Response.ID_KEY;
 import static org.dhis2.mobile.network.Response.SECTIONS_KEY;
 import static org.dhis2.mobile.network.Response.SECTION_NAME_KEY;
 
-import android.content.Context;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.dhis2.mobile.io.holders.DatasetInfoHolder;
+import org.dhis2.mobile.io.holders.DataSetCategoryOptions;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryCombo;
-import org.dhis2.mobile.network.HTTPClient;
-import org.dhis2.mobile.network.Response;
-import org.dhis2.mobile.network.URLConstants;
-import org.dhis2.mobile.utils.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CategoryOptionRelationsByDataSetDownloadProcessor {
+public class DataSetCategoryOptionParser {
 
-    public CategoryOptionRelationsByDataSetDownloadProcessor() {
+    public DataSetCategoryOptionParser() {
     }
 
-    public static void download(Context context,
-            DatasetInfoHolder info) {
-        String url = buildUrl(context, info);
-        String credentials = PrefUtils.getCredentials(context);
-        Response response = HTTPClient.get(url, credentials);
-
-        if (response.getCode() >= 200 && response.getCode() < 300) {
-            info.setDefaultCategoryCombo(addDefaultCategoryCombo(context,
-                    response.getBody()));
-            info.setCategoryComboByDataElement(parseCategoryComboDataElementRelations(
-                    response.getBody()));
-            info.setCategoryOptionComboUIdsBySection(parseCategoryComboBySectionRelations(
-                    response.getBody()));
-        }
-    }
-
-    private static String buildUrl(Context context, DatasetInfoHolder info) {
-        String server = PrefUtils.getServerURL(context);
-        String url = server
-                + URLConstants.DATASET_VALUES_URL + "/" + info.getFormId() + "?"
-                + URLConstants.CATEGORY_OPTION_DATA_ELEMENTS_PARAM;
-
-        return url;
+    public static DataSetCategoryOptions parse(String jsonContent) {
+        DataSetCategoryOptions dataSetCategoryOptions = new DataSetCategoryOptions();
+        dataSetCategoryOptions.setDefaultCategoryCombo(addDefaultCategoryCombo(jsonContent));
+        dataSetCategoryOptions.setCategoryComboByDataElement(parseCategoryComboDataElementRelations(
+                jsonContent));
+        dataSetCategoryOptions.setCategoryOptionComboUIdsBySection(
+                parseCategoryComboBySectionRelations(
+                        jsonContent));
+        return dataSetCategoryOptions;
     }
 
     private static HashMap<String, List<String>> parseCategoryComboBySectionRelations(
@@ -117,18 +97,15 @@ public class CategoryOptionRelationsByDataSetDownloadProcessor {
         return dataElementCategoryComboRelationsBySection;
     }
 
-    private static CategoryCombo addDefaultCategoryCombo(
-            Context context, String responseBody) {
-        String categoryComboUid = getDefaultCategoryComboUId(responseBody);
-        if (categoryComboUid == null) {
+    private static CategoryCombo addDefaultCategoryCombo(String responseBody) {
+        CategoryCombo categoryCombo = getDefaultCategoryComboUId(responseBody);
+        if (categoryCombo == null) {
             return null;
         }
-        CategoryComboDownloadProcessor
-                categoryComboDownloadProcessor = new CategoryComboDownloadProcessor();
-        return categoryComboDownloadProcessor.download(context, categoryComboUid);
+        return categoryCombo;
     }
 
-    private static String getDefaultCategoryComboUId(String responseBody) {
+    private static CategoryCombo getDefaultCategoryComboUId(String responseBody) {
         if (responseBody != null) {
             try {
                 JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
@@ -136,7 +113,12 @@ public class CategoryOptionRelationsByDataSetDownloadProcessor {
                 if (jsonObject == null) {
                     return null;
                 }
-                return jsonObject.get(ID_KEY).getAsString();
+                String categoryComboUid = jsonObject.get(ID_KEY).getAsString();
+                CategoryCombo categoryCombo = new CategoryCombo();
+                List<String> categoryOptionComboUIds = parseCategoryOptionCombo(jsonObject);
+                categoryCombo.setId(categoryComboUid);
+                categoryCombo.setCategoryOptionComboUIdList(categoryOptionComboUIds);
+                return categoryCombo;
             } catch (NullPointerException e) {
                 e.printStackTrace();
             } catch (ParsingException e) {
@@ -144,6 +126,26 @@ public class CategoryOptionRelationsByDataSetDownloadProcessor {
             }
         }
         return null;
+    }
+
+    private static List<String> parseCategoryOptionCombo(JsonObject jsonObject) {
+        List<String> categoryOptionComboUIds = new ArrayList<>();
+        if (jsonObject != null) {
+            try {
+                JsonArray jsonArray = jsonObject.getAsJsonArray(
+                        CATEGORY_OPTION_COMBOS_KEY);
+                if (jsonArray.size() == 0) {
+                    return categoryOptionComboUIds;
+                }
+                for (JsonElement item : jsonArray) {
+                    categoryOptionComboUIds.add(
+                            ((JsonObject) item).get(ID_KEY).getAsString());
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+        }
+        return categoryOptionComboUIds;
     }
 
     private static HashMap<String, List<CategoryCombo>> parseCategoryComboDataElementRelations(

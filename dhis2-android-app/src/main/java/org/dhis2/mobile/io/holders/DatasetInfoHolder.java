@@ -32,12 +32,10 @@ package org.dhis2.mobile.io.holders;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import org.dhis2.mobile.io.models.CategoryCombo;
 import org.dhis2.mobile.io.models.CategoryOption;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class DatasetInfoHolder extends BaseFormInfoHolder {
@@ -45,9 +43,6 @@ public class DatasetInfoHolder extends BaseFormInfoHolder {
     private String periodLabel;
     private String period;
     private List<CategoryOption> categoryOptions = new ArrayList<>();
-    private CategoryCombo defaultCategoryCombo;
-    private HashMap<String, List<CategoryCombo>> categoryComboByDataElement = new HashMap<>();
-    private HashMap<String, List<String>> categoryOptionComboUIdsBySection = new HashMap<>();
 
     public DatasetInfoHolder() {
     }
@@ -135,33 +130,5 @@ public class DatasetInfoHolder extends BaseFormInfoHolder {
         }
 
         return stringBuilder.toString();
-    }
-
-    public HashMap<String, List<CategoryCombo>> getCategoryComboByDataElement() {
-        return categoryComboByDataElement;
-    }
-
-    public void setCategoryComboByDataElement(
-            HashMap<String, List<CategoryCombo>> categoryComboByDataElement) {
-        this.categoryComboByDataElement = categoryComboByDataElement;
-    }
-
-    public CategoryCombo getDefaultCategoryCombo() {
-        return defaultCategoryCombo;
-    }
-
-    public void setDefaultCategoryCombo(CategoryCombo defaultCategoryCombo) {
-        this.defaultCategoryCombo = defaultCategoryCombo;
-    }
-
-    public HashMap<String, List<String>>
-    getCategoryComboDataElementBySection() {
-        return categoryOptionComboUIdsBySection;
-    }
-
-    public void setCategoryOptionComboUIdsBySection(
-            HashMap<String, List<String>>
-                    categoryOptionComboUIdsBySection) {
-        this.categoryOptionComboUIdsBySection = categoryOptionComboUIdsBySection;
     }
 }
