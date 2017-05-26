@@ -49,6 +49,7 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.SyncLogger;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.joda.time.LocalDate;
 
@@ -86,24 +87,19 @@ public class ReportUploadProcessor {
                         context.getString(R.string.import_failed));
             }
 
-            TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
-                    TextFileUtils.FileNames.LOG.toString(),
-                    info.getLogMessage(context, false) + description,
-                    info.getFormattedDate());
+            SyncLogger.log(context, description, info, false);
 
-            NotificationBuilder.fireNotification(context, description, info.getNotification());
+            NotificationBuilder.fireNotification(context, description,
+                    SyncLogger.getNotification(info));
 
 
         } else {
-            String message = info.getErrorMessage(context, false, response);
 
             NotificationBuilder.fireNotification(context,
-                    context.getString(R.string.network_error) + " " + response.getCode(), message);
+                    context.getString(R.string.network_error) + " " + response.getCode(),
+                    SyncLogger.getErrorMessage(context, info, response, false));
 
-            TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
-                    TextFileUtils.FileNames.LOG.toString(),
-                    message,
-                    info.getFormattedDate());
+            SyncLogger.logNetworkError(context, response, info, false);
 
             saveDataset(context, data, info);
         }

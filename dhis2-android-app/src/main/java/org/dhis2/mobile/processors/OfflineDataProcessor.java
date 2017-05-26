@@ -41,6 +41,7 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.SyncLogger;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.io.File;
@@ -109,29 +110,24 @@ public class OfflineDataProcessor {
                                 context.getString(R.string.import_failed));
                     }
 
-                    TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
-                            TextFileUtils.FileNames.LOG.toString(),
-                            info.getLogMessage(context, true) + " " + description,
-                            info.getFormattedDate());
+                    SyncLogger.log(context, description, info, true);
+
                     String title = description;
 
                     // Firing notification to statusbar
-                    NotificationBuilder.fireNotification(context, title, info.getNotification());
+                    NotificationBuilder.fireNotification(context, title,
+                            SyncLogger.getNotification(info));
 
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
                 } else {
 
-                    String message = info.getErrorMessage(context, true, resp);
-
                     NotificationBuilder.fireNotification(context,
                             context.getString(R.string.network_error) + " " + resp.getCode(),
-                            message);
+                            SyncLogger.getErrorMessage(context, info, resp, true));
 
-                    TextFileUtils.writeTextFile(context, TextFileUtils.Directory.LOG,
-                            TextFileUtils.FileNames.LOG.toString(), message,
-                            info.getFormattedDate());
+                    SyncLogger.logNetworkError(context, resp, info, true);
                 }
             }
         }
