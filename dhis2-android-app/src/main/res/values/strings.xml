@@ -119,4 +119,5 @@
     <string name="unavailable">Unavailable</string>
     <string name="est_about">This app is under the maintenance of EyeSeeTea Ltd (http://eyeseetea.com)</string>
 
+    <string name="dialog_content_logout_confirmation">"If you exit the system, all the not sent data will be deleted. Do you still want to exit?"</string>
 </resources>

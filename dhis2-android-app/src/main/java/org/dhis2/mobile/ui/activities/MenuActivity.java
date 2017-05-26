@@ -29,6 +29,8 @@
 
 package org.dhis2.mobile.ui.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -108,7 +110,15 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
                 break;
             }
             case R.id.drawer_item_logout: {
-                logOut();
+                new AlertDialog.Builder(this)
+                        .setTitle(getApplicationContext().getString(R.string.log_out))
+                        .setMessage(R.string.dialog_content_logout_confirmation)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                logOut();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null).create().show();
                 break;
             }
         }
