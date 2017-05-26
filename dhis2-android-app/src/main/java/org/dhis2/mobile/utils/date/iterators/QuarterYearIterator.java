@@ -46,12 +46,17 @@ public class QuarterYearIterator extends CustomDateIteratorClass<ArrayList<DateH
 
     private LocalDate cPeriod;
     private LocalDate checkDate;
+    private LocalDate maxDate;
     private int openFuturePeriods;
 
     public QuarterYearIterator(int openFP) {
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth());
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusMonths(3);
+        }
     }
 
     @Override
@@ -66,6 +71,11 @@ public class QuarterYearIterator extends CustomDateIteratorClass<ArrayList<DateH
     @Override
     public boolean hasNext() {
         return hasNext(checkDate);
+    }
+
+    @Override
+    public boolean hasNextPeriods(){
+        return checkDate.isBefore(maxDate);
     }
 
     private boolean hasNext(LocalDate date) {
@@ -115,8 +125,10 @@ public class QuarterYearIterator extends CustomDateIteratorClass<ArrayList<DateH
                 label = String.format(DATE_LABEL_FORMAT, OCT_STR, DEC_STR, cYearStr);
             }
 
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
 
             checkDate = checkDate.plusMonths(3);
             counter++;

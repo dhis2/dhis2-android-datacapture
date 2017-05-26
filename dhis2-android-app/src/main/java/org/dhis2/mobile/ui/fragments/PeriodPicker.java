@@ -77,7 +77,7 @@ public class PeriodPicker extends DialogFragment {
                             dateAdapter.swapData(iterator.next());
                             listView.smoothScrollToPosition(0);
 
-                            if (!iterator.hasNext()) {
+                            if (!iterator.hasNextPeriods()) {
                                 add.setEnabled(false);
                             }
                         } else {
@@ -124,7 +124,7 @@ public class PeriodPicker extends DialogFragment {
         dateAdapter.swapData(iterator.current());
         listView.smoothScrollToPosition(0);
 
-        if (!iterator.hasNext()) {
+        if (!iterator.hasNextPeriods()) {
             add.setEnabled(false);
         } else {
             add.setEnabled(true);
