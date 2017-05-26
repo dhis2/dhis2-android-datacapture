@@ -41,6 +41,7 @@ import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.dhis2.mobile.utils.SyncLogger;
 import org.dhis2.mobile.utils.TextFileUtils;
 
 import java.io.File;
@@ -94,28 +95,29 @@ public class OfflineDataProcessor {
                 Response resp = HTTPClient.post(url, creds, report);
                 // If upload was successful, notify user and delete offline
                 // report
+                // Getting label of period and dataset
+                String jsonDatasetInfo = PrefUtils.getOfflineReportInfo(context,
+                        reportFile.getName());
+                DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
                 if (!HTTPClient.isError(resp.getCode())) {
-                    // Getting label of period and dataset
-                    String jsonDatasetInfo = PrefUtils.getOfflineReportInfo(context, reportFile.getName());
-                    DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
+                    SyncLogger.log(context, resp, info, true);
 
-                    String description;
-                    if (ImportSummariesHandler.isSuccess(resp.getBody())) {
-                        description = ImportSummariesHandler.getDescription(resp.getBody(),
-                                context.getString(R.string.import_successfully_completed));
-                    } else {
-                        description = ImportSummariesHandler.getDescription(resp.getBody(),
-                                context.getString(R.string.import_failed));
-                    }
-                    String message = String.format("(%s) %s", info.getPeriodLabel(), info.getFormLabel());
-                    String title = description;
+                    String title = SyncLogger.getResponseDescription(context,resp);
 
                     // Firing notification to statusbar
-                    NotificationBuilder.fireNotification(context, title, message);
+                    NotificationBuilder.fireNotification(context, title,
+                            SyncLogger.getNotification(info));
 
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
+                } else {
+
+                    NotificationBuilder.fireNotification(context,
+                            context.getString(R.string.network_error) + " " + resp.getCode(),
+                            SyncLogger.getErrorMessage(context, info, resp, true));
+
+                    SyncLogger.logNetworkError(context, resp, info, true);
                 }
             }
         }
