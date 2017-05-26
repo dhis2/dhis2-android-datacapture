@@ -13,31 +13,23 @@ import java.util.List;
 
 public class DataElementOperandParser {
 
-    public DataElementOperandParser() {
-    }
-
-    public static List<DataElementOperand> parse(String jsonContent) {
+    public static List<DataElementOperand> parse(String jsonContent) throws ParsingException {
         List<DataElementOperand> dataElementOperandsList = parseToDataElementOperandsList(
                 jsonContent);
         return dataElementOperandsList;
     }
 
-    private static List<DataElementOperand> parseToDataElementOperandsList(String responseBody) {
+    private static List<DataElementOperand> parseToDataElementOperandsList(String responseBody)
+            throws ParsingException {
         if (responseBody != null) {
-            try {
-                List<DataElementOperand> dataElementOperandList = new ArrayList<>();
-                JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
-                JsonArray jsonArray = jsonForm.getAsJsonArray("compulsoryDataElementOperands");
-                if (jsonArray.size() == 0) {
-                    return dataElementOperandList;
-                }
-                parseToDataElementOperandsList(dataElementOperandList, jsonArray);
+            List<DataElementOperand> dataElementOperandList = new ArrayList<>();
+            JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
+            JsonArray jsonArray = jsonForm.getAsJsonArray("compulsoryDataElementOperands");
+            if (jsonArray.size() == 0) {
                 return dataElementOperandList;
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (ParsingException e) {
-                e.printStackTrace();
             }
+            parseToDataElementOperandsList(dataElementOperandList, jsonArray);
+            return dataElementOperandList;
         }
         return null;
     }

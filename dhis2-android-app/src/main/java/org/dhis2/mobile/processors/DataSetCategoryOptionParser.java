@@ -24,10 +24,7 @@ import java.util.List;
 
 public class DataSetCategoryOptionParser {
 
-    public DataSetCategoryOptionParser() {
-    }
-
-    public static DataSetCategoryOptions parse(String jsonContent) {
+    public static DataSetCategoryOptions parse(String jsonContent) throws ParsingException {
         DataSetCategoryOptions dataSetCategoryOptions = new DataSetCategoryOptions();
         dataSetCategoryOptions.setDefaultCategoryCombo(addDefaultCategoryCombo(jsonContent));
         dataSetCategoryOptions.setCategoryComboByDataElement(parseCategoryComboDataElementRelations(
@@ -39,20 +36,14 @@ public class DataSetCategoryOptionParser {
     }
 
     private static HashMap<String, List<String>> parseCategoryComboBySectionRelations(
-            String responseBody) {
+            String responseBody) throws ParsingException {
         if (responseBody != null) {
-            try {
-                JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
-                JsonArray jsonArray = jsonForm.getAsJsonArray(SECTIONS_KEY);
-                if (jsonArray.size() == 0) {
-                    return new HashMap<>();
-                }
-                return parseDataElementCategoryComboSectionMap(jsonArray);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (ParsingException e) {
-                e.printStackTrace();
+            JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
+            JsonArray jsonArray = jsonForm.getAsJsonArray(SECTIONS_KEY);
+            if (jsonArray.size() == 0) {
+                return new HashMap<>();
             }
+            return parseDataElementCategoryComboSectionMap(jsonArray);
         }
         return null;
     }
@@ -97,33 +88,29 @@ public class DataSetCategoryOptionParser {
         return dataElementCategoryComboRelationsBySection;
     }
 
-    private static CategoryCombo addDefaultCategoryCombo(String responseBody) {
+    private static CategoryCombo addDefaultCategoryCombo(String responseBody)
+            throws ParsingException {
         CategoryCombo categoryCombo = getDefaultCategoryComboUId(responseBody);
         if (categoryCombo == null) {
-            return null;
+            throw new ParsingException("Wrong params");
         }
         return categoryCombo;
     }
 
-    private static CategoryCombo getDefaultCategoryComboUId(String responseBody) {
+    private static CategoryCombo getDefaultCategoryComboUId(String responseBody)
+            throws ParsingException {
         if (responseBody != null) {
-            try {
-                JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
-                JsonObject jsonObject = jsonForm.getAsJsonObject(CATEGORY_COMBO_KEY);
-                if (jsonObject == null) {
-                    return null;
-                }
-                String categoryComboUid = jsonObject.get(ID_KEY).getAsString();
-                CategoryCombo categoryCombo = new CategoryCombo();
-                List<String> categoryOptionComboUIds = parseCategoryOptionCombo(jsonObject);
-                categoryCombo.setId(categoryComboUid);
-                categoryCombo.setCategoryOptionComboUIdList(categoryOptionComboUIds);
-                return categoryCombo;
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (ParsingException e) {
-                e.printStackTrace();
+            JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
+            JsonObject jsonObject = jsonForm.getAsJsonObject(CATEGORY_COMBO_KEY);
+            if (jsonObject == null) {
+                return null;
             }
+            String categoryComboUid = jsonObject.get(ID_KEY).getAsString();
+            CategoryCombo categoryCombo = new CategoryCombo();
+            List<String> categoryOptionComboUIds = parseCategoryOptionCombo(jsonObject);
+            categoryCombo.setId(categoryComboUid);
+            categoryCombo.setCategoryOptionComboUIdList(categoryOptionComboUIds);
+            return categoryCombo;
         }
         return null;
     }
@@ -149,20 +136,14 @@ public class DataSetCategoryOptionParser {
     }
 
     private static HashMap<String, List<CategoryCombo>> parseCategoryComboDataElementRelations(
-            String responseBody) {
+            String responseBody) throws ParsingException {
         if (responseBody != null) {
-            try {
                 JsonObject jsonForm = JsonHandler.buildJsonObject(responseBody);
                 JsonArray jsonArray = jsonForm.getAsJsonArray(DATA_SET_KEY);
                 if (jsonArray.size() == 0) {
                     return new HashMap<>();
                 }
                 return parseDataElementCategoryComboMap(jsonArray);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (ParsingException e) {
-                e.printStackTrace();
-            }
         }
         return null;
     }

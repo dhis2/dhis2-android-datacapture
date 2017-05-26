@@ -222,7 +222,7 @@ public class FormsDownloadProcessor {
         }
     }
 
-    private static Form addMetaData(Context context, Form form, String uid) {
+    private static Form addMetaData(Context context, Form form, String uid)  throws NetworkException, ParsingException {
         String jsonContent = DataSetMetaData.download(context, uid);
         DataSetMetaData.addCompulsoryDataElements(DataElementOperandParser.parse(jsonContent), form);
         DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form, DataSetCategoryOptionParser.parse(jsonContent));

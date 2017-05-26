@@ -5,11 +5,13 @@ import android.support.annotation.NonNull;
 
 import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DataSetCategoryOptions;
+import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryCombo;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
+import org.dhis2.mobile.network.NetworkException;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.utils.PrefUtils;
@@ -21,14 +23,15 @@ import java.util.List;
 public class DataSetMetaData {
 
     public static String download(Context context,
-            String formId) {
+            String formId) throws NetworkException {
         String url = buildUrl(context, formId);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
         if (response.getCode() >= 200 && response.getCode() < 300) {
             return response.getBody();
+        }else{
+            throw new NetworkException(response.getCode());
         }
-        return null;
     }
 
     private static String buildUrl(Context context, String formId) {
