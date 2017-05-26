@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DataSetCategoryOptions;
-import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryCombo;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
