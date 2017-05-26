@@ -52,6 +52,7 @@
   <string name="import_successfully_completed">Import lyckades</string>
   <string name="import_failed">Import misslyckades</string>
   <string name="something_went_wrong">Något gick fel</string>
+  <string name="compulsory_empty_error">Form inte sparad. En eller flera obligatoriska frågor är tomma.</string>
   <string name="profile_changes_saved">Ändringar har sparats</string>
   <string name="profile_changes_uploaded">Ändringar laddes upp</string>
   <string name="username">Användarnamn</string>
@@ -80,4 +81,11 @@
   <string name="swipe_to_update">Dra för att uppdatera</string>
   <string name="no_forms_found">Inga blanketter finns för aktuell användare</string>
   <string name="placeholder">Something important goes here</string>
+  <!-- last commit -->
+  <string name="about_this_app">"Om den här appen"</string>
+  <string name="app_version">Appversion: %s</string>
+  <string name="last_commit">"Commit hash: %s"</string>
+  <string name="unavailable">"Inte tillgänglig"</string>
+  <string name="est_about">Den här appen är under underhåll av EyeSeeTea Ltd (http://eyeseetea.com)</string>
+  <string name="dialog_content_logout_confirmation">"Om du lämnar systemet kommer alla data som inte skickas att raderas. Vill du fortfarande avsluta?"</string>
 </resources>

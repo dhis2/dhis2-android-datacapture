@@ -92,8 +92,7 @@ public class DatePickerRow implements Row {
             view = convertView;
             holder = (DatePickerRowHolder) view.getTag();  
         }
-        
-        holder.textLabel.setText(field.getLabel());
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         
         holder.dateSetListener.setField(field);
         holder.invokerListener.setFieldAndListener(field, holder.dateSetListener);

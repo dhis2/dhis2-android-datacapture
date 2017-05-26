@@ -52,6 +52,7 @@
   <string name="import_successfully_completed">Importation réalisée avec succès</string>
   <string name="import_failed">Échec de l\'importation</string>
   <string name="something_went_wrong">Quelque chose s\'est mal passée.</string>
+  <string name="compulsory_empty_error">Le formulaire n\'est pas enregistré. Une ou plusieurs questions obligatoires sont vides.</string>
   <string name="profile_changes_saved">Les changements ont été sauvegardés avec succès.</string>
   <string name="profile_changes_uploaded">Les changements ont été téléchargés avec succès.</string>
   <string name="username">Nom d\'utilisateur</string>
@@ -81,4 +82,11 @@
   <string name="no_forms_found">Pas de formulaire assigné à l\'utilisateur actuel</string>
   <string name="drawer_item_placeholder">Éléments</string>
   <string name="placeholder">Something important goes here</string>
+  <!-- last commit -->
+  <string name="about_this_app">À propos de cette application</string>
+  <string name="app_version">Version de l\'application: %s</string>
+  <string name="last_commit">Commit hash: %s</string>
+  <string name="unavailable">Indisponible</string>
+  <string name="est_about">Cette application est sous la maintenance de EyeSeeTea Ltd (http://eyeseetea.com)</string>
+  <string name="dialog_content_logout_confirmation">"Si vous sortez du système, tous les donnés non envoyés seront perdus. Voulez-vous continuer?"</string>
 </resources>

@@ -37,11 +37,14 @@ import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryOption;
+import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
+import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
@@ -64,6 +67,11 @@ public class ReportDownloadProcessor {
         Form form = null;
         if (response.getCode() >= 200 && response.getCode() < 300) {
             form = parseForm(response.getBody());
+            List<DataElementOperand> compulsoryDataElementOperandList = downloadCompulsoryDataElementUIds(context, info);
+            if (compulsoryDataElementOperandList == null) {
+                return;
+            }
+            addCompulsoryDataElements(compulsoryDataElementOperandList, form);
         }
 
         Intent intent = new Intent(DataEntryActivity.TAG);
@@ -74,6 +82,35 @@ public class ReportDownloadProcessor {
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private static List<DataElementOperand> downloadCompulsoryDataElementUIds(Context context,
+            DatasetInfoHolder info) {
+        CompulsoryDataElementUIdsDownloadProcessor
+                compulsoryDataElementUIdsDownloadProcessor = new CompulsoryDataElementUIdsDownloadProcessor();
+
+        return compulsoryDataElementUIdsDownloadProcessor.download(context, info);
+    }
+
+    private static void addCompulsoryDataElements(List<DataElementOperand> compulsoryUIds, Form form) {
+        if (form == null && compulsoryUIds == null) {
+            return;
+        }
+        for (DataElementOperand dataElementOperand : compulsoryUIds) {
+            for (Group group : form.getGroups()) {
+                addCompulsoryDataElements(dataElementOperand, group);
+            }
+        }
+    }
+
+    private static void addCompulsoryDataElements(DataElementOperand dataElementOperand, Group group) {
+        for (Field field : group.getFields()) {
+            if (field.getDataElement().equals(dataElementOperand.getDataElementUid())) {
+                if(field.getCategoryOptionCombo().equals(dataElementOperand.getCategoryOptionComboUid())) {
+                    field.setCompulsory(true);
+                }
+            }
+        }
     }
 
     private static String buildUrl(Context context, DatasetInfoHolder info) {
