@@ -45,7 +45,7 @@ public class FinOctYearIterator extends YearIterator {
     @Override
     protected boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             LocalDate sep = new LocalDate(date.getYear(), SEP, 30);
             return currentDate.isAfter(sep);
@@ -66,12 +66,17 @@ public class FinOctYearIterator extends YearIterator {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
-        while (hasNext(checkDate) && counter < 10) {
+        LocalDate sep = new LocalDate(checkDate.getYear(), SEP, 30);
+
+        while ((openFuturePeriods > 0 || currentDate.isAfter(sep)) && counter < 10) {
             String dateStr = checkDate.minusYears(1).year().getAsString();
             String label = String.format(FIN_DATE_LABEL_FORMAT, OCT_STR, dateStr, SEP_STR, checkDate.year().getAsString());
             String date = dateStr + OCTOBER;
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
 
             checkDate = checkDate.plusYears(1);
             counter++;

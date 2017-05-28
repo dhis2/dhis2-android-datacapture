@@ -44,11 +44,16 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
+    private LocalDate maxDate;
 
     public SixMonthIterator(int openFP) {
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), 1);
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusMonths(6);
+        }
     }
 
     @Override
@@ -58,7 +63,7 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
 
     private boolean hasNext(LocalDate cDate) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(cDate.plusMonths(6));
         }
@@ -91,7 +96,8 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
 
-        while (hasNext(checkDate) && counter < 2) {
+
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(6))) && counter < 2) {
             String year = checkDate.year().getAsString();
             String label;
             String date;
@@ -107,8 +113,10 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
             checkDate = checkDate.plusMonths(6);
             counter++;
 
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
         }
 
         Collections.reverse(dates);

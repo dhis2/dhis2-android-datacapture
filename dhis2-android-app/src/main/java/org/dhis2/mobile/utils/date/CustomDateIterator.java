@@ -30,10 +30,11 @@
 package org.dhis2.mobile.utils.date;
 
 public interface CustomDateIterator<T> {  
-    boolean hasNext();   
+    boolean hasNext();
     boolean hasPrevious();
     
     T current();       
     T next();
-    T previous();    
+    T previous();
+
 }

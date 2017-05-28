@@ -45,7 +45,7 @@ public class FinJulyYearIterator extends YearIterator {
     @Override
     protected boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             LocalDate june = new LocalDate(date.getYear(), JUN, 30);
             return currentDate.isAfter(june);
@@ -66,12 +66,17 @@ public class FinJulyYearIterator extends YearIterator {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
-        while (hasNext(checkDate) && counter < 10) {
+        LocalDate june = new LocalDate(checkDate.getYear(), JUN, 30);
+
+        while ((openFuturePeriods > 0 || currentDate.isAfter(june)) && counter < 10) {
             String dateStr = checkDate.minusYears(1).year().getAsString();
             String label = String.format(FIN_DATE_LABEL_FORMAT, JUL_STR, dateStr, JUN_STR, checkDate.year().getAsString());
             String date = dateStr + JULY;
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
 
             checkDate = checkDate.plusYears(1);
             counter++;

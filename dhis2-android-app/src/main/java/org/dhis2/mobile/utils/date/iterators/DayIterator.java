@@ -43,11 +43,16 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
+    private LocalDate maxDate;
 
     public DayIterator(int openFPs) {
         openFuturePeriods = openFPs;
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth());
+        for (int i = 0; i <= openFuturePeriods; i++) {
+            maxDate = maxDate.plusDays(1);
+        }
     }
 
     @Override
@@ -57,7 +62,7 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
 
     private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(date);
         }
@@ -92,8 +97,7 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
         int counter = 0;
         int quantity = checkDate.dayOfYear().getMaximumValue();
 
-        while (hasNext(checkDate) && counter < quantity) {
-            counter++;
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate)) && counter < quantity) {
 
             String date = checkDate.toString(DATE_FORMAT);
 
@@ -103,9 +107,14 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
 
             String label = String.format(DATE_LABEL_FORMAT, dName, mName, yName);
 
+
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
+
+            counter++;
             checkDate = checkDate.plusDays(1);
-            DateHolder holder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(holder);
         }
 
         Collections.reverse(dates);
