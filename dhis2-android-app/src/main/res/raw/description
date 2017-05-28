@@ -1,5 +1,6 @@
 "Data Capture for DHIS 2" android application is a mobile client for DHIS 2 server instances. <br/>
 In general, client is an interface for some of the core DHIS 2 functionality.<br/>
 Application automatically downloads forms from DHIS 2 server and stores them on device.<br/>
-Client supports an offline workflow, where app and its data entry can work even outside network coverage, and the data is submitted when there is network coverage available again.<br/>
-Developed by University of Oslo(UiO).<br/>
+Client supports an offline workflow, where app and its data entry can work even outside network coverage, and the data is submitted when there is network coverage available again.<br/><br/>
+Developed by University of Oslo(UiO) (http://www.uio.no).<br/><br/>
+Maintained by EyeSeeTea Ltd (http://eyeseetea.com).<br/><br/>
