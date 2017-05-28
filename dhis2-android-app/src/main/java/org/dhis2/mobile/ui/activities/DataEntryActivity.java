@@ -420,7 +420,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             hideProgressBar();
 
             int code = intent.getExtras().getInt(Response.CODE);
-            if (HTTPClient.isError(code)) {
+            int parsingStatusCode = intent.getExtras().getInt(JsonHandler.PARSING_STATUS_CODE);
+
+            if (HTTPClient.isError(code) || parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
                 // load form from disk
                 getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null,
                         DataEntryActivity.this).forceLoad();
