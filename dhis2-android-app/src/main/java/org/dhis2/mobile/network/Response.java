@@ -33,7 +33,16 @@ public class Response {
 	public static final String CODE = "networkResponseCode";
 	public static final String BODY = "body";
 	public static final String EMPTY_RESPONSE = "";
-	
+
+	public static final String CATEGORY_OPTION_COMBOS_KEY = "categoryOptionCombos";
+	public static final String CATEGORY_COMBO_KEY = "categoryCombo";
+	public static final String CATEGORY_COMBOS_KEY = "categoryCombos";
+	public static final String ID_KEY = "id";
+	public static final String DATA_ELEMENT_KEY = "dataElement";
+	public static final String SECTION_NAME_KEY = "name";
+	public static final String DATA_SET_KEY = "dataSetElements";
+	public static final String SECTIONS_KEY = "sections";
+
 	private final int code;
 	private final String body;
 

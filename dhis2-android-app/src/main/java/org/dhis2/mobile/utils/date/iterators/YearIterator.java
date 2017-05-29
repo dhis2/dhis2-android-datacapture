@@ -43,11 +43,16 @@ public class YearIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
     protected int openFuturePeriods;
     protected LocalDate cPeriod;
     protected LocalDate checkDate;
+    protected LocalDate maxDate;
 
     public YearIterator(int openFP) {
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), JAN, 1);
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusYears(1);
+        }
     }
 
     @Override
@@ -57,7 +62,7 @@ public class YearIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
 
     protected boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(date.plusYears(1));
         }
@@ -86,11 +91,13 @@ public class YearIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
 
-        while (hasNext(checkDate) && counter < 10) {
-            String dateStr = checkDate.year().getAsString();
-            DateHolder dateHolder = new DateHolder(dateStr, checkDate.toString(), dateStr);
-            dates.add(dateHolder);
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusYears(1))) && counter < 10) {
+            String date = checkDate.year().getAsString();
 
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), date);
+                dates.add(dateHolder);
+            }
             checkDate = checkDate.plusYears(1);
             counter++;
         }

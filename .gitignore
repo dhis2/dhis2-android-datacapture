@@ -24,3 +24,6 @@ build
 
 #Windows
 *.db
+
+# Last commit file
+dhis2-android-app/src/main/res/raw/lastcommit.txt

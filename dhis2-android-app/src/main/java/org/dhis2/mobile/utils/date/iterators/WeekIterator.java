@@ -44,11 +44,16 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
+    private LocalDate maxDate;
 
     public WeekIterator(int openFP) {
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth()-currentDate.getDayOfWeek());
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusWeeks(1);
+        }
     }
 
     @Override
@@ -58,7 +63,7 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
 
     private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
-            return true;
+            return checkDate.isBefore(maxDate);
         } else {
             return currentDate.isAfter(date.plusWeeks(1));
         }
@@ -95,8 +100,7 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
         int quantity = checkDate.weekOfWeekyear().getMaximumValue();
-
-        while (hasNext(checkDate) && counter < quantity) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusWeeks(1))) && counter < quantity) {
             String year = checkDate.year().getAsString();
             String cWeekNumber = checkDate.weekOfWeekyear().getAsString();
             String cDate = checkDate.toString();
@@ -105,8 +109,10 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
-            dates.add(dateHolder);
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
+                dates.add(dateHolder);
+            }
 
             counter++;
             checkDate = checkDate.plusWeeks(1);
