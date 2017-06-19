@@ -120,4 +120,5 @@
     <string name="est_about">This app is under the maintenance of EyeSeeTea Ltd (http://eyeseetea.com)</string>
 
     <string name="dialog_content_logout_confirmation">"If you exit the system, all the not sent data will be deleted. Do you still want to exit?"</string>
+    <string name="value_not_supported">Value not supported</string>
 </resources>
