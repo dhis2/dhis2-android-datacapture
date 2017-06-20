@@ -92,7 +92,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_entry);
-        setupToolbar(null);
+        setupToolbar();
         setupFormSpinner();
         setupProgressBar(savedInstanceState);
 
@@ -204,21 +204,20 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<Form> loader) {
     }
 
-    private void setupToolbar(String title) {
+    private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            if(title == null || title.equals("")){
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
-            }
-            else{
-                getSupportActionBar().setDisplayShowTitleEnabled(true);
-                getSupportActionBar().setTitle(title);
-            }
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+    }
+
+    private void setToolbarTitle(String title){
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setTitle(title);
     }
 
     private void setupFormSpinner() {
@@ -338,7 +337,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             formGroupSpinner.setVisibility(View.GONE);
             dataEntryListView.setAdapter(adapters.get(0));
             if(adapters.get(0).getLabel()!=null && !adapters.get(0).getLabel().equals(FieldAdapter.FORM_WITHOUT_SECTION)){
-                setupToolbar(adapters.get(0).getLabel());
+                setToolbarTitle(adapters.get(0).getLabel());
             }
             return;
         }
