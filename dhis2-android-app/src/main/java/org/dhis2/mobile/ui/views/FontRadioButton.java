@@ -10,7 +10,7 @@ import android.widget.RadioButton;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.TypefaceManager;
 
-public class FontRadioButton extends RadioButton {
+public class FontRadioButton extends android.support.v7.widget.AppCompatRadioButton {
     public FontRadioButton(Context context) {
         super(context);
     }

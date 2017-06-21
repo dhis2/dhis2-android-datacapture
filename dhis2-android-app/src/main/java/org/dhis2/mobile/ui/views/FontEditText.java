@@ -10,7 +10,7 @@ import android.widget.EditText;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.TypefaceManager;
 
-public class FontEditText extends EditText {
+public class FontEditText extends android.support.v7.widget.AppCompatEditText {
 
     public FontEditText(Context context) {
         super(context);
