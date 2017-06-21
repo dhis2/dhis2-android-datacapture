@@ -44,19 +44,6 @@ import java.util.ArrayList;
 
 
 public class DateIteratorFactory {
-    private static final String YEARLY = "Yearly";
-
-    private static final String FINANCIAL_APRIL = "FinancialApril";
-    private static final String FINANCIAL_JULY = "FinancialJuly";
-    private static final String FINANCIAL_OCT = "FinancialOct";
-
-    private static final String SIX_MONTHLY = "SixMonthly";
-    private static final String QUARTERLY = "Quarterly";
-    private static final String BIMONTHLY = "BiMonthly";
-
-    private static final String MONTHLY = "Monthly";
-    private static final String WEEKLY = "Weekly";
-    private static final String DAILY = "Daily";
 
     // private static final String WRONG_ALLOW_FP_PARAM = "Wrong allowFuturePeriod parameter";
     // private static final String WRONG_PERIOD_TYPE = "Wrong periodType";
@@ -66,25 +53,25 @@ public class DateIteratorFactory {
 
     public static CustomDateIterator<ArrayList<DateHolder>> getDateIterator(String periodType, int openFuturePeriods) {
         if (periodType != null) {
-            if (periodType.equals(YEARLY)) {
+            if (periodType.equals(DatePeriods.YEARLY)) {
                 return (new YearIterator(openFuturePeriods));
-            } else if (periodType.equals(FINANCIAL_APRIL)) {
+            } else if (periodType.equals(DatePeriods.FINANCIAL_APRIL)) {
                 return (new FinAprilYearIterator(openFuturePeriods));
-            } else if (periodType.equals(FINANCIAL_JULY)) {
+            } else if (periodType.equals(DatePeriods.FINANCIAL_JULY)) {
                 return (new FinJulyYearIterator(openFuturePeriods));
-            } else if (periodType.equals(FINANCIAL_OCT)) {
+            } else if (periodType.equals(DatePeriods.FINANCIAL_OCT)) {
                 return (new FinOctYearIterator(openFuturePeriods));
-            } else if (periodType.equals(SIX_MONTHLY)) {
+            } else if (periodType.equals(DatePeriods.SIX_MONTHLY)) {
                 return (new SixMonthIterator(openFuturePeriods));
-            } else if (periodType.equals(QUARTERLY)) {
+            } else if (periodType.equals(DatePeriods.QUARTERLY)) {
                 return (new QuarterYearIterator(openFuturePeriods));
-            } else if (periodType.equals(BIMONTHLY)) {
+            } else if (periodType.equals(DatePeriods.BIMONTHLY)) {
                 return (new BiMonthIterator(openFuturePeriods));
-            } else if (periodType.equals(MONTHLY)) {
+            } else if (periodType.equals(DatePeriods.MONTHLY)) {
                 return (new MonthIterator(openFuturePeriods));
-            } else if (periodType.equals(WEEKLY)) {
+            } else if (periodType.equals(DatePeriods.WEEKLY)) {
                 return (new WeekIterator(openFuturePeriods));
-            } else if (periodType.equals(DAILY)) {
+            } else if (periodType.equals(DatePeriods.DAILY)) {
                 return (new DayIterator(openFuturePeriods));
             }
         }
