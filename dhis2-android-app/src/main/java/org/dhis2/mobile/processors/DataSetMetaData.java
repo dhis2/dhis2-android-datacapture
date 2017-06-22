@@ -71,8 +71,12 @@ public class DataSetMetaData {
     public static Form removeFieldsWithInvalidCategoryOptionRelation(Form form,
             DataSetCategoryOptions dataSetCategoryOptions) {
         for (Group group : form.getGroups()) {
+            boolean defaultSection=false;
+            if(form.getGroups().size()==1 && form.getGroups().get(0).getLabel().equals("default")){
+                defaultSection=true;
+            }
             ArrayList<Field> validFields = getValidatedFieldList(
-                    group, dataSetCategoryOptions);
+                    group, dataSetCategoryOptions, defaultSection);
             group.setFields(validFields);
         }
         return form;
@@ -80,18 +84,18 @@ public class DataSetMetaData {
 
     @NonNull
     private static ArrayList<Field> getValidatedFieldList(
-            Group group, DataSetCategoryOptions dataSetCategoryOptions) {
+            Group group, DataSetCategoryOptions dataSetCategoryOptions, boolean defaultSection) {
         ArrayList<Field> validFields = new ArrayList<>();
         for (int i = 0; i < group.getFields().size(); i++) {
             Field field = group.getFields().get(i);
-            checkIfAFieldIsValid(validFields, field, group.getLabel(), dataSetCategoryOptions);
+            checkIfAFieldIsValid(validFields, field, group.getLabel(), dataSetCategoryOptions, defaultSection);
         }
         return validFields;
     }
 
     private static void checkIfAFieldIsValid(
             ArrayList<Field> validFields, Field field, String section,
-            DataSetCategoryOptions dataSetCategoryOptions) {
+            DataSetCategoryOptions dataSetCategoryOptions, boolean defaultSection) {
         HashMap<String, List<CategoryCombo>> categoryComboByDataElement =
                 dataSetCategoryOptions.getCategoryComboByDataElement();
         HashMap<String, List<String>> categoryOptionComboBySection =
@@ -99,7 +103,7 @@ public class DataSetMetaData {
 
         if (categoryComboByDataElement.containsKey(field.getDataElement())) {
             if (isValidField(field, section, dataSetCategoryOptions, categoryComboByDataElement,
-                    categoryOptionComboBySection)) {
+                    categoryOptionComboBySection, defaultSection)) {
                 validFields.add(field);
             }
         }
@@ -108,10 +112,10 @@ public class DataSetMetaData {
     private static boolean isValidField(Field field, String section,
             DataSetCategoryOptions dataSetCategoryOptions,
             HashMap<String, List<CategoryCombo>> categoryComboByDataElement,
-            HashMap<String, List<String>> categoryOptionComboBySection) {
+            HashMap<String, List<String>> categoryOptionComboBySection, boolean defaultSection) {
         if (categoryComboByDataElement.get(field.getDataElement()) == null) {
             if (isValidDefaultField(field, dataSetCategoryOptions)) return true;
-            if (isValidSectionField(field, section, categoryOptionComboBySection)) return true;
+            if (defaultSection || isValidSectionField(field, section, categoryOptionComboBySection)) return true;
         } else if (isAValidCategoryOptionCombo(categoryComboByDataElement, field)) {
             return true;
         }
