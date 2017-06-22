@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,19 @@ public class DataElementOperandParser {
                     "dataElement").getAsJsonObject();
             DataElementOperand dataElementOperand = new DataElementOperand(categoryOptionCombo.get("id").getAsString(), dataElement.get("id").getAsString());
             list.add(dataElementOperand);
+        }
+    }
+
+    public static boolean isFieldCombinationRequiredToForm(String jsonContent)
+            throws ParsingException {
+        JSONObject form = null;
+        try {
+            form = new JSONObject(jsonContent);
+            return (!form.isNull("fieldCombinationRequired") && form.getBoolean(
+                    "fieldCombinationRequired"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new ParsingException(e.getMessage());
         }
     }
 }

@@ -69,6 +69,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private View uploadButton;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
+    private Form currentForm;
 
     // data entry view
     private static ListView dataEntryListView;
@@ -431,6 +432,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             if (intent.getExtras().containsKey(Response.BODY)) {
                 Form form = intent.getExtras().getParcelable(Response.BODY);
+                currentForm = form;
 
                 if (form != null) {
                     loadGroupsIntoAdapters(form.getGroups());
