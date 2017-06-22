@@ -82,8 +82,6 @@
   <string name="period">Période</string>
   <string name="swipe_to_update">Faites glissez l\'écran pour mettre à jour</string>
   <string name="no_forms_found">Pas de formulaire assigné à l\'utilisateur actuel</string>
-  <string name="drawer_item_placeholder">Éléments</string>
-  <string name="placeholder">Something important goes here</string>
   <string name="delete_log">Réinitialiser</string>
   <string name="log_report_data">" %1$s (période:%2$s)"</string>
   <string name="log_message_offline_report">" rapport hors ligne."</string>
@@ -95,4 +93,5 @@
   <string name="unavailable">Indisponible</string>
   <string name="est_about">Cette application est sous la maintenance de EyeSeeTea Ltd (http://eyeseetea.com)</string>
   <string name="dialog_content_logout_confirmation">"Si vous sortez du système, tous les donnés non envoyés seront perdus. Voulez-vous continuer?"</string>
+  <string name="value_not_supported">Type de valeur non pris en charge</string>
 </resources>

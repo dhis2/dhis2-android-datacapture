@@ -216,6 +216,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         }
     }
 
+    private void setToolbarTitle(String title){
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setTitle(title);
+    }
+
     private void setupFormSpinner() {
         formGroupSpinner = (AppCompatSpinner) findViewById(R.id.spinner_drop_down);
 
@@ -332,6 +337,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (adapters.size() == 1) {
             formGroupSpinner.setVisibility(View.GONE);
             dataEntryListView.setAdapter(adapters.get(0));
+            if(adapters.get(0).getLabel()!=null && !adapters.get(0).getLabel().equals(FieldAdapter.FORM_WITHOUT_SECTION)){
+                setToolbarTitle(adapters.get(0).getLabel());
+            }
             return;
         }
 

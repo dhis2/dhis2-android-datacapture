@@ -10,7 +10,7 @@ import android.widget.AutoCompleteTextView;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.TypefaceManager;
 
-public class FontAutoCompleteTextView extends AutoCompleteTextView {
+public class FontAutoCompleteTextView extends android.support.v7.widget.AppCompatAutoCompleteTextView {
     public FontAutoCompleteTextView(Context context) {
         super(context);
     }
