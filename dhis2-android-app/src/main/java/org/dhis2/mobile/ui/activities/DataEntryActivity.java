@@ -370,6 +370,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         for (FieldAdapter adapter : adapters) {
             groups.add(adapter.getGroup());
         }
+        if (currentForm.isFieldCombinationRequired() && !validateFieldsCombined(groups)) {
+            ToastManager.makeToast(this, getString(R.string.all_questions_compulsories_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if(!validateFields(groups)){
             ToastManager.makeToast(this, getString(R.string.compulsory_empty_error),
@@ -387,6 +392,23 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         startService(intent);
         finish();
+    }
+
+    private boolean validateFieldsCombined(ArrayList<Group> groups) {
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.getValue() == null || field.getValue().isEmpty()) {
+                    for (Field fieldCompare : group.getFields()) {
+                        if (field.getDataElement().equals(fieldCompare.getDataElement())
+                                && fieldCompare.getValue() != null
+                                && !fieldCompare.getValue().isEmpty()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private boolean validateFields(ArrayList<Group> groups) {
