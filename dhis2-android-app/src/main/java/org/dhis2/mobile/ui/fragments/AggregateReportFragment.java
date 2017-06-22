@@ -58,6 +58,7 @@ import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.date.DateHolder;
 import org.dhis2.mobile.utils.date.PeriodFilter;
+import org.dhis2.mobile.utils.date.PeriodFilterFactory;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -759,7 +760,7 @@ public class AggregateReportFragment extends Fragment
                                     endDate = DateTime.parse(option.getEndDate());
                                 }
 
-                                PeriodFilter periodFilter = new PeriodFilter(startDate, endDate, dataSet.getOptions().getPeriodType());
+                                Filter periodFilter = PeriodFilterFactory.getPeriodFilter(startDate, endDate, dataSet.getOptions().getPeriodType());
 
                                 // adding filters which will be triggered in PickerItemAdapter
                                 categoryOptionPicker.addFilter(organisationUnitsFilter);

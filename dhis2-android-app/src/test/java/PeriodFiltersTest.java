@@ -1,8 +1,12 @@
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-import org.dhis2.mobile.utils.date.DatePeriods;
-import org.dhis2.mobile.utils.date.PeriodFilter;
+import org.dhis2.mobile.utils.date.BiMonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.MonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.QuarterlyPeriodFilter;
+import org.dhis2.mobile.utils.date.SixmonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.WeeklyPeriodFilter;
+import org.dhis2.mobile.utils.date.iterators.YearlyPeriodFilter;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -11,13 +15,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class DatePeriodTest {
+public class PeriodFiltersTest {
 
     public DateTime getDateTimeFromString(String dateAsString) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         DateTime date = null;
         try {
-            date =  new DateTime(format.parse(dateAsString).getTime());
+            date = new DateTime(format.parse(dateAsString).getTime());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -25,8 +29,9 @@ public class DatePeriodTest {
     }
 
     @Test
-    public void testMonthlyPeriods() {
-        PeriodFilter periodFilter = new PeriodFilter(getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"), DatePeriods.MONTHLY);
+    public void testMonthlyPeriodsSameDayLimits() {
+        MonthlyPeriodFilter periodFilter = new MonthlyPeriodFilter(
+                getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
         assertFalse(periodFilter.apply());
 
@@ -35,21 +40,12 @@ public class DatePeriodTest {
 
         periodFilter.setSelectedDate(getDateTimeFromString("2016-12-01"));
         assertTrue(periodFilter.apply());
+    }
 
-        periodFilter = new PeriodFilter(getDateTimeFromString("2016-12-15"), getDateTimeFromString("2017-01-15"), DatePeriods.MONTHLY);
-        periodFilter.setSelectedDate(getDateTimeFromString("2017-02-01"));
-        assertTrue(periodFilter.apply());
-
-        periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
-        assertFalse(periodFilter.apply());
-
-        periodFilter.setSelectedDate(getDateTimeFromString("2016-12-01"));
-        assertFalse(periodFilter.apply());
-
-        periodFilter.setSelectedDate(getDateTimeFromString("2016-11-01"));
-        assertTrue(periodFilter.apply());
-
-        periodFilter = new PeriodFilter(getDateTimeFromString("2016-12-1"), getDateTimeFromString("2017-01-31"), DatePeriods.MONTHLY);
+    @Test
+    public void testMonthlyPeriodsLastDaysOfTheYearLimits() {
+        MonthlyPeriodFilter periodFilter = new MonthlyPeriodFilter(
+                getDateTimeFromString("2016-12-31"), getDateTimeFromString("2017-01-31"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-02-01"));
         assertTrue(periodFilter.apply());
 
@@ -64,8 +60,9 @@ public class DatePeriodTest {
     }
 
     @Test
-    public void testBiMonthlyPeriods() {
-        PeriodFilter periodFilter = new PeriodFilter(getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"), DatePeriods.BIMONTHLY);
+    public void testBiMonthlyPeriodsSameDayLimits() {
+        BiMonthlyPeriodFilter periodFilter = new BiMonthlyPeriodFilter(
+                getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
         assertFalse(periodFilter.apply());
 
@@ -73,25 +70,31 @@ public class DatePeriodTest {
         assertFalse(periodFilter.apply());
 
         periodFilter.setSelectedDate(getDateTimeFromString("2016-12-01"));
-        assertTrue(periodFilter.apply());
-
-        periodFilter = new PeriodFilter(getDateTimeFromString("2016-12-15"), getDateTimeFromString("2017-01-15"), DatePeriods.MONTHLY);
-        periodFilter.setSelectedDate(getDateTimeFromString("2017-02-01"));
-        assertTrue(periodFilter.apply());
-
-        periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
-        assertFalse(periodFilter.apply());
-
-        periodFilter.setSelectedDate(getDateTimeFromString("2016-12-01"));
-        assertFalse(periodFilter.apply());
-
-        periodFilter.setSelectedDate(getDateTimeFromString("2016-11-01"));
         assertTrue(periodFilter.apply());
     }
-    @Test
-    public void testQuaterlyPeriods() {
 
-        PeriodFilter periodFilter = new PeriodFilter(getDateTimeFromString("2016-12-15"), getDateTimeFromString("2017-01-15"), DatePeriods.QUARTERLY);
+    @Test
+    public void testBiMonthlyPeriodsLastDaysOfYearLimits() {
+        BiMonthlyPeriodFilter periodFilter = new BiMonthlyPeriodFilter(
+                getDateTimeFromString("2016-12-15"), getDateTimeFromString("2017-01-15"));
+        periodFilter.setSelectedDate(getDateTimeFromString("2017-03-01"));
+        assertTrue(periodFilter.apply());
+        periodFilter.setSelectedDate(getDateTimeFromString("2017-02-01"));
+        assertFalse(periodFilter.apply());
+        periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
+        assertFalse(periodFilter.apply());
+        periodFilter.setSelectedDate(getDateTimeFromString("2016-12-01"));
+        assertFalse(periodFilter.apply());
+        periodFilter.setSelectedDate(getDateTimeFromString("2016-11-01"));
+        assertFalse(periodFilter.apply());
+        periodFilter.setSelectedDate(getDateTimeFromString("2016-10-01"));
+        assertTrue(periodFilter.apply());
+    }
+
+    @Test
+    public void testQuaterlyPeriodsLastDaysOfYearLimits() {
+        QuarterlyPeriodFilter periodFilter = new QuarterlyPeriodFilter(
+                getDateTimeFromString("2016-12-15"), getDateTimeFromString("2017-01-15"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
         assertFalse(periodFilter.apply());
 
@@ -115,8 +118,12 @@ public class DatePeriodTest {
 
         periodFilter.setSelectedDate(getDateTimeFromString("2016-09-01"));
         assertTrue(periodFilter.apply());
+    }
 
-        periodFilter = new PeriodFilter(getDateTimeFromString("2016-05-15"), getDateTimeFromString("2016-09-15"), DatePeriods.QUARTERLY);
+    @Test
+    public void testQuaterlyPeriodsQuaterlyLimits() {
+        QuarterlyPeriodFilter periodFilter = new QuarterlyPeriodFilter(
+                getDateTimeFromString("2016-05-15"), getDateTimeFromString("2016-09-15"));
         periodFilter.setSelectedDate(getDateTimeFromString("2016-06-01"));
         assertFalse(periodFilter.apply());
 
@@ -140,8 +147,12 @@ public class DatePeriodTest {
 
         periodFilter.setSelectedDate(getDateTimeFromString("2016-03-01"));
         assertTrue(periodFilter.apply());
+    }
 
-        periodFilter = new PeriodFilter(getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"), DatePeriods.QUARTERLY);
+    @Test
+    public void testQuaterlyPeriodsQuaterlySameDayLimits() {
+        QuarterlyPeriodFilter periodFilter = new QuarterlyPeriodFilter(
+                getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
         assertFalse(periodFilter.apply());
 
@@ -159,8 +170,9 @@ public class DatePeriodTest {
     }
 
     @Test
-    public void testWeeklyPeriods() {
-        PeriodFilter periodFilter = new PeriodFilter(getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-07"), DatePeriods.WEEKLY);
+    public void testWeeklyPeriodsSameDayLimits() {
+        WeeklyPeriodFilter periodFilter = new WeeklyPeriodFilter(
+                getDateTimeFromString("2017-01-06"), getDateTimeFromString("2017-01-06"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-02"));
         assertFalse(periodFilter.apply());
 
@@ -169,8 +181,12 @@ public class DatePeriodTest {
 
         periodFilter.setSelectedDate(getDateTimeFromString("2016-12-26"));
         assertTrue(periodFilter.apply());
+    }
 
-        periodFilter = new PeriodFilter(getDateTimeFromString("2016-12-26"), getDateTimeFromString("2017-01-09"), DatePeriods.WEEKLY);
+    @Test
+    public void testWeeklyPeriodsLastDaysOfYearLimits() {
+        WeeklyPeriodFilter periodFilter = new WeeklyPeriodFilter(
+                getDateTimeFromString("2016-12-26"), getDateTimeFromString("2017-01-09"));
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-09"));
         assertFalse(periodFilter.apply());
 
@@ -185,8 +201,9 @@ public class DatePeriodTest {
     }
 
     @Test
-    public void testYearlyPeriods() {
-        PeriodFilter periodFilter = new PeriodFilter(getDateTimeFromString("2015-01-01"), getDateTimeFromString("2015-12-31"), DatePeriods.YEARLY);
+    public void testYearlyPeriodsLastDaysOfYearLimits() {
+        YearlyPeriodFilter periodFilter = new YearlyPeriodFilter(
+                getDateTimeFromString("2015-01-01"), getDateTimeFromString("2015-12-31"));
         periodFilter.setSelectedDate(getDateTimeFromString("2015-01-01"));
         assertFalse(periodFilter.apply());
 
@@ -195,7 +212,12 @@ public class DatePeriodTest {
 
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
         assertTrue(periodFilter.apply());
-        periodFilter = new PeriodFilter(getDateTimeFromString("2014-12-31"), getDateTimeFromString("2016-01-01"), DatePeriods.YEARLY);
+    }
+
+    @Test
+    public void testYearlyPeriodsLastDaysOfMultipleYearsLimits() {
+        YearlyPeriodFilter periodFilter = new YearlyPeriodFilter(
+                getDateTimeFromString("2014-12-31"), getDateTimeFromString("2016-01-01"));
         periodFilter.setSelectedDate(getDateTimeFromString("2013-01-01"));
         assertTrue(periodFilter.apply());
 
@@ -213,8 +235,23 @@ public class DatePeriodTest {
     }
 
     @Test
-    public void testSixMontlyPeriods() {
-        PeriodFilter periodFilter = new PeriodFilter(getDateTimeFromString("2016-06-30"), getDateTimeFromString("2016-06-30"), DatePeriods.SIX_MONTHLY);
+    public void testYearlyPeriodsSameDaysLimits() {
+        YearlyPeriodFilter periodFilter = new YearlyPeriodFilter(
+                getDateTimeFromString("2015-01-15"), getDateTimeFromString("2015-01-15"));
+        periodFilter.setSelectedDate(getDateTimeFromString("2014-01-01"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(getDateTimeFromString("2015-01-01"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(getDateTimeFromString("2016-01-01"));
+        assertTrue(periodFilter.apply());
+    }
+
+    @Test
+    public void testSixMontlyPeriodsSameDayLimit() {
+        SixmonthlyPeriodFilter periodFilter = new SixmonthlyPeriodFilter(
+                getDateTimeFromString("2016-06-30"), getDateTimeFromString("2016-06-30"));
         periodFilter.setSelectedDate(getDateTimeFromString("2016-07-01"));
         assertFalse(periodFilter.apply());
 
@@ -224,7 +261,12 @@ public class DatePeriodTest {
         periodFilter.setSelectedDate(getDateTimeFromString("2017-01-01"));
         assertTrue(periodFilter.apply());
 
-        periodFilter = new PeriodFilter(getDateTimeFromString("2015-01-01"), getDateTimeFromString("2015-07-01"), DatePeriods.SIX_MONTHLY);
+    }
+
+    @Test
+    public void testSixMontlyPeriodsPeriodLimit() {
+        SixmonthlyPeriodFilter periodFilter = new SixmonthlyPeriodFilter(
+                getDateTimeFromString("2015-01-01"), getDateTimeFromString("2015-07-01"));
         periodFilter.setSelectedDate(getDateTimeFromString("2015-07-01"));
         assertFalse(periodFilter.apply());
 

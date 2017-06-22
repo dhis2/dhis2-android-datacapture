@@ -6,15 +6,10 @@ import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
-public class PeriodFilter implements Filter, Serializable {
-    private final DateTime startDate;
-    private final DateTime endDate;
-    private DateTime selectedDate;
-
-    public PeriodFilter(DateTime startDate, DateTime endDate, String periodType) {
-        this.startDate = DatePeriods.fixStartDate(startDate, periodType);
-        this.endDate = DatePeriods.fixEndDate(endDate, periodType);
-    }
+public class PeriodFilter implements Filter,Serializable{
+    protected final DateTime startDate;
+    protected final DateTime endDate;
+    protected DateTime selectedDate;
 
     public PeriodFilter(DateTime startDate, DateTime endDate) {
         this.startDate = startDate;

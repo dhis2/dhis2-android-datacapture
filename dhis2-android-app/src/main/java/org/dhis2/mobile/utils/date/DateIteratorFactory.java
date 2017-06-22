@@ -53,25 +53,25 @@ public class DateIteratorFactory {
 
     public static CustomDateIterator<ArrayList<DateHolder>> getDateIterator(String periodType, int openFuturePeriods) {
         if (periodType != null) {
-            if (periodType.equals(DatePeriods.YEARLY)) {
+            if (periodType.equals(PeriodFilterFactory.YEARLY)) {
                 return (new YearIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.FINANCIAL_APRIL)) {
+            } else if (periodType.equals(PeriodFilterFactory.FINANCIAL_APRIL)) {
                 return (new FinAprilYearIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.FINANCIAL_JULY)) {
+            } else if (periodType.equals(PeriodFilterFactory.FINANCIAL_JULY)) {
                 return (new FinJulyYearIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.FINANCIAL_OCT)) {
+            } else if (periodType.equals(PeriodFilterFactory.FINANCIAL_OCT)) {
                 return (new FinOctYearIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.SIX_MONTHLY)) {
+            } else if (periodType.equals(PeriodFilterFactory.SIX_MONTHLY)) {
                 return (new SixMonthIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.QUARTERLY)) {
+            } else if (periodType.equals(PeriodFilterFactory.QUARTERLY)) {
                 return (new QuarterYearIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.BIMONTHLY)) {
+            } else if (periodType.equals(PeriodFilterFactory.BIMONTHLY)) {
                 return (new BiMonthIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.MONTHLY)) {
+            } else if (periodType.equals(PeriodFilterFactory.MONTHLY)) {
                 return (new MonthIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.WEEKLY)) {
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY)) {
                 return (new WeekIterator(openFuturePeriods));
-            } else if (periodType.equals(DatePeriods.DAILY)) {
+            } else if (periodType.equals(PeriodFilterFactory.DAILY)) {
                 return (new DayIterator(openFuturePeriods));
             }
         }
