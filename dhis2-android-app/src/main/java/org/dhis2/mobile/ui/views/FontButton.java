@@ -10,7 +10,7 @@ import android.widget.Button;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.TypefaceManager;
 
-public class FontButton extends Button {
+public class FontButton extends android.support.v7.widget.AppCompatButton {
 
     public FontButton(Context context) {
         super(context);

@@ -51,6 +51,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.GenderRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.IntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.LongTextRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.NegativeIntegerRow;
+import org.dhis2.mobile.ui.adapters.dataEntry.rows.NotSupportedRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.NumberRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosIntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.PosOrZeroIntegerRow;
@@ -113,6 +114,8 @@ public class FieldAdapter extends BaseAdapter {
                 rows.add(new DatePickerRow(inflater, field, this, context));
             } else if (field.getType().equals(RowTypes.GENDER.name())) {
                 rows.add(new GenderRow(inflater, field));
+            } else{
+                rows.add(new NotSupportedRow(inflater, field));
             }
         }
     }
