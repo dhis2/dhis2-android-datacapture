@@ -53,6 +53,7 @@
   <string name="import_failed">Import misslyckades</string>
   <string name="something_went_wrong">Något gick fel</string>
   <string name="compulsory_empty_error">Form inte sparad. En eller flera obligatoriska frågor är tomma.</string>
+  <string name="all_questions_compulsories_error">Den här blanketten krävde att alla fält för ett dataelement måste fyllas i. Var god och korrigera det innan du fortsätter</string>
   <string name="profile_changes_saved">Ändringar har sparats</string>
   <string name="profile_changes_uploaded">Ändringar laddes upp</string>
   <string name="username">Användarnamn</string>
