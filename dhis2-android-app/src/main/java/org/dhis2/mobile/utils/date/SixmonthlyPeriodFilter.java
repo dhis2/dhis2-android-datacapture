@@ -2,8 +2,7 @@ package org.dhis2.mobile.utils.date;
 
 
 import org.joda.time.DateTime;
-
-import java.util.Calendar;
+import org.joda.time.DateTimeConstants;
 
 public class SixmonthlyPeriodFilter extends PeriodFilter {
     public SixmonthlyPeriodFilter(DateTime startDate, DateTime endDate) {
@@ -11,28 +10,25 @@ public class SixmonthlyPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixStartDate(DateTime startDate) {
-        Calendar startDateCalendar = CalendarUtils.getInstanceDate(startDate);
-
-        int month = startDateCalendar.get(Calendar.MONTH);
-        if (month < 6) {
-            CalendarUtils.moveToFistDayOfMonth(startDateCalendar, Calendar.JANUARY);
-        } else if (month < 12) {
-            CalendarUtils.moveToFistDayOfMonth(startDateCalendar, Calendar.JULY);
+        int month = startDate.getMonthOfYear();
+        if (month <= 6) {
+            return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(2);
+        } else if (month <= 12) {
+            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(2);
         }
-        startDateCalendar.add(Calendar.DAY_OF_YEAR, 1);
-        return new DateTime(startDateCalendar.getTime());
+        return startDate;
     }
     private static DateTime fixEndDate(DateTime endDate) {
-        Calendar endDateCalendar = CalendarUtils.getInstanceDate(endDate);
-
-        int month = endDateCalendar.get(Calendar.MONTH);
-        if (month < 6) {
-            CalendarUtils.moveDateToLastDayOfMonth(endDateCalendar, Calendar.JUNE);
-        } else if (month < 12) {
-            CalendarUtils.getLastDayOfYear(endDateCalendar);
+        int month = endDate.getMonthOfYear();
+        if (month <= 6) {
+            endDate = endDate.withMonthOfYear(DateTimeConstants.JULY);
+            endDate = endDate.withDayOfMonth(endDate.dayOfMonth().getMinimumValue());
+        } else if (month <= 12) {
+            endDate = endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
+                    DateTimeConstants.JANUARY);
+            endDate = endDate.withDayOfYear(endDate.dayOfYear().getMaximumValue());
         }
-        endDateCalendar.add(Calendar.DAY_OF_YEAR, 1);
-        return new DateTime(endDateCalendar.getTime());
+        return endDate;
     }
 
 }

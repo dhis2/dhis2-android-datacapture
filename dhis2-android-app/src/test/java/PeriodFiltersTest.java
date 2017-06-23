@@ -249,7 +249,7 @@ public class PeriodFiltersTest {
     }
 
     @Test
-    public void testSixMontlyPeriodsSameDayLimit() {
+    public void testSixMonthlyPeriodsSameDayLimit() {
         SixmonthlyPeriodFilter periodFilter = new SixmonthlyPeriodFilter(
                 getDateTimeFromString("2016-06-30"), getDateTimeFromString("2016-06-30"));
         periodFilter.setSelectedDate(getDateTimeFromString("2016-07-01"));
@@ -264,7 +264,7 @@ public class PeriodFiltersTest {
     }
 
     @Test
-    public void testSixMontlyPeriodsPeriodLimit() {
+    public void testSixMonthlyPeriodsPeriodLimit() {
         SixmonthlyPeriodFilter periodFilter = new SixmonthlyPeriodFilter(
                 getDateTimeFromString("2015-01-01"), getDateTimeFromString("2015-07-01"));
         periodFilter.setSelectedDate(getDateTimeFromString("2015-07-01"));

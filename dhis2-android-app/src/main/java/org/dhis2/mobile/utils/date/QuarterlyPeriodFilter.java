@@ -2,8 +2,7 @@ package org.dhis2.mobile.utils.date;
 
 
 import org.joda.time.DateTime;
-
-import java.util.Calendar;
+import org.joda.time.DateTimeConstants;
 
 public class QuarterlyPeriodFilter extends PeriodFilter {
     public QuarterlyPeriodFilter(DateTime startDate, DateTime endDate) {
@@ -11,34 +10,34 @@ public class QuarterlyPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixStartDate(DateTime startDate) {
-        Calendar startDateCalendar = CalendarUtils.getInstanceDate(startDate);
-
-        int month = startDateCalendar.get(Calendar.MONTH);
-        if (month < 3) {
-            CalendarUtils.moveToFistDayOfMonth(startDateCalendar, Calendar.JANUARY);
-        } else if (month < 6) {
-            CalendarUtils.moveToFistDayOfMonth(startDateCalendar, Calendar.APRIL);
-        } else if (month < 9) {
-            CalendarUtils.moveToFistDayOfMonth(startDateCalendar, Calendar.JULY);
-        } else if (month < 12) {
-            CalendarUtils.moveToFistDayOfMonth(startDateCalendar, Calendar.OCTOBER);
+        int month = startDate.getMonthOfYear();
+        if (month <= 3) {
+            return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(1);
+        } else if (month <= 6) {
+            return startDate.withMonthOfYear(DateTimeConstants.APRIL).withDayOfMonth(1);
+        } else if (month <= 9) {
+            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1);
+        } else if (month <= 12) {
+            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(1);
         }
-        return new DateTime(startDateCalendar.getTime());
+        return startDate;
     }
     private static DateTime fixEndDate(DateTime endDate) {
-        Calendar endDateCalendar = CalendarUtils.getInstanceDate(endDate);
-
-        int month = endDateCalendar.get(Calendar.MONTH);
-        if (month < 3) {
-            CalendarUtils.moveDateToLastDayOfMonth(endDateCalendar, Calendar.MARCH);
-        } else if (month < 6) {
-            CalendarUtils.moveDateToLastDayOfMonth(endDateCalendar, Calendar.JUNE);
-        } else if (month < 9) {
-            CalendarUtils.moveDateToLastDayOfMonth(endDateCalendar, Calendar.SEPTEMBER);
-        } else if (month < 12) {
-            CalendarUtils.getLastDayOfYear(endDateCalendar);
+        int month = endDate.getMonthOfYear();
+        if (month <= 3) {
+            return endDate.withMonthOfYear(DateTimeConstants.MARCH).withDayOfMonth(
+                    endDate.dayOfMonth().getMaximumValue());
+        } else if (month <= 6) {
+            return endDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(
+                    endDate.dayOfMonth().getMaximumValue());
+        } else if (month <= 9) {
+            return endDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(
+                    endDate.dayOfMonth().getMaximumValue());
+        } else if (month <= 12) {
+            return endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
+                    DateTimeConstants.JANUARY).withDayOfYear(endDate.dayOfYear().getMaximumValue());
         }
-        return new DateTime(endDateCalendar.getTime());
+        return endDate;
     }
 
 }
