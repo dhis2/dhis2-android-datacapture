@@ -181,7 +181,7 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
         int grey = R.color.light_grey;
 
         mSwipeRefreshLayout.setOnRefreshListener(listener);
-        mSwipeRefreshLayout.setColorScheme(blue, grey, blue, grey);
+        mSwipeRefreshLayout.setColorSchemeResources(blue, grey, blue);
 
         mUploadButton.setOnClickListener(new OnClickListener() {
 
