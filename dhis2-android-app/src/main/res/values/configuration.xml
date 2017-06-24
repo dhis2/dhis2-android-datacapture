@@ -29,12 +29,12 @@
 -->
 <resources>
     <!-- Specify default DHIS2 server instance URL-->
-    <string name="default_server_url">https://apps.dhis2.org/demo</string>
+    <string name="default_server_url" translatable="false">https://apps.dhis2.org/demo</string>
 
     <!-- Set custom fonts by specifying their names.
          NOTE! Make sure to:
             1) Put the font into assets/fonts directory
             2) Specify the name of the font with extension -->
-    <string name="light_font_name">Roboto-Light.ttf</string>
-    <string name="regular_font_name">Roboto-Regular.ttf</string>
+    <string name="light_font_name" translatable="false">Roboto-Light.ttf</string>
+    <string name="regular_font_name" translatable="false">Roboto-Regular.ttf</string>
 </resources>
