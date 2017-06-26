@@ -85,6 +85,7 @@
   <string name="log_report_data">" %1$s (période:%2$s)"</string>
   <string name="log_message_offline_report">" rapport hors ligne."</string>
   <string name="network_error">Erreur de réseau</string>
+  <string name="server_error">Erreur du serveur</string>
   <!-- last commit -->
   <string name="about_this_app">À propos de cette application</string>
   <string name="app_version">Version de l\'application: %s</string>

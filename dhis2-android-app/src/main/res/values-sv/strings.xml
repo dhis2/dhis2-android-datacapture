@@ -91,6 +91,7 @@
   <string name="log_report_data">" %1$s (period:%2$s)"</string>
   <string name="log_message_offline_report">" offline rapport."</string>
   <string name="network_error">Nätverksfel</string>
+  <string name="server_error">Serverfel</string>
 
   <string name="dialog_content_logout_confirmation">"Om du lämnar systemet kommer alla data som inte skickas att raderas. Vill du fortfarande avsluta?"</string>
   <string name="value_not_supported">Värdetyp stöds inte</string>

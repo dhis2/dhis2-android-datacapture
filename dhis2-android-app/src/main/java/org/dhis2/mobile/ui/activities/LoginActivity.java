@@ -52,6 +52,7 @@ import org.dhis2.mobile.WorkService;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
+import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
 
@@ -82,10 +83,18 @@ public class LoginActivity extends AppCompatActivity {
             // If response code is 200, then MenuActivity is started
             // If not, user is notified with error message
             if (!HTTPClient.isError(code)) {
-                Intent menuActivity = new Intent(LoginActivity.this, MenuActivity.class);
-                startActivity(menuActivity);
-                overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
-                finish();
+                if(PrefUtils.getServerVersion(context)!=null && !PrefUtils.getServerVersion(context).equals("")) {
+
+                    Intent menuActivity = new Intent(LoginActivity.this, MenuActivity.class);
+                    startActivity(menuActivity);
+                    overridePendingTransition(R.anim.activity_open_enter,
+                            R.anim.activity_open_exit);
+                    finish();
+                }else{
+                    hideProgress();
+                    String message = context.getString(R.string.server_error);
+                    showMessage(message);
+                }
             } else {
                 hideProgress();
                 String message = HTTPClient.getErrorMessage(LoginActivity.this, code);

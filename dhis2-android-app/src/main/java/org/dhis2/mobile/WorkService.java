@@ -58,6 +58,7 @@ public class WorkService extends Service {
     public static final String METHOD_UPDATE_PROFILE_INFO = "updateProfileInfo";
     public static final String METHOD_UPLOAD_PROFILE_INFO = "uploadProfileInfo";
     public static final String METHOD_LOGIN_USER = "loginUser";
+    public static final String METHOD_SERVER_INFO = "uploadServerInfo";
     public static final String METHOD_UPDATE_DATASETS = "updateDatasets";
     public static final String METHOD_DOWNLOAD_LATEST_DATASET_VALUES = "downloadLatestDatasetValues";
     public static final String METHOD_UPLOAD_DATASET = "aggregateReportUploadProcessor";

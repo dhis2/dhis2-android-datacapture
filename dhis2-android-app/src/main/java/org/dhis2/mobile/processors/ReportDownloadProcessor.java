@@ -69,11 +69,16 @@ public class ReportDownloadProcessor {
             if (form != null) {
 
                 try {
-                    String jsonContent = DataSetMetaData.download(context, info.getFormId());
-                    DataSetMetaData.addCompulsoryDataElements(
-                            DataElementOperandParser.parse(jsonContent), form);
-                    DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
-                            DataSetCategoryOptionParser.parse(jsonContent));
+                    if(PrefUtils.getServerVersion(context).equals(25)){
+                        System.out.println("serverv 25");
+                    }
+                    else {
+                        String jsonContent = DataSetMetaData.download(context, info.getFormId());
+                        DataSetMetaData.addCompulsoryDataElements(
+                                DataElementOperandParser.parse(jsonContent), form);
+                        DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
+                                DataSetCategoryOptionParser.parse(jsonContent));
+                    }
                 } catch (NetworkException e) {
                     e.printStackTrace();
                     responseCode = e.getErrorCode();

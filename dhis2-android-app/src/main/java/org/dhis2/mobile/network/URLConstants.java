@@ -32,7 +32,8 @@ package org.dhis2.mobile.network;
 public class URLConstants {
 
 	private URLConstants() { }
-	
+
+	public static final String API_SERVER_INFO = "api/system/info/";
 	public static final String API_USER_ACCOUNT_URL = "api/me/user-account";
 
 	public static final String OPTION_SET_PARAM = "?fields=id,name,created,lastUpdated," +
