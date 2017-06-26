@@ -611,8 +611,28 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     @Override
     public void onBackPressed() {
-        showAlertDialogExit();
+        if (anyFieldEdited()) {
+            showAlertDialogExit();
+        } else {
+            super.onBackPressed();
+        }
     }
+
+    private boolean anyFieldEdited() {
+        ArrayList<Group> groups = new ArrayList<>();
+        for (FieldAdapter adapter : adapters) {
+            groups.add(adapter.getGroup());
+        }
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.isEdited()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     private void showAlertDialogExit() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
