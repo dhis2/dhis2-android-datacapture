@@ -56,36 +56,49 @@ public class DataSetCategoryOptionParser {
         for (JsonElement categoryComboElement : jsonArray) {
             JsonObject categoryComboObject = (JsonObject) categoryComboElement;
             String sectionName = getSectionNameFromJson(categoryComboObject);
-            if (!(categoryComboObject.has(CATEGORY_COMBOS_KEY))) {
-                dataElementCategoryComboRelationsBySection.put(sectionName, null);
-                continue;
-            }
-
-            JsonArray categoryComboList = categoryComboObject.get(
-                    CATEGORY_COMBOS_KEY).getAsJsonArray();
-
-            for (JsonElement subCategoryComboElement : categoryComboList) {
-                JsonObject subCategoryComboObject = (JsonObject) subCategoryComboElement;
-                JsonArray categoryOptionComboList = subCategoryComboObject.get(
-                        CATEGORY_OPTION_COMBOS_KEY).getAsJsonArray();
-                List<String> categoryOptionComboUIds = new ArrayList<>();
-
-                for (JsonElement categoryOptionComboElement : categoryOptionComboList) {
-                    JsonObject categoryOptionComboObject = (JsonObject) categoryOptionComboElement;
-                    categoryOptionComboUIds.add(
-                            categoryOptionComboObject.get(ID_KEY).getAsString());
+            JsonArray categoryComboList;
+                if (!(categoryComboObject.has(CATEGORY_COMBO_KEY)) && !(categoryComboObject.has(CATEGORY_COMBOS_KEY))) {
+                    dataElementCategoryComboRelationsBySection.put(sectionName, null);
+                    continue;
                 }
-
-                if (dataElementCategoryComboRelationsBySection.containsKey(sectionName)) {
-                    dataElementCategoryComboRelationsBySection.put(sectionName,
-                            categoryOptionComboUIds);
-                } else {
-                    dataElementCategoryComboRelationsBySection.put(sectionName,
-                            categoryOptionComboUIds);
+                else if ((categoryComboObject.has(CATEGORY_COMBOS_KEY))) {
+                        categoryComboList = categoryComboObject.get(
+                                CATEGORY_COMBOS_KEY).getAsJsonArray();
+                    for (JsonElement subCategoryComboElement : categoryComboList) {
+                        JsonObject subCategoryComboObject = (JsonObject) subCategoryComboElement;
+                        JsonArray categoryOptionComboList = subCategoryComboObject.get(
+                                CATEGORY_OPTION_COMBOS_KEY).getAsJsonArray();
+                        putCategoryOptionComboUIds(dataElementCategoryComboRelationsBySection, sectionName,
+                                categoryOptionComboList);
+                    }
+                }else{
+                    JsonArray categoryOptionComboList = categoryComboObject.get(
+                            CATEGORY_COMBO_KEY).getAsJsonObject().get(CATEGORY_OPTION_COMBOS_KEY).getAsJsonArray();
+                    putCategoryOptionComboUIds(dataElementCategoryComboRelationsBySection, sectionName,
+                            categoryOptionComboList);
                 }
-            }
         }
         return dataElementCategoryComboRelationsBySection;
+    }
+
+    private static void putCategoryOptionComboUIds(
+            HashMap<String, List<String>> dataElementCategoryComboRelationsBySection,
+            String sectionName, JsonArray categoryOptionComboList) {
+        List<String> categoryOptionComboUIds = new ArrayList<>();
+
+        for (JsonElement categoryOptionComboElement : categoryOptionComboList) {
+            JsonObject categoryOptionComboObject = (JsonObject) categoryOptionComboElement;
+            categoryOptionComboUIds.add(
+                    categoryOptionComboObject.get(ID_KEY).getAsString());
+        }
+
+        if (dataElementCategoryComboRelationsBySection.containsKey(sectionName)) {
+            dataElementCategoryComboRelationsBySection.put(sectionName,
+                    categoryOptionComboUIds);
+        } else {
+            dataElementCategoryComboRelationsBySection.put(sectionName,
+                    categoryOptionComboUIds);
+        }
     }
 
     private static CategoryCombo addDefaultCategoryCombo(String responseBody)

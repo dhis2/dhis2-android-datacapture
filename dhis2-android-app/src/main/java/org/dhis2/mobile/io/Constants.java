@@ -33,6 +33,7 @@ public class Constants {
     private Constants() {
     }
 
+    public static final String API_25 = "2.25";
     public static final String DATA_SET_ID = "dataSet";
     public static final String ORG_UNIT_ID = "orgUnit";
     public static final String PERIOD = "period";
