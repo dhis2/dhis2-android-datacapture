@@ -54,7 +54,10 @@ public class ServerInfoProcessor {
                 e.printStackTrace();
                 return false;
             }
-            PrefUtils.initServerData(context, version);
+            System.out.println("Saving version " +version);
+            if(!PrefUtils.getServerVersion(context).equals(version)) {
+                PrefUtils.initServerData(context, version);
+            }
         }
         return true;
     }
