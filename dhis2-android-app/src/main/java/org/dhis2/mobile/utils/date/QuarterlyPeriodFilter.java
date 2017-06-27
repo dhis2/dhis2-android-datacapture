@@ -10,6 +10,9 @@ public class QuarterlyPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixStartDate(DateTime startDate) {
+        if(startDate==null) {
+            return null;
+        }
         int month = startDate.getMonthOfYear();
         if (month <= 3) {
             return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(1);
@@ -23,6 +26,9 @@ public class QuarterlyPeriodFilter extends PeriodFilter {
         return startDate;
     }
     private static DateTime fixEndDate(DateTime endDate) {
+        if(endDate==null) {
+            return null;
+        }
         int month = endDate.getMonthOfYear();
         if (month <= 3) {
             return endDate.withMonthOfYear(DateTimeConstants.MARCH).withDayOfMonth(

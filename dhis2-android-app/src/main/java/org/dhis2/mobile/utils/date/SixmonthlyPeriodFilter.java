@@ -10,6 +10,9 @@ public class SixmonthlyPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixStartDate(DateTime startDate) {
+        if(startDate==null) {
+            return null;
+        }
         int month = startDate.getMonthOfYear();
         if (month <= 6) {
             return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(2);
@@ -19,6 +22,9 @@ public class SixmonthlyPeriodFilter extends PeriodFilter {
         return startDate;
     }
     private static DateTime fixEndDate(DateTime endDate) {
+        if(endDate==null) {
+            return null;
+        }
         int month = endDate.getMonthOfYear();
         if (month <= 6) {
             endDate = endDate.withMonthOfYear(DateTimeConstants.JULY);

@@ -10,6 +10,9 @@ public class BiMonthlyPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixStartDate(DateTime startDate) {
+        if(startDate==null) {
+            return null;
+        }
         int month = startDate.getMonthOfYear();
         if (month <= 2) {
             return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(1);
@@ -27,6 +30,9 @@ public class BiMonthlyPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixEndDate(DateTime endDate) {
+        if(endDate==null) {
+            return null;
+        }
         int month = endDate.getMonthOfYear();
         if (month <= 2) {
             endDate = endDate.withMonthOfYear(DateTimeConstants.FEBRUARY);
