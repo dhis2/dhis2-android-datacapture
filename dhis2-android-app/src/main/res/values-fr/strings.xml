@@ -94,4 +94,9 @@
   <string name="est_about">Cette application est sous la maintenance de EyeSeeTea Ltd (http://eyeseetea.com)</string>
   <string name="dialog_content_logout_confirmation">"Si vous sortez du système, tous les donnés non envoyés seront perdus. Voulez-vous continuer?"</string>
   <string name="value_not_supported">Type de valeur non pris en charge</string>
+
+  <string name="dialog_exit_survey_title">Confirmer la sortie</string>
+  <string name="dialog_exit_survey_message">Vous avez toujours des données non synchronisées avec le serveur. Si vous continuez et quittez ce rapport, toutes les données non sauvegardées seront perdues. Voulez-vous continuer?</string>
+  <string name="dialog_exit_survey_yes">Oui</string>
+  <string name="dialog_exit_survey_no">Non</string>
 </resources>

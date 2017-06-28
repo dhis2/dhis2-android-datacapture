@@ -5,6 +5,7 @@ import static android.text.TextUtils.isEmpty;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Rect;
@@ -13,6 +14,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -629,5 +631,58 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             }
             return false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (anyFieldEdited()) {
+            showAlertDialogExit();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean anyFieldEdited() {
+        ArrayList<Group> groups = new ArrayList<>();
+        for (FieldAdapter adapter : adapters) {
+            groups.add(adapter.getGroup());
+        }
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.isEdited()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private void showAlertDialogExit() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_exit_survey_title);
+        builder.setMessage(R.string.dialog_exit_survey_message);
+
+        builder.setPositiveButton(R.string.dialog_exit_survey_yes,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+        builder.setNegativeButton(R.string.dialog_exit_survey_no,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }
