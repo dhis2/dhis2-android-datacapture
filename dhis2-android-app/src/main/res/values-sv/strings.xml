@@ -100,4 +100,5 @@
   <string name="dialog_exit_survey_message">Du har fortfarande data som inte synkroniseras med servern. Om du fortsätter och avslutar rapporten kommer alla data som inte sparas att gå vilse. Vill du fortsätta?</string>
   <string name="dialog_exit_survey_yes">Ja</string>
   <string name="dialog_exit_survey_no">Nej</string>
+    <string name="error_loading_dataset">Nätverksfel - Laddar lokala dataset</string>
 </resources>

@@ -127,4 +127,5 @@
     <string name="dialog_exit_survey_message">You still have data not synced with the server. If you continue and exit this report all the data not saved will be lost. Do you want to continue?</string>
     <string name="dialog_exit_survey_yes">Yes</string>
     <string name="dialog_exit_survey_no">No</string>
+    <string name="error_loading_dataset">"Network error - Loading local datasets"</string>
 </resources>
