@@ -66,6 +66,7 @@
     <string name="import_failed">Import failed</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="compulsory_empty_error">Form not saved. One or more compulsory question are empty.</string>
+    <string name="all_questions_compulsories_error">This form required that all fields for a data element must be filled, please correct this before continuing</string>
 
     <string name="profile_changes_saved">Changes have been successfully saved</string>
     <string name="profile_changes_uploaded">Changes have been successfully uploaded</string>
