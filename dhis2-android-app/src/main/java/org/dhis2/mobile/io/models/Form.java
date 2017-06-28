@@ -53,6 +53,7 @@ public class Form implements Serializable, Parcelable {
     private CategoryCombo categoryCombo;
     private FormOptions options;
     private ArrayList<Group> groups = new ArrayList<>();
+    private boolean fieldCombinationRequired;
 
     private Form(Parcel in) {
         id = in.readString();
@@ -60,6 +61,7 @@ public class Form implements Serializable, Parcelable {
         categoryCombo = in.readParcelable(CategoryCombo.class.getClassLoader());
         options = in.readParcelable(FormOptions.class.getClassLoader());
         in.readTypedList(groups, Group.CREATOR);
+        fieldCombinationRequired = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<Form> CREATOR = new Parcelable.Creator<Form>() {
@@ -85,6 +87,7 @@ public class Form implements Serializable, Parcelable {
         parcel.writeParcelable(categoryCombo, flags);
         parcel.writeParcelable(options, flags);
         parcel.writeTypedList(groups);
+        parcel.writeByte((byte) (fieldCombinationRequired ? 1 : 0));
     }
 
     public String getId() {
@@ -105,5 +108,13 @@ public class Form implements Serializable, Parcelable {
 
     public CategoryCombo getCategoryCombo() {
         return categoryCombo;
+    }
+
+    public boolean isFieldCombinationRequired() {
+        return fieldCombinationRequired;
+    }
+
+    public void setFieldCombinationRequired(boolean fieldCombinationRequired) {
+        this.fieldCombinationRequired = fieldCombinationRequired;
     }
 }

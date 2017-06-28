@@ -66,6 +66,7 @@
     <string name="import_failed">Import failed</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="compulsory_empty_error">Form not saved. One or more compulsory question are empty.</string>
+    <string name="all_questions_compulsories_error">This form required that all fields for a data element must be filled, please correct this before continuing</string>
 
     <string name="profile_changes_saved">Changes have been successfully saved</string>
     <string name="profile_changes_uploaded">Changes have been successfully uploaded</string>
@@ -121,4 +122,9 @@
 
     <string name="dialog_content_logout_confirmation">"If you exit the system, all the not sent data will be deleted. Do you still want to exit?"</string>
     <string name="value_not_supported">Value-type not supported</string>
+
+    <string name="dialog_exit_survey_title">Confirm exit</string>
+    <string name="dialog_exit_survey_message">You still have data not synced with the server. If you continue and exit this report all the data not saved will be lost. Do you want to continue?</string>
+    <string name="dialog_exit_survey_yes">Yes</string>
+    <string name="dialog_exit_survey_no">No</string>
 </resources>

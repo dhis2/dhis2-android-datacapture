@@ -70,6 +70,8 @@ public class ReportDownloadProcessor {
 
                 try {
                     String jsonContent = DataSetMetaData.download(context, info.getFormId());
+                    form.setFieldCombinationRequired(
+                            DataElementOperandParser.isFieldCombinationRequiredToForm(jsonContent));
                     DataSetMetaData.addCompulsoryDataElements(
                             DataElementOperandParser.parse(jsonContent), form);
                     DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
