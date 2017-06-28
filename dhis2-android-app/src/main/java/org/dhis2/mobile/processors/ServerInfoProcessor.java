@@ -54,7 +54,8 @@ public class ServerInfoProcessor {
                 e.printStackTrace();
                 return false;
             }
-            if(!PrefUtils.getServerVersion(context).equals(version)) {
+            if(PrefUtils.getServerVersion(context) == null ||
+                    !PrefUtils.getServerVersion(context).equals(version)) {
                 PrefUtils.initServerData(context, version);
             }
         }
