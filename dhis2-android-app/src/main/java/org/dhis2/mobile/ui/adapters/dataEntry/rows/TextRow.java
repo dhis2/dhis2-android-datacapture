@@ -54,8 +54,11 @@ public class TextRow implements Row {
     public View getView(View convertView) {
         View view;
         EditTextHolder holder;
-        
-        if (convertView == null) {
+
+        if(convertView !=null && convertView.getTag() instanceof EditTextHolder){
+            view = convertView;
+            holder = (EditTextHolder) view.getTag();
+        }else  {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_text, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
             EditText editText = (EditText) rowRoot.findViewById(R.id.edit_text_row);
@@ -66,9 +69,6 @@ public class TextRow implements Row {
             holder = new EditTextHolder(label, editText, watcher);
             rowRoot.setTag(holder);
             view = rowRoot;
-        } else {
-            view = convertView;
-            holder = (EditTextHolder) view.getTag();
         }
 
         RowCosmetics.setTextLabel(field, holder.textLabel);
@@ -109,7 +109,7 @@ class EditTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) { }
-    
+
 }
 
 class EditTextHolder {

@@ -52,16 +52,16 @@ public class NotSupportedRow implements Row {
         View view;
         TextHolder holder;
         
-        if (convertView == null) {
+        if (convertView != null && convertView.getTag() instanceof TextHolder) {
+            view = convertView;
+            holder = (TextHolder) view.getTag();
+        } else {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_not_supported, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
-            
+
             holder = new TextHolder(label);
             rowRoot.setTag(holder);
             view = rowRoot;
-        } else {
-            view = convertView;
-            holder = (TextHolder) view.getTag();
         }
 
         RowCosmetics.setTextLabel(field, holder.textLabel);
@@ -71,7 +71,7 @@ public class NotSupportedRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.TEXT.ordinal();
-    }    
+    }
 }
 class TextHolder {
     final TextView textLabel;
