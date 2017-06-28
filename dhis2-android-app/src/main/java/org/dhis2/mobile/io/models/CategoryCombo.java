@@ -32,6 +32,7 @@ public class CategoryCombo implements Serializable, Parcelable {
     private CategoryCombo(Parcel in) {
         this.id = in.readString();
         in.readTypedList(categories, Category.CREATOR);
+        in.readStringList(categoryOptionComboUIdList);
     }
 
     public CategoryCombo(String UId, List<String> categoryOptionComboUIds) {
@@ -56,6 +57,7 @@ public class CategoryCombo implements Serializable, Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(id);
         parcel.writeTypedList(categories);
+        parcel.writeStringList(categoryOptionComboUIdList);
     }
 
     public void setId(String id) {
