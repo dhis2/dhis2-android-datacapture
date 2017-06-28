@@ -57,7 +57,7 @@ public class LoginProcessor {
             Log.i(LoginActivity.TAG, "Login failed");
             return;
         }
-
+        
         String url = prepareUrl(server, creds);
         Response resp = tryToLogIn(url, creds);
 
@@ -67,11 +67,19 @@ public class LoginProcessor {
             result.putExtra(Response.CODE, HttpURLConnection.HTTP_NOT_FOUND);
             LocalBroadcastManager.getInstance(context).sendBroadcast(result);
             return;
+        } 
+        
+        // If credentials and address is correct,
+        // user information will be saved to internal storage
+        if (!HTTPClient.isError(resp.getCode())) {
+            PrefUtils.initAppData(context, creds, username, url);
+            TextFileUtils.writeTextFile(context, TextFileUtils.Directory.ROOT,
+                    TextFileUtils.FileNames.ACCOUNT_INFO, resp.getBody());
         }
 
         // If credentials and address is correct,
         // user information will be saved to internal storage
-        if (!HTTPClient.isError(resp.getCode())) {
+        if (!HTTPClient.isError(resp.getCode()) && !ServerInfoProcessor.pullServerInfo(context, server, creds)) {
             PrefUtils.initAppData(context, creds, username, url);
             TextFileUtils.writeTextFile(context, TextFileUtils.Directory.ROOT,
                     TextFileUtils.FileNames.ACCOUNT_INFO, resp.getBody());
@@ -82,6 +90,9 @@ public class LoginProcessor {
         Intent result = new Intent(LoginActivity.TAG);
         result.putExtra(Response.CODE, resp.getCode());
         LocalBroadcastManager.getInstance(context).sendBroadcast(result);
+    }
+
+    private static void gerServerVersion() {
     }
 
     private static String prepareUrl(String initialUrl, String creds) {

@@ -22,8 +22,8 @@ import java.util.List;
 public class DataSetMetaData {
 
     public static String download(Context context,
-            String formId) throws NetworkException {
-        String url = buildUrl(context, formId);
+            String formId, boolean oldApi) throws NetworkException {
+        String url = buildUrl(context, formId, oldApi);
         String credentials = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, credentials);
         if (response.getCode() >= 200 && response.getCode() < 300) {
@@ -33,11 +33,15 @@ public class DataSetMetaData {
         }
     }
 
-    private static String buildUrl(Context context, String formId) {
+    public static String buildUrl(Context context, String formId, boolean olderApi) {
         String server = PrefUtils.getServerURL(context);
         String url = server
-                + URLConstants.DATASET_VALUES_URL + "/" + formId + "?"
-                + URLConstants.DATA_SET_DATA_ELEMENTS_META_DATA_PARAM;
+                + URLConstants.DATASET_VALUES_URL + "/" + formId + "?";
+                if(olderApi) {
+                    url += URLConstants.DATA_SET_DATA_ELEMENTS_META_DATA_API_25_PARAM;
+                }else{
+                    url += URLConstants.DATA_SET_DATA_ELEMENTS_META_DATA_PARAM;
+                }
 
         return url;
     }
