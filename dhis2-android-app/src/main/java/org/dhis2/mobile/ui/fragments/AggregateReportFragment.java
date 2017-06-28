@@ -1,5 +1,8 @@
 package org.dhis2.mobile.ui.fragments;
 
+import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
+import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -54,6 +57,8 @@ import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.dhis2.mobile.utils.date.PeriodFilter;
+import org.dhis2.mobile.utils.date.PeriodFilterFactory;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -61,9 +66,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
-import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
 
 public class AggregateReportFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Picker> {
@@ -758,7 +760,7 @@ public class AggregateReportFragment extends Fragment
                                     endDate = DateTime.parse(option.getEndDate());
                                 }
 
-                                PeriodFilter periodFilter = new PeriodFilter(startDate, endDate);
+                                Filter periodFilter = PeriodFilterFactory.getPeriodFilter(startDate, endDate, dataSet.getOptions().getPeriodType());
 
                                 // adding filters which will be triggered in PickerItemAdapter
                                 categoryOptionPicker.addFilter(organisationUnitsFilter);
@@ -800,44 +802,6 @@ public class AggregateReportFragment extends Fragment
             }
 
             return !organisationUnitIds.contains(organisationUnitId);
-        }
-    }
-
-    private static class PeriodFilter implements Filter, Serializable {
-        private final DateTime startDate;
-        private final DateTime endDate;
-        private DateTime selectedDate;
-
-        PeriodFilter(DateTime startDate, DateTime endDate) {
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        void setSelectedDate(DateTime selectedDate) {
-            this.selectedDate = selectedDate;
-        }
-
-        @Override
-        public boolean apply() {
-            if ((startDate == null && endDate == null) || selectedDate == null) {
-                return false;
-            }
-
-            if (startDate != null && endDate != null) {
-                // return true, if criteria is not between two dates
-                // return startDate.isBefore(selectedDate) || endDate.isAfter(selectedDate);
-                return !(selectedDate.isAfter(startDate) && selectedDate.isBefore(endDate));
-            }
-
-            if (startDate != null) {
-                // return true, if criteria is before startDate
-                // return startDate.isBefore(selectedDate);
-                return !(selectedDate.isAfter(startDate));
-            }
-
-            // return true, if criteria is after endDate
-            // return endDate.isAfter(selectedDate);
-            return !(selectedDate.isBefore(endDate));
         }
     }
 }

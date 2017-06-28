@@ -32,4 +32,6 @@ dependencies {
     compile 'com.android.support:design:25.2.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'joda-time:joda-time:2.6'
+    /// / Java test dependencies
+    testCompile "junit:junit:4.12"
 }
