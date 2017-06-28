@@ -54,11 +54,13 @@ public class AutoCompleteRow implements Row {
     private LayoutInflater inflater;
     private Field field;
     private OptionSet optionset;
+    private Context mContext;
 
     public AutoCompleteRow(LayoutInflater inflater, Field field, OptionSet optionset, Context context) {
         this.inflater = inflater;
         this.field = field;
         this.optionset = optionset;
+        mContext = context;
 
         ArrayList<String> options = new ArrayList<String>();
         if (optionset != null && optionset.getOptions() != null) {
@@ -105,6 +107,16 @@ public class AutoCompleteRow implements Row {
             holder = (AutoCompleteRowHolder) view.getTag();
         }
         RowCosmetics.setTextLabel(field, holder.textLabel);
+
+
+        ArrayList<String> options = new ArrayList<String>();
+        if (optionset != null && optionset.getOptions() != null) {
+            for (Option option : optionset.getOptions()) {
+                options.add(option.getName());
+            }
+        }
+        adapter = new AutoCompleteAdapter(mContext);
+        adapter.swapData(options);
 
         holder.textWatcher.setField(field);
         holder.autoComplete.setText(field.getValue());
