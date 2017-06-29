@@ -62,14 +62,7 @@ public class AutoCompleteRow implements Row {
         this.optionset = optionset;
         mContext = context;
 
-        ArrayList<String> options = new ArrayList<String>();
-        if (optionset != null && optionset.getOptions() != null) {
-            for (Option option : optionset.getOptions()) {
-                options.add(option.getName());
-            }
-        }
-        adapter = new AutoCompleteAdapter(context);
-        adapter.swapData(options);
+        loadOptions();
     }
 
     @Override
@@ -109,14 +102,7 @@ public class AutoCompleteRow implements Row {
         RowCosmetics.setTextLabel(field, holder.textLabel);
 
 
-        ArrayList<String> options = new ArrayList<String>();
-        if (optionset != null && optionset.getOptions() != null) {
-            for (Option option : optionset.getOptions()) {
-                options.add(option.getName());
-            }
-        }
-        adapter = new AutoCompleteAdapter(mContext);
-        adapter.swapData(options);
+        loadOptions();
 
         holder.textWatcher.setField(field);
         holder.autoComplete.setText(field.getValue());
@@ -136,6 +122,17 @@ public class AutoCompleteRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.AUTO_COMPLETE.ordinal();
+    }
+
+    private void loadOptions() {
+        ArrayList<String> options = new ArrayList<String>();
+        if (optionset != null && optionset.getOptions() != null) {
+            for (Option option : optionset.getOptions()) {
+                options.add(option.getName());
+            }
+        }
+        adapter = new AutoCompleteAdapter(mContext);
+        adapter.swapData(options);
     }
 
     private class AutoCompleteRowHolder {
