@@ -54,15 +54,15 @@ public class TextRow implements Row {
     public View getView(View convertView) {
         View view;
         EditTextHolder holder;
-        
+
         if (convertView == null) {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_text, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
             EditText editText = (EditText) rowRoot.findViewById(R.id.edit_text_row);
-           
+
             EditTextWatcher watcher = new EditTextWatcher(field);
             editText.addTextChangedListener(watcher);
-            
+
             holder = new EditTextHolder(label, editText, watcher);
             rowRoot.setTag(holder);
             view = rowRoot;
@@ -109,7 +109,7 @@ class EditTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) { }
-    
+
 }
 
 class EditTextHolder {

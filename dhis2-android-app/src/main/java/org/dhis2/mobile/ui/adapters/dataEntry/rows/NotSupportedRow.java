@@ -51,11 +51,11 @@ public class NotSupportedRow implements Row {
     public View getView(View convertView) {
         View view;
         TextHolder holder;
-        
+
         if (convertView == null) {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_not_supported, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
-            
+
             holder = new TextHolder(label);
             rowRoot.setTag(holder);
             view = rowRoot;
@@ -70,8 +70,8 @@ public class NotSupportedRow implements Row {
 
     @Override
     public int getViewType() {
-        return RowTypes.TEXT.ordinal();
-    }    
+        return RowTypes.NO_SUPPORTED_ROW.ordinal();
+    }
 }
 class TextHolder {
     final TextView textLabel;
