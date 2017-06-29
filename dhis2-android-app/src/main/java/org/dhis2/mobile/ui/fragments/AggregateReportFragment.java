@@ -258,6 +258,8 @@ public class AggregateReportFragment extends Fragment
         pickerAdapterOne.setOnPickerListChangeListener(new OnPickerListChangeListener() {
             @Override
             public void onPickerListChanged(List<Picker> pickers) {
+                // clear category pickers
+                pickerAdapterTwo.swapData(null);
                 AggregateReportFragment.this.onPickerListChanged(pickers);
             }
         });
