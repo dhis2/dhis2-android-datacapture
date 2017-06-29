@@ -199,6 +199,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
+            currentForm = form;
             loadGroupsIntoAdapters(form.getGroups());
         }
     }
