@@ -458,7 +458,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             if (HTTPClient.isError(code) || parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
                 // load form from disk
-                Toast.makeText(cxt, cxt.getString(R.string.error_loading_dataset), Toast.LENGTH_SHORT).show();
                 getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null,
                         DataEntryActivity.this).forceLoad();
                 return;
