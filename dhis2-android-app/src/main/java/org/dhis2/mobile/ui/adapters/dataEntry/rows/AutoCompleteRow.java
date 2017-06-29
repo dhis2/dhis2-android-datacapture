@@ -49,7 +49,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.AutoCompleteAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoCompleteRow implements Row {
+public class AutoCompleteRow extends EditTextRow implements Row {
     private AutoCompleteAdapter adapter;
     private LayoutInflater inflater;
     private Field field;
@@ -114,7 +114,7 @@ public class AutoCompleteRow implements Row {
         holder.listener.setAutoComplete(holder.autoComplete);
         holder.button.setOnClickListener(holder.listener);
         holder.autoComplete.clearFocus();
-        holder.autoComplete.setOnEditorActionListener(new DataEntryActivity.CustomOnEditorActionListener());
+        holder.autoComplete.setOnEditorActionListener(mOnEditorActionListener);
 
         return view;
     }

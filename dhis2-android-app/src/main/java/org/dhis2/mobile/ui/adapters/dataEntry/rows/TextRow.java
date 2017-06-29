@@ -41,7 +41,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
-public class TextRow implements Row {
+public class TextRow extends EditTextRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
     
@@ -77,7 +77,7 @@ public class TextRow implements Row {
         holder.editText.addTextChangedListener(holder.textWatcher);
         holder.editText.setText(field.getValue());
         holder.editText.clearFocus();
-        holder.editText.setOnEditorActionListener(new DataEntryActivity.CustomOnEditorActionListener());
+        holder.editText.setOnEditorActionListener(mOnEditorActionListener);
 
         return view;
     }
