@@ -324,7 +324,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this));
+                    adapters.add(new FieldAdapter(group, this, dataEntryListView));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -612,27 +612,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return null;
         }
     }
-    public static class CustomOnEditorActionListener implements TextView.OnEditorActionListener{
 
-        @Override
-        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            final TextView view = v;
-            if(actionId == EditorInfo.IME_ACTION_NEXT) {
-                int position=dataEntryListView.getPositionForView(v);
-                dataEntryListView.smoothScrollToPosition(position+1);
-                dataEntryListView.postDelayed(new Runnable() {
-                    public void run() {
-                        TextView nextField = (TextView)view.focusSearch(View.FOCUS_DOWN);
-                        if(nextField != null) {
-                            nextField.requestFocus();
-                        }
-                    }
-                }, 200);
-                return true;
-            }
-            return false;
-        }
-    }
 
     @Override
     public void onBackPressed() {

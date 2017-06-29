@@ -30,10 +30,14 @@
 package org.dhis2.mobile.ui.adapters.dataEntry;
 
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -47,6 +51,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.AutoCompleteRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.BooleanRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.CheckBoxRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.DatePickerRow;
+import org.dhis2.mobile.ui.adapters.dataEntry.rows.EditTextRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.GenderRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.IntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.LongTextRow;
@@ -70,11 +75,18 @@ public class FieldAdapter extends BaseAdapter {
     private final String adapterLabel;
     private final Group group;
 
-    public FieldAdapter(Group group, Context context) {
+    private ListView mListView;
+
+    public FieldAdapter(Group group, Context context, ListView listView) {
         ArrayList<Field> fields = group.getFields();
         this.group = group;
         this.rows = new ArrayList<Row>();
         this.adapterLabel = group.getLabel();
+
+        CustomOnEditorActionListener customOnEditorActionListener =
+                new CustomOnEditorActionListener();
+
+        mListView = listView;
 
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -91,21 +103,42 @@ public class FieldAdapter extends BaseAdapter {
             Field field = fields.get(i);
             if (field.hasOptionSet()) {
                 OptionSet optionSet = getOptionSet(context, field.getOptionSet());
-                rows.add(new AutoCompleteRow(inflater, field, optionSet, context));
+
+                AutoCompleteRow autoCompleteRow = new AutoCompleteRow(inflater, field, optionSet, context);
+                autoCompleteRow.setOnEditorActionListener(customOnEditorActionListener);
+
+                rows.add(autoCompleteRow);
             } else if (field.getType().equals(RowTypes.TEXT.name())) {
-                rows.add(new TextRow(inflater, field));
+                TextRow textRow = new TextRow(inflater, field);
+                textRow.setOnEditorActionListener(customOnEditorActionListener);
+
+                rows.add(textRow);
             } else if (field.getType().equals(RowTypes.LONG_TEXT.name())) {
-                rows.add(new LongTextRow(inflater, field));
+                LongTextRow longTextRow = new LongTextRow(inflater, field);
+                longTextRow.setOnEditorActionListener(customOnEditorActionListener);
+
+                rows.add(longTextRow);
             } else if (field.getType().equals(RowTypes.NUMBER.name())) {
-                rows.add(new NumberRow(inflater, field));
+                NumberRow numberRow = new NumberRow(inflater, field);
+                numberRow.setOnEditorActionListener(customOnEditorActionListener);
+
+                rows.add(numberRow);
             } else if (field.getType().equals(RowTypes.INTEGER.name())) {
-                rows.add(new IntegerRow(inflater, field));
+                IntegerRow integerRow = new IntegerRow(inflater, field);
+                integerRow.setOnEditorActionListener(customOnEditorActionListener);
+                rows.add(integerRow);
             } else if (field.getType().equals(RowTypes.INTEGER_ZERO_OR_POSITIVE.name())) {
-                rows.add(new PosOrZeroIntegerRow(inflater, field));
+                PosOrZeroIntegerRow posOrZeroIntegerRow = new PosOrZeroIntegerRow(inflater, field);
+                posOrZeroIntegerRow.setOnEditorActionListener(customOnEditorActionListener);
+                rows.add(posOrZeroIntegerRow);
             } else if (field.getType().equals(RowTypes.INTEGER_POSITIVE.name())) {
-                rows.add(new PosIntegerRow(inflater, field));
+                PosIntegerRow posIntegerRow = new PosIntegerRow(inflater, field);
+                posIntegerRow.setOnEditorActionListener(customOnEditorActionListener);
+                rows.add(posIntegerRow);
             } else if (field.getType().equals(RowTypes.INTEGER_NEGATIVE.name())) {
-                rows.add(new NegativeIntegerRow(inflater, field));
+                NegativeIntegerRow negativeIntegerRow = new NegativeIntegerRow(inflater, field);
+                negativeIntegerRow.setOnEditorActionListener(customOnEditorActionListener);
+                rows.add(negativeIntegerRow);
             } else if (field.getType().equals(RowTypes.BOOLEAN.name())) {
                 rows.add(new BooleanRow(inflater, field));
             } else if (field.getType().equals(RowTypes.TRUE_ONLY.name())) {
@@ -168,5 +201,27 @@ public class FieldAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public class CustomOnEditorActionListener implements TextView.OnEditorActionListener{
+
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            final TextView view = v;
+            if(actionId == EditorInfo.IME_ACTION_NEXT) {
+                int position= mListView.getPositionForView(v);
+                mListView.smoothScrollToPosition(position+1);
+                mListView.postDelayed(new Runnable() {
+                    public void run() {
+                        TextView nextField = (TextView)view.focusSearch(View.FOCUS_DOWN);
+                        if(nextField != null) {
+                            nextField.requestFocus();
+                        }
+                    }
+                }, 200);
+                return true;
+            }
+            return false;
+        }
     }
 }

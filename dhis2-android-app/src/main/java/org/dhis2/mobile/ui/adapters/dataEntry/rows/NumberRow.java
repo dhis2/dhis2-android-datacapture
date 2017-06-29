@@ -39,9 +39,10 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
-public class NumberRow implements Row {
+public class NumberRow extends EditTextRow implements Row{
     private final LayoutInflater inflater;
     private final Field field;
+
     
     public NumberRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -75,7 +76,7 @@ public class NumberRow implements Row {
         holder.editText.addTextChangedListener(holder.textWatcher);
         holder.editText.setText(field.getValue());
         holder.editText.clearFocus();
-        holder.editText.setOnEditorActionListener(new DataEntryActivity.CustomOnEditorActionListener());
+        holder.editText.setOnEditorActionListener(mOnEditorActionListener);
 
         return view;
     }
@@ -83,5 +84,5 @@ public class NumberRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.NUMBER.ordinal();
-    }    
+    }
 }
