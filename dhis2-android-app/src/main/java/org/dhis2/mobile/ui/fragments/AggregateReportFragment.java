@@ -99,6 +99,8 @@ public class AggregateReportFragment extends Fragment
     // swipe refresh layout
     private SwipeRefreshLayout swipeRefreshLayout;
     private View stubLayout;
+    private View rootView;
+    private Bundle savedInstanceState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -113,6 +115,12 @@ public class AggregateReportFragment extends Fragment
 
     @Override
     public void onViewCreated(View root, Bundle savedInstanceState) {
+        setupViews(root, savedInstanceState);
+        rootView = root;
+        this.savedInstanceState = savedInstanceState;
+    }
+
+    private void setupViews(View root, Bundle savedInstanceState) {
         setupStubLayout(root);
         setupDataEntryButton(root);
         setupPickerRecyclerViews(root, savedInstanceState);
@@ -168,7 +176,20 @@ public class AggregateReportFragment extends Fragment
 
     @Override
     public void onLoaderReset(Loader<Picker> loader) {
-        // stub implementation
+        periodPickerLinearLayout.setVisibility(View.GONE);
+        hideSpinners();
+        hideProgressBar();
+        setupViews(rootView, savedInstanceState);
+
+    }
+
+    private void hideSpinners() {
+        periodPickerLinearLayout.setVisibility(View.GONE);
+        periodPickerLinearLayout.setTag(null);
+        periodPickerTextView.setText(null);
+
+        // clear category pickers
+        pickerAdapterTwo.swapData(null);
     }
 
     @Override
@@ -258,6 +279,8 @@ public class AggregateReportFragment extends Fragment
         pickerAdapterOne.setOnPickerListChangeListener(new OnPickerListChangeListener() {
             @Override
             public void onPickerListChanged(List<Picker> pickers) {
+                // clear category pickers
+                pickerAdapterTwo.swapData(null);
                 AggregateReportFragment.this.onPickerListChanged(pickers);
             }
         });
@@ -347,12 +370,7 @@ public class AggregateReportFragment extends Fragment
                 //                .build());
             } else {
                 // hide period picker
-                periodPickerLinearLayout.setVisibility(View.GONE);
-                periodPickerLinearLayout.setTag(null);
-                periodPickerTextView.setText(null);
-
-                // clear category pickers
-                pickerAdapterTwo.swapData(null);
+                hideSpinners();
             }
 
             // hiding empty state message
