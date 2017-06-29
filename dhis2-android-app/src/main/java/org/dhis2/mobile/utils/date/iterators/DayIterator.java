@@ -50,7 +50,7 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
         maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth());
-        for (int i = 0; i <= openFuturePeriods; i++) {
+        for (int i = 0; i <= openFuturePeriods-1; i++) {
             maxDate = maxDate.plusDays(1);
         }
     }
