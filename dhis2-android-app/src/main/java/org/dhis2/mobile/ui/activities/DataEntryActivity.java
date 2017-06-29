@@ -205,6 +205,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<Form> loader) {
+        System.out.println("loader reset");
     }
 
     private void setupToolbar() {
@@ -644,6 +645,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private boolean anyFieldEdited() {
         ArrayList<Group> groups = new ArrayList<>();
+        if(adapters==null){
+            return false;
+        }
         for (FieldAdapter adapter : adapters) {
             groups.add(adapter.getGroup());
         }

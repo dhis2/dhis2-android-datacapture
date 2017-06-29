@@ -70,9 +70,11 @@ public class ReportDownloadProcessor {
                 try {
                     FormMetadataProcessorStrategy.process(context, form, info);
                 } catch (NetworkException e) {
+                    form=null;
                     e.printStackTrace();
                     responseCode = e.getErrorCode();
                 } catch (ParsingException e) {
+                    form=null;
                     e.printStackTrace();
                     parsingStatusCode = JsonHandler.PARSING_FAILED_CODE;
                 }
