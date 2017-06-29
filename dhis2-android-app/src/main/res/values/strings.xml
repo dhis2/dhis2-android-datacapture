@@ -112,6 +112,7 @@
     <string name="log_report_data">" %1$s (period: %2$s) "</string>
     <string name="log_message_offline_report">" offline report."</string>
     <string name="network_error">Network error</string>
+    <string name="server_error">Server error</string>
 
     <!-- last commit -->
     <string name="about_this_app">About this app</string>

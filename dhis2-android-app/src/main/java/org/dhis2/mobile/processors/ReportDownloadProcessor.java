@@ -67,15 +67,8 @@ public class ReportDownloadProcessor {
         if (responseCode >= 200 && responseCode < 300) {
             form = parseForm(response.getBody());
             if (form != null) {
-
                 try {
-                    String jsonContent = DataSetMetaData.download(context, info.getFormId());
-                    form.setFieldCombinationRequired(
-                            DataElementOperandParser.isFieldCombinationRequiredToForm(jsonContent));
-                    DataSetMetaData.addCompulsoryDataElements(
-                            DataElementOperandParser.parse(jsonContent), form);
-                    DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
-                            DataSetCategoryOptionParser.parse(jsonContent));
+                    FormMetadataProcessorStrategy.process(context, form, info);
                 } catch (NetworkException e) {
                     form=null;
                     e.printStackTrace();
