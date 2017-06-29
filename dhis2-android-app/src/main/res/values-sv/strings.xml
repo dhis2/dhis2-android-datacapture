@@ -53,6 +53,7 @@
   <string name="import_failed">Import misslyckades</string>
   <string name="something_went_wrong">Något gick fel</string>
   <string name="compulsory_empty_error">Form inte sparad. En eller flera obligatoriska frågor är tomma.</string>
+  <string name="all_questions_compulsories_error">Den här blanketten krävde att alla fält för ett dataelement måste fyllas i. Var god och korrigera det innan du fortsätter</string>
   <string name="profile_changes_saved">Ändringar har sparats</string>
   <string name="profile_changes_uploaded">Ändringar laddes upp</string>
   <string name="username">Användarnamn</string>
@@ -91,7 +92,13 @@
   <string name="log_report_data">" %1$s (period:%2$s)"</string>
   <string name="log_message_offline_report">" offline rapport."</string>
   <string name="network_error">Nätverksfel</string>
+  <string name="server_error">Serverfel</string>
 
   <string name="dialog_content_logout_confirmation">"Om du lämnar systemet kommer alla data som inte skickas att raderas. Vill du fortfarande avsluta?"</string>
   <string name="value_not_supported">Värdetyp stöds inte</string>
+
+  <string name="dialog_exit_survey_title">Bekräfta exit</string>
+  <string name="dialog_exit_survey_message">Du har fortfarande data som inte synkroniseras med servern. Om du fortsätter och avslutar rapporten kommer alla data som inte sparas att gå vilse. Vill du fortsätta?</string>
+  <string name="dialog_exit_survey_yes">Ja</string>
+  <string name="dialog_exit_survey_no">Nej</string>
 </resources>

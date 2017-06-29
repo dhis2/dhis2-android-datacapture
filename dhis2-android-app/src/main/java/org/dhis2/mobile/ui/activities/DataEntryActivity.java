@@ -5,6 +5,7 @@ import static android.text.TextUtils.isEmpty;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Rect;
@@ -13,6 +14,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -69,6 +71,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private View uploadButton;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
+    private Form currentForm;
 
     // data entry view
     private static ListView dataEntryListView;
@@ -196,12 +199,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
+            currentForm = form;
             loadGroupsIntoAdapters(form.getGroups());
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Form> loader) {
+        System.out.println("loader reset");
     }
 
     private void setupToolbar() {
@@ -320,7 +325,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this));
+                    adapters.add(new FieldAdapter(group, this, dataEntryListView));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -377,6 +382,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         for (FieldAdapter adapter : adapters) {
             groups.add(adapter.getGroup());
         }
+        if (currentForm.isFieldCombinationRequired() && !validateFieldsCombined(groups)) {
+            ToastManager.makeToast(this, getString(R.string.all_questions_compulsories_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if(!validateFields(groups)){
             ToastManager.makeToast(this, getString(R.string.compulsory_empty_error),
@@ -394,6 +404,23 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         startService(intent);
         finish();
+    }
+
+    private boolean validateFieldsCombined(ArrayList<Group> groups) {
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.getValue() == null || field.getValue().isEmpty()) {
+                    for (Field fieldCompare : group.getFields()) {
+                        if (field.getDataElement().equals(fieldCompare.getDataElement())
+                                && fieldCompare.getValue() != null
+                                && !fieldCompare.getValue().isEmpty()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private boolean validateFields(ArrayList<Group> groups) {
@@ -439,6 +466,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             if (intent.getExtras().containsKey(Response.BODY)) {
                 Form form = intent.getExtras().getParcelable(Response.BODY);
+                currentForm = form;
 
                 if (form != null) {
                     loadGroupsIntoAdapters(form.getGroups());
@@ -585,25 +613,61 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return null;
         }
     }
-    public static class CustomOnEditorActionListener implements TextView.OnEditorActionListener{
 
-        @Override
-        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            final TextView view = v;
-            if(actionId == EditorInfo.IME_ACTION_NEXT) {
-                int position=dataEntryListView.getPositionForView(v);
-                dataEntryListView.smoothScrollToPosition(position+1);
-                dataEntryListView.postDelayed(new Runnable() {
-                    public void run() {
-                        TextView nextField = (TextView)view.focusSearch(View.FOCUS_DOWN);
-                        if(nextField != null) {
-                            nextField.requestFocus();
-                        }
-                    }
-                }, 200);
-                return true;
-            }
+
+    @Override
+    public void onBackPressed() {
+        if (anyFieldEdited()) {
+            showAlertDialogExit();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean anyFieldEdited() {
+        ArrayList<Group> groups = new ArrayList<>();
+        if(adapters==null){
             return false;
         }
+        for (FieldAdapter adapter : adapters) {
+            groups.add(adapter.getGroup());
+        }
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.isEdited()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private void showAlertDialogExit() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_exit_survey_title);
+        builder.setMessage(R.string.dialog_exit_survey_message);
+
+        builder.setPositiveButton(R.string.dialog_exit_survey_yes,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+        builder.setNegativeButton(R.string.dialog_exit_survey_no,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

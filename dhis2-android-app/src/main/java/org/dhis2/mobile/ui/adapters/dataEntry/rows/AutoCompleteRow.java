@@ -49,25 +49,20 @@ import org.dhis2.mobile.ui.adapters.dataEntry.AutoCompleteAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoCompleteRow implements Row {
+public class AutoCompleteRow extends EditTextRow implements Row {
     private AutoCompleteAdapter adapter;
     private LayoutInflater inflater;
     private Field field;
     private OptionSet optionset;
+    private Context mContext;
 
     public AutoCompleteRow(LayoutInflater inflater, Field field, OptionSet optionset, Context context) {
         this.inflater = inflater;
         this.field = field;
         this.optionset = optionset;
+        mContext = context;
 
-        ArrayList<String> options = new ArrayList<String>();
-        if (optionset != null && optionset.getOptions() != null) {
-            for (Option option : optionset.getOptions()) {
-                options.add(option.getName());
-            }
-        }
-        adapter = new AutoCompleteAdapter(context);
-        adapter.swapData(options);
+        loadOptions();
     }
 
     @Override
@@ -106,6 +101,9 @@ public class AutoCompleteRow implements Row {
         }
         RowCosmetics.setTextLabel(field, holder.textLabel);
 
+
+        loadOptions();
+
         holder.textWatcher.setField(field);
         holder.autoComplete.setText(field.getValue());
         holder.autoComplete.setAdapter(adapter);
@@ -116,7 +114,7 @@ public class AutoCompleteRow implements Row {
         holder.listener.setAutoComplete(holder.autoComplete);
         holder.button.setOnClickListener(holder.listener);
         holder.autoComplete.clearFocus();
-        holder.autoComplete.setOnEditorActionListener(new DataEntryActivity.CustomOnEditorActionListener());
+        holder.autoComplete.setOnEditorActionListener(mOnEditorActionListener);
 
         return view;
     }
@@ -124,6 +122,17 @@ public class AutoCompleteRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.AUTO_COMPLETE.ordinal();
+    }
+
+    private void loadOptions() {
+        ArrayList<String> options = new ArrayList<String>();
+        if (optionset != null && optionset.getOptions() != null) {
+            for (Option option : optionset.getOptions()) {
+                options.add(option.getName());
+            }
+        }
+        adapter = new AutoCompleteAdapter(mContext);
+        adapter.swapData(options);
     }
 
     private class AutoCompleteRowHolder {

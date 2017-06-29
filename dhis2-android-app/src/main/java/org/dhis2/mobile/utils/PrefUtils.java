@@ -31,10 +31,12 @@ package org.dhis2.mobile.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
+import android.util.Log;
 
 public class PrefUtils {
 	private static final String APP_DATA = "APP_DATA";
-	private static final String USER_DATA = "USER_DATA";
+    private static final String USER_DATA = "USER_DATA";
+    private static final String SERVER_DATA = "SERVER_DATA";
     private static final String RESOURCE_STATE = "RESOURCE_STATE";
 	private static final String OFFLINE_REPORTS_INFO = "OFFLINE_REPORTS_INFO";
 
@@ -43,7 +45,8 @@ public class PrefUtils {
 	private static final String LOGGED_IN = "loggedIn";
 	private static final String ACCOUNT_NEEDS_UPDATE = "accountNeedsUpdate";
 	private static final String URL = "url";
-	private static final String USER_NAME = "userName";
+    private static final String USER_NAME = "userName";
+    private static final String SERVER_VERSION = "serverVersion";
 
 	private PrefUtils() { }
 
@@ -77,6 +80,13 @@ public class PrefUtils {
 		context.getSharedPreferences(OFFLINE_REPORTS_INFO, Context.MODE_PRIVATE).edit().commit();
 	}
 
+    public static void initServerData(Context context, String serverVersion) {
+        Log.d(PrefUtils.class.getName(), "Server version: " + serverVersion);
+        Editor serverData = context.getSharedPreferences(SERVER_DATA, Context.MODE_PRIVATE).edit();
+        serverData.putString(SERVER_VERSION, serverVersion);
+        serverData.commit();
+    }
+
 
 	public static boolean isUserLoggedIn(Context context) {
 		return context.getSharedPreferences(APP_DATA, Context.MODE_PRIVATE).getBoolean(LOGGED_IN, false);
@@ -94,10 +104,15 @@ public class PrefUtils {
 		return context.getSharedPreferences(USER_DATA, Context.MODE_PRIVATE).getString(USER_NAME, null);
 	}
 
+    public static String getServerVersion(Context context) {
+        return context.getSharedPreferences(SERVER_DATA, Context.MODE_PRIVATE).getString(SERVER_VERSION, null);
+    }
+
 	public static void eraseData(Context context) {
 		context.getSharedPreferences(USER_DATA, Context.MODE_PRIVATE).edit().clear().commit();
 		context.getSharedPreferences(APP_DATA, Context.MODE_PRIVATE).edit().clear().commit();
 		context.getSharedPreferences(OFFLINE_REPORTS_INFO, Context.MODE_PRIVATE).edit().clear().commit();
+        context.getSharedPreferences(SERVER_DATA, Context.MODE_PRIVATE).edit().clear().commit();
         context.getSharedPreferences(RESOURCE_STATE, Context.MODE_PRIVATE).edit().clear().commit();
 	}
 
