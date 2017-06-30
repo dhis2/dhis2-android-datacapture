@@ -43,6 +43,7 @@ import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.network.HTTPClient;
+import org.dhis2.mobile.network.NetworkException;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.ui.activities.DataEntryActivity;
@@ -60,14 +61,29 @@ public class ReportDownloadProcessor {
         String url = buildUrl(context, info);
         String creds = PrefUtils.getCredentials(context);
         Response response = HTTPClient.get(url, creds);
-
+        int responseCode = response.getCode();
+        int parsingStatusCode = JsonHandler.PARSING_OK_CODE;
         Form form = null;
-        if (response.getCode() >= 200 && response.getCode() < 300) {
+        if (responseCode >= 200 && responseCode < 300) {
             form = parseForm(response.getBody());
+            if (form != null) {
+                try {
+                    FormMetadataProcessorStrategy.process(context, form, info);
+                } catch (NetworkException e) {
+                    form=null;
+                    e.printStackTrace();
+                    responseCode = e.getErrorCode();
+                } catch (ParsingException e) {
+                    form=null;
+                    e.printStackTrace();
+                    parsingStatusCode = JsonHandler.PARSING_FAILED_CODE;
+                }
+            }
         }
 
         Intent intent = new Intent(DataEntryActivity.TAG);
-        intent.putExtra(Response.CODE, response.getCode());
+        intent.putExtra(Response.CODE, responseCode);
+        intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
 
         if (form != null) {
             intent.putExtra(Response.BODY, (Parcelable) form);

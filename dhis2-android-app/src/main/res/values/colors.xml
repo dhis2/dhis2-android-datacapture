@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="white">#FFFFFF</color>
     <color name="light_grey">#e5e5e5</color>
     <color name="dark_navy_blue">#1d5288</color>
     <color name="light_blue">#67b0f9</color>
@@ -21,5 +22,8 @@
     
     <color name="upload_button_state_unpressed">#C01f70c3</color>
     <color name="upload_button_state_pressed">#C01d5288</color>
-    
+
+    <color name="button_log_out_state_enabled_false">#EF9A9A</color>
+    <color name="button_log_out_state_unpressed">#F44336</color>
+    <color name="button_log_out_state_pressed">#D32F2F</color>
 </resources>

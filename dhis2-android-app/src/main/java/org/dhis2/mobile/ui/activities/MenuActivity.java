@@ -29,6 +29,8 @@
 
 package org.dhis2.mobile.ui.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -41,8 +43,10 @@ import android.view.View;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.WorkService;
+import org.dhis2.mobile.ui.fragments.AboutUsFragment;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
+import org.dhis2.mobile.ui.fragments.SyncLogFragment;
 
 public class MenuActivity extends BaseActivity implements OnNavigationItemSelectedListener {
     private static final String STATE_TOOLBAR_TITLE = "state:toolbarTitle";
@@ -96,8 +100,25 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
                 attachFragment(new MyProfileFragment());
                 break;
             }
+            case R.id.drawer_item_about: {
+                attachFragment(new AboutUsFragment());
+
+                break;
+            }
+            case R.id.drawer_item_sync_logs: {
+                attachFragment(new SyncLogFragment());
+                break;
+            }
             case R.id.drawer_item_logout: {
-                logOut();
+                new AlertDialog.Builder(this)
+                        .setTitle(getApplicationContext().getString(R.string.log_out))
+                        .setMessage(R.string.dialog_content_logout_confirmation)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                logOut();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null).create().show();
                 break;
             }
         }

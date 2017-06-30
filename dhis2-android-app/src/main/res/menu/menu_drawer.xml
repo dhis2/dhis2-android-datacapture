@@ -44,9 +44,21 @@
             android:title="@string/profile" />
 
         <item
+            android:id="@+id/drawer_item_sync_logs"
+            android:icon="@drawable/ic_notification"
+            android:orderInCategory="130"
+            android:title="@string/sync_logs" />
+
+        <item
+            android:id="@+id/drawer_item_about"
+            android:icon="@drawable/ic_notification"
+            android:orderInCategory="140"
+            android:title="@string/about_this_app" />
+
+        <item
             android:id="@+id/drawer_item_logout"
             android:icon="@drawable/ic_log_out"
-            android:orderInCategory="120"
+            android:orderInCategory="150"
             android:title="@string/log_out" />
     </group>
 </menu>

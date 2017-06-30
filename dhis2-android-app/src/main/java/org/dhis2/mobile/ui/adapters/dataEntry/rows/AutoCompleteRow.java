@@ -43,30 +43,26 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Option;
 import org.dhis2.mobile.io.models.OptionSet;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.ui.adapters.dataEntry.AutoCompleteAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoCompleteRow implements Row {
+public class AutoCompleteRow extends EditTextRow implements Row {
     private AutoCompleteAdapter adapter;
     private LayoutInflater inflater;
     private Field field;
     private OptionSet optionset;
+    private Context mContext;
 
     public AutoCompleteRow(LayoutInflater inflater, Field field, OptionSet optionset, Context context) {
         this.inflater = inflater;
         this.field = field;
         this.optionset = optionset;
+        mContext = context;
 
-        ArrayList<String> options = new ArrayList<String>();
-        if (optionset != null && optionset.getOptions() != null) {
-            for (Option option : optionset.getOptions()) {
-                options.add(option.getName());
-            }
-        }
-        adapter = new AutoCompleteAdapter(context);
-        adapter.swapData(options);
+        loadOptions();
     }
 
     @Override
@@ -103,19 +99,22 @@ public class AutoCompleteRow implements Row {
             view = convertView;
             holder = (AutoCompleteRowHolder) view.getTag();
         }
+        RowCosmetics.setTextLabel(field, holder.textLabel);
 
-        holder.textLabel.setText(field.getLabel());
 
+        loadOptions();
+
+        holder.textWatcher.setField(field);
+        holder.autoComplete.setText(field.getValue());
         holder.autoComplete.setAdapter(adapter);
         holder.onFocusListener.setValues(holder.autoComplete, adapter.getData());
         holder.autoComplete.setOnFocusChangeListener(holder.onFocusListener);
-        holder.textWatcher.setField(field);
         holder.autoComplete.addTextChangedListener(holder.textWatcher);
-        holder.autoComplete.setText(field.getValue());
 
         holder.listener.setAutoComplete(holder.autoComplete);
         holder.button.setOnClickListener(holder.listener);
         holder.autoComplete.clearFocus();
+        holder.autoComplete.setOnEditorActionListener(mOnEditorActionListener);
 
         return view;
     }
@@ -123,6 +122,17 @@ public class AutoCompleteRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.AUTO_COMPLETE.ordinal();
+    }
+
+    private void loadOptions() {
+        ArrayList<String> options = new ArrayList<String>();
+        if (optionset != null && optionset.getOptions() != null) {
+            for (Option option : optionset.getOptions()) {
+                options.add(option.getName());
+            }
+        }
+        adapter = new AutoCompleteAdapter(mContext);
+        adapter.swapData(options);
     }
 
     private class AutoCompleteRowHolder {

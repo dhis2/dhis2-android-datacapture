@@ -29,6 +29,13 @@
 
 package org.dhis2.mobile.processors;
 
+import static org.dhis2.mobile.io.json.JsonHandler.buildJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
+import static org.dhis2.mobile.io.json.JsonHandler.getAsJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.getJsonArray;
+import static org.dhis2.mobile.io.json.JsonHandler.getJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.getString;
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,6 +47,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
+import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.Field;
@@ -63,13 +71,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.dhis2.mobile.io.json.JsonHandler.buildJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
-import static org.dhis2.mobile.io.json.JsonHandler.getAsJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.getJsonArray;
-import static org.dhis2.mobile.io.json.JsonHandler.getJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.getString;
-
 public class FormsDownloadProcessor {
     private static final String TAG = FormsDownloadProcessor.class.getSimpleName();
 
@@ -90,7 +91,7 @@ public class FormsDownloadProcessor {
         int parsingStatusCode = JsonHandler.PARSING_OK_CODE;
 
         try {
-            downloadDatasets(context);
+            downloadDatasets(context, PrefUtils.getServerVersion(context).equals(Constants.API_25));
         } catch (NetworkException e) {
             e.printStackTrace();
             networkStatusCode = e.getErrorCode();
@@ -120,7 +121,8 @@ public class FormsDownloadProcessor {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private static void downloadDatasets(Context context) throws NetworkException, ParsingException {
+    private static void downloadDatasets(Context context, boolean oldApi) throws NetworkException, ParsingException {
+        System.out.println("is old api"+oldApi);
         final String creds = PrefUtils.getCredentials(context);
         final String server = PrefUtils.getServerURL(context);
         final String datasetsURL = server + URLConstants.DATASETS_URL;
@@ -143,7 +145,11 @@ public class FormsDownloadProcessor {
 
         OrganizationUnit[] units = handleUnitsWithDatasets(jUnits, jDatasets);
         HashMap<String, Form> forms = handleForms(jDatasets);
-
+        for (Map.Entry<String, Form> entry : forms.entrySet()) {
+            Form form = forms.get(entry.getKey());
+            form = addMetaData(context, form, entry.getKey(), oldApi);
+            forms.put(entry.getKey(), form);
+        }
         HashSet<String> optionSetIds = getOptionSetIds(forms);
         updateOptionSets(context, optionSetIds);
 
@@ -216,6 +222,14 @@ public class FormsDownloadProcessor {
             e.printStackTrace();
             throw new ParsingException("The incoming Json is bad/malicious");
         }
+    }
+
+    private static Form addMetaData(Context context, Form form, String uid, boolean oldApi)  throws NetworkException, ParsingException {
+        String jsonContent = DataSetMetaData.download(context, uid, oldApi);
+        DataSetMetaData.addCompulsoryDataElements(DataElementOperandParser.parse(jsonContent), form);
+        DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form, DataSetCategoryOptionParser.parse(jsonContent));
+        return form;
+
     }
 
     private static HashSet<String> getOptionSetIds(HashMap<String, Form> forms) throws ParsingException {

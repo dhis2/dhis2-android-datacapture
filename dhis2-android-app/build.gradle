@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion 25
@@ -7,9 +8,22 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25
-        versionCode 17
-        versionName "1.6.3"
+        versionCode 19
+        versionName "1.6.5"
     }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+    }
+
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
+
 }
 
 dependencies {
@@ -18,4 +32,6 @@ dependencies {
     compile 'com.android.support:design:25.2.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'joda-time:joda-time:2.6'
+    /// / Java test dependencies
+    testCompile "junit:junit:4.12"
 }

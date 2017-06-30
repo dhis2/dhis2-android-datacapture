@@ -27,7 +27,7 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.utils.Preconditions;
 import org.dhis2.mobile.utils.TypefaceManager;
 
-public class FontTextView extends TextView {
+public class FontTextView extends android.support.v7.widget.AppCompatTextView {
 
     public FontTextView(Context context) {
         super(context);

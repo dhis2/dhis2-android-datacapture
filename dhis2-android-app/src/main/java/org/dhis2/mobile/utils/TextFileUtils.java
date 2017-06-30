@@ -30,6 +30,7 @@
 package org.dhis2.mobile.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -42,13 +43,14 @@ public final class TextFileUtils {
     private static final String TAG = TextFileUtils.class.getSimpleName();
 
     public enum FileNames {
-        ORG_UNITS_WITH_DATASETS, ACCOUNT_INFO
+        ORG_UNITS_WITH_DATASETS, ACCOUNT_INFO, LOG
     }
 
     public enum Directory {
         ROOT(""),
         DATASETS("datasets"),
         OFFLINE_DATASETS("offlineDatasets"),
+        LOG("log"),
         OPTION_SETS("optionSets");
 
         private String directory;
@@ -115,6 +117,16 @@ public final class TextFileUtils {
         writeTextFile(context, dir, name.toString(), data);
     }
 
+    public static void writeTextFile(Context context, Directory dir, String name, String message,
+            String startOfLine) {
+        message = startOfLine + "-" + message + "\n";
+        try {
+            writeLineIntoTextFile(context, dir, name, message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Writes data to text file with given name.
      * <p/>
@@ -125,13 +137,7 @@ public final class TextFileUtils {
      * @param data    String which will be written to text file.
      */
     public static void writeTextFile(Context context, Directory dir, String name, String data) {
-        String path = getDirectoryPath(context, dir);
-        File directory = new File(path);
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-
-        File file = new File(path, name);
+        File file = getFile(context, dir, name);
         try {
             file.createNewFile();
             FileOutputStream output = new FileOutputStream(file);
@@ -143,6 +149,35 @@ public final class TextFileUtils {
         } catch (IOException e) {
             throw new RuntimeException(name + " IOException");
         }
+    }
+
+    private static void writeLineIntoTextFile(Context context, Directory dir,
+            String filename, String message) throws IOException {
+        File file = getFile(context, dir, filename);
+
+        String fileContent = message;
+        if (!file.exists()) {
+            file.createNewFile();
+        } else {
+            fileContent += readTextFile(context, dir, filename);
+        }
+
+        writeTextFile(context, dir, filename, fileContent);
+    }
+
+    private static void createDirectoryIfNotExist(String path) {
+        File directory = new File(path);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+    }
+
+    @NonNull
+    private static File getFile(Context context, Directory dir, String name) {
+        String path = getDirectoryPath(context, dir);
+        createDirectoryIfNotExist(path);
+
+        return new File(path, name);
     }
 
     public static String getDirectoryPath(Context context, Directory dir) {
@@ -159,7 +194,9 @@ public final class TextFileUtils {
     public static void removeFile(Context context, Directory dir, FileNames fileName) {
         String path = getDirectoryPath(context, dir);
         File file = new File(path, fileName.toString());
-        removeFile(file);
+        if(file.exists()) {
+            removeFile(file);
+        }
     }
 
     public static void removeFile(File file) {

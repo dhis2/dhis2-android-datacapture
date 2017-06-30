@@ -46,8 +46,10 @@ import org.dhis2.mobile.processors.OfflineDataProcessor;
 import org.dhis2.mobile.processors.RemoveDataProcessor;
 import org.dhis2.mobile.processors.ReportDownloadProcessor;
 import org.dhis2.mobile.processors.ReportUploadProcessor;
+import org.dhis2.mobile.processors.ServerInfoProcessor;
 import org.dhis2.mobile.ui.activities.LoginActivity;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
+import org.dhis2.mobile.utils.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -129,10 +131,12 @@ public class WorkService extends Service {
         if (METHOD_UPLOAD_PROFILE_INFO.equals(methodName)) {
             ArrayList<Field> fields = extras.getParcelableArrayList(MyProfileFragment.GROUP);
             MyProfileProcessor.uploadProfileInfo(context, fields);
+            ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
         }
 
         if (METHOD_UPDATE_PROFILE_INFO.equals(methodName)) {
             MyProfileProcessor.updateProfileInfo(context);
+            ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
         }
 
         if (METHOD_LOGIN_USER.equals(methodName)) {
@@ -144,17 +148,20 @@ public class WorkService extends Service {
 
         if (METHOD_UPDATE_DATASETS.equals(methodName)) {
             FormsDownloadProcessor.updateDatasets(context);
+            ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
         }
 
         if (METHOD_DOWNLOAD_LATEST_DATASET_VALUES.equals(methodName)) {
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             ReportDownloadProcessor.download(context, info);
+            ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
         }
 
         if (METHOD_UPLOAD_DATASET.equals(methodName)) {
             DatasetInfoHolder info = extras.getParcelable(DatasetInfoHolder.TAG);
             ArrayList<Group> groups = extras.getParcelableArrayList(Group.TAG);
             ReportUploadProcessor.upload(context, info, groups);
+            ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
         }
 
         if (METHOD_OFFLINE_DATA_UPLOAD.equals(methodName)) {

@@ -1,23 +1,32 @@
 package org.dhis2.mobile.ui.activities;
 
+import static android.text.TextUtils.isEmpty;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -47,8 +56,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static android.text.TextUtils.isEmpty;
-
 public class DataEntryActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Form> {
     public static final String TAG = DataEntryActivity.class.getSimpleName();
 
@@ -64,9 +71,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private View uploadButton;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
+    private Form currentForm;
 
     // data entry view
-    private ListView dataEntryListView;
+    private static ListView dataEntryListView;
     private List<FieldAdapter> adapters;
 
     // state
@@ -87,7 +95,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_entry);
-
         setupToolbar();
         setupFormSpinner();
         setupProgressBar(savedInstanceState);
@@ -100,6 +107,32 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
+        
+        setupKeyboardObserver();
+    }
+
+    private void setupKeyboardObserver() {
+        final View rootView = findViewById(R.id.data_entry_container);
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                Rect r = new Rect();
+                rootView.getWindowVisibleDisplayFrame(r);
+                int screenHeight = rootView.getRootView().getHeight();
+
+                // r.bottom is the position above soft keypad or device button.
+                // if keypad is shown, the r.bottom is smaller than that before.
+                int keypadHeight = screenHeight - r.bottom;
+
+                if (keypadHeight > screenHeight * 0.15) {
+                    rootView.findViewById(R.id.upload_button).setVisibility(View.GONE);
+                }
+                else {
+                    rootView.findViewById(R.id.upload_button).setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override
@@ -166,12 +199,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
+            currentForm = form;
             loadGroupsIntoAdapters(form.getGroups());
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Form> loader) {
+        System.out.println("loader reset");
     }
 
     private void setupToolbar() {
@@ -183,6 +218,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+    }
+
+    private void setToolbarTitle(String title){
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setTitle(title);
     }
 
     private void setupFormSpinner() {
@@ -213,6 +253,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
+        dataEntryListView.addFooterView(dataEntryListView.inflate(getApplicationContext(), R.layout.listview_row_footer, null));
     }
 
     private void setupUploadButton() {
@@ -284,7 +325,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this));
+                    adapters.add(new FieldAdapter(group, this, dataEntryListView));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -300,6 +341,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (adapters.size() == 1) {
             formGroupSpinner.setVisibility(View.GONE);
             dataEntryListView.setAdapter(adapters.get(0));
+            if(adapters.get(0).getLabel()!=null && !adapters.get(0).getLabel().equals(FieldAdapter.FORM_WITHOUT_SECTION)){
+                setToolbarTitle(adapters.get(0).getLabel());
+            }
             return;
         }
 
@@ -338,6 +382,17 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         for (FieldAdapter adapter : adapters) {
             groups.add(adapter.getGroup());
         }
+        if (currentForm.isFieldCombinationRequired() && !validateFieldsCombined(groups)) {
+            ToastManager.makeToast(this, getString(R.string.all_questions_compulsories_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(!validateFields(groups)){
+            ToastManager.makeToast(this, getString(R.string.compulsory_empty_error),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         DatasetInfoHolder info = getIntent().getExtras()
                 .getParcelable(DatasetInfoHolder.TAG);
@@ -349,6 +404,34 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         startService(intent);
         finish();
+    }
+
+    private boolean validateFieldsCombined(ArrayList<Group> groups) {
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.getValue() == null || field.getValue().isEmpty()) {
+                    for (Field fieldCompare : group.getFields()) {
+                        if (field.getDataElement().equals(fieldCompare.getDataElement())
+                                && fieldCompare.getValue() != null
+                                && !fieldCompare.getValue().isEmpty()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean validateFields(ArrayList<Group> groups) {
+        for (Group group:groups){
+            for(Field field:group.getFields()){
+                if(field.isCompulsory() && (field.getValue()==null || field.getValue().equals(""))){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void getLatestValues() {
@@ -372,7 +455,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             hideProgressBar();
 
             int code = intent.getExtras().getInt(Response.CODE);
-            if (HTTPClient.isError(code)) {
+            int parsingStatusCode = intent.getExtras().getInt(JsonHandler.PARSING_STATUS_CODE);
+
+            if (HTTPClient.isError(code) || parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
                 // load form from disk
                 getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null,
                         DataEntryActivity.this).forceLoad();
@@ -381,6 +466,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             if (intent.getExtras().containsKey(Response.BODY)) {
                 Form form = intent.getExtras().getParcelable(Response.BODY);
+                currentForm = form;
 
                 if (form != null) {
                     loadGroupsIntoAdapters(form.getGroups());
@@ -526,5 +612,62 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             return null;
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (anyFieldEdited()) {
+            showAlertDialogExit();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean anyFieldEdited() {
+        ArrayList<Group> groups = new ArrayList<>();
+        if(adapters==null){
+            return false;
+        }
+        for (FieldAdapter adapter : adapters) {
+            groups.add(adapter.getGroup());
+        }
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.isEdited()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private void showAlertDialogExit() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_exit_survey_title);
+        builder.setMessage(R.string.dialog_exit_survey_message);
+
+        builder.setPositiveButton(R.string.dialog_exit_survey_yes,
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+
+        builder.setNegativeButton(R.string.dialog_exit_survey_no,
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

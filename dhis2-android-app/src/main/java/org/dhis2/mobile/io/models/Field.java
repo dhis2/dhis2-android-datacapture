@@ -50,6 +50,8 @@ public class Field implements Serializable, Parcelable {
     private String label;
     private String optionSet;
     private String type;
+    private boolean compulsory;
+    private boolean edited;
 
     public Field() {
     }
@@ -91,6 +93,7 @@ public class Field implements Serializable, Parcelable {
 
     public void setValue(String value) {
         if (value != null) {
+            if (!value.equals(this.value)) edited = true;
             this.value = value;
         }
     }
@@ -133,6 +136,18 @@ public class Field implements Serializable, Parcelable {
 
     public String getValue() {
         return value;
+    }
+
+    public boolean isCompulsory() {
+        return compulsory;
+    }
+
+    public void setCompulsory(boolean compulsory) {
+        this.compulsory = compulsory;
+    }
+
+    public boolean isEdited() {
+        return edited;
     }
 }
 

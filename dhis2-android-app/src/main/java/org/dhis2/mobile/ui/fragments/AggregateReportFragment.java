@@ -1,5 +1,8 @@
 package org.dhis2.mobile.ui.fragments;
 
+import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
+import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -54,6 +57,8 @@ import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.dhis2.mobile.utils.date.PeriodFilter;
+import org.dhis2.mobile.utils.date.PeriodFilterFactory;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
@@ -61,9 +66,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
-import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
 
 public class AggregateReportFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Picker> {
@@ -97,6 +99,8 @@ public class AggregateReportFragment extends Fragment
     // swipe refresh layout
     private SwipeRefreshLayout swipeRefreshLayout;
     private View stubLayout;
+    private View rootView;
+    private Bundle savedInstanceState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,6 +115,12 @@ public class AggregateReportFragment extends Fragment
 
     @Override
     public void onViewCreated(View root, Bundle savedInstanceState) {
+        setupViews(root, savedInstanceState);
+        rootView = root;
+        this.savedInstanceState = savedInstanceState;
+    }
+
+    private void setupViews(View root, Bundle savedInstanceState) {
         setupStubLayout(root);
         setupDataEntryButton(root);
         setupPickerRecyclerViews(root, savedInstanceState);
@@ -166,7 +176,20 @@ public class AggregateReportFragment extends Fragment
 
     @Override
     public void onLoaderReset(Loader<Picker> loader) {
-        // stub implementation
+        periodPickerLinearLayout.setVisibility(View.GONE);
+        hideSpinners();
+        hideProgressBar();
+        setupViews(rootView, savedInstanceState);
+
+    }
+
+    private void hideSpinners() {
+        periodPickerLinearLayout.setVisibility(View.GONE);
+        periodPickerLinearLayout.setTag(null);
+        periodPickerTextView.setText(null);
+
+        // clear category pickers
+        pickerAdapterTwo.swapData(null);
     }
 
     @Override
@@ -256,6 +279,8 @@ public class AggregateReportFragment extends Fragment
         pickerAdapterOne.setOnPickerListChangeListener(new OnPickerListChangeListener() {
             @Override
             public void onPickerListChanged(List<Picker> pickers) {
+                // clear category pickers
+                pickerAdapterTwo.swapData(null);
                 AggregateReportFragment.this.onPickerListChanged(pickers);
             }
         });
@@ -345,12 +370,7 @@ public class AggregateReportFragment extends Fragment
                 //                .build());
             } else {
                 // hide period picker
-                periodPickerLinearLayout.setVisibility(View.GONE);
-                periodPickerLinearLayout.setTag(null);
-                periodPickerTextView.setText(null);
-
-                // clear category pickers
-                pickerAdapterTwo.swapData(null);
+                hideSpinners();
             }
 
             // hiding empty state message
@@ -758,7 +778,7 @@ public class AggregateReportFragment extends Fragment
                                     endDate = DateTime.parse(option.getEndDate());
                                 }
 
-                                PeriodFilter periodFilter = new PeriodFilter(startDate, endDate);
+                                Filter periodFilter = PeriodFilterFactory.getPeriodFilter(startDate, endDate, dataSet.getOptions().getPeriodType());
 
                                 // adding filters which will be triggered in PickerItemAdapter
                                 categoryOptionPicker.addFilter(organisationUnitsFilter);
@@ -800,44 +820,6 @@ public class AggregateReportFragment extends Fragment
             }
 
             return !organisationUnitIds.contains(organisationUnitId);
-        }
-    }
-
-    private static class PeriodFilter implements Filter, Serializable {
-        private final DateTime startDate;
-        private final DateTime endDate;
-        private DateTime selectedDate;
-
-        PeriodFilter(DateTime startDate, DateTime endDate) {
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        void setSelectedDate(DateTime selectedDate) {
-            this.selectedDate = selectedDate;
-        }
-
-        @Override
-        public boolean apply() {
-            if ((startDate == null && endDate == null) || selectedDate == null) {
-                return false;
-            }
-
-            if (startDate != null && endDate != null) {
-                // return true, if criteria is not between two dates
-                // return startDate.isBefore(selectedDate) || endDate.isAfter(selectedDate);
-                return !(selectedDate.isAfter(startDate) && selectedDate.isBefore(endDate));
-            }
-
-            if (startDate != null) {
-                // return true, if criteria is before startDate
-                // return startDate.isBefore(selectedDate);
-                return !(selectedDate.isAfter(startDate));
-            }
-
-            // return true, if criteria is after endDate
-            // return endDate.isAfter(selectedDate);
-            return !(selectedDate.isBefore(endDate));
         }
     }
 }

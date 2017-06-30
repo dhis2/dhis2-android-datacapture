@@ -29,10 +29,6 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import org.dhis2.mobile.io.models.Field;
-
-import org.dhis2.mobile.R;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -41,7 +37,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class TextRow implements Row {
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.models.Field;
+import org.dhis2.mobile.ui.activities.DataEntryActivity;
+
+public class TextRow extends EditTextRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
     
@@ -54,15 +54,15 @@ public class TextRow implements Row {
     public View getView(View convertView) {
         View view;
         EditTextHolder holder;
-        
+
         if (convertView == null) {
             ViewGroup rowRoot = (ViewGroup) inflater.inflate(R.layout.listview_row_text, null);
             TextView label = (TextView) rowRoot.findViewById(R.id.text_label);
             EditText editText = (EditText) rowRoot.findViewById(R.id.edit_text_row);
-           
+
             EditTextWatcher watcher = new EditTextWatcher(field);
             editText.addTextChangedListener(watcher);
-            
+
             holder = new EditTextHolder(label, editText, watcher);
             rowRoot.setTag(holder);
             view = rowRoot;
@@ -70,13 +70,14 @@ public class TextRow implements Row {
             view = convertView;
             holder = (EditTextHolder) view.getTag();
         }
-        
-        holder.textLabel.setText(field.getLabel());
+
+        RowCosmetics.setTextLabel(field, holder.textLabel);
         
         holder.textWatcher.setField(field);
         holder.editText.addTextChangedListener(holder.textWatcher);
         holder.editText.setText(field.getValue());
         holder.editText.clearFocus();
+        holder.editText.setOnEditorActionListener(mOnEditorActionListener);
 
         return view;
     }
@@ -108,7 +109,7 @@ class EditTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) { }
-    
+
 }
 
 class EditTextHolder {
