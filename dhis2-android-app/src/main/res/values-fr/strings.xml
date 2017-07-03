@@ -100,4 +100,6 @@
   <string name="dialog_exit_survey_message">Vous avez toujours des données non synchronisées avec le serveur. Si vous continuez et quittez ce rapport, toutes les données non sauvegardées seront perdues. Voulez-vous continuer?</string>
   <string name="dialog_exit_survey_yes">Oui</string>
   <string name="dialog_exit_survey_no">Non</string>
+
+  <string name="dialog_period_not_supported">"Type de période non pris en charge"</string>
 </resources>
