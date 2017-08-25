@@ -330,6 +330,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 int expiringDate = form.getOptions().getexpiryDays();
                 //// FIXME: 25/08/2017 check if the expiring date is over
             }
+            if(form.isApproved()){
+                readOnly = true;
+            }
+
             uploadButtonEnabled(!readOnly);
 
             try {
