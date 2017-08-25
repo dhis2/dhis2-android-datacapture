@@ -17,16 +17,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -200,7 +197,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
             currentForm = form;
-            loadGroupsIntoAdapters(form.getGroups());
+            loadGroupsIntoAdapters(form.getGroups(), form);
         }
     }
 
@@ -267,6 +264,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         });
     }
 
+    private void uploadButtonEnabled(boolean value) {
+        uploadButton = findViewById(R.id.upload_button);
+        uploadButton.setEnabled(value);
+    }
     private void attemptToDownloadReport(Bundle savedInstanceState) {
         // first, we need to check if previous instances of
         // activities already tried to download values
@@ -297,10 +298,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             // we did not load form before,
             // so we need to do so now
-            if (dataEntryGroups == null) {
+            if (dataEntryGroups == null || currentForm==null) {
                 getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null, this).forceLoad();
             } else {
-                loadGroupsIntoAdapters(dataEntryGroups);
+                loadGroupsIntoAdapters(dataEntryGroups, currentForm);
             }
         }
     }
@@ -319,13 +320,21 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         return progressBarLayout.getVisibility() == View.VISIBLE;
     }
 
-    private void loadGroupsIntoAdapters(List<Group> groups) {
+    private void loadGroupsIntoAdapters(List<Group> groups, Form form) {
         if (groups != null) {
             List<FieldAdapter> adapters = new ArrayList<>();
 
+            boolean readOnly = false;
+            if(form.getOptions().getexpiryDays()>0)
+            {
+                int expiringDate = form.getOptions().getexpiryDays();
+                //// FIXME: 25/08/2017 check if the expiring date is over
+            }
+            uploadButtonEnabled(!readOnly);
+
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this, dataEntryListView));
+                    adapters.add(new FieldAdapter(group, this, dataEntryListView, readOnly));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -469,7 +478,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 currentForm = form;
 
                 if (form != null) {
-                    loadGroupsIntoAdapters(form.getGroups());
+                    loadGroupsIntoAdapters(form.getGroups(), currentForm);
                 }
             }
         }
