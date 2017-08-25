@@ -29,21 +29,21 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import org.dhis2.mobile.io.models.Field;
-
-import org.dhis2.mobile.R;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TextView;
+
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.models.Field;
 
 public class CheckBoxRow implements Row {
     private LayoutInflater inflater;
     private Field field;
+    public boolean readOnly = false;
     
     public CheckBoxRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -76,7 +76,12 @@ public class CheckBoxRow implements Row {
         
         if (field.getValue().equals(Field.TRUE)) holder.checkBox.setChecked(true);
         else if (field.getValue().equals(Field.EMPTY_FIELD)) holder.checkBox.setChecked(false);
-        
+
+        if(readOnly){
+            holder.checkBox.setEnabled(false);
+        } else {
+            holder.checkBox.setEnabled(true);
+        }
         return view;
     }
 
@@ -84,7 +89,12 @@ public class CheckBoxRow implements Row {
     public int getViewType() {
         return RowTypes.TRUE_ONLY.ordinal();
     }
-    
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
+    }
+
     private class CheckBoxListener implements OnCheckedChangeListener {
         private Field field;
         

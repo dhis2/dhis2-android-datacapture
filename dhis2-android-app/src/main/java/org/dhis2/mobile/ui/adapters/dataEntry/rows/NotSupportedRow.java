@@ -32,7 +32,6 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.dhis2.mobile.R;
@@ -41,6 +40,7 @@ import org.dhis2.mobile.io.models.Field;
 public class NotSupportedRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
+    public boolean readOnly = false;
     
     public NotSupportedRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -71,6 +71,11 @@ public class NotSupportedRow implements Row {
     @Override
     public int getViewType() {
         return RowTypes.NO_SUPPORTED_ROW.ordinal();
+    }
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
     }
 }
 class TextHolder {

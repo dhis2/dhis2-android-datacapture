@@ -39,11 +39,11 @@ import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
-import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
 public class NegativeIntegerRow extends EditTextRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
+    public boolean readOnly = false;
     
     public NegativeIntegerRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -80,14 +80,24 @@ public class NegativeIntegerRow extends EditTextRow implements Row {
         holder.editText.clearFocus();
         holder.editText.setOnEditorActionListener(mOnEditorActionListener);
 
+        if(readOnly){
+            holder.editText.setEnabled(false);
+        } else {
+            holder.editText.setEnabled(true);
+        }
         return view;
     }
 
     @Override
     public int getViewType() {
         return RowTypes.INTEGER_NEGATIVE.ordinal();
-    }    
-    
+    }
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
+    }
+
     private class InpFilter implements InputFilter {
 
         @Override

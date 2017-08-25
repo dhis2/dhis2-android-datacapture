@@ -51,7 +51,6 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.AutoCompleteRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.BooleanRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.CheckBoxRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.DatePickerRow;
-import org.dhis2.mobile.ui.adapters.dataEntry.rows.EditTextRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.GenderRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.IntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.LongTextRow;

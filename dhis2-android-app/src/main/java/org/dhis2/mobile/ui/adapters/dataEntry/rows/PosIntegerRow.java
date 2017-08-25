@@ -39,11 +39,11 @@ import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
-import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
 public class PosIntegerRow extends EditTextRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
+    public boolean readOnly = false;
     
     public PosIntegerRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -80,6 +80,11 @@ public class PosIntegerRow extends EditTextRow implements Row {
         holder.editText.clearFocus();
         holder.editText.setOnEditorActionListener(mOnEditorActionListener);
 
+        if(readOnly){
+            holder.editText.setEnabled(false);
+        } else {
+            holder.editText.setEnabled(true);
+        }
         return view;
     }
 
@@ -87,7 +92,12 @@ public class PosIntegerRow extends EditTextRow implements Row {
     public int getViewType() {
         return RowTypes.INTEGER_POSITIVE.ordinal();
     }
-    
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
+    }
+
     private class NegInpFilter implements InputFilter {
 
         @Override
