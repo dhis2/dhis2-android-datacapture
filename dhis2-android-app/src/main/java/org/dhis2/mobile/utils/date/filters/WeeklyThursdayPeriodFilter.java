@@ -1,16 +1,18 @@
-package org.dhis2.mobile.utils.date;
+package org.dhis2.mobile.utils.date.filters;
 
 
+import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import java.util.Calendar;
 
-public class WeeklySaturdayPeriodFilter extends PeriodFilter {
-    public WeeklySaturdayPeriodFilter(DateTime startDate, DateTime endDate) {
-            super(fixStartDate(startDate), fixEndDate(endDate));
-        }
+public class WeeklyThursdayPeriodFilter extends PeriodFilter {
+
+    public WeeklyThursdayPeriodFilter(DateTime startDate, DateTime endDate) {
+        super(fixStartDate(startDate), fixEndDate(endDate));
+    }
 
     private static DateTime fixEndDate(DateTime endDate) {
         if(endDate==null) {
@@ -18,7 +20,7 @@ public class WeeklySaturdayPeriodFilter extends PeriodFilter {
         }
         Calendar endDateCalendar = Calendar.getInstance();
         endDateCalendar.setTime(endDate.toDate());
-        LocalDate fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.FRIDAY));
+        LocalDate fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.WEDNESDAY));
         endDateCalendar.setTime(fixedWeek.toDate());
         return new DateTime(endDateCalendar.getTime());
     }
@@ -29,7 +31,7 @@ public class WeeklySaturdayPeriodFilter extends PeriodFilter {
         }
         Calendar startDateCalendar = Calendar.getInstance();
         startDateCalendar.setTime(startDate.toDate());
-        startDateCalendar.setTime(new LocalDate(startDate.withDayOfWeek(DateTimeConstants.SATURDAY)).toDate());
+        startDateCalendar.setTime(new LocalDate(startDate.withDayOfWeek(DateTimeConstants.THURSDAY)).toDate());
         return new DateTime(startDateCalendar.getTime());
     }
 }

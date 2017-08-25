@@ -1,6 +1,7 @@
-package org.dhis2.mobile.utils.date;
+package org.dhis2.mobile.utils.date.filters;
 
 
+import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 

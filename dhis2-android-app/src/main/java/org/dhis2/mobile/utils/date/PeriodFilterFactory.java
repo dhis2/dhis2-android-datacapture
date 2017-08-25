@@ -2,6 +2,11 @@ package org.dhis2.mobile.utils.date;
 
 
 import org.dhis2.mobile.ui.models.Filter;
+import org.dhis2.mobile.utils.date.filters.SixmonthlyAprilPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.WeeklySaturdayPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.WeeklySundayPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.WeeklyThursdayPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.WeeklyWednesdayPeriodFilter;
 import org.dhis2.mobile.utils.date.iterators.YearlyPeriodFilter;
 import org.joda.time.DateTime;
 
