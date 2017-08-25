@@ -40,6 +40,7 @@ public class FormOptions implements Serializable, Parcelable {
     // options related to datasets
     private int openFuturePeriods;
     private String periodType;
+    private int expiryDays;
 
     // options related to programs
     private String dateOfIncidentDescription;
@@ -51,6 +52,7 @@ public class FormOptions implements Serializable, Parcelable {
     private FormOptions(Parcel in) {
         openFuturePeriods = in.readInt();
         periodType = in.readString();
+        expiryDays = in.readInt();
 
         dateOfIncidentDescription = in.readString();
         dateOfEnrollmentDescription = in.readString();
@@ -79,6 +81,7 @@ public class FormOptions implements Serializable, Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeInt(openFuturePeriods);
         parcel.writeString(periodType);
+        parcel.writeInt(expiryDays);
 
         parcel.writeString(dateOfIncidentDescription);
         parcel.writeString(dateOfEnrollmentDescription);
@@ -89,6 +92,10 @@ public class FormOptions implements Serializable, Parcelable {
 
     public int getOpenFuturePeriods() {
         return openFuturePeriods;
+    }
+
+    public int getexpiryDays() {
+        return expiryDays;
     }
 
     public String getPeriodType() {
