@@ -17,19 +17,19 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -110,37 +110,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
-
-        setupKeyboardObserver();
-    }
-
-    private void setupKeyboardObserver() {
-        final View rootView = findViewById(R.id.data_entry_container);
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-
-                        Rect r = new Rect();
-                        rootView.getWindowVisibleDisplayFrame(r);
-                        int screenHeight = rootView.getRootView().getHeight();
-
-                        // r.bottom is the position above soft keypad or device button.
-                        // if keypad is shown, the r.bottom is smaller than that before.
-                        int keypadHeight = screenHeight - r.bottom;
-
-                        LinearLayout buttonParent = (LinearLayout) rootView.findViewById(
-                                R.id.button_container);
-                        FrameLayout.LayoutParams params =
-                                (FrameLayout.LayoutParams) buttonParent.getLayoutParams();
-                        if (keypadHeight > screenHeight * 0.15) {
-                            params.gravity = Gravity.TOP | Gravity.RIGHT;
-                        } else {
-                            params.gravity = Gravity.BOTTOM | Gravity.RIGHT;
-                        }
-                        buttonParent.setLayoutParams(params);
-                    }
-                });
     }
 
     @Override
