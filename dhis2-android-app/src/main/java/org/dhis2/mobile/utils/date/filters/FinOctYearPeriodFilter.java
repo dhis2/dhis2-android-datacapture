@@ -11,45 +11,28 @@ public class FinOctYearPeriodFilter extends PeriodFilter {
     }
 
     private static DateTime fixStartDate(DateTime startDate) {
-        if(startDate==null) {
+        if (startDate == null) {
             return null;
         }
         int month = startDate.getMonthOfYear();
-        if (month <= 2) {
-            return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(1);
-        } else if (month <= 4) {
-            return startDate.withMonthOfYear(DateTimeConstants.MARCH).withDayOfMonth(1);
-        } else if (month <= 6) {
-            return startDate.withMonthOfYear(DateTimeConstants.MAY).withDayOfMonth(1);
-        } else if (month <= 8) {
-            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1);
-        } else if (month <= 10) {
-            return startDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(1);
+        if (month < 4) {
+            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(30).withYear(
+                    startDate.getYear() - 1);
         } else {
-            return startDate.withMonthOfYear(DateTimeConstants.NOVEMBER).withDayOfMonth(1);
+            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(30);
         }
     }
 
     private static DateTime fixEndDate(DateTime endDate) {
-        if(endDate==null) {
+        if (endDate == null) {
             return null;
         }
         int month = endDate.getMonthOfYear();
-        if (month <= 2) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.FEBRUARY);
-        } else if (month <= 4) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.APRIL);
-        } else if (month <= 6) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.JUNE);
-        } else if (month <= 8) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.AUGUST);
-        } else if (month <= 10) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.OCTOBER);
-        } else if (month <= 12) {
-            endDate = endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
-                    DateTimeConstants.JANUARY);
+        if (month <= 4) {
+            return endDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(1);
+        } else {
+            return endDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(1).withYear(endDate.getYear()+1);
         }
-        return endDate.withDayOfMonth(endDate.dayOfMonth().getMaximumValue());
     }
 
 }

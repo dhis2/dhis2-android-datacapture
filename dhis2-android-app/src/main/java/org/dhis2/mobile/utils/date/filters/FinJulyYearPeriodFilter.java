@@ -15,12 +15,11 @@ public class FinJulyYearPeriodFilter extends PeriodFilter {
             return null;
         }
         int month = startDate.getMonthOfYear();
-        if (month <= 6) {
+        if (month < 6) {
             return startDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30).withYear(
                     startDate.getYear() - 1);
         } else {
-            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1).withYear(
-                    startDate.getYear() - 1);
+            return startDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30);
         }
     }
 
@@ -30,12 +29,10 @@ public class FinJulyYearPeriodFilter extends PeriodFilter {
         }
         int month = endDate.getMonthOfYear();
         if (month <= 6) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1).withYear(
-                    endDate.getYear() - 1);
+            return endDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1);
         } else {
-            return endDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30);
+            return endDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1).withYear(endDate.getYear()+1);
         }
-        return endDate.withDayOfMonth(endDate.dayOfMonth().getMaximumValue());
     }
 
 }
