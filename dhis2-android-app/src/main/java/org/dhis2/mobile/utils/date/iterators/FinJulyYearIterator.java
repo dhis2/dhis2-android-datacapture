@@ -40,6 +40,13 @@ public class FinJulyYearIterator extends YearIterator {
 
     public FinJulyYearIterator(int openFP) {
         super(openFP);
+        openFuturePeriods = openFP;
+        cPeriod = new LocalDate(currentDate.getYear(), JUN, 30);
+        checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), JUL, 1);
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusYears(1);
+        }
     }
 
     @Override

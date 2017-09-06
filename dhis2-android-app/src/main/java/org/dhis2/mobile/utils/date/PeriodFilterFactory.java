@@ -2,7 +2,15 @@ package org.dhis2.mobile.utils.date;
 
 
 import org.dhis2.mobile.ui.models.Filter;
-import org.dhis2.mobile.utils.date.iterators.YearlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.BiMonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.FinAprilYearPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.FinJulyYearPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.FinOctYearPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.MonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.QuarterlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.SixmonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.WeeklyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.YearlyPeriodFilter;
 import org.joda.time.DateTime;
 
 public class PeriodFilterFactory {
@@ -31,8 +39,14 @@ public class PeriodFilterFactory {
             return new BiMonthlyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(QUARTERLY)){
             return new QuarterlyPeriodFilter(startDate, endDate);
-        } else if (periodType.equals(SIX_MONTHLY)){
+        } else if (periodType.equals(SIX_MONTHLY)) {
             return new SixmonthlyPeriodFilter(startDate, endDate);
+        } else if (periodType.equals(FINANCIAL_JULY)){
+            return new FinJulyYearPeriodFilter(startDate, endDate);
+        } else if (periodType.equals(FINANCIAL_APRIL)){
+            return new FinAprilYearPeriodFilter(startDate, endDate);
+        } else if (periodType.equals(FINANCIAL_OCT)){
+            return new FinOctYearPeriodFilter(startDate, endDate);
         } else {
             return new PeriodFilter(startDate, endDate);
         }

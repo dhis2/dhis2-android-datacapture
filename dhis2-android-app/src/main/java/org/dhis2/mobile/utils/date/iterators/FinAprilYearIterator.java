@@ -40,8 +40,14 @@ public class FinAprilYearIterator extends YearIterator {
 
     public FinAprilYearIterator(int openFP) {
         super(openFP);
+        openFuturePeriods = openFP;
+        cPeriod = new LocalDate(currentDate.getYear(), APR, 30);
+        checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), MAY, 1);
+        for (int i = 0; i < openFuturePeriods; i++) {
+            maxDate = maxDate.plusYears(1);
+        }
     }
-
     @Override
     protected boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
