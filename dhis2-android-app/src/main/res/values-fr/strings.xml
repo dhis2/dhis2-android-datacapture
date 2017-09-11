@@ -97,7 +97,7 @@
   <string name="value_not_supported">Type de valeur non pris en charge</string>
 
   <string name="dialog_exit_survey_title">Confirmer la sortie</string>
-  <string name="dialog_exit_survey_message">Vous avez toujours des données non synchronisées avec le serveur. Si vous continuez et quittez ce rapport, toutes les données non sauvegardées seront perdues. Voulez-vous continuer?</string>
+  <string name="dialog_exit_survey_message">"Vous avez des données qui n'ont pas encore été enregistrées. Si vous continuez et quittez ce rapport, toutes les données non enregistrées seront perdues. Voulez-vous continuer?"</string>
   <string name="dialog_exit_survey_yes">Oui</string>
   <string name="dialog_exit_survey_no">Non</string>
 </resources>
