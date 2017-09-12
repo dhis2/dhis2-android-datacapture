@@ -128,4 +128,5 @@
     <string name="dialog_exit_survey_message">"You have data that hasn't yet been saved. If you continue and exit this report, all the data not saved will be lost. Do you want to continue?"</string>
     <string name="dialog_exit_survey_yes">Yes</string>
     <string name="dialog_exit_survey_no">No</string>
+    <string name="save_data_set">save dataset</string>
 </resources>

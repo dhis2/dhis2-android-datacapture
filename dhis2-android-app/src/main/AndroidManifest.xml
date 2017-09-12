@@ -28,7 +28,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activities.DataEntryActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
