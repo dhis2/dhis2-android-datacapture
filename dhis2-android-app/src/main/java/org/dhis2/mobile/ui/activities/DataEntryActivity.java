@@ -17,6 +17,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -46,6 +47,8 @@ import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
+import org.dhis2.mobile.utils.date.expiryday.ExpiryDayValidator;
+import org.dhis2.mobile.utils.date.expiryday.ExpiryDayValidatorFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +79,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     // state
     private boolean downloadAttempted;
+    private String mPeriod;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -91,6 +95,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = savedInstanceState;
+        if (bundle == null) {
+            bundle = getIntent().getExtras();
+        }
         setContentView(R.layout.activity_data_entry);
         setupToolbar();
         setupFormSpinner();
@@ -104,8 +112,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
+
+        initPeriod(bundle);
         
         setupKeyboardObserver();
+    }
+
+    private void initPeriod(Bundle bundle) {
+        DatasetInfoHolder datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
+        mPeriod = datasetInfoHolder.getPeriod();
     }
 
     private void setupKeyboardObserver() {
@@ -327,8 +342,13 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             boolean readOnly = false;
             if(form.getOptions().getexpiryDays()>0)
             {
-                int expiringDate = form.getOptions().getexpiryDays();
-                //// FIXME: 25/08/2017 check if the expiring date is over
+                int expiringDay = form.getOptions().getexpiryDays();
+                String periodType = form.getOptions().getPeriodType();
+                ExpiryDayValidator expiryDayValidator = ExpiryDayValidatorFactory.getExpiryDay(
+                        periodType, expiringDay, mPeriod);
+                if (!expiryDayValidator.canEdit()) {
+                    readOnly = true;
+                }
             }
             if(form.isApproved()){
                 readOnly = true;
