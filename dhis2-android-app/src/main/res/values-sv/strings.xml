@@ -98,7 +98,8 @@
   <string name="value_not_supported">Värdetyp stöds inte</string>
 
   <string name="dialog_exit_survey_title">Bekräfta exit</string>
-  <string name="dialog_exit_survey_message">Du har fortfarande data som inte synkroniseras med servern. Om du fortsätter och avslutar rapporten kommer alla data som inte sparas att gå vilse. Vill du fortsätta?</string>
+  <string name="dialog_exit_survey_message">Du har data som inte har sparats ännu. Om du fortsätter och avslutar den här rapporten kommer alla data som inte sparas att gå vilse. Vill du fortsätta?</string>
   <string name="dialog_exit_survey_yes">Ja</string>
   <string name="dialog_exit_survey_no">Nej</string>
+    <string name="save_data_set">save dataset</string>
 </resources>

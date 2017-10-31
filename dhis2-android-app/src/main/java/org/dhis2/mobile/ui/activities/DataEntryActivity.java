@@ -1,6 +1,7 @@
 package org.dhis2.mobile.ui.activities;
 
 import static android.text.TextUtils.isEmpty;
+import static android.text.TextUtils.substring;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -17,11 +18,18 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -65,7 +73,6 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static final int LOADER_FORM_ID = 896927645;
 
     // views
-    private View uploadButton;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
     private Form currentForm;
@@ -97,39 +104,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         setupProgressBar(savedInstanceState);
 
         setupListView();
-        setupUploadButton();
 
         // let's try to get latest values from API
         attemptToDownloadReport(savedInstanceState);
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
-        
-        setupKeyboardObserver();
-    }
-
-    private void setupKeyboardObserver() {
-        final View rootView = findViewById(R.id.data_entry_container);
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-
-                Rect r = new Rect();
-                rootView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = rootView.getRootView().getHeight();
-
-                // r.bottom is the position above soft keypad or device button.
-                // if keypad is shown, the r.bottom is smaller than that before.
-                int keypadHeight = screenHeight - r.bottom;
-
-                if (keypadHeight > screenHeight * 0.15) {
-                    rootView.findViewById(R.id.upload_button).setVisibility(View.GONE);
-                }
-                else {
-                    rootView.findViewById(R.id.upload_button).setVisibility(View.VISIBLE);
-                }
-            }
-        });
     }
 
     @Override
@@ -169,6 +149,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case org.dhis2.mobile.R.id.action_save_data_set:
+                upload();
                 return true;
         }
 
@@ -217,7 +200,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         }
     }
 
-    private void setToolbarTitle(String title){
+    private void setToolbarTitle(String title) {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle(title);
     }
@@ -250,16 +233,16 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
-        dataEntryListView.addFooterView(dataEntryListView.inflate(getApplicationContext(), R.layout.listview_row_footer, null));
-    }
-
-    private void setupUploadButton() {
-        uploadButton = findViewById(R.id.upload_button);
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-
+        dataEntryListView.setRecyclerListener(new AbsListView.RecyclerListener() {
             @Override
-            public void onClick(View arg0) {
-                upload();
+            public void onMovedToScrapHeap(View view) {
+                if ( view.hasFocus()){
+                    view.clearFocus();
+                    if ( view instanceof EditText) {
+                        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                }
             }
         });
     }
@@ -302,13 +285,19 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(org.dhis2.mobile.R.menu.menu_data_entry, menu);
+        return true;
+    }
     private void showProgressBar() {
-        ViewUtils.hideAndDisableViews(uploadButton, dataEntryListView);
+        ViewUtils.hideAndDisableViews(dataEntryListView);
         ViewUtils.enableViews(progressBarLayout);
     }
 
     private void hideProgressBar() {
-        ViewUtils.enableViews(uploadButton, dataEntryListView);
+        ViewUtils.enableViews(dataEntryListView);
         ViewUtils.hideAndDisableViews(progressBarLayout);
     }
 
@@ -338,7 +327,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (adapters.size() == 1) {
             formGroupSpinner.setVisibility(View.GONE);
             dataEntryListView.setAdapter(adapters.get(0));
-            if(adapters.get(0).getLabel()!=null && !adapters.get(0).getLabel().equals(FieldAdapter.FORM_WITHOUT_SECTION)){
+            if (adapters.get(0).getLabel() != null && !adapters.get(0).getLabel().equals(
+                    FieldAdapter.FORM_WITHOUT_SECTION)) {
                 setToolbarTitle(adapters.get(0).getLabel());
             }
             return;
@@ -385,7 +375,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return;
         }
 
-        if(!validateFields(groups)){
+        if (!validateFields(groups)) {
             ToastManager.makeToast(this, getString(R.string.compulsory_empty_error),
                     Toast.LENGTH_SHORT).show();
             return;
@@ -421,9 +411,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private boolean validateFields(ArrayList<Group> groups) {
-        for (Group group:groups){
-            for(Field field:group.getFields()){
-                if(field.isCompulsory() && (field.getValue()==null || field.getValue().equals(""))){
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.isCompulsory() && (field.getValue() == null || field.getValue().equals(
+                        ""))) {
                     return false;
                 }
             }
@@ -623,7 +614,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private boolean anyFieldEdited() {
         ArrayList<Group> groups = new ArrayList<>();
-        if(adapters==null){
+        if (adapters == null) {
             return false;
         }
         for (FieldAdapter adapter : adapters) {
