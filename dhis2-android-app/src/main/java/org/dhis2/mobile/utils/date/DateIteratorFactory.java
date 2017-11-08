@@ -38,6 +38,7 @@ import org.dhis2.mobile.utils.date.iterators.MonthIterator;
 import org.dhis2.mobile.utils.date.iterators.QuarterYearIterator;
 import org.dhis2.mobile.utils.date.iterators.SixMonthIterator;
 import org.dhis2.mobile.utils.date.iterators.WeekIterator;
+import org.dhis2.mobile.utils.date.iterators.WeekWednesdayIterator;
 import org.dhis2.mobile.utils.date.iterators.YearIterator;
 
 import java.util.ArrayList;
@@ -61,7 +62,8 @@ public class DateIteratorFactory {
                 return (new FinJulyYearIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.FINANCIAL_OCT)) {
                 return (new FinOctYearIterator(openFuturePeriods));
-            } else if (periodType.equals(PeriodFilterFactory.SIX_MONTHLY)) {
+            } else if (periodType.equals(PeriodFilterFactory.SIX_MONTHLY)
+                    || periodType.equals(PeriodFilterFactory.SIX_MONTHLY_APRIL)) {
                 return (new SixMonthIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.QUARTERLY)) {
                 return (new QuarterYearIterator(openFuturePeriods));
@@ -71,6 +73,11 @@ public class DateIteratorFactory {
                 return (new MonthIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.WEEKLY)) {
                 return (new WeekIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY_WEDNESDAY)
+                    || periodType.equals(PeriodFilterFactory.WEEKLY_THURSDAY)
+                    || periodType.equals(PeriodFilterFactory.WEEKLY_SATURDAY)
+                    || periodType.equals(PeriodFilterFactory.WEEKLY_SUNDAY)) {
+                return (new WeekWednesdayIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.DAILY)) {
                 return (new DayIterator(openFuturePeriods));
             }
