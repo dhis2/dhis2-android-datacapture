@@ -1,21 +1,32 @@
 package org.dhis2.mobile.utils.date.expiryday;
 
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 
-public class FinancialYearOctExpiryDayValidator extends SixMonthlyExpiryDayValidator {
-    protected static final String DATE_FORMAT = "yyyy'Oc'";
+public class FinancialYearOctExpiryDayValidator extends ExpiryDayValidator {
+    protected static final String DATE_FORMAT = "yyyy'Oct'";
 
     public FinancialYearOctExpiryDayValidator(int expiryDays, String period) {
         super(expiryDays, period);
     }
 
+
     @Override
-    protected int plusMonths() {
+    protected LocalDate getMaxDateCanEdit() {
+        LocalDate periodDate = LocalDate.parse(period,
+                DateTimeFormat.forPattern(DATE_FORMAT));
+        periodDate = periodDate.withMonthOfYear(monthOfYear());
+        periodDate = periodDate.plusMonths(plusMonths());
+        return periodDate.plusDays(expiryDays - 2);
+    }
+
+    private int plusMonths() {
         return 12;
     }
 
-    @Override
-    protected int monthOfYear(int periodNumber) {
+
+    private int monthOfYear() {
         return DateTimeConstants.OCTOBER;
     }
 }
