@@ -8,9 +8,10 @@ import org.joda.time.LocalDate;
 import java.util.Calendar;
 
 public class WeeklyThursdayPeriodFilter extends PeriodFilter {
+
     public WeeklyThursdayPeriodFilter(DateTime startDate, DateTime endDate) {
-            super(fixStartDate(startDate), fixEndDate(endDate));
-        }
+        super(fixStartDate(startDate), fixEndDate(endDate));
+    }
 
     private static DateTime fixEndDate(DateTime endDate) {
         if(endDate==null) {

@@ -38,6 +38,7 @@ import org.dhis2.mobile.utils.date.iterators.MonthIterator;
 import org.dhis2.mobile.utils.date.iterators.QuarterYearIterator;
 import org.dhis2.mobile.utils.date.iterators.SixMonthIterator;
 import org.dhis2.mobile.utils.date.iterators.WeekIterator;
+import org.dhis2.mobile.utils.date.iterators.WeekThursdayIterator;
 import org.dhis2.mobile.utils.date.iterators.WeekWednesdayIterator;
 import org.dhis2.mobile.utils.date.iterators.YearIterator;
 
@@ -74,10 +75,11 @@ public class DateIteratorFactory {
             } else if (periodType.equals(PeriodFilterFactory.WEEKLY)) {
                 return (new WeekIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.WEEKLY_WEDNESDAY)
-                    || periodType.equals(PeriodFilterFactory.WEEKLY_THURSDAY)
                     || periodType.equals(PeriodFilterFactory.WEEKLY_SATURDAY)
                     || periodType.equals(PeriodFilterFactory.WEEKLY_SUNDAY)) {
                 return (new WeekWednesdayIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY_THURSDAY)) {
+                return (new WeekThursdayIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.DAILY)) {
                 return (new DayIterator(openFuturePeriods));
             }
