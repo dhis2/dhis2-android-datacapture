@@ -48,7 +48,7 @@ public class PeriodFilterFactory {
         } else if (periodType.equals(SIX_MONTHLY)){
             return new SixmonthlyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(SIX_MONTHLY_APRIL)){
-            return new SixmonthlyPeriodFilter(startDate, endDate);
+            return new SixmonthlyAprilPeriodFilter(startDate, endDate);
         } else {
             return new PeriodFilter(startDate, endDate);
         }
