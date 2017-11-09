@@ -40,7 +40,7 @@ import java.util.Collections;
 public class WeekThursdayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
     private static final String DATE_FORMAT = "%s%s%s";
     private static final String DATE_LABEL_FORMAT = "%s%s %s - %s";
-    private static final String W = "ThusW";
+    private static final String W = "ThuW";
 
     private int openFuturePeriods;
     private LocalDate cPeriod;
