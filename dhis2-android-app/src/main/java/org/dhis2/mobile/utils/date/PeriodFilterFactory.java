@@ -2,12 +2,17 @@ package org.dhis2.mobile.utils.date;
 
 
 import org.dhis2.mobile.ui.models.Filter;
-import org.dhis2.mobile.utils.date.filters.SixmonthlyAprilPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.BiMonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.MonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.QuarterlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.SixMonthlyAprilPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.SixMonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.WeeklyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklySaturdayPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklySundayPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklyThursdayPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklyWednesdayPeriodFilter;
-import org.dhis2.mobile.utils.date.iterators.YearlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.YearlyPeriodFilter;
 import org.joda.time.DateTime;
 
 public class PeriodFilterFactory {
@@ -51,9 +56,9 @@ public class PeriodFilterFactory {
         } else if (periodType.equals(QUARTERLY)){
             return new QuarterlyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(SIX_MONTHLY)){
-            return new SixmonthlyPeriodFilter(startDate, endDate);
+            return new SixMonthlyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(SIX_MONTHLY_APRIL)){
-            return new SixmonthlyAprilPeriodFilter(startDate, endDate);
+            return new SixMonthlyAprilPeriodFilter(startDate, endDate);
         } else {
             return new PeriodFilter(startDate, endDate);
         }

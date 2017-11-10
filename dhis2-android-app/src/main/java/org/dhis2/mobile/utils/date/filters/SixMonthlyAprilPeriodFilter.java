@@ -5,8 +5,8 @@ import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
-public class SixmonthlyPeriodFilter extends PeriodFilter {
-    public SixmonthlyPeriodFilter(DateTime startDate, DateTime endDate) {
+public class SixMonthlyAprilPeriodFilter extends PeriodFilter {
+    public SixMonthlyAprilPeriodFilter(DateTime startDate, DateTime endDate) {
         super(fixStartDate(startDate), fixEndDate(endDate));
     }
 
@@ -16,9 +16,9 @@ public class SixmonthlyPeriodFilter extends PeriodFilter {
         }
         int month = startDate.getMonthOfYear();
         if (month <= 6) {
-            return startDate.withMonthOfYear(DateTimeConstants.JANUARY).withDayOfMonth(2);
+            return startDate.withMonthOfYear(DateTimeConstants.APRIL).withDayOfMonth(2);
         } else if (month <= 12) {
-            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(2);
+            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(2);
         }
         return startDate;
     }
@@ -28,11 +28,11 @@ public class SixmonthlyPeriodFilter extends PeriodFilter {
         }
         int month = endDate.getMonthOfYear();
         if (month <= 6) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.JULY);
+            endDate = endDate.withMonthOfYear(DateTimeConstants.OCTOBER);
             endDate = endDate.withDayOfMonth(endDate.dayOfMonth().getMinimumValue());
         } else if (month <= 12) {
             endDate = endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
-                    DateTimeConstants.JANUARY);
+                    DateTimeConstants.APRIL);
             endDate = endDate.withDayOfYear(endDate.dayOfYear().getMaximumValue());
         }
         return endDate;
