@@ -88,7 +88,6 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView mList;
     private ProgressBar mProgressBar;
-    private Button mUploadButton;
     private FieldAdapter mAdapter;
     private boolean mIsRefreshing;
 
@@ -163,9 +162,8 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
         mSwipeRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.ptr_layout);
         mList = (ListView) mSwipeRefreshLayout.findViewById(R.id.list_of_fields);
         mProgressBar = (ProgressBar) root.findViewById(R.id.progress_bar);
-        mUploadButton = (Button) root.findViewById(R.id.upload_button);
 
-        ViewUtils.hideAndDisableViews(mList, mUploadButton, mProgressBar);
+        ViewUtils.hideAndDisableViews(mList, mProgressBar);
 
         OnRefreshListener listener = new OnRefreshListener() {
 
@@ -183,14 +181,6 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
         mSwipeRefreshLayout.setOnRefreshListener(listener);
         mSwipeRefreshLayout.setColorSchemeResources(blue, grey, blue);
 
-        mUploadButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                startUpload();
-            }
-        });
-
         // restoring previous state of fragment
         restoreFromPreviousState(savedInstanceState);
 
@@ -200,6 +190,7 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_refresh, menu);
+        inflater.inflate(org.dhis2.mobile.R.menu.menu_data_entry, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -210,6 +201,9 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
                 startUpdate();
                 return true;
             }
+            case org.dhis2.mobile.R.id.action_save_data_set:
+                startUpload();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -372,17 +366,13 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
 
     private void showUploadButton(boolean withAnimation) {
         if (withAnimation) {
-            ViewUtils.perfomInAnimation(getActivity(), R.anim.fade_in, mUploadButton);
-        } else {
-            ViewUtils.enableViews(mUploadButton);
+            ViewUtils.perfomInAnimation(getActivity(), R.anim.fade_in);
         }
     }
 
     private void hideUploadButton(boolean withAnimation) {
         if (withAnimation) {
-            ViewUtils.perfomOutAnimation(getActivity(), R.anim.fade_out, true, mUploadButton);
-        } else {
-            ViewUtils.hideAndDisableViews(mUploadButton);
+            ViewUtils.perfomOutAnimation(getActivity(), R.anim.fade_out, true);
         }
     }
 
