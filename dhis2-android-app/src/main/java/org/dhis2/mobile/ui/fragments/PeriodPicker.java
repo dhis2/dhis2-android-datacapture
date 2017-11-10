@@ -20,6 +20,7 @@ import org.dhis2.mobile.ui.adapters.dataEntry.DateAdapter;
 import org.dhis2.mobile.utils.date.CustomDateIterator;
 import org.dhis2.mobile.utils.date.DateHolder;
 import org.dhis2.mobile.utils.date.DateIteratorFactory;
+import org.dhis2.mobile.utils.date.exceptions.PeriodNotSupportedException;
 
 import java.util.ArrayList;
 
@@ -136,9 +137,11 @@ public class PeriodPicker extends DialogFragment {
         } else {
             add.setEnabled(true);
         }
-        } catch (IllegalArgumentException e) {
+        } catch (PeriodNotSupportedException e) {
             Log.d(TAG, "Not supported period:" + e.getMessage());
-            Toast.makeText(getContext(), R.string.dialog_period_not_supported,
+            Toast.makeText(getContext(),
+                    String.format(getResources().getString(R.string.dialog_period_not_supported),
+                            periodType),
                     Toast.LENGTH_SHORT).show();
         }
     }

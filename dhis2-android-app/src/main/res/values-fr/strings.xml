@@ -101,5 +101,5 @@
   <string name="dialog_exit_survey_yes">Oui</string>
   <string name="dialog_exit_survey_no">Non</string>
   <string name="save_data_set">save dataset</string>
-  <string name="dialog_period_not_supported">"Type de période non pris en charge"</string>
+  <string name="dialog_period_not_supported">"Type de période non pris en charge: %s"</string>
 </resources>
