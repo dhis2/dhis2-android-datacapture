@@ -75,9 +75,8 @@ public class FinAprilYearIterator extends YearIterator {
         LocalDate march = new LocalDate(checkDate.getYear(), MAR, 31);
 
         while ((openFuturePeriods > 0 || currentDate.isAfter(march))  && counter < 10) {
-            String dateStr = checkDate.minusYears(1).year().getAsString();
-            String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, dateStr, MAR_STR, checkDate.year().getAsString());
-            String date = dateStr + APRIL;
+            String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, checkDate.minusYears(1).year().getAsString(), MAR_STR, checkDate.year().getAsString());
+            String date = checkDate.minusYears(1).year().getAsString() + APRIL;
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
