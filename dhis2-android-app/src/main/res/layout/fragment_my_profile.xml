@@ -11,8 +11,6 @@
         <include layout="@layout/listview" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <include layout="@layout/button_upload" />
     <include layout="@layout/progress_bar" />
 
 </FrameLayout>
