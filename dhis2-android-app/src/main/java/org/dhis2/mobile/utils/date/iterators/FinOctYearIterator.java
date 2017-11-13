@@ -37,24 +37,30 @@ import java.util.Collections;
 
 public class FinOctYearIterator extends YearIterator {
     private static final String OCTOBER = "Oct";
-
     public FinOctYearIterator(int openFP) {
         super(openFP);
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), OCT, 31);
+        cPeriod = new LocalDate(currentDate.getYear(), OCT, 1);
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), SEP, 1);
-        for (int i = 0; i < openFuturePeriods; i++) {
-            maxDate = maxDate.plusYears(1);
+        maxDate = new LocalDate(currentDate.getYear(), SEP, 30);
+        if(openFuturePeriods>0) {
+            for (int i = 0; i < openFuturePeriods; i++) {
+                maxDate = maxDate.plusYears(1);
+            }
         }
     }
 
-    @Override
     protected boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
             return checkDate.isBefore(maxDate);
         } else {
-            LocalDate sep = new LocalDate(date.getYear(), SEP, 30);
+            LocalDate sep;
+            if(date.getMonthOfYear()>=10) {
+                sep = new LocalDate(date.getYear()+1, SEP, 30);
+            }
+            else{
+                sep = new LocalDate(date.getYear(), SEP, 30);
+            }
             return currentDate.isAfter(sep);
         }
     }
@@ -73,12 +79,17 @@ public class FinOctYearIterator extends YearIterator {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
-        LocalDate sep = new LocalDate(checkDate.getYear(), SEP, 30);
+        LocalDate sep;
 
-        while ((openFuturePeriods > 0 || currentDate.isAfter(sep)) && counter < 10) {
-            String dateStr = checkDate.minusYears(1).year().getAsString();
-            String label = String.format(FIN_DATE_LABEL_FORMAT, OCT_STR, dateStr, SEP_STR, checkDate.year().getAsString());
-            String date = dateStr + OCTOBER;
+        if(checkDate.getMonthOfYear()>=9) {
+            sep = new LocalDate(checkDate.getYear()+1, SEP, 30);
+        }
+        else{
+            sep = new LocalDate(checkDate.getYear(), SEP, 30);
+        }
+        while ((openFuturePeriods > 0 || currentDate.isAfter(sep.minusYears(1))) && counter < 10) {
+            String label = String.format(FIN_DATE_LABEL_FORMAT, OCT_STR, checkDate.year().getAsString(), SEP_STR, checkDate.plusYears(1).year().getAsString());
+            String date = checkDate.year().getAsString() + OCTOBER;
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
