@@ -15,27 +15,28 @@ public class SixMonthlyAprilPeriodFilter extends PeriodFilter {
             return null;
         }
         int month = startDate.getMonthOfYear();
-        if (month <= 6) {
-            return startDate.withMonthOfYear(DateTimeConstants.APRIL).withDayOfMonth(2);
-        } else if (month <= 12) {
-            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(2);
+        if (month >= 4 && month <= 9) {
+            return startDate.withMonthOfYear(DateTimeConstants.APRIL).withDayOfMonth(1);
+        } else if( month>9) {
+            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(1);
+        } else{
+            return startDate.withMonthOfYear(DateTimeConstants.OCTOBER).withDayOfMonth(1);
         }
-        return startDate;
     }
     private static DateTime fixEndDate(DateTime endDate) {
         if(endDate==null) {
             return null;
         }
         int month = endDate.getMonthOfYear();
-        if (month <= 6) {
-            endDate = endDate.withMonthOfYear(DateTimeConstants.OCTOBER);
-            endDate = endDate.withDayOfMonth(endDate.dayOfMonth().getMinimumValue());
-        } else if (month <= 12) {
-            endDate = endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
-                    DateTimeConstants.APRIL);
-            endDate = endDate.withDayOfYear(endDate.dayOfYear().getMaximumValue());
+        if (month >= 4 && month <= 9) {
+            return endDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(30);
+        }else if( month>9) {
+            return endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
+                    DateTimeConstants.MARCH).withDayOfMonth(31);
+        }else{
+            return endDate.withYear(endDate.getYear()+1).withMonthOfYear(
+                    DateTimeConstants.MARCH).withDayOfMonth(31);
         }
-        return endDate;
     }
 
 }
