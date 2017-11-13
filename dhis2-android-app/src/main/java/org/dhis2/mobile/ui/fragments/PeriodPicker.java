@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.ui.adapters.dataEntry.DateAdapter;
 import org.dhis2.mobile.utils.date.CustomDateIterator;
 import org.dhis2.mobile.utils.date.DateHolder;
 import org.dhis2.mobile.utils.date.DateIteratorFactory;
+import org.dhis2.mobile.utils.date.exceptions.PeriodNotSupportedException;
 
 import java.util.ArrayList;
 
@@ -63,9 +66,13 @@ public class PeriodPicker extends DialogFragment {
 
         final String periodType = getPeriodType();
         final int openFuturePeriods = getOpenFuturePeriods();
+        try {
 
-        final CustomDateIterator<ArrayList<DateHolder>> iterator =
-                DateIteratorFactory.getDateIterator(periodType, openFuturePeriods);
+
+            final CustomDateIterator<ArrayList<DateHolder>> iterator =
+                    DateIteratorFactory.getDateIterator(periodType, openFuturePeriods);
+
+
 
         final View.OnClickListener onClickListener = new View.OnClickListener() {
 
@@ -100,7 +107,8 @@ public class PeriodPicker extends DialogFragment {
             }
         };
 
-        listView.setAdapter(dateAdapter);
+
+            listView.setAdapter(dateAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -128,6 +136,13 @@ public class PeriodPicker extends DialogFragment {
             add.setEnabled(false);
         } else {
             add.setEnabled(true);
+        }
+        } catch (PeriodNotSupportedException e) {
+            Log.d(TAG, "Not supported period:" + e.getMessage());
+            Toast.makeText(getContext(),
+                    String.format(getResources().getString(R.string.dialog_period_not_supported),
+                            periodType),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -129,4 +129,5 @@
     <string name="dialog_exit_survey_yes">Yes</string>
     <string name="dialog_exit_survey_no">No</string>
     <string name="save_data_set">save dataset</string>
+    <string name="dialog_period_not_supported">"Period type not supported: %s"</string>
 </resources>
