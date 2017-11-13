@@ -84,6 +84,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static ListView dataEntryListView;
     private List<FieldAdapter> adapters;
 
+    MenuItem saveMenuItem;
+
     // state
     private boolean downloadAttempted;
     private String mPeriod;
@@ -263,10 +265,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         });
     }
 
-    private void uploadButtonEnabled(boolean value) {
-        uploadButton = findViewById(R.id.upload_button);
-        uploadButton.setEnabled(value);
+    private void uploadButtonEnabled(boolean active) {
+        saveMenuItem.setVisible(active);
     }
+
     private void attemptToDownloadReport(Bundle savedInstanceState) {
         // first, we need to check if previous instances of
         // activities already tried to download values
@@ -309,6 +311,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(org.dhis2.mobile.R.menu.menu_data_entry, menu);
+
+        saveMenuItem = (MenuItem) menu.findItem(R.id.action_save_data_set);
+
         return true;
     }
     private void showProgressBar() {
