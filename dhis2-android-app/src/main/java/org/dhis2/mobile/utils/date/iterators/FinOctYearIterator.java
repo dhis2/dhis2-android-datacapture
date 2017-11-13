@@ -37,6 +37,7 @@ import java.util.Collections;
 
 public class FinOctYearIterator extends YearIterator {
     private static final String OCTOBER = "Oct";
+
     public FinOctYearIterator(int openFP) {
         super(openFP);
         openFuturePeriods = openFP;
