@@ -30,4 +30,8 @@ public class QuarterlyExpiryDayValidator extends SixMonthlyExpiryDayValidator {
 
         }
     }
+    @Override
+    public String getDateFormat() {
+        return DATE_FORMAT;
+    }
 }

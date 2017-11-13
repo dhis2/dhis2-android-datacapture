@@ -11,4 +11,9 @@ public class YearlyExpiryDayValidator extends MonthlyExpiryDayValidator {
     protected int plusMonths() {
         return 12;
     }
+
+    @Override
+    public String getDateFormat() {
+        return DATE_FORMAT;
+    }
 }

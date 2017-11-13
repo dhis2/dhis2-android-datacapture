@@ -15,8 +15,8 @@ public class SixMonthlyExpiryDayValidator extends ExpiryDayValidator {
     @Override
     protected LocalDate getMaxDateCanEdit() {
         int periodNumber = Character.getNumericValue(period.charAt(period.length() - 1));
-        LocalDate periodDate = LocalDate.parse(period.substring(0, period.length() - 2),
-                DateTimeFormat.forPattern(DATE_FORMAT));
+        LocalDate periodDate = LocalDate.parse(period.substring(0, period.length() - 1),
+                DateTimeFormat.forPattern(getDateFormat()));
         periodDate = periodDate.withMonthOfYear(monthOfYear(periodNumber));
         periodDate = periodDate.plusMonths(plusMonths());
         return periodDate.plusDays(expiryDays - 2);
@@ -32,5 +32,9 @@ public class SixMonthlyExpiryDayValidator extends ExpiryDayValidator {
         } else {
             return DateTimeConstants.JULY;
         }
+    }
+
+    public String getDateFormat() {
+        return DATE_FORMAT;
     }
 }

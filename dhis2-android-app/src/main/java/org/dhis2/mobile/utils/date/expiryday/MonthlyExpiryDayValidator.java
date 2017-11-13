@@ -12,12 +12,16 @@ public class MonthlyExpiryDayValidator extends ExpiryDayValidator {
 
     @Override
     protected LocalDate getMaxDateCanEdit() {
-        LocalDate periodDate = LocalDate.parse(period, DateTimeFormat.forPattern(DATE_FORMAT));
+        LocalDate periodDate = LocalDate.parse(period, DateTimeFormat.forPattern(getDateFormat()));
         periodDate = periodDate.plusMonths(plusMonths());
         return periodDate.plusDays(expiryDays - 2);
     }
 
     protected int plusMonths() {
         return 1;
+    }
+
+    public String getDateFormat() {
+        return DATE_FORMAT;
     }
 }

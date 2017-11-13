@@ -22,5 +22,9 @@ public class SixMonthlyAprilExpiryDayValidator extends SixMonthlyExpiryDayValida
             return DateTimeConstants.OCTOBER;
         }
     }
+    @Override
+    public String getDateFormat() {
+        return DATE_FORMAT;
+    }
 
 }
