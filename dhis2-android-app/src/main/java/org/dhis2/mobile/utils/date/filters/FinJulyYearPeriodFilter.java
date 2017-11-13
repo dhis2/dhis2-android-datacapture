@@ -16,10 +16,10 @@ public class FinJulyYearPeriodFilter extends PeriodFilter {
         }
         int month = startDate.getMonthOfYear();
         if (month < 6) {
-            return startDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30).withYear(
+            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1).withYear(
                     startDate.getYear() - 1);
         } else {
-            return startDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30);
+            return startDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1);
         }
     }
 
@@ -29,10 +29,33 @@ public class FinJulyYearPeriodFilter extends PeriodFilter {
         }
         int month = endDate.getMonthOfYear();
         if (month <= 6) {
-            return endDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1);
+            return endDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30);
         } else {
-            return endDate.withMonthOfYear(DateTimeConstants.JULY).withDayOfMonth(1).withYear(endDate.getYear()+1);
+            return endDate.withMonthOfYear(DateTimeConstants.JUNE).withDayOfMonth(30).withYear(endDate.getYear()+1);
         }
     }
 
+    @Override
+    public boolean apply() {
+        if ((startDate == null && endDate == null) || selectedDate == null) {
+            return false;
+        }
+
+        if (startDate != null && endDate != null) {
+            // return true, if criteria is not between two dates
+            // return startDate.isBefore(selectedDate) || endDate.isAfter(selectedDate);
+            return !((selectedDate.isAfter(startDate) || selectedDate.isEqual(startDate))
+                    && (selectedDate.isBefore(endDate) || selectedDate.isEqual(endDate)));
+        }
+
+        if (startDate != null) {
+            // return true, if criteria is before startDate
+            // return startDate.isBefore(selectedDate);
+            return !(selectedDate.isAfter(startDate) || selectedDate.isEqual(startDate));
+        }
+
+        // return true, if criteria is after endDate
+        // return endDate.isAfter(selectedDate);
+        return !(selectedDate.isBefore(endDate) || selectedDate.equals(endDate));
+    }
 }
