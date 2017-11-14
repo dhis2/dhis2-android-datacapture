@@ -4,14 +4,14 @@ package periodFilters;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-import org.dhis2.mobile.utils.date.filters.SixMonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.SixMonthlyPeriodFilters;
 import org.junit.Test;
 
 public class SixMonthlyPeriodTest {
 
     @Test
     public void testSixMonthlyPeriodsNullStartDate() {
-        SixMonthlyPeriodFilter periodFilter = new SixMonthlyPeriodFilter(
+        SixMonthlyPeriodFilters periodFilter = new SixMonthlyPeriodFilters(
                 null, PeriodFiltersCommon.getDateTimeFromString("2016-06-30"));
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-07-01"));
         assertTrue(periodFilter.apply());
@@ -26,7 +26,7 @@ public class SixMonthlyPeriodTest {
 
     @Test
     public void testSixMonthlyPeriodsNullEndDate() {
-        SixMonthlyPeriodFilter periodFilter = new SixMonthlyPeriodFilter(
+        SixMonthlyPeriodFilters periodFilter = new SixMonthlyPeriodFilters(
                 PeriodFiltersCommon.getDateTimeFromString("2016-06-30"), null);
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-07-01"));
         assertFalse(periodFilter.apply());
@@ -41,7 +41,7 @@ public class SixMonthlyPeriodTest {
 
     @Test
     public void testSixMonthlyPeriodsSameDayLimit() {
-        SixMonthlyPeriodFilter periodFilter = new SixMonthlyPeriodFilter(
+        SixMonthlyPeriodFilters periodFilter = new SixMonthlyPeriodFilters(
                 PeriodFiltersCommon.getDateTimeFromString("2016-06-30"), PeriodFiltersCommon.getDateTimeFromString("2016-06-30"));
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-07-01"));
         assertFalse(periodFilter.apply());
@@ -56,7 +56,7 @@ public class SixMonthlyPeriodTest {
 
     @Test
     public void testSixMonthlyPeriodsPeriodLimit() {
-        SixMonthlyPeriodFilter periodFilter = new SixMonthlyPeriodFilter(
+        SixMonthlyPeriodFilters periodFilter = new SixMonthlyPeriodFilters(
                 PeriodFiltersCommon.getDateTimeFromString("2015-01-01"), PeriodFiltersCommon.getDateTimeFromString("2015-07-01"));
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2015-07-01"));
         assertFalse(periodFilter.apply());

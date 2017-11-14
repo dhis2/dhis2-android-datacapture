@@ -29,6 +29,7 @@
 
 package org.dhis2.mobile.utils.date;
 
+import org.dhis2.mobile.utils.date.exceptions.PeriodNotSupportedException;
 import org.dhis2.mobile.utils.date.iterators.BiMonthIterator;
 import org.dhis2.mobile.utils.date.iterators.DayIterator;
 import org.dhis2.mobile.utils.date.iterators.FinAprilYearIterator;
@@ -56,7 +57,9 @@ public class DateIteratorFactory {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
 
-    public static CustomDateIterator<ArrayList<DateHolder>> getDateIterator(String periodType, int openFuturePeriods) {
+    public static CustomDateIterator<ArrayList<DateHolder>> getDateIterator(String periodType, int openFuturePeriods)
+
+            throws PeriodNotSupportedException {
         if (periodType != null) {
             if (periodType.equals(PeriodFilterFactory.YEARLY)) {
                 return (new YearIterator(openFuturePeriods));
@@ -90,7 +93,7 @@ public class DateIteratorFactory {
                 return (new DayIterator(openFuturePeriods));
             }
         }
-        throw new IllegalArgumentException("Unsupported period type");
+        throw new PeriodNotSupportedException("Unsupported period type",periodType);
     }
 }
 
