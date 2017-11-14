@@ -20,7 +20,14 @@ public class WeeklyThursdayPeriodFilter extends PeriodFilter {
         }
         Calendar endDateCalendar = Calendar.getInstance();
         endDateCalendar.setTime(endDate.toDate());
-        LocalDate fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.WEDNESDAY));
+        int day = endDate.getDayOfMonth();
+        LocalDate fixedWeek = new LocalDate(endDate);
+        if(endDate.getDayOfWeek()!=DateTimeConstants.WEDNESDAY) {
+            fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.WEDNESDAY));
+            if (day > fixedWeek.getDayOfMonth()) {
+                fixedWeek = fixedWeek.plusWeeks(1);
+            }
+        }
         endDateCalendar.setTime(fixedWeek.toDate());
         return new DateTime(endDateCalendar.getTime());
     }

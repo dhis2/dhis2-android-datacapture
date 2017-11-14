@@ -51,11 +51,15 @@ public class WeekThursdayIterator extends CustomDateIteratorClass<ArrayList<Date
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.THURSDAY));
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth()-1);
-        while(maxDate.getDayOfWeek()!=DateTimeConstants.WEDNESDAY){
-            maxDate=new LocalDate(maxDate.getYear(), maxDate.getMonthOfYear(), maxDate.getDayOfMonth()-1);
+        int day = currentDate.getDayOfWeek();
+        maxDate = currentDate;
+        if(currentDate.getDayOfWeek()!=DateTimeConstants.WEDNESDAY) {
+            maxDate = new LocalDate(currentDate.withDayOfWeek(DateTimeConstants.WEDNESDAY));
+            if (day > maxDate.getDayOfMonth()) {
+                maxDate = maxDate.plusWeeks(1);
+            }
         }
-        for (int i = 0; i < openFuturePeriods; i++) {
+        for (int i = 0; i < openFuturePeriods-1; i++) {
             maxDate = maxDate.plusWeeks(1);
         }
     }
@@ -113,8 +117,8 @@ public class WeekThursdayIterator extends CustomDateIteratorClass<ArrayList<Date
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            if(checkDate.minusDays(1).isBefore(maxDate)) {
-                DateHolder dateHolder = new DateHolder(date, checkDate.minusDays(1).toString(), label);
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
 
