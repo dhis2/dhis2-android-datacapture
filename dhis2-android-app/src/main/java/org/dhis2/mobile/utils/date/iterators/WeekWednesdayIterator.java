@@ -31,6 +31,7 @@ package org.dhis2.mobile.utils.date.iterators;
 
 import org.dhis2.mobile.utils.date.CustomDateIteratorClass;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
@@ -51,11 +52,12 @@ public class WeekWednesdayIterator extends CustomDateIteratorClass<ArrayList<Dat
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.WEDNESDAY));
         checkDate = new LocalDate(cPeriod);
-        int day = currentDate.getDayOfWeek();
+        String day = PeriodFilter.getDayString(currentDate);
         maxDate = currentDate;
         if(currentDate.getDayOfWeek()!=DateTimeConstants.TUESDAY) {
             maxDate = new LocalDate(currentDate.withDayOfWeek(DateTimeConstants.TUESDAY));
-            if (day > maxDate.getDayOfMonth()) {
+            String fixedDay = PeriodFilter.getDayString(maxDate);
+            if (Integer.parseInt(day) > Integer.parseInt(fixedDay)) {
                 maxDate = maxDate.plusWeeks(1);
             }
         }

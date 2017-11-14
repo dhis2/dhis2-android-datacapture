@@ -20,11 +20,12 @@ public class WeeklyThursdayPeriodFilter extends PeriodFilter {
         }
         Calendar endDateCalendar = Calendar.getInstance();
         endDateCalendar.setTime(endDate.toDate());
-        int day = endDate.getDayOfMonth();
+        String day = endDate.getDayOfMonth()+""+endDate.getMonthOfYear()+""+endDate.getYear();
         LocalDate fixedWeek = new LocalDate(endDate);
         if(endDate.getDayOfWeek()!=DateTimeConstants.WEDNESDAY) {
             fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.WEDNESDAY));
-            if (day > fixedWeek.getDayOfMonth()) {
+            String fixedDay = fixedWeek.getDayOfMonth()+""+fixedWeek.getMonthOfYear()+""+fixedWeek.getYear();
+            if (Integer.parseInt(day) > Integer.parseInt(fixedDay)) {
                 fixedWeek = fixedWeek.plusWeeks(1);
             }
         }
@@ -40,5 +41,30 @@ public class WeeklyThursdayPeriodFilter extends PeriodFilter {
         startDateCalendar.setTime(startDate.toDate());
         startDateCalendar.setTime(new LocalDate(startDate.withDayOfWeek(DateTimeConstants.THURSDAY)).toDate());
         return new DateTime(startDateCalendar.getTime());
+    }
+
+
+    @Override
+    public boolean apply() {
+        if ((startDate == null && endDate == null) || selectedDate == null) {
+            return false;
+        }
+
+        if (startDate != null && endDate != null) {
+            // return true, if criteria is not between two dates
+            // return startDate.isBefore(selectedDate) || endDate.isAfter(selectedDate);
+            return !((selectedDate.isAfter(startDate) || selectedDate.isEqual(startDate))
+                    && (selectedDate.isBefore(endDate) || selectedDate.isEqual(endDate)));
+        }
+
+        if (startDate != null) {
+            // return true, if criteria is before startDate
+            // return startDate.isBefore(selectedDate);
+            return !(selectedDate.isAfter(startDate) || selectedDate.isEqual(startDate));
+        }
+
+        // return true, if criteria is after endDate
+        // return endDate.isAfter(selectedDate);
+        return !(selectedDate.isBefore(endDate) || selectedDate.isEqual(endDate));
     }
 }

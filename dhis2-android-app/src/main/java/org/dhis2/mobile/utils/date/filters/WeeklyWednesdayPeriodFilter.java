@@ -19,11 +19,12 @@ public class WeeklyWednesdayPeriodFilter extends PeriodFilter {
         }
         Calendar endDateCalendar = Calendar.getInstance();
         endDateCalendar.setTime(endDate.toDate());
-        int day = endDate.getDayOfMonth();
+        String day = endDate.getDayOfMonth()+""+endDate.getMonthOfYear()+""+endDate.getYear();
         LocalDate fixedWeek = new LocalDate(endDate);
         if(endDate.getDayOfWeek()!=DateTimeConstants.TUESDAY) {
             fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.TUESDAY));
-            if (day > fixedWeek.getDayOfMonth()) {
+            String fixedDay = fixedWeek.getDayOfMonth()+""+fixedWeek.getMonthOfYear()+""+fixedWeek.getYear();
+            if (Integer.parseInt(day) > Integer.parseInt(fixedDay)) {
                 fixedWeek = fixedWeek.plusWeeks(1);
             }
         }

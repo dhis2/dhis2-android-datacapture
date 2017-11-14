@@ -31,8 +31,10 @@ package org.dhis2.mobile.utils.date.iterators;
 
 import org.dhis2.mobile.utils.date.CustomDateIteratorClass;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
+import org.joda.time.Period;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,11 +53,16 @@ public class WeekSaturdayIterator extends CustomDateIteratorClass<ArrayList<Date
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.SATURDAY));
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth()-1);
-        while(maxDate.getDayOfWeek()!=DateTimeConstants.FRIDAY){
-            maxDate=new LocalDate(maxDate.getYear(), maxDate.getMonthOfYear(), maxDate.getDayOfMonth()-1);
+        String day = PeriodFilter.getDayString(currentDate);
+        maxDate = currentDate;
+        if(currentDate.getDayOfWeek()!=DateTimeConstants.FRIDAY) {
+            maxDate = new LocalDate(currentDate.withDayOfWeek(DateTimeConstants.FRIDAY));
+            String fixedDay = PeriodFilter.getDayString(maxDate);
+            if (Integer.parseInt(day) > Integer.parseInt(fixedDay)) {
+                maxDate = maxDate.plusWeeks(1);
+            }
         }
-        for (int i = 0; i < openFuturePeriods; i++) {
+        for (int i = 0; i < openFuturePeriods-1; i++) {
             maxDate = maxDate.plusWeeks(1);
         }
     }
@@ -113,8 +120,8 @@ public class WeekSaturdayIterator extends CustomDateIteratorClass<ArrayList<Date
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            if(checkDate.minusDays(1).isBefore(maxDate)) {
-                DateHolder dateHolder = new DateHolder(date, checkDate.minusDays(1).toString(), label);
+            if(checkDate.isBefore(maxDate)) {
+                DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
 

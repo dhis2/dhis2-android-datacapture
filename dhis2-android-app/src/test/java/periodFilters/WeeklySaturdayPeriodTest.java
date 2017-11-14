@@ -13,13 +13,14 @@ public class WeeklySaturdayPeriodTest {
     public void testWeeklyPeriodsNullStartDate() {
         WeeklySaturdayPeriodFilter periodFilter = new WeeklySaturdayPeriodFilter(
                 null, PeriodFiltersCommon.getDateTimeFromString("2017-01-07"));
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-02"));
-        assertFalse(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-02-09"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-14"));
         assertTrue(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-26"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-13"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-30"));
         assertFalse(periodFilter.apply());
     }
 
@@ -30,42 +31,45 @@ public class WeeklySaturdayPeriodTest {
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-07"));
         assertFalse(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-14"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-15"));
         assertFalse(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-26"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-06"));
         assertTrue(periodFilter.apply());
     }
 
     @Test
     public void testWeeklyPeriodsSameDayLimits() {
         WeeklySaturdayPeriodFilter periodFilter = new WeeklySaturdayPeriodFilter(
-                PeriodFiltersCommon.getDateTimeFromString("2017-01-07"), PeriodFiltersCommon.getDateTimeFromString("2017-01-14"));
+                PeriodFiltersCommon.getDateTimeFromString("2017-01-07"), PeriodFiltersCommon.getDateTimeFromString("2017-01-07"));
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-07"));
         assertFalse(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-02-09"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-13"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-14"));
         assertTrue(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-26"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-31"));
         assertTrue(periodFilter.apply());
     }
 
     @Test
     public void testWeeklyPeriodsLastDaysOfYearLimits() {
         WeeklySaturdayPeriodFilter periodFilter = new WeeklySaturdayPeriodFilter(
-                PeriodFiltersCommon.getDateTimeFromString("2017-01-01"), PeriodFiltersCommon.getDateTimeFromString("2017-01-14"));
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-09"));
-        assertFalse(periodFilter.apply());
-
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-16"));
+                PeriodFiltersCommon.getDateTimeFromString("2016-12-31"), PeriodFiltersCommon.getDateTimeFromString("2017-01-06"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-07"));
         assertTrue(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-19"));
-        assertTrue(periodFilter.apply());
-
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-01"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-06"));
         assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-31"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-30"));
+        assertTrue(periodFilter.apply());
     }
 
 }
