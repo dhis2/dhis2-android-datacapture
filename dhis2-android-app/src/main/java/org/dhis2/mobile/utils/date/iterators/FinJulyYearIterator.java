@@ -40,6 +40,15 @@ public class FinJulyYearIterator extends YearIterator {
 
     public FinJulyYearIterator(int openFP) {
         super(openFP);
+        openFuturePeriods = openFP;
+        cPeriod = new LocalDate(currentDate.getYear(), JUL, 1);
+        checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), JUN, 30);
+        if(openFuturePeriods>0) {
+            for (int i = 0; i < openFuturePeriods; i++) {
+                maxDate = maxDate.plusYears(1);
+            }
+        }
     }
 
     @Override
@@ -47,7 +56,13 @@ public class FinJulyYearIterator extends YearIterator {
         if (openFuturePeriods > 0) {
             return checkDate.isBefore(maxDate);
         } else {
-            LocalDate june = new LocalDate(date.getYear(), JUN, 30);
+            LocalDate june;
+            if(date.getMonthOfYear()>=7) {
+                june = new LocalDate(date.getYear()+1, JUN, 30);
+            }
+            else{
+                june = new LocalDate(date.getYear(), JUN, 30);
+            }
             return currentDate.isAfter(june);
         }
     }
@@ -66,12 +81,18 @@ public class FinJulyYearIterator extends YearIterator {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
-        LocalDate june = new LocalDate(checkDate.getYear(), JUN, 30);
+        LocalDate june;
 
-        while ((openFuturePeriods > 0 || currentDate.isAfter(june)) && counter < 10) {
-            String dateStr = checkDate.minusYears(1).year().getAsString();
-            String label = String.format(FIN_DATE_LABEL_FORMAT, JUL_STR, dateStr, JUN_STR, checkDate.year().getAsString());
-            String date = dateStr + JULY;
+        if(checkDate.getMonthOfYear()>=9) {
+            june = new LocalDate(checkDate.getYear()+1, JUN, 30);
+        }
+        else{
+            june = new LocalDate(checkDate.getYear(), JUN, 30);
+        }
+
+        while ((openFuturePeriods > 0 || currentDate.isAfter(june.minusYears(1))) && counter < 10) {
+            String label = String.format(FIN_DATE_LABEL_FORMAT, JUL_STR, checkDate.year().getAsString(), JUN_STR, checkDate.plusYears(1).year().getAsString());
+            String date = checkDate.year().getAsString() + JULY;
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
