@@ -59,7 +59,7 @@ public class WeekWednesdayIterator extends CustomDateIteratorClass<ArrayList<Dat
                 maxDate = maxDate.plusWeeks(1);
             }
         }
-        for (int i = 0; i < openFuturePeriods; i++) {
+        for (int i = 0; i < openFuturePeriods -1; i++) {
             maxDate = maxDate.plusWeeks(1);
         }
     }
