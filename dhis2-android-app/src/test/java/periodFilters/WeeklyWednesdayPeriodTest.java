@@ -11,17 +11,30 @@ public class WeeklyWednesdayPeriodTest {
 
     @Test
     public void testWeeklyPeriodsNullStartDate() {
-        WeeklyWednesdayPeriodFilter periodFilter = new WeeklyWednesdayPeriodFilter(
-                null, PeriodFiltersCommon.getDateTimeFromString("2017-01-04"));
+        WeeklyWednesdayPeriodFilter
+                periodFilter = new WeeklyWednesdayPeriodFilter(
+                null, PeriodFiltersCommon.getDateTimeFromString("2017-01-03"));
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-02"));
         assertFalse(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-02-09"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-06"));
         assertTrue(periodFilter.apply());
 
-        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-26"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-28"));
         assertFalse(periodFilter.apply());
+
+        periodFilter = new WeeklyWednesdayPeriodFilter(
+                null, PeriodFiltersCommon.getDateTimeFromString("2017-08-02"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-08-02"));
+        assertFalse(periodFilter.apply());
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-08-08"));
+        assertFalse(periodFilter.apply());
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-08-09"));
+        assertTrue(periodFilter.apply());
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-08-15"));
+        assertTrue(periodFilter.apply());
     }
+
 
     @Test
     public void testWeeklyPeriodsNullEndDate() {

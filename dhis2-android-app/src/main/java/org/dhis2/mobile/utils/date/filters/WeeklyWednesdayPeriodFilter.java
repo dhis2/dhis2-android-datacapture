@@ -19,7 +19,14 @@ public class WeeklyWednesdayPeriodFilter extends PeriodFilter {
         }
         Calendar endDateCalendar = Calendar.getInstance();
         endDateCalendar.setTime(endDate.toDate());
-        LocalDate fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.TUESDAY));
+        int day = endDate.getDayOfMonth();
+        LocalDate fixedWeek = new LocalDate(endDate);
+        if(endDate.getDayOfWeek()!=DateTimeConstants.TUESDAY) {
+            fixedWeek = new LocalDate(endDate.withDayOfWeek(DateTimeConstants.TUESDAY));
+            if (day > fixedWeek.getDayOfMonth()) {
+                fixedWeek = fixedWeek.plusWeeks(1);
+            }
+        }
         endDateCalendar.setTime(fixedWeek.toDate());
         return new DateTime(endDateCalendar.getTime());
     }
@@ -32,5 +39,29 @@ public class WeeklyWednesdayPeriodFilter extends PeriodFilter {
         startDateCalendar.setTime(startDate.toDate());
         startDateCalendar.setTime(new LocalDate(startDate.withDayOfWeek(DateTimeConstants.WEDNESDAY)).toDate());
         return new DateTime(startDateCalendar.getTime());
+    }
+
+    @Override
+    public boolean apply() {
+        if ((startDate == null && endDate == null) || selectedDate == null) {
+            return false;
+        }
+
+        if (startDate != null && endDate != null) {
+            // return true, if criteria is not between two dates
+            // return startDate.isBefore(selectedDate) || endDate.isAfter(selectedDate);
+            return !((selectedDate.isAfter(startDate) || selectedDate.isEqual(startDate))
+                    && (selectedDate.isBefore(endDate) || selectedDate.isEqual(endDate)));
+        }
+
+        if (startDate != null) {
+            // return true, if criteria is before startDate
+            // return startDate.isBefore(selectedDate);
+            return !(selectedDate.isAfter(startDate) || selectedDate.isEqual(startDate));
+        }
+
+        // return true, if criteria is after endDate
+        // return endDate.isAfter(selectedDate);
+        return !(selectedDate.isBefore(endDate) || selectedDate.isEqual(endDate));
     }
 }
