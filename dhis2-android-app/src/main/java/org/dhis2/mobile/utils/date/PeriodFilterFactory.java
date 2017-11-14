@@ -6,7 +6,7 @@ import org.dhis2.mobile.utils.date.filters.BiMonthlyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.MonthlyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.QuarterlyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.SixMonthlyAprilPeriodFilter;
-import org.dhis2.mobile.utils.date.filters.SixMonthlyPeriodFilters;
+import org.dhis2.mobile.utils.date.filters.SixMonthlyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklySaturdayPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklySundayPeriodFilter;
@@ -56,7 +56,7 @@ public class PeriodFilterFactory {
         } else if (periodType.equals(QUARTERLY)){
             return new QuarterlyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(SIX_MONTHLY)){
-            return new SixMonthlyPeriodFilters(startDate, endDate);
+            return new SixMonthlyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(SIX_MONTHLY_APRIL)){
             return new SixMonthlyAprilPeriodFilter(startDate, endDate);
         } else {

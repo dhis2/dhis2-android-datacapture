@@ -5,8 +5,8 @@ import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
-public class SixMonthlyPeriodFilters extends PeriodFilter {
-    public SixMonthlyPeriodFilters(DateTime startDate, DateTime endDate) {
+public class SixMonthlyPeriodFilter extends PeriodFilter {
+    public SixMonthlyPeriodFilter(DateTime startDate, DateTime endDate) {
         super(fixStartDate(startDate), fixEndDate(endDate));
     }
 
