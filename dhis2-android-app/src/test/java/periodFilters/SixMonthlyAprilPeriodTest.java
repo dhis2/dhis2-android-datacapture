@@ -44,7 +44,21 @@ public class SixMonthlyAprilPeriodTest {
 
     @Test
     public void testSixMonthlyPeriodsSameDayLimit() {
+
         SixMonthlyAprilPeriodFilter periodFilter = new SixMonthlyAprilPeriodFilter(
+                PeriodFiltersCommon.getDateTimeFromString("2016-10-01"), PeriodFiltersCommon.getDateTimeFromString("2016-10-01"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-10-31"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-09-01"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-04-01"));
+        assertTrue(periodFilter.apply());
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-03-31"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter = new SixMonthlyAprilPeriodFilter(
                 PeriodFiltersCommon.getDateTimeFromString("2016-04-30"), PeriodFiltersCommon.getDateTimeFromString("2016-04-30"));
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-07-01"));
         assertFalse(periodFilter.apply());
@@ -53,6 +67,16 @@ public class SixMonthlyAprilPeriodTest {
         assertTrue(periodFilter.apply());
 
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-01-01"));
+        assertTrue(periodFilter.apply());
+        periodFilter = new SixMonthlyAprilPeriodFilter(
+                PeriodFiltersCommon.getDateTimeFromString("2016-03-31"), PeriodFiltersCommon.getDateTimeFromString("2016-03-31"));
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-03-31"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-04-01"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2015-04-01"));
         assertTrue(periodFilter.apply());
 
     }

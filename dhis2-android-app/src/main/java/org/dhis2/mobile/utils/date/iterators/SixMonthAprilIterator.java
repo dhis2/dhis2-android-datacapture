@@ -31,6 +31,7 @@ package org.dhis2.mobile.utils.date.iterators;
 
 import org.dhis2.mobile.utils.date.CustomDateIteratorClass;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<Dat
         cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
         checkDate = new LocalDate(cPeriod);
         maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), 1);
-        for (int i = 0; i < openFuturePeriods; i++) {
+        for (int i = 0; i < openFuturePeriods-1; i++) {
             maxDate = maxDate.plusMonths(6);
         }
     }
@@ -99,24 +100,25 @@ public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<Dat
 
         while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(6))) && counter < 2) {
             String year = checkDate.year().getAsString();
+            String yearLastPeriod = Integer.parseInt(year)+1+"";
             String label;
             String date;
 
-            if (checkDate.getMonthOfYear() > APR) {
-                label = String.format(DATE_LABEL_FORMAT, OCT_STR, MAY_STR, year);
-                date = year + S2;
-            } else {
-                label = String.format(DATE_LABEL_FORMAT, APR_STR, SEP_STR, year);
+            if (checkDate.getMonthOfYear() >= APR && checkDate.getMonthOfYear() <= SEP) {
+                label = String.format(DATE_LABEL_FORMAT, APR_STR_LONG, SEP_STR_LONG, year);
                 date = year + S1;
+            } else {
+                label = String.format(DATE_LABEL_FORMAT, OCT_STR_LONG +" "+ year, MAR_STR_LONG, yearLastPeriod);
+                date = year + S2;
             }
 
-            checkDate = checkDate.plusMonths(6);
-            counter++;
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
+            checkDate = checkDate.plusMonths(6);
+            counter++;
         }
 
         Collections.reverse(dates);
