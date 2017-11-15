@@ -37,7 +37,6 @@ public class WeeklySaturdayPeriodFilter extends PeriodFilter {
             return null;
         }
         Calendar startDateCalendar = Calendar.getInstance();
-        startDateCalendar.setTime(startDate.toDate());
         String day = PeriodFilter.getDayString(startDate);
         LocalDate fixedWeek=new LocalDate(startDate.withDayOfWeek(DateTimeConstants.SATURDAY));
 

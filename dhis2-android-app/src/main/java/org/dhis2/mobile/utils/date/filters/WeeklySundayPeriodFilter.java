@@ -37,8 +37,17 @@ public class WeeklySundayPeriodFilter extends PeriodFilter {
             return null;
         }
         Calendar startDateCalendar = Calendar.getInstance();
-        startDateCalendar.setTime(startDate.toDate());
-        startDateCalendar.setTime(new LocalDate(startDate.withDayOfWeek(DateTimeConstants.SUNDAY)).toDate());
+        String day = PeriodFilter.getDayString(startDate);
+        LocalDate fixedWeek=new LocalDate(startDate.withDayOfWeek(DateTimeConstants.SUNDAY));
+
+        if(startDate.getDayOfWeek()!=DateTimeConstants.SUNDAY) {
+            fixedWeek = new LocalDate(startDate.withDayOfWeek(DateTimeConstants.SUNDAY));
+            String fixedDay = fixedWeek.getDayOfMonth()+""+fixedWeek.getMonthOfYear()+""+fixedWeek.getYear();
+            if (Integer.parseInt(day) > Integer.parseInt(fixedDay)) {
+                fixedWeek = fixedWeek.minusWeeks(1);
+            }
+        }
+        startDateCalendar.setTime(fixedWeek.toDate());
         return new DateTime(startDateCalendar.getTime());
     }
     @Override

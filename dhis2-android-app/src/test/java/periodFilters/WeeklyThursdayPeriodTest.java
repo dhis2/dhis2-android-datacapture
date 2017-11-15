@@ -4,6 +4,7 @@ package periodFilters;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
+import org.dhis2.mobile.utils.date.filters.WeeklySundayPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.WeeklyThursdayPeriodFilter;
 import org.junit.Test;
 
@@ -34,6 +35,25 @@ public class WeeklyThursdayPeriodTest {
         assertTrue(periodFilter.apply());
 
         periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2016-12-26"));
+        assertFalse(periodFilter.apply());
+    }
+
+    @Test
+    public void testWeeklyLastDayLimit() {
+        WeeklyThursdayPeriodFilter periodFilter = new WeeklyThursdayPeriodFilter(
+                PeriodFiltersCommon.getDateTimeFromString("2017-11-08"),
+                PeriodFiltersCommon.getDateTimeFromString("2017-11-08"));
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-01"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-09"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-08"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-02"));
         assertFalse(periodFilter.apply());
     }
 

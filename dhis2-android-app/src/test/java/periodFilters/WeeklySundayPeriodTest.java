@@ -58,6 +58,25 @@ public class WeeklySundayPeriodTest {
     }
 
     @Test
+    public void testWeeklyLastDayLimit() {
+        WeeklySundayPeriodFilter periodFilter = new WeeklySundayPeriodFilter(
+                PeriodFiltersCommon.getDateTimeFromString("2017-11-11"),
+                PeriodFiltersCommon.getDateTimeFromString("2017-11-11"));
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-04"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-12"));
+        assertTrue(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-11"));
+        assertFalse(periodFilter.apply());
+
+        periodFilter.setSelectedDate(PeriodFiltersCommon.getDateTimeFromString("2017-11-05"));
+        assertFalse(periodFilter.apply());
+    }
+
+    @Test
     public void testWeeklyPeriodsLastDaysOfYearLimits() {
         WeeklySundayPeriodFilter periodFilter = new WeeklySundayPeriodFilter(
                 PeriodFiltersCommon.getDateTimeFromString("2016-12-25"), PeriodFiltersCommon.getDateTimeFromString("2017-01-07"));
