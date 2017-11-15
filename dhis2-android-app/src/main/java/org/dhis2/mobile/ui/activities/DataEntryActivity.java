@@ -18,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,6 +55,8 @@ import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
+import org.dhis2.mobile.utils.date.expiryday.ExpiryDayValidator;
+import org.dhis2.mobile.utils.date.expiryday.ExpiryDayValidatorFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,8 +84,11 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static ListView dataEntryListView;
     private List<FieldAdapter> adapters;
 
+    MenuItem saveMenuItem;
+
     // state
     private boolean downloadAttempted;
+    private String mPeriod;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -98,6 +104,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = savedInstanceState;
+        if (bundle == null) {
+            bundle = getIntent().getExtras();
+        }
         setContentView(R.layout.activity_data_entry);
         setupToolbar();
         setupFormSpinner();
@@ -110,7 +120,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
+
+        initPeriod(bundle);
     }
+
+    private void initPeriod(Bundle bundle) {
+        DatasetInfoHolder datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
+        mPeriod = datasetInfoHolder.getPeriod();
+    }
+
 
     @Override
     public void onPause() {
@@ -180,7 +198,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
             currentForm = form;
-            loadGroupsIntoAdapters(form.getGroups());
+            loadGroupsIntoAdapters(form.getGroups(), form);
         }
     }
 
@@ -247,6 +265,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         });
     }
 
+    private void uploadButtonEnabled(boolean active) {
+        saveMenuItem.setVisible(active);
+    }
+
     private void attemptToDownloadReport(Bundle savedInstanceState) {
         // first, we need to check if previous instances of
         // activities already tried to download values
@@ -277,10 +299,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             // we did not load form before,
             // so we need to do so now
-            if (dataEntryGroups == null) {
+            if (dataEntryGroups == null || currentForm==null) {
                 getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null, this).forceLoad();
             } else {
-                loadGroupsIntoAdapters(dataEntryGroups);
+                loadGroupsIntoAdapters(dataEntryGroups, currentForm);
             }
         }
     }
@@ -289,6 +311,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(org.dhis2.mobile.R.menu.menu_data_entry, menu);
+
+        saveMenuItem = (MenuItem) menu.findItem(R.id.action_save_data_set);
+
         return true;
     }
     private void showProgressBar() {
@@ -305,13 +330,30 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         return progressBarLayout.getVisibility() == View.VISIBLE;
     }
 
-    private void loadGroupsIntoAdapters(List<Group> groups) {
+    private void loadGroupsIntoAdapters(List<Group> groups, Form form) {
         if (groups != null) {
             List<FieldAdapter> adapters = new ArrayList<>();
 
+            boolean readOnly = false;
+            if(form.getOptions().getexpiryDays()>0)
+            {
+                int expiringDay = form.getOptions().getexpiryDays();
+                String periodType = form.getOptions().getPeriodType();
+                ExpiryDayValidator expiryDayValidator = ExpiryDayValidatorFactory.getExpiryDay(
+                        periodType, expiringDay, mPeriod);
+                if (!expiryDayValidator.canEdit()) {
+                    readOnly = true;
+                }
+            }
+            if(form.isApproved()){
+                readOnly = true;
+            }
+
+            uploadButtonEnabled(!readOnly);
+
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this, dataEntryListView));
+                    adapters.add(new FieldAdapter(group, this, dataEntryListView, readOnly));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -457,7 +499,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 currentForm = form;
 
                 if (form != null) {
-                    loadGroupsIntoAdapters(form.getGroups());
+                    loadGroupsIntoAdapters(form.getGroups(), currentForm);
                 }
             }
         }

@@ -29,15 +29,6 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import org.dhis2.mobile.io.models.Field;
-
-import org.dhis2.mobile.R;
-import org.dhis2.mobile.ui.fragments.DatePickerDialog;
-import org.dhis2.mobile.ui.fragments.DatePickerDialog.OnDateSetListener;
-import org.joda.time.LocalDate;
-
-import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,12 +38,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.models.Field;
+import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
+import org.dhis2.mobile.ui.fragments.DatePickerDialog;
+import org.dhis2.mobile.ui.fragments.DatePickerDialog.OnDateSetListener;
+import org.joda.time.LocalDate;
+
 public class DatePickerRow implements Row {
     private LayoutInflater inflater;
     private Field field;
     private FieldAdapter adapter;
     private Context context;
     private LocalDate currentDate;
+    public boolean readOnly = false;
     
     public DatePickerRow(LayoutInflater inflater, Field field, FieldAdapter adapter, Context context) {
         this.inflater= inflater;
@@ -102,6 +101,13 @@ public class DatePickerRow implements Row {
         holder.cbListener.setEditText(holder.pickerInvoker, field);
         holder.clearButton.setOnClickListener(holder.cbListener);
 
+        if(readOnly){
+            holder.clearButton.setEnabled(false);
+            holder.pickerInvoker.setEnabled(false);
+        } else {
+            holder.clearButton.setEnabled(true);
+            holder.pickerInvoker.setEnabled(true);
+        }
         return view;
     }
 
@@ -109,7 +115,12 @@ public class DatePickerRow implements Row {
     public int getViewType() {
         return RowTypes.DATE.ordinal();
     }
-    
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
+    }
+
 
     private class DatePickerRowHolder {
         final TextView textLabel;

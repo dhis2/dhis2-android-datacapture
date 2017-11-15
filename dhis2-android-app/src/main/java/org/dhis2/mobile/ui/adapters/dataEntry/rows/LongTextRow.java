@@ -37,11 +37,11 @@ import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
-import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
 public class LongTextRow extends EditTextRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
+    public boolean readOnly = false;
     
     public LongTextRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -77,11 +77,21 @@ public class LongTextRow extends EditTextRow implements Row {
         holder.editText.clearFocus();
         holder.editText.setOnEditorActionListener(mOnEditorActionListener);
 
+        if(readOnly){
+            holder.editText.setEnabled(false);
+        } else {
+            holder.editText.setEnabled(true);
+        }
         return view;
     }
 
     @Override
     public int getViewType() {
         return RowTypes.LONG_TEXT.ordinal();
-    }    
+    }
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
+    }
 }
