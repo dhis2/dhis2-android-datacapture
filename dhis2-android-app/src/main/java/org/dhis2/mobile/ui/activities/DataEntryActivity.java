@@ -16,8 +16,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -86,6 +84,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private boolean downloadAttempted;
     private String mPeriod;
 
+    private DatasetInfoHolder datasetInfoHolder;
+
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
             Intent intent = new Intent(activity, DataEntryActivity.class);
@@ -121,7 +121,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void initPeriod(Bundle bundle) {
-        DatasetInfoHolder datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
+        datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
         mPeriod = datasetInfoHolder.getPeriod();
     }
 
@@ -155,6 +155,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             outState.putParcelableArrayList(STATE_REPORT, groups);
             outState.putBoolean(STATE_DOWNLOAD_ATTEMPTED, downloadAttempted);
             outState.putBoolean(STATE_DOWNLOAD_IN_PROGRESS, isProgressBarVisible());
+            outState.putParcelable(DatasetInfoHolder.TAG, datasetInfoHolder);
         }
     }
 
