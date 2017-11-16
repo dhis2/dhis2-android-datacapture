@@ -104,5 +104,5 @@
   <string name="dialog_period_not_supported">"Type de période non pris en charge: %s"</string>
 
   <string name="dataset_readonly_by_approve">"Ensemble de données approuvé"</string>
-  <string name="dataset_readonly_by_expiry_days">"Jeu de données verrouillé par jours d'expiration"</string>
+  <string name="dataset_readonly_by_expiry_days">"Ensemble de données expiré"</string>
 </resources>
