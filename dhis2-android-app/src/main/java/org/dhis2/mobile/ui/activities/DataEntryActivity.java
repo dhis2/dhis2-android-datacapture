@@ -16,8 +16,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -339,10 +337,15 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                         periodType, expiringDay, mPeriod);
                 if (!expiryDayValidator.canEdit()) {
                     readOnly = true;
+
+                    showToast(R.string.dataset_readonly_by_expiry_days);
                 }
             }
             if(form.isApproved()){
                 readOnly = true;
+
+                showToast(R.string.dataset_readonly_by_approve);
+
             }
 
             uploadButtonEnabled(!readOnly);
@@ -695,5 +698,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void showToast(int resId){
+        Toast.makeText(this, resId, Toast.LENGTH_LONG).show();
     }
 }
