@@ -13,8 +13,7 @@
         android:id="@+id/edit_long_text_row"
         style="@style/ListViewEditTextStyle"
         android:hint="@string/enter_long_text"
-        android:imeOptions="actionNext|flagNoExtractUi"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         app:font="@string/regular_font_name" />
 
 </LinearLayout>
