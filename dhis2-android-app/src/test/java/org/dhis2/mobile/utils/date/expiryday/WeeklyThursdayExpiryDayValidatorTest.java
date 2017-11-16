@@ -9,7 +9,7 @@ import org.joda.time.LocalDate;
 import org.junit.Test;
 
 public class WeeklyThursdayExpiryDayValidatorTest {
-    private static final String PATTERN = "yyyy'W'ww";
+    private static final String PATTERN = "yyyy'ThuW'ww";
 
     @Test
     public void testCanNotEditPreviousPeriodEndsSameTodayMinusDifferenceExpiryDays() {

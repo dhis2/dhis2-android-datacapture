@@ -59,6 +59,7 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkException;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
+import org.dhis2.mobile.ui.activities.LoginActivity;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
@@ -82,7 +83,7 @@ public class FormsDownloadProcessor {
     private static final String OPTIONS = "options";
     private static final String CATEGORY_COMBO = "categoryCombo";
 
-    public static void updateDatasets(Context context) {
+    public static void updateDatasets(Context context, boolean isFirstPull) {
         PrefUtils.setResourceState(context,
                 PrefUtils.Resources.DATASETS,
                 PrefUtils.State.REFRESHING);
@@ -115,10 +116,18 @@ public class FormsDownloadProcessor {
         }
 
         Log.i(TAG, "Download finished");
-        Intent intent = new Intent(AggregateReportFragment.TAG);
-        intent.putExtra(Response.CODE, networkStatusCode);
-        intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
+        Intent intent;
+        if(isFirstPull) {
+            intent = new Intent(LoginActivity.TAG);
+            intent.putExtra(Response.CODE, networkStatusCode);
+            intent.putExtra(LoginActivity.IS_FIRST_PULL, isFirstPull);
+        }else{
+            intent = new Intent(AggregateReportFragment.TAG);
+            intent.putExtra(Response.CODE, networkStatusCode);
+            intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
+        }
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
     }
 
     private static void downloadDatasets(Context context, boolean oldApi) throws NetworkException, ParsingException {

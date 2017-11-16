@@ -105,4 +105,7 @@
   <string name="dialog_exit_survey_no">Nej</string>
   <string name="dialog_period_not_supported">"Periodstyp stöds inte: : %s"</string>
   <string name="save_data_set">save dataset</string>
+
+  <string name="dataset_readonly_by_approve">"Godkänd dataset"</string>
+  <string name="dataset_readonly_by_expiry_days">"Förfallit dataset"</string>
 </resources>

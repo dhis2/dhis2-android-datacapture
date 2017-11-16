@@ -29,9 +29,11 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -74,8 +76,7 @@ public class LongTextRow extends EditTextRow implements Row {
         holder.textWatcher.setField(field);
         holder.editText.addTextChangedListener(holder.textWatcher);
         holder.editText.setText(field.getValue());
-        holder.editText.clearFocus();
-        holder.editText.setOnEditorActionListener(mOnEditorActionListener);
+        holder.editText.clearFocus(); 
 
         if(readOnly){
             holder.editText.setEnabled(false);
