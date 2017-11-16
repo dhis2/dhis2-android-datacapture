@@ -103,10 +103,10 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
             String date;
 
             if (checkDate.getMonthOfYear() > JUN) {
-                label = String.format(DATE_LABEL_FORMAT, JUL_STR, DEC_STR, year);
+                label = String.format(DATE_LABEL_FORMAT, JUL_STR_LONG, DEC_STR_LONG, year);
                 date = year + S2;
             } else {
-                label = String.format(DATE_LABEL_FORMAT, JAN_STR, JUN_STR, year);
+                label = String.format(DATE_LABEL_FORMAT, JAN_STR_LONG, JUN_STR_LONG, year);
                 date = year + S1;
             }
 

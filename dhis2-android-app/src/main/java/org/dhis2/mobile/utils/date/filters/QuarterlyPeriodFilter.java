@@ -1,6 +1,7 @@
-package org.dhis2.mobile.utils.date;
+package org.dhis2.mobile.utils.date.filters;
 
 
+import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
@@ -40,8 +41,9 @@ public class QuarterlyPeriodFilter extends PeriodFilter {
             return endDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(
                     endDate.dayOfMonth().getMaximumValue());
         } else if (month <= 12) {
-            return endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
-                    DateTimeConstants.JANUARY).withDayOfYear(endDate.dayOfYear().getMaximumValue());
+            endDate = endDate.withYear(endDate.getYear()).withMonthOfYear(
+                    DateTimeConstants.JANUARY);
+            return endDate.withDayOfYear(endDate.dayOfYear().getMaximumValue());
         }
         return endDate;
     }

@@ -44,6 +44,7 @@ public class URLConstants {
 	public static final String DATASET_UPLOAD_URL = "api/dataValueSets";
 	public static final String DATASET_VALUES_URL = "api/dataSets";
 	public static final String CATEGORY_COMBOS_URL = "api/categoryCombos";
+	public static final String DATA_APPROVALS_URL = "api/dataApprovals";
 
 	public static final String FORM_PARAM = "form?ou=";
 	public static final String DATA_SET_DATA_ELEMENTS_META_DATA_PARAM =
@@ -54,6 +55,10 @@ public class URLConstants {
 	public static final String DATA_SET_DATA_ELEMENTS_META_DATA_API_25_PARAM = "fields=compulsoryDataElementOperands[categoryOptionCombo,dataElement[id]],categoryCombo[id,categoryOptionCombos],dataSetElements[dataElement,categoryCombo[id,"
 			+ "categoryOptionCombos]],sections[name,categoryCombo[categoryOptionCombos[id]]";
 	public static final String PERIOD_PARAM = "&pe=";
+	public static final String ORG_UNIT_PARAM = "&ou=";
+	public static final String DATA_SET_PARAM = "?ds=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
+
+
 
 }

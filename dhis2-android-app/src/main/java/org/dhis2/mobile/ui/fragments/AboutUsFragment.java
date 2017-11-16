@@ -9,6 +9,7 @@ import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +19,13 @@ import android.widget.TextView;
 import org.dhis2.mobile.BuildConfig;
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Group;
+import org.dhis2.mobile.utils.PrefUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 public class AboutUsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Group> {
 
@@ -95,12 +98,21 @@ public class AboutUsFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
         ((TextView) view.findViewById(R.id.app_version)).setText(
                 getVersionMessage(getContext()));
         ((TextView) view.findViewById(R.id.commit_hash)).setText(
                 getCommitMessage(getContext()));
         ((TextView) view.findViewById(R.id.description)).setText(
                 getDescriptionMessage(getContext()));
+        ((TextView) view.findViewById(R.id.logged_user)).append(PrefUtils.getUserName(getContext()));
+        ((TextView) view.findViewById(R.id.logged_server)).append(
+                Html.fromHtml(
+                        String.format(Locale.getDefault(), "<a href=\"%s\">%s</a>",
+                                PrefUtils.getServerURL(getContext())
+                                ,
+                                PrefUtils.getServerURL(getContext()))));
+        ((TextView) view.findViewById(R.id.logged_server)).setMovementMethod(LinkMovementMethod.getInstance());
         view.setBackgroundColor(
                 getContext().getResources().getColor(R.color.white));
     }

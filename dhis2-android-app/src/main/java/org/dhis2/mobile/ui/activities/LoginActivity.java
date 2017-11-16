@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     public static final String USERNAME = "username";
     public static final String SERVER = "server";
     public static final String CREDENTIALS = "creds";
+    public static final String IS_FIRST_PULL = "isfirstpull";
 
     private Button mLoginButton;
     private EditText mUsername;
@@ -71,6 +72,7 @@ public class LoginActivity extends AppCompatActivity {
     // developers to build app with custom server address
     private EditText mServerUrl;
     private ProgressBar mProgressBar;
+    private LoginActivity mLoginActivity;
 
     // BroadcastReceiver which aim is to listen
     // for network response on login post request
@@ -79,17 +81,25 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int code = intent.getExtras().getInt(Response.CODE);
+            Boolean isFirstPull = intent.getExtras().getBoolean(LoginActivity.IS_FIRST_PULL);
 
             // If response code is 200, then MenuActivity is started
             // If not, user is notified with error message
             if (!HTTPClient.isError(code)) {
                 if(PrefUtils.getServerVersion(context)!=null && !PrefUtils.getServerVersion(context).equals("")) {
 
-                    Intent menuActivity = new Intent(LoginActivity.this, MenuActivity.class);
-                    startActivity(menuActivity);
-                    overridePendingTransition(R.anim.activity_open_enter,
-                            R.anim.activity_open_exit);
-                    finish();
+                    // Prepare Intent and start service
+                    if(isFirstPull == null || !isFirstPull) {
+                        intent = new Intent(mLoginActivity, WorkService.class);
+                        intent.putExtra(WorkService.METHOD, WorkService.METHOD_FIRST_PULL_DATASETS);
+                        mLoginActivity.startService(intent);
+                    }else {
+                        finish();
+                        Intent menuActivity = new Intent(LoginActivity.this, MenuActivity.class);
+                        startActivity(menuActivity);
+                        overridePendingTransition(R.anim.activity_open_enter,
+                                R.anim.activity_open_exit);
+                    }
                 }else{
                     hideProgress();
                     String message = context.getString(R.string.server_error);
@@ -107,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        mLoginActivity = this;
         mDhis2Logo = (ImageView) findViewById(R.id.dhis2_logo);
         mLoginButton = (Button) findViewById(R.id.login_button);
 

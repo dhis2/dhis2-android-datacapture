@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">DHIS2 Data Capture</string>
+    <string name="app_name">DHIS2 Data Capture (dev)</string>
     <string name="title_activity_launcher">LauncherActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="desc">stub image</string>
@@ -125,7 +125,14 @@
     <string name="value_not_supported">Value-type not supported</string>
 
     <string name="dialog_exit_survey_title">Confirm exit</string>
-    <string name="dialog_exit_survey_message">You still have data not synced with the server. If you continue and exit this report all the data not saved will be lost. Do you want to continue?</string>
+    <string name="dialog_exit_survey_message">"You have data that hasn't yet been saved. If you continue and exit this report, all the data not saved will be lost. Do you want to continue?"</string>
     <string name="dialog_exit_survey_yes">Yes</string>
     <string name="dialog_exit_survey_no">No</string>
+    <string name="save_data_set">save dataset</string>
+    <string name="dialog_period_not_supported">"Period type not supported: %s"</string>
+
+    <string name="dataset_readonly_by_approve">"Data set already approved"</string>
+    <string name="dataset_readonly_by_expiry_days">"Data set has expired"</string>
+    <string name="logged_in">"Logged in as: "</string>
+    <string name="at_server">"At server: "</string>
 </resources>

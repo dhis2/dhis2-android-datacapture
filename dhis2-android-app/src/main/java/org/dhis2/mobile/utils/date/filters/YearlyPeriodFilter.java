@@ -1,4 +1,4 @@
-package org.dhis2.mobile.utils.date.iterators;
+package org.dhis2.mobile.utils.date.filters;
 
 
 import org.dhis2.mobile.utils.date.PeriodFilter;

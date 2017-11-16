@@ -29,19 +29,21 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
-import org.dhis2.mobile.ui.activities.DataEntryActivity;
 
 public class LongTextRow extends EditTextRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
+    public boolean readOnly = false;
     
     public LongTextRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -74,14 +76,23 @@ public class LongTextRow extends EditTextRow implements Row {
         holder.textWatcher.setField(field);
         holder.editText.addTextChangedListener(holder.textWatcher);
         holder.editText.setText(field.getValue());
-        holder.editText.clearFocus();
-        holder.editText.setOnEditorActionListener(mOnEditorActionListener);
+        holder.editText.clearFocus(); 
 
+        if(readOnly){
+            holder.editText.setEnabled(false);
+        } else {
+            holder.editText.setEnabled(true);
+        }
         return view;
     }
 
     @Override
     public int getViewType() {
         return RowTypes.LONG_TEXT.ordinal();
-    }    
+    }
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
+    }
 }

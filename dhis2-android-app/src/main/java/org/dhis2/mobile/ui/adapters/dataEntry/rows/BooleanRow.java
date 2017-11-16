@@ -29,20 +29,20 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import org.dhis2.mobile.io.models.Field;
-
-import org.dhis2.mobile.R;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TextView;
+
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.models.Field;
 
 public class BooleanRow implements Row {
     private final LayoutInflater inflater;
     private final Field field;
+    public boolean readOnly = false;
     
     public BooleanRow(LayoutInflater inflater, Field field) {
         this.inflater = inflater;
@@ -93,8 +93,22 @@ public class BooleanRow implements Row {
         if (field.getValue().equals(Field.FALSE)) holder.falseButton.setChecked(true);
         else if (field.getValue().equals(Field.TRUE)) holder.trueButton.setChecked(true);
         else if (field.getValue().equals(Field.EMPTY_FIELD)) holder.noneButton.setChecked(true);
-        
+
+        if(readOnly){
+            holder.trueButton.setEnabled(false);
+            holder.falseButton.setEnabled(false);
+            holder.noneButton.setEnabled(false);
+        } else {
+            holder.trueButton.setEnabled(true);
+            holder.falseButton.setEnabled(true);
+            holder.noneButton.setEnabled(true);
+        }
         return view;
+    }
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly=value;
     }
 
     @Override

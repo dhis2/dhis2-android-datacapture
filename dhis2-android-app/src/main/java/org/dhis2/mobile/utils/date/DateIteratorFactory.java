@@ -29,6 +29,7 @@
 
 package org.dhis2.mobile.utils.date;
 
+import org.dhis2.mobile.utils.date.exceptions.PeriodNotSupportedException;
 import org.dhis2.mobile.utils.date.iterators.BiMonthIterator;
 import org.dhis2.mobile.utils.date.iterators.DayIterator;
 import org.dhis2.mobile.utils.date.iterators.FinAprilYearIterator;
@@ -36,8 +37,13 @@ import org.dhis2.mobile.utils.date.iterators.FinJulyYearIterator;
 import org.dhis2.mobile.utils.date.iterators.FinOctYearIterator;
 import org.dhis2.mobile.utils.date.iterators.MonthIterator;
 import org.dhis2.mobile.utils.date.iterators.QuarterYearIterator;
+import org.dhis2.mobile.utils.date.iterators.SixMonthAprilIterator;
 import org.dhis2.mobile.utils.date.iterators.SixMonthIterator;
 import org.dhis2.mobile.utils.date.iterators.WeekIterator;
+import org.dhis2.mobile.utils.date.iterators.WeekSaturdayIterator;
+import org.dhis2.mobile.utils.date.iterators.WeekSundayIterator;
+import org.dhis2.mobile.utils.date.iterators.WeekThursdayIterator;
+import org.dhis2.mobile.utils.date.iterators.WeekWednesdayIterator;
 import org.dhis2.mobile.utils.date.iterators.YearIterator;
 
 import java.util.ArrayList;
@@ -51,7 +57,9 @@ public class DateIteratorFactory {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
 
-    public static CustomDateIterator<ArrayList<DateHolder>> getDateIterator(String periodType, int openFuturePeriods) {
+    public static CustomDateIterator<ArrayList<DateHolder>> getDateIterator(String periodType, int openFuturePeriods)
+
+            throws PeriodNotSupportedException {
         if (periodType != null) {
             if (periodType.equals(PeriodFilterFactory.YEARLY)) {
                 return (new YearIterator(openFuturePeriods));
@@ -63,6 +71,8 @@ public class DateIteratorFactory {
                 return (new FinOctYearIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.SIX_MONTHLY)) {
                 return (new SixMonthIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.SIX_MONTHLY_APRIL)) {
+                return (new SixMonthAprilIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.QUARTERLY)) {
                 return (new QuarterYearIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.BIMONTHLY)) {
@@ -71,11 +81,19 @@ public class DateIteratorFactory {
                 return (new MonthIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.WEEKLY)) {
                 return (new WeekIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY_WEDNESDAY)) {
+                return (new WeekWednesdayIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY_THURSDAY)) {
+                return (new WeekThursdayIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY_SATURDAY)) {
+                return (new WeekSaturdayIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.WEEKLY_SUNDAY)) {
+                return (new WeekSundayIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.DAILY)) {
                 return (new DayIterator(openFuturePeriods));
             }
         }
-        throw new IllegalArgumentException("Unsupported period type");
+        throw new PeriodNotSupportedException("Unsupported period type",periodType);
     }
 }
 

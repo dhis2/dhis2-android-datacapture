@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -17,16 +16,17 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -49,6 +49,8 @@ import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
 import org.dhis2.mobile.utils.ViewUtils;
+import org.dhis2.mobile.utils.date.expiryday.ExpiryDayValidator;
+import org.dhis2.mobile.utils.date.expiryday.ExpiryDayValidatorFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,12 +65,12 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static final String STATE_REPORT = "state:report";
     private static final String STATE_DOWNLOAD_ATTEMPTED = "state:downloadAttempted";
     private static final String STATE_DOWNLOAD_IN_PROGRESS = "state:downloadInProgress";
+    private static final String STATE_SHOW_MENU_ITEM = "state_showMenuItem";
 
     // loader ids
     private static final int LOADER_FORM_ID = 896927645;
 
     // views
-    private View uploadButton;
     private RelativeLayout progressBarLayout;
     private AppCompatSpinner formGroupSpinner;
     private Form currentForm;
@@ -77,8 +79,14 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static ListView dataEntryListView;
     private List<FieldAdapter> adapters;
 
+    MenuItem saveMenuItem;
+
     // state
     private boolean downloadAttempted;
+    private String mPeriod;
+    private boolean showSaveMenuItem;
+
+    private DatasetInfoHolder datasetInfoHolder;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -94,46 +102,31 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = savedInstanceState;
+        if (bundle == null) {
+            bundle = getIntent().getExtras();
+        }
         setContentView(R.layout.activity_data_entry);
-        setupToolbar();
+        setupToolbar(bundle);
         setupFormSpinner();
         setupProgressBar(savedInstanceState);
 
         setupListView();
-        setupUploadButton();
 
         // let's try to get latest values from API
         attemptToDownloadReport(savedInstanceState);
 
         // if we are downloading values, build form
         buildReportDataEntryForm(savedInstanceState);
-        
-        setupKeyboardObserver();
+
+        initPeriod(bundle);
     }
 
-    private void setupKeyboardObserver() {
-        final View rootView = findViewById(R.id.data_entry_container);
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-
-                Rect r = new Rect();
-                rootView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = rootView.getRootView().getHeight();
-
-                // r.bottom is the position above soft keypad or device button.
-                // if keypad is shown, the r.bottom is smaller than that before.
-                int keypadHeight = screenHeight - r.bottom;
-
-                if (keypadHeight > screenHeight * 0.15) {
-                    rootView.findViewById(R.id.upload_button).setVisibility(View.GONE);
-                }
-                else {
-                    rootView.findViewById(R.id.upload_button).setVisibility(View.VISIBLE);
-                }
-            }
-        });
+    private void initPeriod(Bundle bundle) {
+        datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
+        mPeriod = datasetInfoHolder.getPeriod();
     }
+
 
     @Override
     public void onPause() {
@@ -164,6 +157,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             outState.putParcelableArrayList(STATE_REPORT, groups);
             outState.putBoolean(STATE_DOWNLOAD_ATTEMPTED, downloadAttempted);
             outState.putBoolean(STATE_DOWNLOAD_IN_PROGRESS, isProgressBarVisible());
+            outState.putParcelable(DatasetInfoHolder.TAG, datasetInfoHolder);
+            outState.putBoolean(STATE_SHOW_MENU_ITEM, showSaveMenuItem);
         }
     }
 
@@ -172,6 +167,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case org.dhis2.mobile.R.id.action_save_data_set:
+                upload();
                 return true;
         }
 
@@ -200,7 +198,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Form> loader, Form form) {
         if (loader != null && loader.getId() == LOADER_FORM_ID) {
             currentForm = form;
-            loadGroupsIntoAdapters(form.getGroups());
+            loadGroupsIntoAdapters(form.getGroups(), form);
         }
     }
 
@@ -209,7 +207,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         System.out.println("loader reset");
     }
 
-    private void setupToolbar() {
+    private void setupToolbar(Bundle bundle) {
+        showSaveMenuItem = bundle.getBoolean(STATE_SHOW_MENU_ITEM, false);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -220,7 +220,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         }
     }
 
-    private void setToolbarTitle(String title){
+    private void setToolbarTitle(String title) {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setTitle(title);
     }
@@ -253,18 +253,25 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void setupListView() {
         dataEntryListView = (ListView) findViewById(R.id.list_of_fields);
-        dataEntryListView.addFooterView(dataEntryListView.inflate(getApplicationContext(), R.layout.listview_row_footer, null));
-    }
-
-    private void setupUploadButton() {
-        uploadButton = findViewById(R.id.upload_button);
-        uploadButton.setOnClickListener(new View.OnClickListener() {
-
+        dataEntryListView.setRecyclerListener(new AbsListView.RecyclerListener() {
             @Override
-            public void onClick(View arg0) {
-                upload();
+            public void onMovedToScrapHeap(View view) {
+                if ( view.hasFocus()){
+                    view.clearFocus();
+                    if ( view instanceof EditText) {
+                        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                }
             }
         });
+    }
+
+    private void uploadButtonEnabled(boolean active) {
+        if (saveMenuItem != null) {
+            saveMenuItem.setVisible(active);
+        }
+        showSaveMenuItem = active;
     }
 
     private void attemptToDownloadReport(Bundle savedInstanceState) {
@@ -297,21 +304,31 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
             // we did not load form before,
             // so we need to do so now
-            if (dataEntryGroups == null) {
+            if (dataEntryGroups == null || currentForm==null) {
                 getSupportLoaderManager().restartLoader(LOADER_FORM_ID, null, this).forceLoad();
             } else {
-                loadGroupsIntoAdapters(dataEntryGroups);
+                loadGroupsIntoAdapters(dataEntryGroups, currentForm);
             }
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(org.dhis2.mobile.R.menu.menu_data_entry, menu);
+
+        saveMenuItem = (MenuItem) menu.findItem(R.id.action_save_data_set);
+        saveMenuItem.setVisible(showSaveMenuItem);
+
+        return true;
+    }
     private void showProgressBar() {
-        ViewUtils.hideAndDisableViews(uploadButton, dataEntryListView);
+        ViewUtils.hideAndDisableViews(dataEntryListView);
         ViewUtils.enableViews(progressBarLayout);
     }
 
     private void hideProgressBar() {
-        ViewUtils.enableViews(uploadButton, dataEntryListView);
+        ViewUtils.enableViews(dataEntryListView);
         ViewUtils.hideAndDisableViews(progressBarLayout);
     }
 
@@ -319,13 +336,35 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         return progressBarLayout.getVisibility() == View.VISIBLE;
     }
 
-    private void loadGroupsIntoAdapters(List<Group> groups) {
+    private void loadGroupsIntoAdapters(List<Group> groups, Form form) {
         if (groups != null) {
             List<FieldAdapter> adapters = new ArrayList<>();
 
+            boolean readOnly = false;
+            if(form.getOptions().getexpiryDays()>0)
+            {
+                int expiringDay = form.getOptions().getexpiryDays();
+                String periodType = form.getOptions().getPeriodType();
+                ExpiryDayValidator expiryDayValidator = ExpiryDayValidatorFactory.getExpiryDay(
+                        periodType, expiringDay, mPeriod);
+                if (!expiryDayValidator.canEdit()) {
+                    readOnly = true;
+
+                    showToast(R.string.dataset_readonly_by_expiry_days);
+                }
+            }
+            if(form.isApproved()){
+                readOnly = true;
+
+                showToast(R.string.dataset_readonly_by_approve);
+
+            }
+
+            uploadButtonEnabled(!readOnly);
+
             try {
                 for (Group group : groups) {
-                    adapters.add(new FieldAdapter(group, this, dataEntryListView));
+                    adapters.add(new FieldAdapter(group, this, dataEntryListView, readOnly));
                 }
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -341,7 +380,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (adapters.size() == 1) {
             formGroupSpinner.setVisibility(View.GONE);
             dataEntryListView.setAdapter(adapters.get(0));
-            if(adapters.get(0).getLabel()!=null && !adapters.get(0).getLabel().equals(FieldAdapter.FORM_WITHOUT_SECTION)){
+            if (adapters.get(0).getLabel() != null && !adapters.get(0).getLabel().equals(
+                    FieldAdapter.FORM_WITHOUT_SECTION)) {
                 setToolbarTitle(adapters.get(0).getLabel());
             }
             return;
@@ -388,7 +428,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             return;
         }
 
-        if(!validateFields(groups)){
+        if (!validateFields(groups)) {
             ToastManager.makeToast(this, getString(R.string.compulsory_empty_error),
                     Toast.LENGTH_SHORT).show();
             return;
@@ -424,9 +464,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private boolean validateFields(ArrayList<Group> groups) {
-        for (Group group:groups){
-            for(Field field:group.getFields()){
-                if(field.isCompulsory() && (field.getValue()==null || field.getValue().equals(""))){
+        for (Group group : groups) {
+            for (Field field : group.getFields()) {
+                if (field.isCompulsory() && (field.getValue() == null || field.getValue().equals(
+                        ""))) {
                     return false;
                 }
             }
@@ -469,7 +510,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
                 currentForm = form;
 
                 if (form != null) {
-                    loadGroupsIntoAdapters(form.getGroups());
+                    loadGroupsIntoAdapters(form.getGroups(), currentForm);
                 }
             }
         }
@@ -626,7 +667,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private boolean anyFieldEdited() {
         ArrayList<Group> groups = new ArrayList<>();
-        if(adapters==null){
+        if (adapters == null) {
             return false;
         }
         for (FieldAdapter adapter : adapters) {
@@ -669,5 +710,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void showToast(int resId){
+        Toast.makeText(this, resId, Toast.LENGTH_LONG).show();
     }
 }
