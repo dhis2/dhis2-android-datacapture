@@ -41,7 +41,7 @@ public class QuarterlyPeriodFilter extends PeriodFilter {
             return endDate.withMonthOfYear(DateTimeConstants.SEPTEMBER).withDayOfMonth(
                     endDate.dayOfMonth().getMaximumValue());
         } else if (month <= 12) {
-            endDate = endDate.withYear(endDate.getYear() + 1).withMonthOfYear(
+            endDate = endDate.withYear(endDate.getYear()).withMonthOfYear(
                     DateTimeConstants.JANUARY);
             return endDate.withDayOfYear(endDate.dayOfYear().getMaximumValue());
         }
