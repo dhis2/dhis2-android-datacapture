@@ -61,6 +61,7 @@ public class WorkService extends Service {
     public static final String METHOD_UPLOAD_PROFILE_INFO = "uploadProfileInfo";
     public static final String METHOD_LOGIN_USER = "loginUser";
     public static final String METHOD_UPDATE_DATASETS = "updateDatasets";
+    public static final String METHOD_FIRST_PULL_DATASETS = "firstUpdateDatasets";
     public static final String METHOD_DOWNLOAD_LATEST_DATASET_VALUES = "downloadLatestDatasetValues";
     public static final String METHOD_UPLOAD_DATASET = "aggregateReportUploadProcessor";
     public static final String METHOD_OFFLINE_DATA_UPLOAD = "offlineDataUploading";
@@ -146,8 +147,12 @@ public class WorkService extends Service {
             LoginProcessor.loginUser(context, server, creds, username);
         }
 
+        if (METHOD_FIRST_PULL_DATASETS.equals(methodName)) {
+            FormsDownloadProcessor.updateDatasets(context, true);
+            ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
+        }
         if (METHOD_UPDATE_DATASETS.equals(methodName)) {
-            FormsDownloadProcessor.updateDatasets(context);
+            FormsDownloadProcessor.updateDatasets(context, false);
             ServerInfoProcessor.pullServerInfo(context, PrefUtils.getServerURL(context), PrefUtils.getCredentials(context));
         }
 
