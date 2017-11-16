@@ -13,7 +13,7 @@ public class WeeklyExpiryDayValidator extends ExpiryDayValidator {
 
     @Override
     protected LocalDate getMaxDateCanEdit() {
-        LocalDate periodDate = LocalDate.parse(period, DateTimeFormat.forPattern(DATE_FORMAT));
+        LocalDate periodDate = LocalDate.parse(period, DateTimeFormat.forPattern(getDateFormat()));
         periodDate = periodDate.withDayOfWeek(weekStarts());
         periodDate = periodDate.plusDays(6);
         return periodDate.plusDays(expiryDays - 1);
@@ -21,5 +21,9 @@ public class WeeklyExpiryDayValidator extends ExpiryDayValidator {
 
     protected int weekStarts() {
         return DateTimeConstants.MONDAY;
+    }
+
+    protected String getDateFormat() {
+        return DATE_FORMAT;
     }
 }
