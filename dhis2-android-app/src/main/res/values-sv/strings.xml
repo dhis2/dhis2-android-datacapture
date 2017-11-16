@@ -97,8 +97,8 @@
   <string name="dialog_content_logout_confirmation">"Om du lämnar systemet kommer alla data som inte skickas att raderas. Vill du fortfarande avsluta?"</string>
   <string name="value_not_supported">Värdetyp stöds inte</string>
 
-  <string name="logged_in_as">"Logga in som: "</string>
-  <string name="logged_in_at">"På servern: "</string>
+  <string name="logged_in">"Logga in som: "</string>
+  <string name="at_server">"På servern: "</string>
   <string name="dialog_exit_survey_title">Bekräfta exit</string>
   <string name="dialog_exit_survey_message">Du har data som inte har sparats ännu. Om du fortsätter och avslutar den här rapporten kommer alla data som inte sparas att gå vilse. Vill du fortsätta?</string>
   <string name="dialog_exit_survey_yes">Ja</string>
