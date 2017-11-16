@@ -10,6 +10,7 @@ android {
         targetSdkVersion 25
         versionCode 21
         versionName "1.7.0"
+        applicationId "org.dhis2.mobile_dev"
     }
 
     buildTypes {
