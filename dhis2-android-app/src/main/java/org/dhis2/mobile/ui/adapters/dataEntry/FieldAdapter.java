@@ -114,7 +114,6 @@ public class FieldAdapter extends BaseAdapter {
                 rows.add(textRow);
             } else if (field.getType().equals(RowTypes.LONG_TEXT.name())) {
                 LongTextRow longTextRow = new LongTextRow(inflater, field);
-                longTextRow.setOnEditorActionListener(customOnEditorActionListener);
                 longTextRow.setReadOnly(readOnly);
                 rows.add(longTextRow);
             } else if (field.getType().equals(RowTypes.NUMBER.name())) {

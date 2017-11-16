@@ -16,8 +16,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -67,6 +65,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private static final String STATE_REPORT = "state:report";
     private static final String STATE_DOWNLOAD_ATTEMPTED = "state:downloadAttempted";
     private static final String STATE_DOWNLOAD_IN_PROGRESS = "state:downloadInProgress";
+    private static final String STATE_SHOW_MENU_ITEM = "state_showMenuItem";
 
     // loader ids
     private static final int LOADER_FORM_ID = 896927645;
@@ -85,6 +84,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     // state
     private boolean downloadAttempted;
     private String mPeriod;
+    private boolean showSaveMenuItem;
+
+    private DatasetInfoHolder datasetInfoHolder;
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -105,7 +107,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             bundle = getIntent().getExtras();
         }
         setContentView(R.layout.activity_data_entry);
-        setupToolbar();
+        setupToolbar(bundle);
         setupFormSpinner();
         setupProgressBar(savedInstanceState);
 
@@ -121,7 +123,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void initPeriod(Bundle bundle) {
-        DatasetInfoHolder datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
+        datasetInfoHolder = bundle.getParcelable(DatasetInfoHolder.TAG);
         mPeriod = datasetInfoHolder.getPeriod();
     }
 
@@ -155,6 +157,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
             outState.putParcelableArrayList(STATE_REPORT, groups);
             outState.putBoolean(STATE_DOWNLOAD_ATTEMPTED, downloadAttempted);
             outState.putBoolean(STATE_DOWNLOAD_IN_PROGRESS, isProgressBarVisible());
+            outState.putParcelable(DatasetInfoHolder.TAG, datasetInfoHolder);
+            outState.putBoolean(STATE_SHOW_MENU_ITEM, showSaveMenuItem);
         }
     }
 
@@ -203,7 +207,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         System.out.println("loader reset");
     }
 
-    private void setupToolbar() {
+    private void setupToolbar(Bundle bundle) {
+        showSaveMenuItem = bundle.getBoolean(STATE_SHOW_MENU_ITEM, false);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -262,7 +268,10 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     }
 
     private void uploadButtonEnabled(boolean active) {
-        saveMenuItem.setVisible(active);
+        if (saveMenuItem != null) {
+            saveMenuItem.setVisible(active);
+        }
+        showSaveMenuItem = active;
     }
 
     private void attemptToDownloadReport(Bundle savedInstanceState) {
@@ -309,6 +318,7 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         inflater.inflate(org.dhis2.mobile.R.menu.menu_data_entry, menu);
 
         saveMenuItem = (MenuItem) menu.findItem(R.id.action_save_data_set);
+        saveMenuItem.setVisible(showSaveMenuItem);
 
         return true;
     }
