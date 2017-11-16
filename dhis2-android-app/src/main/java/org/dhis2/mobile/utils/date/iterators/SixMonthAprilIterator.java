@@ -31,27 +31,28 @@ package org.dhis2.mobile.utils.date.iterators;
 
 import org.dhis2.mobile.utils.date.CustomDateIteratorClass;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
+public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
     private static final String DATE_LABEL_FORMAT = "%s - %s %s";
-    private static final String S1 = "S1";
-    private static final String S2 = "S2";
+    private static final String S1 = "AprilS1";
+    private static final String S2 = "AprilS2";
 
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public SixMonthIterator(int openFP) {
+    public SixMonthAprilIterator(int openFP) {
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
+        cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
         checkDate = new LocalDate(cPeriod);
         maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), 1);
-        for (int i = 0; i < openFuturePeriods; i++) {
+        for (int i = 0; i < openFuturePeriods-1; i++) {
             maxDate = maxDate.plusMonths(6);
         }
     }
@@ -99,24 +100,25 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
 
         while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(6))) && counter < 2) {
             String year = checkDate.year().getAsString();
+            String yearLastPeriod = Integer.parseInt(year)+1+"";
             String label;
             String date;
 
-            if (checkDate.getMonthOfYear() > JUN) {
-                label = String.format(DATE_LABEL_FORMAT, JUL_STR_LONG, DEC_STR_LONG, year);
-                date = year + S2;
-            } else {
-                label = String.format(DATE_LABEL_FORMAT, JAN_STR_LONG, JUN_STR_LONG, year);
+            if (checkDate.getMonthOfYear() >= APR && checkDate.getMonthOfYear() <= SEP) {
+                label = String.format(DATE_LABEL_FORMAT, APR_STR_LONG, SEP_STR_LONG, year);
                 date = year + S1;
+            } else {
+                label = String.format(DATE_LABEL_FORMAT, OCT_STR_LONG +" "+ year, MAR_STR_LONG, yearLastPeriod);
+                date = year + S2;
             }
 
-            checkDate = checkDate.plusMonths(6);
-            counter++;
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
+            checkDate = checkDate.plusMonths(6);
+            counter++;
         }
 
         Collections.reverse(dates);

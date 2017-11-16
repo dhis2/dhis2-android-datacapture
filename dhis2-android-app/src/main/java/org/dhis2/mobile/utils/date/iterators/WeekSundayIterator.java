@@ -31,28 +31,38 @@ package org.dhis2.mobile.utils.date.iterators;
 
 import org.dhis2.mobile.utils.date.CustomDateIteratorClass;
 import org.dhis2.mobile.utils.date.DateHolder;
+import org.dhis2.mobile.utils.date.PeriodFilter;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
-    private static final String DATE_LABEL_FORMAT = "%s - %s %s";
-    private static final String S1 = "S1";
-    private static final String S2 = "S2";
+public class WeekSundayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
+    private static final String DATE_FORMAT = "%s%s%s";
+    private static final String DATE_LABEL_FORMAT = "%s%s %s - %s";
+    private static final String W = "SunW";
 
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public SixMonthIterator(int openFP) {
+    public WeekSundayIterator(int openFP) {
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
+        cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.SUNDAY));
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), 1);
-        for (int i = 0; i < openFuturePeriods; i++) {
-            maxDate = maxDate.plusMonths(6);
+        maxDate = currentDate;
+        String day = PeriodFilter.getDayString(currentDate);
+        if(currentDate.getDayOfWeek()!=DateTimeConstants.SATURDAY) {
+            maxDate = new LocalDate(currentDate.withDayOfWeek(DateTimeConstants.SATURDAY));
+            String fixedDay = PeriodFilter.getDayString(maxDate);
+            if (Integer.parseInt(day) > Integer.parseInt(fixedDay)) {
+                maxDate = maxDate.plusWeeks(1);
+            }
+        }
+        for (int i = 0; i < openFuturePeriods -1; i++) {
+            maxDate = maxDate.plusWeeks(1);
         }
     }
 
@@ -61,24 +71,12 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
         return hasNext(checkDate);
     }
 
-    private boolean hasNext(LocalDate cDate) {
+    private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
             return checkDate.isBefore(maxDate);
         } else {
-            return currentDate.isAfter(cDate.plusMonths(6));
+            return currentDate.isAfter(date.plusWeeks(1));
         }
-    }
-
-    @Override
-    public ArrayList<DateHolder> next() {
-        cPeriod = cPeriod.plusYears(1);
-        return generatePeriod();
-    }
-
-    @Override
-    public ArrayList<DateHolder> previous() {
-        cPeriod = cPeriod.minusYears(1);
-        return generatePeriod();
     }
 
     @Override
@@ -91,32 +89,43 @@ public class SixMonthIterator extends CustomDateIteratorClass<ArrayList<DateHold
     }
 
     @Override
+    public ArrayList<DateHolder> next() {
+        cPeriod = cPeriod.plusYears(1);
+        cPeriod = cPeriod.plusMonths(1);
+        cPeriod = cPeriod.withDayOfYear(1).withDayOfWeek(DateTimeConstants.SUNDAY);
+        return generatePeriod();
+    }
+
+    @Override
+    public ArrayList<DateHolder> previous() {
+        cPeriod = cPeriod.minusYears(1);
+        cPeriod = cPeriod.plusMonths(1);
+        cPeriod = cPeriod.withDayOfYear(1).withDayOfWeek(DateTimeConstants.SUNDAY);
+        return generatePeriod();
+    }
+
+    @Override
     protected ArrayList<DateHolder> generatePeriod() {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
-
-
-        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(6))) && counter < 2) {
+        int quantity = checkDate.weekOfWeekyear().getMaximumValue();
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusWeeks(1).minusDays(1))) && counter < quantity) {
             String year = checkDate.year().getAsString();
-            String label;
-            String date;
+            String cWeekNumber = checkDate.weekOfWeekyear().getAsString();
+            String cDate = checkDate.toString();
+            String nDate = checkDate.plusWeeks(1).minusDays(1).toString();
 
-            if (checkDate.getMonthOfYear() > JUN) {
-                label = String.format(DATE_LABEL_FORMAT, JUL_STR_LONG, DEC_STR_LONG, year);
-                date = year + S2;
-            } else {
-                label = String.format(DATE_LABEL_FORMAT, JAN_STR_LONG, JUN_STR_LONG, year);
-                date = year + S1;
-            }
-
-            checkDate = checkDate.plusMonths(6);
-            counter++;
+            String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
+            String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
+
+            counter++;
+            checkDate = checkDate.plusWeeks(1);
         }
 
         Collections.reverse(dates);

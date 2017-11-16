@@ -3,6 +3,7 @@ package org.dhis2.mobile.utils.date;
 
 import org.dhis2.mobile.ui.models.Filter;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.io.Serializable;
 
@@ -42,5 +43,19 @@ public class PeriodFilter implements Filter,Serializable{
         // return true, if criteria is after endDate
         // return endDate.isAfter(selectedDate);
         return !(selectedDate.isBefore(endDate));
+    }
+
+    public static String getDayString(DateTime date) {
+        return date.getYear()+getTwoDigits(date.getMonthOfYear()+"")+""+getTwoDigits(date.getDayOfMonth()+"");
+    }
+
+    public static String getDayString(LocalDate date) {
+        return date.getYear()+getTwoDigits(date.getMonthOfYear()+"")+""+getTwoDigits(date.getDayOfMonth()+"");
+    }
+    private static String getTwoDigits(String dayOfMonth) {
+        if(dayOfMonth.length()==1){
+            return "0"+dayOfMonth;
+        }
+        return dayOfMonth;
     }
 }
