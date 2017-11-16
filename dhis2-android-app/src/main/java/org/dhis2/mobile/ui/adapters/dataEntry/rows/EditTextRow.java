@@ -2,7 +2,7 @@ package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
 import android.widget.TextView;
 
-public class EditTextRow {
+public class EditTextRow  {
 
     protected TextView.OnEditorActionListener mOnEditorActionListener;
 

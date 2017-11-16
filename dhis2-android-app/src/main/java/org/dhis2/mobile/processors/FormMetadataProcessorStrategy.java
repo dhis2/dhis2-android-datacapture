@@ -20,5 +20,8 @@ class FormMetadataProcessorStrategy {
                 DataElementOperandParser.parse(jsonContent), form);
         DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
                 DataSetCategoryOptionParser.parse(jsonContent));
+
+        boolean isApproved = DataSetApprovals.download(context, info.getFormId(), info.getPeriod(), info.getOrgUnitId());
+        form.setApproved(isApproved);
     }
 }

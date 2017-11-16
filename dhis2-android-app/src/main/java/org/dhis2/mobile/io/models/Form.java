@@ -54,6 +54,7 @@ public class Form implements Serializable, Parcelable {
     private FormOptions options;
     private ArrayList<Group> groups = new ArrayList<>();
     private boolean fieldCombinationRequired;
+    private boolean isApproved;
 
     private Form(Parcel in) {
         id = in.readString();
@@ -62,6 +63,7 @@ public class Form implements Serializable, Parcelable {
         options = in.readParcelable(FormOptions.class.getClassLoader());
         in.readTypedList(groups, Group.CREATOR);
         fieldCombinationRequired = in.readByte() != 0;
+        isApproved = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<Form> CREATOR = new Parcelable.Creator<Form>() {
@@ -88,6 +90,7 @@ public class Form implements Serializable, Parcelable {
         parcel.writeParcelable(options, flags);
         parcel.writeTypedList(groups);
         parcel.writeByte((byte) (fieldCombinationRequired ? 1 : 0));
+        parcel.writeByte((byte) (isApproved ? 1 : 0));
     }
 
     public String getId() {
@@ -116,5 +119,13 @@ public class Form implements Serializable, Parcelable {
 
     public void setFieldCombinationRequired(boolean fieldCombinationRequired) {
         this.fieldCombinationRequired = fieldCombinationRequired;
+    }
+
+    public boolean isApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        isApproved = approved;
     }
 }

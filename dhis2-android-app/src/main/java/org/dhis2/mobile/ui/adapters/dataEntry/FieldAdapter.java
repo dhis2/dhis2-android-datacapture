@@ -51,7 +51,6 @@ import org.dhis2.mobile.ui.adapters.dataEntry.rows.AutoCompleteRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.BooleanRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.CheckBoxRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.DatePickerRow;
-import org.dhis2.mobile.ui.adapters.dataEntry.rows.EditTextRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.GenderRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.IntegerRow;
 import org.dhis2.mobile.ui.adapters.dataEntry.rows.LongTextRow;
@@ -77,7 +76,7 @@ public class FieldAdapter extends BaseAdapter {
 
     private ListView mListView;
 
-    public FieldAdapter(Group group, Context context, ListView listView) {
+    public FieldAdapter(Group group, Context context, ListView listView, boolean readOnly) {
         ArrayList<Field> fields = group.getFields();
         this.group = group;
         this.rows = new ArrayList<Row>();
@@ -106,41 +105,47 @@ public class FieldAdapter extends BaseAdapter {
 
                 AutoCompleteRow autoCompleteRow = new AutoCompleteRow(inflater, field, optionSet, context);
                 autoCompleteRow.setOnEditorActionListener(customOnEditorActionListener);
-
+                autoCompleteRow.setReadOnly(readOnly);
                 rows.add(autoCompleteRow);
             } else if (field.getType().equals(RowTypes.TEXT.name())) {
                 TextRow textRow = new TextRow(inflater, field);
                 textRow.setOnEditorActionListener(customOnEditorActionListener);
-
+                textRow.setReadOnly(readOnly);
                 rows.add(textRow);
             } else if (field.getType().equals(RowTypes.LONG_TEXT.name())) {
                 LongTextRow longTextRow = new LongTextRow(inflater, field);
                 longTextRow.setOnEditorActionListener(customOnEditorActionListener);
-
+                longTextRow.setReadOnly(readOnly);
                 rows.add(longTextRow);
             } else if (field.getType().equals(RowTypes.NUMBER.name())) {
                 NumberRow numberRow = new NumberRow(inflater, field);
                 numberRow.setOnEditorActionListener(customOnEditorActionListener);
-
+                numberRow.setReadOnly(readOnly);
                 rows.add(numberRow);
             } else if (field.getType().equals(RowTypes.INTEGER.name())) {
                 IntegerRow integerRow = new IntegerRow(inflater, field);
                 integerRow.setOnEditorActionListener(customOnEditorActionListener);
+                integerRow.setReadOnly(readOnly);
                 rows.add(integerRow);
             } else if (field.getType().equals(RowTypes.INTEGER_ZERO_OR_POSITIVE.name())) {
                 PosOrZeroIntegerRow posOrZeroIntegerRow = new PosOrZeroIntegerRow(inflater, field);
                 posOrZeroIntegerRow.setOnEditorActionListener(customOnEditorActionListener);
+                posOrZeroIntegerRow.setReadOnly(readOnly);
                 rows.add(posOrZeroIntegerRow);
             } else if (field.getType().equals(RowTypes.INTEGER_POSITIVE.name())) {
                 PosIntegerRow posIntegerRow = new PosIntegerRow(inflater, field);
                 posIntegerRow.setOnEditorActionListener(customOnEditorActionListener);
+                posIntegerRow.setReadOnly(readOnly);
                 rows.add(posIntegerRow);
             } else if (field.getType().equals(RowTypes.INTEGER_NEGATIVE.name())) {
                 NegativeIntegerRow negativeIntegerRow = new NegativeIntegerRow(inflater, field);
                 negativeIntegerRow.setOnEditorActionListener(customOnEditorActionListener);
+                negativeIntegerRow.setReadOnly(readOnly);
                 rows.add(negativeIntegerRow);
             } else if (field.getType().equals(RowTypes.BOOLEAN.name())) {
-                rows.add(new BooleanRow(inflater, field));
+                BooleanRow booleanRow = new BooleanRow(inflater, field);
+                booleanRow.setReadOnly(readOnly);
+                rows.add(booleanRow);
             } else if (field.getType().equals(RowTypes.TRUE_ONLY.name())) {
                 rows.add(new CheckBoxRow(inflater, field));
             } else if (field.getType().equals(RowTypes.DATE.name())) {
