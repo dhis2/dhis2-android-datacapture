@@ -14,6 +14,7 @@ public class DataSetApprovals {
 
     public static final String APPROVED_HERE = "APPROVED_HERE";
     public static final String APPROVED_ELSEWHERE = "APPROVED_ELSEWHERE";
+    public static final String APPROVED_ABOVE = "APPROVED_ABOVE";
 
     public static boolean download(Context context,
             String dataSet, String period, String ou) throws NetworkException {
@@ -40,7 +41,8 @@ public class DataSetApprovals {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            if(state.equals(APPROVED_HERE) || state.equals(APPROVED_ELSEWHERE)) {
+            if (state.equals(APPROVED_HERE) || state.equals(APPROVED_ELSEWHERE) || state.equals(
+                    APPROVED_ABOVE)) {
                 return true;
             }
         }
