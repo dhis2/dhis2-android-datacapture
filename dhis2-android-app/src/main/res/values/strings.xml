@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">DHIS2 Data Capture (dev)</string>
+    <string name="app_name">DHIS2 Data Capture</string>
     <string name="title_activity_launcher">LauncherActivity</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="desc">stub image</string>
