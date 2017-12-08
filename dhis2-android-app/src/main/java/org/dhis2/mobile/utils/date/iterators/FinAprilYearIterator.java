@@ -40,14 +40,28 @@ public class FinAprilYearIterator extends YearIterator {
 
     public FinAprilYearIterator(int openFP) {
         super(openFP);
+        openFuturePeriods = openFP;
+        cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
+        checkDate = new LocalDate(cPeriod);
+        maxDate = new LocalDate(currentDate.getYear(), MAR, 31);
+        if(openFuturePeriods>0) {
+            for (int i = 0; i < openFuturePeriods; i++) {
+                maxDate = maxDate.plusYears(1);
+            }
+        }
     }
-
     @Override
     protected boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
             return checkDate.isBefore(maxDate);
         } else {
-            LocalDate march = new LocalDate(date.getYear(), MAR, 31);
+            LocalDate march;
+            if(date.getMonthOfYear()>=4) {
+                march = new LocalDate(date.getYear()+1, MAR, 31);
+            }
+            else{
+                march = new LocalDate(date.getYear(), MAR, 31);
+            }
             return currentDate.isAfter(march);
         }
     }
@@ -66,12 +80,17 @@ public class FinAprilYearIterator extends YearIterator {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
-        LocalDate march = new LocalDate(checkDate.getYear(), MAR, 31);
+        LocalDate march;
+        if(checkDate.getMonthOfYear()>=3) {
+            march = new LocalDate(checkDate.getYear()+1, MAR, 31);
+        }
+        else{
+            march = new LocalDate(checkDate.getYear(), MAR, 31);
+        }
 
-        while ((openFuturePeriods > 0 || currentDate.isAfter(march))  && counter < 10) {
-            String dateStr = checkDate.minusYears(1).year().getAsString();
-            String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, dateStr, MAR_STR, checkDate.year().getAsString());
-            String date = dateStr + APRIL;
+        while ((openFuturePeriods > 0 || currentDate.isAfter(march.minusYears(1)))  && counter < 10) {
+            String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, checkDate.year().getAsString(), MAR_STR, checkDate.plusYears(1).year().getAsString());
+            String date = checkDate.year().getAsString() + APRIL;
 
             if(checkDate.isBefore(maxDate)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);

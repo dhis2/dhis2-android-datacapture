@@ -43,7 +43,6 @@ import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Option;
 import org.dhis2.mobile.io.models.OptionSet;
-import org.dhis2.mobile.ui.activities.DataEntryActivity;
 import org.dhis2.mobile.ui.adapters.dataEntry.AutoCompleteAdapter;
 
 import java.util.ArrayList;
@@ -55,6 +54,7 @@ public class AutoCompleteRow extends EditTextRow implements Row {
     private Field field;
     private OptionSet optionset;
     private Context mContext;
+    public boolean readOnly = false;
 
     public AutoCompleteRow(LayoutInflater inflater, Field field, OptionSet optionset, Context context) {
         this.inflater = inflater;
@@ -115,13 +115,24 @@ public class AutoCompleteRow extends EditTextRow implements Row {
         holder.button.setOnClickListener(holder.listener);
         holder.autoComplete.clearFocus();
         holder.autoComplete.setOnEditorActionListener(mOnEditorActionListener);
-
+        if(readOnly){
+            holder.button.setEnabled(false);
+            holder.autoComplete.setEnabled(false);
+        } else {
+            holder.button.setEnabled(true);
+            holder.autoComplete.setEnabled(true);
+        }
         return view;
     }
 
     @Override
     public int getViewType() {
         return RowTypes.AUTO_COMPLETE.ordinal();
+    }
+
+    @Override
+    public void setReadOnly(boolean value) {
+        readOnly = value;
     }
 
     private void loadOptions() {

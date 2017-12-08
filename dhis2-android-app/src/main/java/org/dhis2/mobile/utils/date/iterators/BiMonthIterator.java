@@ -38,11 +38,11 @@ import java.util.Collections;
 
 public class BiMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
     private static final String B1 = "01B";
+    private static final String B2 = "02B";
     private static final String B3 = "03B";
+    private static final String B4 = "04B";
     private static final String B5 = "05B";
-    private static final String B7 = "07B";
-    private static final String B9 = "09B";
-    private static final String B11 = "11B";
+    private static final String B6 = "06B";
 
     private static final String DATE_LABEL_FORMAT = "%s - %s %s";
 
@@ -112,19 +112,19 @@ public class BiMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolde
                 date = year + B1;
                 label = String.format(DATE_LABEL_FORMAT, JAN_STR, FEB_STR, year);
             } else if ((cMonth >= FEB) && (cMonth < APR)) {
-                date = year + B3;
+                date = year + B2;
                 label = String.format(DATE_LABEL_FORMAT, MAR_STR, APR_STR, year);
             } else if ((cMonth >= APR) && (cMonth < JUN)) {
-                date = year + B5;
+                date = year + B3;
                 label = String.format(DATE_LABEL_FORMAT, MAY_STR, JUN_STR, year);
             } else if ((cMonth >= JUN) && (cMonth < AUG)) {
-                date = year + B7;
+                date = year + B4;
                 label = String.format(DATE_LABEL_FORMAT, JUL_STR, AUG_STR, year);
             } else if ((cMonth >= AUG) && (cMonth < OCT)) {
-                date = year + B9;
+                date = year + B5;
                 label = String.format(DATE_LABEL_FORMAT, SEP_STR, OCT_STR, year);
             } else {
-                date = year + B11;
+                date = year + B6;
                 label = String.format(DATE_LABEL_FORMAT, NOV_STR, DEC_STR, year);
             }
 

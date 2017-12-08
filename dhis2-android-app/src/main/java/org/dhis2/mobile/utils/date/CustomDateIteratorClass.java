@@ -57,6 +57,19 @@ public abstract class CustomDateIteratorClass<T> implements CustomDateIterator<T
     protected static final String OCT_STR;
     protected static final String NOV_STR;
     protected static final String DEC_STR;
+
+    protected static final String JAN_STR_LONG;
+    protected static final String FEB_STR_LONG;
+    protected static final String MAR_STR_LONG;
+    protected static final String APR_STR_LONG;
+    protected static final String MAY_STR_LONG;
+    protected static final String JUN_STR_LONG;
+    protected static final String JUL_STR_LONG;
+    protected static final String AUG_STR_LONG;
+    protected static final String SEP_STR_LONG;
+    protected static final String OCT_STR_LONG;
+    protected static final String NOV_STR_LONG;
+    protected static final String DEC_STR_LONG;
     
     static {
         LocalDate lDate = new LocalDate();
@@ -73,6 +86,20 @@ public abstract class CustomDateIteratorClass<T> implements CustomDateIterator<T
         OCT_STR = lDate.withMonthOfYear(OCT).monthOfYear().getAsShortText();
         NOV_STR = lDate.withMonthOfYear(NOV).monthOfYear().getAsShortText();
         DEC_STR = lDate.withMonthOfYear(DEC).monthOfYear().getAsShortText();
+
+        JAN_STR_LONG = lDate.withMonthOfYear(JAN).monthOfYear().getAsText();
+        FEB_STR_LONG = lDate.withMonthOfYear(FEB).monthOfYear().getAsText();
+        MAR_STR_LONG = lDate.withMonthOfYear(MAR).monthOfYear().getAsText();
+        APR_STR_LONG = lDate.withMonthOfYear(APR).monthOfYear().getAsText();
+        MAY_STR_LONG = lDate.withMonthOfYear(MAY).monthOfYear().getAsText();
+        JUN_STR_LONG = lDate.withMonthOfYear(JUN).monthOfYear().getAsText();
+        JUL_STR_LONG = lDate.withMonthOfYear(JUL).monthOfYear().getAsText();
+        AUG_STR_LONG = lDate.withMonthOfYear(AUG).monthOfYear().getAsText();
+        SEP_STR_LONG = lDate.withMonthOfYear(SEP).monthOfYear().getAsText();
+        OCT_STR_LONG = lDate.withMonthOfYear(OCT).monthOfYear().getAsText();
+        NOV_STR_LONG = lDate.withMonthOfYear(NOV).monthOfYear().getAsText();
+        DEC_STR_LONG = lDate.withMonthOfYear(DEC).monthOfYear().getAsText();
+
     }
     
     protected LocalDate currentDate;

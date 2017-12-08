@@ -29,16 +29,15 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
-import org.dhis2.mobile.io.models.Field;
-
-import org.dhis2.mobile.R;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
+
+import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.models.Field;
 
 public class GenderRow extends RowCosmetics implements Row {
     public static final String FEMALE = "gender_female";
@@ -47,6 +46,7 @@ public class GenderRow extends RowCosmetics implements Row {
     
 	private final LayoutInflater inflater;
 	private final Field field;
+	public boolean readOnly = false;
 
 	public GenderRow(LayoutInflater inflater, Field field) {
 		this.inflater = inflater;
@@ -101,12 +101,26 @@ public class GenderRow extends RowCosmetics implements Row {
 		else if (field.getValue().equals(OTHER))
 			holder.optionOther.setChecked(true);
 
+		if(readOnly){
+			holder.optionOther.setEnabled(false);
+			holder.optionFemale.setEnabled(false);
+			holder.optionMale.setEnabled(false);
+		} else {
+			holder.optionOther.setEnabled(true);
+			holder.optionFemale.setEnabled(true);
+			holder.optionMale.setEnabled(true);
+		}
 		return view;
 	}
 
 	@Override
 	public int getViewType() {
 		return RowTypes.GENDER.ordinal();
+	}
+
+	@Override
+	public void setReadOnly(boolean value) {
+		readOnly = value;
 	}
 
 	private class BooleanRowHolder {

@@ -72,6 +72,7 @@ public class ReportUploadProcessor {
 
         String url = PrefUtils.getServerURL(context) + URLConstants.DATASET_UPLOAD_URL;
         String creds = PrefUtils.getCredentials(context);
+        Log.i(TAG, data);
         Response response = HTTPClient.post(url, creds, data);
 
         String log = String.format("[%s] %s", response.getCode(), response.getBody());
