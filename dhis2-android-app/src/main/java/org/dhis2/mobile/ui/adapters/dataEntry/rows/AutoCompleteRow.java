@@ -29,7 +29,13 @@
 
 package org.dhis2.mobile.ui.adapters.dataEntry.rows;
 
+import static android.text.TextUtils.isEmpty;
+
+import static org.dhis2.mobile.io.models.Field.EMPTY_FIELD;
+
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +52,9 @@ import org.dhis2.mobile.io.models.OptionSet;
 import org.dhis2.mobile.ui.adapters.dataEntry.AutoCompleteAdapter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AutoCompleteRow extends EditTextRow implements Row {
     private AutoCompleteAdapter adapter;
@@ -56,12 +64,24 @@ public class AutoCompleteRow extends EditTextRow implements Row {
     private Context mContext;
     public boolean readOnly = false;
 
+    private final Map<String, String> mCodeToNameMap;
+    private final Map<String, String> mNameToCodeMap;
+    private final ArrayList<String> mOptions;
+
     public AutoCompleteRow(LayoutInflater inflater, Field field, OptionSet optionset, Context context) {
         this.inflater = inflater;
         this.field = field;
         this.optionset = optionset;
         mContext = context;
-
+        mCodeToNameMap = new LinkedHashMap<>();
+        mNameToCodeMap = new LinkedHashMap<>();
+        if (optionset.getOptions() != null) {
+            for (Option option : optionset.getOptions()) {
+                mCodeToNameMap.put(option.getCode(), option.getName());
+                mNameToCodeMap.put(option.getName(), option.getCode());
+            }
+        }
+        mOptions = new ArrayList<>(mNameToCodeMap.keySet());
         loadOptions();
     }
 
@@ -79,11 +99,8 @@ public class AutoCompleteRow extends EditTextRow implements Row {
                     rootView.findViewById(R.id.text_label);
             AutoCompleteTextView autoComplete = (AutoCompleteTextView)
                     rootView.findViewById(R.id.chooseOption);
-            OnFocusListener onFocusChangeListener = new OnFocusListener(autoComplete,
-                    adapter.getData());
-            EditTextWatcher textWatcher = new EditTextWatcher(field);
+            AutoCompleteEditTextWatcher textWatcher = new AutoCompleteEditTextWatcher(field);
 
-            autoComplete.setOnFocusChangeListener(onFocusChangeListener);
             autoComplete.addTextChangedListener(textWatcher);
 
             ImageView showOptions = (ImageView) rootView.findViewById(R.id.showDropDownList);
@@ -91,7 +108,7 @@ public class AutoCompleteRow extends EditTextRow implements Row {
             showOptions.setOnClickListener(listener);
 
             holder = new AutoCompleteRowHolder(textLabel, autoComplete, showOptions,
-                    listener, onFocusChangeListener, textWatcher);
+                    listener, textWatcher);
 
             rootView.setTag(holder);
             view = rootView;
@@ -104,11 +121,16 @@ public class AutoCompleteRow extends EditTextRow implements Row {
 
         loadOptions();
 
+        String name;
+        if (mCodeToNameMap.containsKey(field.getValue())) {
+            name = mCodeToNameMap.get(field.getValue());
+        } else {
+            name = EMPTY_FIELD;
+        }
+        holder.textWatcher.setOptions(mNameToCodeMap);
         holder.textWatcher.setField(field);
-        holder.autoComplete.setText(field.getValue());
+        holder.autoComplete.setText(name);
         holder.autoComplete.setAdapter(adapter);
-        holder.onFocusListener.setValues(holder.autoComplete, adapter.getData());
-        holder.autoComplete.setOnFocusChangeListener(holder.onFocusListener);
         holder.autoComplete.addTextChangedListener(holder.textWatcher);
 
         holder.listener.setAutoComplete(holder.autoComplete);
@@ -136,14 +158,8 @@ public class AutoCompleteRow extends EditTextRow implements Row {
     }
 
     private void loadOptions() {
-        ArrayList<String> options = new ArrayList<String>();
-        if (optionset != null && optionset.getOptions() != null) {
-            for (Option option : optionset.getOptions()) {
-                options.add(option.getName());
-            }
-        }
         adapter = new AutoCompleteAdapter(mContext);
-        adapter.swapData(options);
+        adapter.swapData(mOptions);
     }
 
     private class AutoCompleteRowHolder {
@@ -151,18 +167,15 @@ public class AutoCompleteRow extends EditTextRow implements Row {
         final AutoCompleteTextView autoComplete;
         final ImageView button;
         final DropDownButtonListener listener;
-        final OnFocusListener onFocusListener;
-        final EditTextWatcher textWatcher;
+        final AutoCompleteEditTextWatcher textWatcher;
 
         AutoCompleteRowHolder(TextView textLabel, AutoCompleteTextView autoComplete,
-                              ImageView button, DropDownButtonListener listener,
-                              OnFocusListener onFocusListener, EditTextWatcher textWatcher) {
+                              ImageView button, DropDownButtonListener listener, AutoCompleteEditTextWatcher textWatcher) {
 
             this.textLabel = textLabel;
             this.autoComplete = autoComplete;
             this.button = button;
             this.listener = listener;
-            this.onFocusListener = onFocusListener;
             this.textWatcher = textWatcher;
         }
     }
@@ -203,10 +216,48 @@ public class AutoCompleteRow extends EditTextRow implements Row {
         public void onFocusChange(View view, boolean hasFocus) {
             if (!hasFocus) {
                 String choice = autoComplete.getText().toString();
-                if (!options.contains(choice)) {
-                    autoComplete.setText(Field.EMPTY_FIELD);
+                if (!options.contains(choice) && !choice.equals("")) {
+                    autoComplete.setText(EMPTY_FIELD);
                 }
             }
+        }
+    }
+    class AutoCompleteEditTextWatcher implements TextWatcher {
+        private Field field;
+        private Map<String, String> nameToCodeMap;
+
+        AutoCompleteEditTextWatcher(Field field) {
+            this.field = field;
+        }
+
+        public void setField(Field field) {
+            this.field = field;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String name = s != null ? s.toString() : EMPTY_FIELD;
+            String newValue = nameToCodeMap.get(name);
+            if(newValue==null){
+                return;
+            }
+            if (isEmpty(newValue)) {
+                newValue = EMPTY_FIELD;
+            }
+
+            if (!newValue.equals(field.getValue())) {
+                field.setValue(newValue);
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+        public void setOptions(Map<String, String> nameToCodeMap) {
+            this.nameToCodeMap = nameToCodeMap;
         }
     }
 }
