@@ -34,11 +34,11 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
+import org.dhis2.mobile.io.handlers.DialogHandler;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.SyncLogger;
@@ -116,7 +116,7 @@ public class OfflineDataProcessor {
                     NotificationBuilder.fireNotification(context,
                             context.getString(R.string.network_error) + " " + resp.getCode(),
                             SyncLogger.getErrorMessage(context, info, resp, true));
-
+                    DialogHandler.showMessage(SyncLogger.getErrorMessage(context, info, resp, true));
                     SyncLogger.logNetworkError(context, resp, info, true);
                 }
             }
