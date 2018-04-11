@@ -3,6 +3,7 @@ package org.dhis2.mobile.utils.date;
 
 import org.dhis2.mobile.ui.models.Filter;
 import org.dhis2.mobile.utils.date.filters.BiMonthlyPeriodFilter;
+import org.dhis2.mobile.utils.date.filters.BiWeeklyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.MonthlyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.QuarterlyPeriodFilter;
 import org.dhis2.mobile.utils.date.filters.SixMonthlyAprilPeriodFilter;
@@ -26,6 +27,7 @@ public class PeriodFilterFactory {
     public static final String BIMONTHLY = "BiMonthly";
     public static final String MONTHLY = "Monthly";
     public static final String WEEKLY = "Weekly";
+    public static final String BIWEEKLY = "BiWeekly";
     public static final String WEEKLY_WEDNESDAY = "WeeklyWednesday";
     public static final String WEEKLY_THURSDAY = "WeeklyThursday";
     public static final String WEEKLY_SATURDAY = "WeeklySaturday";
@@ -39,6 +41,8 @@ public class PeriodFilterFactory {
     public static Filter getPeriodFilter(DateTime startDate, DateTime endDate, String periodType){
         if(periodType.equals(YEARLY)){
             return new YearlyPeriodFilter(startDate, endDate);
+        }else if(periodType.equals(BIWEEKLY)){
+            return new BiWeeklyPeriodFilter(startDate, endDate);
         }else if(periodType.equals(WEEKLY)){
             return new WeeklyPeriodFilter(startDate, endDate);
         } else if (periodType.equals(WEEKLY_WEDNESDAY)){
