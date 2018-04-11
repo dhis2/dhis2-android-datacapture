@@ -3,6 +3,7 @@ package org.dhis2.mobile.ui.fragments;
 import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
 import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -53,6 +54,7 @@ import org.dhis2.mobile.ui.adapters.PickerAdapter;
 import org.dhis2.mobile.ui.adapters.PickerAdapter.OnPickerListChangeListener;
 import org.dhis2.mobile.ui.models.Filter;
 import org.dhis2.mobile.ui.models.Picker;
+import org.dhis2.mobile.io.handlers.DialogHandler;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
@@ -101,10 +103,12 @@ public class AggregateReportFragment extends Fragment
     private View stubLayout;
     private View rootView;
     private Bundle savedInstanceState;
+    public static Activity activity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
         setHasOptionsMenu(true);
     }
 
@@ -653,17 +657,25 @@ public class AggregateReportFragment extends Fragment
 
             if (HTTPClient.isError(networkStatusCode)) {
                 String message = HTTPClient.getErrorMessage(getActivity(), networkStatusCode);
-                ToastManager.makeToast(getActivity(), message, Toast.LENGTH_LONG).show();
+                showError(message, getActivity());
             }
 
             if (parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
                 String message = getString(R.string.bad_response);
-                ToastManager.makeToast(getActivity(), message, Toast.LENGTH_LONG).show();
+                showError(message, getActivity());
             }
 
             loadData();
         }
     };
+
+    private void showError(String message, FragmentActivity activity) {
+        DialogHandler.showMessage(message, activity);
+    }
+
+    public static Activity getActiveActivity(){
+        return activity;
+    }
 
     /* This class is responsible for async. data loading from storage */
     private static class DataLoader extends AsyncTaskLoader<Picker> {
