@@ -127,7 +127,8 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
     };
 
     private void showMessage(String message, Activity activity) {
-        DialogHandler.showMessage(message, activity);
+        DialogHandler dialogHandler = new DialogHandler(activity, message);
+        dialogHandler.showMessage();
     }
     // Work out loading stuff here
     private static class DataLoader extends AsyncTaskLoader<Group> {

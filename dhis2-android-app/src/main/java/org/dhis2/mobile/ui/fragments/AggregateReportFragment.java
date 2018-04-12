@@ -670,7 +670,8 @@ public class AggregateReportFragment extends Fragment
     };
 
     private void showError(String message, FragmentActivity activity) {
-        DialogHandler.showMessage(message, activity);
+        DialogHandler dialogHandler = new DialogHandler(activity, message);
+        dialogHandler.showMessage();
     }
 
     public static Activity getActiveActivity(){

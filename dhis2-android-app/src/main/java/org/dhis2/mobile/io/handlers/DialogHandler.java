@@ -8,7 +8,20 @@ import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 
 public class DialogHandler {
 
-    public static void showMessage(final String message, final Activity activity) {
+    Activity activity;
+    String message;
+
+    public DialogHandler(String message){
+        this.activity=AggregateReportFragment.getActiveActivity();
+        this.message=message;
+    }
+
+    public DialogHandler(Activity activity, String message){
+        this.activity=activity;
+        this.message=message;
+    }
+
+    public void showMessage() {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -17,21 +30,6 @@ public class DialogHandler {
                         activity.getString(R.string.network_error))
                         .setMessage(message)
                         .setNeutralButton(activity.getString(android.R.string.ok), null).create();
-                builder.show();
-            }
-        };
-        DataEntryActivity.runInHandler(runnable);
-    }
-
-    public static void showMessage(final String message) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(AggregateReportFragment.getActiveActivity());
-                builder.setTitle(
-                        AggregateReportFragment.getActiveActivity().getString(R.string.network_error))
-                        .setMessage(message)
-                        .setNeutralButton(AggregateReportFragment.getActiveActivity().getString(android.R.string.ok), null).create();
                 builder.show();
             }
         };

@@ -33,12 +33,11 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
-import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.handlers.DialogHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
-import org.dhis2.mobile.io.handlers.DialogHandler;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.SyncLogger;
@@ -112,11 +111,8 @@ public class OfflineDataProcessor {
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
                 } else {
-
-                    NotificationBuilder.fireNotification(context,
-                            context.getString(R.string.network_error) + " " + resp.getCode(),
-                            SyncLogger.getErrorMessage(context, info, resp, true));
-                    DialogHandler.showMessage(SyncLogger.getErrorMessage(context, info, resp, true));
+                    DialogHandler dialogHandler = new DialogHandler(SyncLogger.getErrorMessage(context, info, resp, true));
+                    dialogHandler.showMessage();
                     SyncLogger.logNetworkError(context, resp, info, true);
                 }
             }
