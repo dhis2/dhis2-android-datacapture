@@ -5,7 +5,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
 public class BiWeeklyExpiryDayValidator extends ExpiryDayValidator {
-    protected static final String DATE_FORMAT = "yyyy'iW'ww";
+    protected static final String DATE_FORMAT = "yyyy'BiW'ww";
 
     public BiWeeklyExpiryDayValidator(int expiryDays, String period) {
         super(expiryDays, period);
