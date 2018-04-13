@@ -9,7 +9,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 public class BiWeeklyExpiryDateValidatorTest {
-    private static final String PATTERN = "yyyy'iW'ww";
+    private static final String PATTERN = "yyyy'BiW'ww";
 
     @Test
     public void testCanNotEditPreviousPeriodEndsSameTodayMinusDifferenceExpiryDays() {
