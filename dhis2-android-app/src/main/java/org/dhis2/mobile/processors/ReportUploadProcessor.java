@@ -38,6 +38,7 @@ import com.google.gson.JsonObject;
 
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.handlers.DialogHandler;
+import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Field;
@@ -79,10 +80,15 @@ public class ReportUploadProcessor {
 
         if (!HTTPClient.isError(response.getCode())) {
             SyncLogger.log(context, response, info, false);
+            if(ImportSummariesHandler.isSuccess(response.getBody())) {
+                NotificationBuilder.fireNotification(context,
+                        SyncLogger.getResponseDescription(context, response),
+                        SyncLogger.getNotification(info));
+            }else{
+                DialogHandler dialogHandler = new DialogHandler(SyncLogger.getResponseDescription(context,response));
+                dialogHandler.showMessage();
+            }
 
-            NotificationBuilder.fireNotification(context,
-                    SyncLogger.getResponseDescription(context,response),
-                    SyncLogger.getNotification(info));
         } else {
             DialogHandler dialogHandler = new DialogHandler(SyncLogger.getErrorMessage(context, info, response, true));
             dialogHandler.showMessage();
