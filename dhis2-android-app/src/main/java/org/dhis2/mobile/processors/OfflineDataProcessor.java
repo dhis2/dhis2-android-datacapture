@@ -30,15 +30,16 @@
 package org.dhis2.mobile.processors;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.google.gson.Gson;
 
 import org.dhis2.mobile.R;
-import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
+import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.SyncLogger;
@@ -111,6 +112,7 @@ public class OfflineDataProcessor {
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
+                    sendBroadcastCorrectlyUpload(info,context);
                 } else {
 
                     NotificationBuilder.fireNotification(context,
@@ -121,5 +123,11 @@ public class OfflineDataProcessor {
                 }
             }
         }
+    }
+
+    private static void sendBroadcastCorrectlyUpload(DatasetInfoHolder info,Context context) {
+        Intent intent = new Intent(AggregateReportFragment.SAVED_ONLINE_ACTION);
+        intent.putExtra(DatasetInfoHolder.TAG, info);
+        context.sendBroadcast(intent);
     }
 }
