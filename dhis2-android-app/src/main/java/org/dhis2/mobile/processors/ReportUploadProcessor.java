@@ -30,6 +30,7 @@
 package org.dhis2.mobile.processors;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -38,7 +39,6 @@ import com.google.gson.JsonObject;
 
 import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
-import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Field;
@@ -47,6 +47,7 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
+import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.utils.NotificationBuilder;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.SyncLogger;
@@ -84,6 +85,7 @@ public class ReportUploadProcessor {
             NotificationBuilder.fireNotification(context,
                     SyncLogger.getResponseDescription(context,response),
                     SyncLogger.getNotification(info));
+            sendBroadcastCorrectlyUpload(info, context);
         } else {
 
             NotificationBuilder.fireNotification(context,
@@ -153,5 +155,18 @@ public class ReportUploadProcessor {
         String jsonReportInfo = gson.toJson(info);
         PrefUtils.saveOfflineReportInfo(context, key, jsonReportInfo);
         TextFileUtils.writeTextFile(context, TextFileUtils.Directory.OFFLINE_DATASETS, key, data);
+        sendBroadcastSavedOffline(info, context);
+    }
+
+    private static void sendBroadcastSavedOffline(DatasetInfoHolder info, Context context) {
+        Intent intent = new Intent(AggregateReportFragment.SAVED_OFFLINE_ACTION);
+        intent.putExtra(DatasetInfoHolder.TAG, info);
+        context.sendBroadcast(intent);
+    }
+
+    private static void sendBroadcastCorrectlyUpload(DatasetInfoHolder info, Context context) {
+        Intent intent = new Intent(AggregateReportFragment.SAVED_ONLINE_ACTION);
+        intent.putExtra(DatasetInfoHolder.TAG, info);
+        context.sendBroadcast(intent);
     }
 }
