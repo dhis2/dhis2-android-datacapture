@@ -105,7 +105,6 @@ public class BiWeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder
         int quantity = checkDate.weekOfWeekyear().getMaximumValue()/2;
         while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusWeeks(2))) && counter < quantity) {
             String year = checkDate.year().getAsString();
-            String cWeekNumber = checkDate.weekOfWeekyear().getAsString();
             String cDate = checkDate.toString();
             String nDate = checkDate.plusWeeks(2).minusDays(1).toString();
 

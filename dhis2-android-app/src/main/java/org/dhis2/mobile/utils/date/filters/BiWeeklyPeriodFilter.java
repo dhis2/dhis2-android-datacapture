@@ -1,16 +1,11 @@
 package org.dhis2.mobile.utils.date.filters;
 
 
-import android.support.annotation.NonNull;
-
 import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.Hours;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class BiWeeklyPeriodFilter extends PeriodFilter {

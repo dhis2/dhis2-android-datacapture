@@ -2,7 +2,6 @@ package org.dhis2.mobile.utils.date.expiryday;
 
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
 
 public class BiWeeklyExpiryDayValidator extends ExpiryDayValidator {
     protected static final String DATE_FORMAT = "yyyy'BiW'ww";
@@ -13,10 +12,16 @@ public class BiWeeklyExpiryDayValidator extends ExpiryDayValidator {
 
     @Override
     protected LocalDate getMaxDateCanEdit() {
-        LocalDate periodDate = LocalDate.parse(period, DateTimeFormat.forPattern(getDateFormat()));
-        periodDate = periodDate.withDayOfWeek(weekStarts());
-        periodDate = periodDate.plusDays(13);
-        return periodDate.plusDays(expiryDays - 1);
+        String periodFixed = period.replace("Bi","");
+        int weeks = Integer.parseInt(periodFixed.substring(periodFixed.lastIndexOf("W")+1));
+        int year = Integer.parseInt(periodFixed.substring(0, periodFixed.lastIndexOf("W")));
+        int count =0;
+        LocalDate checkDate = new LocalDate( new LocalDate().withYear(year).withWeekOfWeekyear(1).withDayOfWeek(1));
+        while(count<weeks){
+            checkDate = checkDate.plusWeeks(2);
+            count++;
+        }
+        return checkDate.minusDays(1).plusDays(expiryDays - 1);
     }
 
     protected int weekStarts() {
