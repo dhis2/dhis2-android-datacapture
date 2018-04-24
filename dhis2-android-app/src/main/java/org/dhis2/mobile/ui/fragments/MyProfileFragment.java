@@ -29,6 +29,7 @@
 
 package org.dhis2.mobile.ui.fragments;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -49,9 +50,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -65,6 +64,7 @@ import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.NetworkUtils;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
+import org.dhis2.mobile.io.handlers.DialogHandler;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.PrefUtils.Resources;
 import org.dhis2.mobile.utils.PrefUtils.State;
@@ -121,11 +121,15 @@ public class MyProfileFragment extends Fragment implements LoaderManager.LoaderC
             if (HTTPClient.isError(code)) {
                 Context context = getActivity();
                 String message = HTTPClient.getErrorMessage(context, code);
-                ToastManager.makeToast(context, message, Toast.LENGTH_LONG).show();
+                showMessage(message, getActivity());
             }
         }
     };
 
+    private void showMessage(String message, Activity activity) {
+        DialogHandler dialogHandler = new DialogHandler(activity, message);
+        dialogHandler.showMessage();
+    }
     // Work out loading stuff here
     private static class DataLoader extends AsyncTaskLoader<Group> {
 

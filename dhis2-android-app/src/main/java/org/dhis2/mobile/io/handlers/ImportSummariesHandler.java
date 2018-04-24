@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 public class ImportSummariesHandler {
     private static final String SUCCESS = "SUCCESS";
+    private static final String WARNING = "WARNING";
     private static final Pattern STATUS = Pattern.compile("\"(status)\":\"(\\w+)\"");
     private static final Pattern DESCRIPTION = Pattern.compile("\"(description)\":\"(.*?)\"");
 
@@ -49,7 +50,7 @@ public class ImportSummariesHandler {
         Matcher matcher = STATUS.matcher(source);
         if (matcher.find()) {
             String status = matcher.group(2);
-            return status != null && status.equals(SUCCESS);
+            return status != null && status.equals(SUCCESS) || status.equals(WARNING);
         } else {
             return false;
         }
