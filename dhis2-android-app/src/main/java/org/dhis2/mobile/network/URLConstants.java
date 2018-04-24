@@ -51,7 +51,7 @@ public class URLConstants {
 			"fields=fieldCombinationRequired,compulsoryDataElementOperands[categoryOptionCombo,"
 					+ "dataElement[id]],categoryCombo[id,categoryOptionCombos],"
 					+ "dataSetElements[dataElement,categoryCombo[id,"
-			+ "categoryOptionCombos]],sections[name,categoryCombos[categoryOptionCombos]]";
+			+ "categoryOptionCombos]],sections[name,categoryCombos[categoryOptionCombos]],dataInputPeriods";
 	public static final String DATA_SET_DATA_ELEMENTS_META_DATA_API_25_PARAM = "fields=compulsoryDataElementOperands[categoryOptionCombo,dataElement[id]],categoryCombo[id,categoryOptionCombos],dataSetElements[dataElement,categoryCombo[id,"
 			+ "categoryOptionCombos]],sections[name,categoryCombo[categoryOptionCombos[id]]";
 	public static final String PERIOD_PARAM = "&pe=";
