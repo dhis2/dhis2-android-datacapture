@@ -31,6 +31,7 @@ package org.dhis2.mobile.utils.date;
 
 import org.dhis2.mobile.utils.date.exceptions.PeriodNotSupportedException;
 import org.dhis2.mobile.utils.date.iterators.BiMonthIterator;
+import org.dhis2.mobile.utils.date.iterators.BiWeekIterator;
 import org.dhis2.mobile.utils.date.iterators.DayIterator;
 import org.dhis2.mobile.utils.date.iterators.FinAprilYearIterator;
 import org.dhis2.mobile.utils.date.iterators.FinJulyYearIterator;
@@ -79,6 +80,8 @@ public class DateIteratorFactory {
                 return (new BiMonthIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.MONTHLY)) {
                 return (new MonthIterator(openFuturePeriods));
+            } else if (periodType.equals(PeriodFilterFactory.BIWEEKLY)) {
+                return (new BiWeekIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.WEEKLY)) {
                 return (new WeekIterator(openFuturePeriods));
             } else if (periodType.equals(PeriodFilterFactory.WEEKLY_WEDNESDAY)) {
