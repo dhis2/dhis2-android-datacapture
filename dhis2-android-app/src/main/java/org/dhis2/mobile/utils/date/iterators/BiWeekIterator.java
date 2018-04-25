@@ -47,7 +47,8 @@ public class BiWeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public BiWeekIterator(int openFP) {
+    public BiWeekIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         checkDate = new LocalDate(cPeriod);
@@ -111,7 +112,7 @@ public class BiWeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder
             String date = String.format(DATE_FORMAT, year, periodApi, counter+1);
             String label = String.format(DATE_LABEL_FORMAT, periodHumanReedable, counter+1, cDate, nDate);
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

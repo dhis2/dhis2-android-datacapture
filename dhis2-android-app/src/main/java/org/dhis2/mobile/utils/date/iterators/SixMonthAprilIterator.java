@@ -31,7 +31,6 @@ package org.dhis2.mobile.utils.date.iterators;
 
 import org.dhis2.mobile.utils.date.CustomDateIteratorClass;
 import org.dhis2.mobile.utils.date.DateHolder;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
@@ -47,7 +46,8 @@ public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<Dat
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public SixMonthAprilIterator(int openFP) {
+    public SixMonthAprilIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
         checkDate = new LocalDate(cPeriod);
@@ -113,7 +113,7 @@ public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<Dat
             }
 
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

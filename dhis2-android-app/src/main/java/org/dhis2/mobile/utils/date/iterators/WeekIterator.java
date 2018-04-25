@@ -40,13 +40,13 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
     private static final String DATE_FORMAT = "%s%s%s";
     private static final String DATE_LABEL_FORMAT = "%s%s %s - %s";
     private static final String W = "W";
-
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public WeekIterator(int openFP) {
+    public WeekIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         checkDate = new LocalDate(cPeriod);
@@ -109,7 +109,7 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
