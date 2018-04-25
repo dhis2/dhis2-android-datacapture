@@ -11,6 +11,7 @@ public class DateConstants {
     public static final String PERIOD_BIMONTHLY = "BiMonthly";
     public static final String PERIOD_MONTHLY = "Monthly";
     public static final String PERIOD_WEEKLY = "Weekly";
+    public static final String PERIOD_BIWEEKLY = "BiWeekly";
     public static final String PERIOD_DAILY = "Daily";
     public static final String PERIOD_WEEKLY_WEDNESDAY = "WeeklyWednesday";
     public static final String PERIOD_WEEKLY_THURSDAY = "WeeklyThursday";

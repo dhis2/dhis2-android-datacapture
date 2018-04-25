@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -87,6 +89,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
     private boolean showSaveMenuItem;
 
     private DatasetInfoHolder datasetInfoHolder;
+
+    final static Handler mHandler = new Handler(Looper.getMainLooper());
 
     public static void navigateTo(Activity activity, DatasetInfoHolder info) {
         if (info != null && activity != null) {
@@ -714,5 +718,9 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
 
     private void showToast(int resId){
         Toast.makeText(this, resId, Toast.LENGTH_LONG).show();
+    }
+
+    public static void runInHandler(final Runnable action){
+        mHandler.post(action);
     }
 }
