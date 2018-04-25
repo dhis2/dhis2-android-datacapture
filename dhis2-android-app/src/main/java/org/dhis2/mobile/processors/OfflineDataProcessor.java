@@ -35,6 +35,8 @@ import android.content.Intent;
 import com.google.gson.Gson;
 
 import org.dhis2.mobile.R;
+import org.dhis2.mobile.io.handlers.DialogHandler;
+import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.network.HTTPClient;
 import org.dhis2.mobile.network.Response;
@@ -100,25 +102,25 @@ public class OfflineDataProcessor {
                 String jsonDatasetInfo = PrefUtils.getOfflineReportInfo(context,
                         reportFile.getName());
                 DatasetInfoHolder info = gson.fromJson(jsonDatasetInfo, DatasetInfoHolder.class);
+
                 if (!HTTPClient.isError(resp.getCode())) {
                     SyncLogger.log(context, resp, info, true);
 
-                    String title = SyncLogger.getResponseDescription(context,resp);
-
-                    // Firing notification to statusbar
-                    NotificationBuilder.fireNotification(context, title,
-                            SyncLogger.getNotification(info));
-
+                    if(ImportSummariesHandler.isSuccess(resp.getBody())) {
+                        // Firing notification to statusbar
+                        NotificationBuilder.fireNotification(context, SyncLogger.getResponseDescription(context,resp),
+                                SyncLogger.getNotification(info));
+                    }else{
+                        DialogHandler dialogHandler = new DialogHandler(SyncLogger.getResponseDescription(context,resp));
+                        dialogHandler.showMessage();
+                    }
                     // Removing uploaded data
                     TextFileUtils.removeFile(reportFile);
                     PrefUtils.removeOfflineReportInfo(context, reportFile.getName());
                     sendBroadcastCorrectlyUpload(info,context);
                 } else {
-
-                    NotificationBuilder.fireNotification(context,
-                            context.getString(R.string.network_error) + " " + resp.getCode(),
-                            SyncLogger.getErrorMessage(context, info, resp, true));
-
+                    DialogHandler dialogHandler = new DialogHandler(SyncLogger.getErrorMessage(context, info, resp, true));
+                    dialogHandler.showMessage();
                     SyncLogger.logNetworkError(context, resp, info, true);
                 }
             }

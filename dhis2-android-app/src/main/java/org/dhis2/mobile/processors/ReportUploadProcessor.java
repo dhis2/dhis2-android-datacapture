@@ -37,8 +37,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.dhis2.mobile.R;
 import org.dhis2.mobile.io.Constants;
+import org.dhis2.mobile.io.handlers.DialogHandler;
+import org.dhis2.mobile.io.handlers.ImportSummariesHandler;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Field;
@@ -82,15 +83,19 @@ public class ReportUploadProcessor {
         if (!HTTPClient.isError(response.getCode())) {
             SyncLogger.log(context, response, info, false);
 
-            NotificationBuilder.fireNotification(context,
-                    SyncLogger.getResponseDescription(context,response),
-                    SyncLogger.getNotification(info));
+            if(ImportSummariesHandler.isSuccess(response.getBody())) {
+                NotificationBuilder.fireNotification(context,
+                        SyncLogger.getResponseDescription(context, response),
+                        SyncLogger.getNotification(info));
+            }else{
+                DialogHandler dialogHandler = new DialogHandler(SyncLogger.getResponseDescription(context,response));
+                dialogHandler.showMessage();
+            }
+
             sendBroadcastCorrectlyUpload(info, context);
         } else {
-
-            NotificationBuilder.fireNotification(context,
-                    context.getString(R.string.network_error) + " " + response.getCode(),
-                    SyncLogger.getErrorMessage(context, info, response, false));
+            DialogHandler dialogHandler = new DialogHandler(SyncLogger.getErrorMessage(context, info, response, true));
+            dialogHandler.showMessage();
 
             SyncLogger.logNetworkError(context, response, info, false);
 
