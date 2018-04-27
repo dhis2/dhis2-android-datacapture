@@ -164,6 +164,9 @@ public class AggregateReportFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(onFormsUpdateListener, new IntentFilter(TAG));
+        showOfflineSaved(currentDataSetInfoHolder);
     }
 
     @Override
