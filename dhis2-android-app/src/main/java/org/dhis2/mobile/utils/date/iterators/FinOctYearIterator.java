@@ -38,8 +38,8 @@ import java.util.Collections;
 public class FinOctYearIterator extends YearIterator {
     private static final String OCTOBER = "Oct";
 
-    public FinOctYearIterator(int openFP) {
-        super(openFP);
+    public FinOctYearIterator(int openFP, String[] dataInputPeriods) {
+        super(openFP, dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), OCT, 1);
         checkDate = new LocalDate(cPeriod);
@@ -92,7 +92,7 @@ public class FinOctYearIterator extends YearIterator {
             String label = String.format(FIN_DATE_LABEL_FORMAT, OCT_STR, checkDate.year().getAsString(), SEP_STR, checkDate.plusYears(1).year().getAsString());
             String date = checkDate.year().getAsString() + OCTOBER;
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

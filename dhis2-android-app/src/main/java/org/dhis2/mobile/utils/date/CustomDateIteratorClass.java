@@ -103,8 +103,10 @@ public abstract class CustomDateIteratorClass<T> implements CustomDateIterator<T
     }
     
     protected LocalDate currentDate;
-    
-    public CustomDateIteratorClass() {
+    protected String[] mDataInputPeriods;
+
+    public CustomDateIteratorClass(String[] dataInputPeriods) {
+        mDataInputPeriods = dataInputPeriods;
         currentDate = new LocalDate();
     }
     
@@ -117,4 +119,16 @@ public abstract class CustomDateIteratorClass<T> implements CustomDateIterator<T
     public abstract T next();
     public abstract T previous();    
     protected abstract T generatePeriod();
+
+    protected boolean isInInputPeriods(String date) {
+        if (mDataInputPeriods == null || mDataInputPeriods.length == 0) {
+            return true;
+        }
+        for (String dataInputPeriod : mDataInputPeriods) {
+            if (dataInputPeriod.equals(date)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

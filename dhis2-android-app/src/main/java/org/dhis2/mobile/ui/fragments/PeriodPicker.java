@@ -29,16 +29,19 @@ public class PeriodPicker extends DialogFragment {
     private static final String ARG_TITLE = "arg:title";
     private static final String ARG_PERIOD_TYPE = "arg:periodType";
     private static final String ARG_OPEN_FUTURE_PERIOD = "arg:openFuturePeriod";
+    private static final String ARG_DATA_INPUT_PERIODS = "arg:dataInputPeriods";
 
     private OnPeriodClickListener onPeriodClickListener;
 
-    public static PeriodPicker newInstance(String title, String periodType, int openFuturePeriod) {
+    public static PeriodPicker newInstance(String title, String periodType, int openFuturePeriod,
+            String[] dataInputPeriods) {
         PeriodPicker periodPicker = new PeriodPicker();
         Bundle arguments = new Bundle();
 
         arguments.putString(ARG_TITLE, title);
         arguments.putString(ARG_PERIOD_TYPE, periodType);
         arguments.putInt(ARG_OPEN_FUTURE_PERIOD, openFuturePeriod);
+        arguments.putStringArray(ARG_DATA_INPUT_PERIODS, dataInputPeriods);
 
         periodPicker.setArguments(arguments);
         periodPicker.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
@@ -66,11 +69,13 @@ public class PeriodPicker extends DialogFragment {
 
         final String periodType = getPeriodType();
         final int openFuturePeriods = getOpenFuturePeriods();
+        final String[] dataInputPeriods = getDataInputPeriods();
         try {
 
 
             final CustomDateIterator<ArrayList<DateHolder>> iterator =
-                    DateIteratorFactory.getDateIterator(periodType, openFuturePeriods);
+                    DateIteratorFactory.getDateIterator(periodType, openFuturePeriods,
+                            dataInputPeriods);
 
 
 
@@ -171,6 +176,13 @@ public class PeriodPicker extends DialogFragment {
             }
         }
 
+        return null;
+    }
+
+    private String[] getDataInputPeriods() {
+        if (getArguments() != null && getArguments().containsKey(ARG_DATA_INPUT_PERIODS)) {
+            return getArguments().getStringArray(ARG_DATA_INPUT_PERIODS);
+        }
         return null;
     }
 

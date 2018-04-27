@@ -45,7 +45,8 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public DayIterator(int openFPs) {
+    public DayIterator(int openFPs, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFPs;
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
@@ -108,7 +109,7 @@ public class DayIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> 
             String label = String.format(DATE_LABEL_FORMAT, dName, mName, yName);
 
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
