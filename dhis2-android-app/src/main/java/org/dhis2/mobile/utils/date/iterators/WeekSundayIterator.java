@@ -48,7 +48,8 @@ public class WeekSundayIterator extends CustomDateIteratorClass<ArrayList<DateHo
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public WeekSundayIterator(int openFP) {
+    public WeekSundayIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.SUNDAY));
         checkDate = new LocalDate(cPeriod);
@@ -119,7 +120,7 @@ public class WeekSundayIterator extends CustomDateIteratorClass<ArrayList<DateHo
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

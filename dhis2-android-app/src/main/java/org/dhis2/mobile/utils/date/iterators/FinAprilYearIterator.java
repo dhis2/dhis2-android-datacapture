@@ -38,8 +38,8 @@ import java.util.Collections;
 public class FinAprilYearIterator extends YearIterator {
     private static final String APRIL = "April";
 
-    public FinAprilYearIterator(int openFP) {
-        super(openFP);
+    public FinAprilYearIterator(int openFP, String[] dataInputPeriods) {
+        super(openFP, dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
         checkDate = new LocalDate(cPeriod);
@@ -92,7 +92,7 @@ public class FinAprilYearIterator extends YearIterator {
             String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, checkDate.year().getAsString(), MAR_STR, checkDate.plusYears(1).year().getAsString());
             String date = checkDate.year().getAsString() + APRIL;
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

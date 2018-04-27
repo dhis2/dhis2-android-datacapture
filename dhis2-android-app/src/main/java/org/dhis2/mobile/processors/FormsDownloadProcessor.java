@@ -158,6 +158,7 @@ public class FormsDownloadProcessor {
             Form form = forms.get(entry.getKey());
             form = addMetaData(context, form, entry.getKey(), oldApi);
             forms.put(entry.getKey(), form);
+            addDataInputPeriodsToOrgUnits(form, units, entry.getKey());
         }
         HashSet<String> optionSetIds = getOptionSetIds(forms);
         updateOptionSets(context, optionSetIds);
@@ -175,6 +176,21 @@ public class FormsDownloadProcessor {
                 TextFileUtils.Directory.ROOT,
                 TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS,
                 orgUnitsWithDatasets);
+    }
+
+    private static void addDataInputPeriodsToOrgUnits(Form form, OrganizationUnit[] units,
+            String key) {
+        if (form.getOptions().getDataInputPeriods() != null
+                && form.getOptions().getDataInputPeriods().length > 0) {
+            for (OrganizationUnit organizationUnit : units) {
+                for (Form orgUnitForm : organizationUnit.getForms()) {
+                    if (orgUnitForm.getId().equals(key)) {
+                        orgUnitForm.getOptions().setDataInputPeriods(
+                                form.getOptions().getDataInputPeriods());
+                    }
+                }
+            }
+        }
     }
 
     private static OrganizationUnit[] handleUnitsWithDatasets(
@@ -237,6 +253,7 @@ public class FormsDownloadProcessor {
         String jsonContent = DataSetMetaData.download(context, uid, oldApi);
         DataSetMetaData.addCompulsoryDataElements(DataElementOperandParser.parse(jsonContent), form);
         DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form, DataSetCategoryOptionParser.parse(jsonContent));
+        DataSetMetaData.addDataInputPeriods(form, jsonContent);
         return form;
 
     }

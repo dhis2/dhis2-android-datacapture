@@ -51,7 +51,8 @@ public class BiMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolde
     private LocalDate cPeriod;
     private LocalDate maxDate;
 
-    public BiMonthIterator(int openFP) {
+    public BiMonthIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
         checkDate = new LocalDate(cPeriod);
@@ -129,7 +130,7 @@ public class BiMonthIterator extends CustomDateIteratorClass<ArrayList<DateHolde
             }
 
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

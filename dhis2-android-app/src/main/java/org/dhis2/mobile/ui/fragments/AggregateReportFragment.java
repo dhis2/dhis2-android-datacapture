@@ -401,7 +401,8 @@ public class AggregateReportFragment extends Fragment {
                         .newInstance(
                                 choosePeriodPrompt,
                                 options.getPeriodType(),
-                                options.getOpenFuturePeriods());
+                                options.getOpenFuturePeriods(),
+                                options.getDataInputPeriods());
                 periodPicker.setOnPeriodClickListener(new PeriodPicker.OnPeriodClickListener() {
                     @Override
                     public void onPeriodClicked(DateHolder dateHolder) {
