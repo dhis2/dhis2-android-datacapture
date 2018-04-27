@@ -35,6 +35,8 @@ public class ExpiryDayValidatorFactory {
                 return new WeeklySundayExpiryDayValidator(expiryDays, period);
             case DateConstants.PERIOD_WEEKLY:
                 return new WeeklyExpiryDayValidator(expiryDays, period);
+            case DateConstants.PERIOD_BIWEEKLY:
+                return new BiWeeklyExpiryDayValidator(expiryDays, period);
             default:
                 return new ExpiryDayValidator(expiryDays, period);
         }

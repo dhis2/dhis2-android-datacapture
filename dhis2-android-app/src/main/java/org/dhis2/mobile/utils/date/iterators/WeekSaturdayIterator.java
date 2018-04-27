@@ -34,7 +34,6 @@ import org.dhis2.mobile.utils.date.DateHolder;
 import org.dhis2.mobile.utils.date.PeriodFilter;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
-import org.joda.time.Period;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +48,8 @@ public class WeekSaturdayIterator extends CustomDateIteratorClass<ArrayList<Date
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public WeekSaturdayIterator(int openFP) {
+    public WeekSaturdayIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(DateTimeConstants.SATURDAY));
         checkDate = new LocalDate(cPeriod);
@@ -120,7 +120,7 @@ public class WeekSaturdayIterator extends CustomDateIteratorClass<ArrayList<Date
             String date = String.format(DATE_FORMAT, year, W, cWeekNumber);
             String label = String.format(DATE_LABEL_FORMAT, W, cWeekNumber, cDate, nDate);
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }

@@ -46,7 +46,8 @@ public class MonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>
     private LocalDate maxDate;
 
 
-    public MonthIterator(int openFP) {
+    public MonthIterator(int openFP, String[] dataInputPeriods) {
+        super(dataInputPeriods);
         openFuturePeriods = openFP;
         maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), 1);
         cPeriod = new LocalDate(currentDate.getYear(), JAN, 1);
@@ -103,7 +104,7 @@ public class MonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>
             String date = checkDate.toString(DATE_FORMAT);
             String label = String.format(DATE_LABEL_FORMAT, month, year);
 
-            if(checkDate.isBefore(maxDate)) {
+            if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
@@ -115,5 +116,6 @@ public class MonthIterator extends CustomDateIteratorClass<ArrayList<DateHolder>
         Collections.reverse(dates);
         return dates;
     }
+
 
 }
