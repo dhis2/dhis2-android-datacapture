@@ -41,9 +41,17 @@ public class FinOctYearIterator extends YearIterator {
     public FinOctYearIterator(int openFP, String[] dataInputPeriods) {
         super(openFP, dataInputPeriods);
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), OCT, 1);
+        if (currentDate.getMonthOfYear() >= 10) {
+            cPeriod = new LocalDate(currentDate.getYear(), OCT, 1);
+        } else {
+            cPeriod = new LocalDate(currentDate.getYear() - 1, OCT, 1);
+        }
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), SEP, 30);
+        if (currentDate.getMonthOfYear() >= 10) {
+            maxDate = new LocalDate(currentDate.getYear() + 1, SEP, 30);
+        } else {
+            maxDate = new LocalDate(currentDate.getYear(), SEP, 30);
+        }
         if(openFuturePeriods>0) {
             for (int i = 0; i < openFuturePeriods; i++) {
                 maxDate = maxDate.plusYears(1);
@@ -82,13 +90,13 @@ public class FinOctYearIterator extends YearIterator {
         checkDate = new LocalDate(cPeriod);
         LocalDate sep;
 
-        if(checkDate.getMonthOfYear()>=9) {
+        if (checkDate.getMonthOfYear() >= 10) {
             sep = new LocalDate(checkDate.getYear()+1, SEP, 30);
         }
         else{
             sep = new LocalDate(checkDate.getYear(), SEP, 30);
         }
-        while ((openFuturePeriods > 0 || currentDate.isAfter(sep.minusYears(1))) && counter < 10) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(sep)) && counter < 10) {
             String label = String.format(FIN_DATE_LABEL_FORMAT, OCT_STR, checkDate.year().getAsString(), SEP_STR, checkDate.plusYears(1).year().getAsString());
             String date = checkDate.year().getAsString() + OCTOBER;
 

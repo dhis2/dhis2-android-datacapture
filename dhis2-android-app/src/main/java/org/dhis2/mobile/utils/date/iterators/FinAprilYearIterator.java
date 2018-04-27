@@ -41,9 +41,17 @@ public class FinAprilYearIterator extends YearIterator {
     public FinAprilYearIterator(int openFP, String[] dataInputPeriods) {
         super(openFP, dataInputPeriods);
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
+        if (currentDate.getMonthOfYear() >= 4) {
+            cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
+        } else {
+            cPeriod = new LocalDate(currentDate.getYear() - 1, APR, 1);
+        }
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), MAR, 31);
+        if (currentDate.getMonthOfYear() >= 4) {
+            maxDate = new LocalDate(currentDate.getYear() + 1, MAR, 31);
+        } else {
+            maxDate = new LocalDate(currentDate.getYear(), MAR, 31);
+        }
         if(openFuturePeriods>0) {
             for (int i = 0; i < openFuturePeriods; i++) {
                 maxDate = maxDate.plusYears(1);
@@ -81,14 +89,14 @@ public class FinAprilYearIterator extends YearIterator {
         int counter = 0;
         checkDate = new LocalDate(cPeriod);
         LocalDate march;
-        if(checkDate.getMonthOfYear()>=3) {
+        if(checkDate.getMonthOfYear()>=4) {
             march = new LocalDate(checkDate.getYear()+1, MAR, 31);
         }
         else{
             march = new LocalDate(checkDate.getYear(), MAR, 31);
         }
 
-        while ((openFuturePeriods > 0 || currentDate.isAfter(march.minusYears(1)))  && counter < 10) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(march))  && counter < 10) {
             String label = String.format(FIN_DATE_LABEL_FORMAT, APR_STR, checkDate.year().getAsString(), MAR_STR, checkDate.plusYears(1).year().getAsString());
             String date = checkDate.year().getAsString() + APRIL;
 

@@ -41,9 +41,17 @@ public class FinJulyYearIterator extends YearIterator {
     public FinJulyYearIterator(int openFP, String[] dataInputPeriods) {
         super(openFP, dataInputPeriods);
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), JUL, 1);
+        if (currentDate.getMonthOfYear() >= 7) {
+            cPeriod = new LocalDate(currentDate.getYear(), JUL, 1);
+        } else {
+            cPeriod = new LocalDate(currentDate.getYear() - 1, JUL, 1);
+        }
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), JUN, 30);
+        if (currentDate.getMonthOfYear() >= 7) {
+            maxDate = new LocalDate(currentDate.getYear()+1, JUN, 30);
+        }else {
+            maxDate = new LocalDate(currentDate.getYear(), JUN, 30);
+        }
         if(openFuturePeriods>0) {
             for (int i = 0; i < openFuturePeriods; i++) {
                 maxDate = maxDate.plusYears(1);
@@ -83,14 +91,14 @@ public class FinJulyYearIterator extends YearIterator {
         checkDate = new LocalDate(cPeriod);
         LocalDate june;
 
-        if(checkDate.getMonthOfYear()>=9) {
+        if (checkDate.getMonthOfYear() >= 7) {
             june = new LocalDate(checkDate.getYear()+1, JUN, 30);
         }
         else{
             june = new LocalDate(checkDate.getYear(), JUN, 30);
         }
 
-        while ((openFuturePeriods > 0 || currentDate.isAfter(june.minusYears(1))) && counter < 10) {
+        while ((openFuturePeriods > 0 || currentDate.isAfter(june)) && counter < 10) {
             String label = String.format(FIN_DATE_LABEL_FORMAT, JUL_STR, checkDate.year().getAsString(), JUN_STR, checkDate.plusYears(1).year().getAsString());
             String date = checkDate.year().getAsString() + JULY;
 
