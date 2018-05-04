@@ -50,7 +50,8 @@ public class WeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>>
         openFuturePeriods = openFP;
         cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth()-currentDate.getDayOfWeek());
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth());
+        maxDate = maxDate.minusDays(currentDate.getDayOfWeek());
         for (int i = 0; i < openFuturePeriods; i++) {
             maxDate = maxDate.plusWeeks(1);
         }
