@@ -137,6 +137,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         }
 
         super.onSaveInstanceState(outState);
+        outState.clear();
     }
 
     protected void attachFragment(Fragment fragment) {

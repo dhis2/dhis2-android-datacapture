@@ -1,8 +1,11 @@
 package org.dhis2.mobile.ui.fragments;
 
+import static android.text.TextUtils.isEmpty;
+
 import static org.dhis2.mobile.utils.ViewUtils.perfomInAnimation;
 import static org.dhis2.mobile.utils.ViewUtils.perfomOutAnimation;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -53,6 +56,7 @@ import org.dhis2.mobile.ui.adapters.PickerAdapter;
 import org.dhis2.mobile.ui.adapters.PickerAdapter.OnPickerListChangeListener;
 import org.dhis2.mobile.ui.models.Filter;
 import org.dhis2.mobile.ui.models.Picker;
+import org.dhis2.mobile.io.handlers.DialogHandler;
 import org.dhis2.mobile.utils.PrefUtils;
 import org.dhis2.mobile.utils.TextFileUtils;
 import org.dhis2.mobile.utils.ToastManager;
@@ -67,8 +71,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class AggregateReportFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Picker> {
+public class AggregateReportFragment extends Fragment {
     public static final String TAG = AggregateReportFragment.class.getName();
     public static final int AGGREGATE_REPORT_LOADER_ID = TAG.length();
 
@@ -81,6 +84,11 @@ public class AggregateReportFragment extends Fragment
     private static final String STATE_PICKERS_TWO = "state:pickersTwo";
     private static final String STATE_PICKERS_PERIOD = "state:pickersPeriod";
     private static final String STATE_IS_REFRESHING = "state:isRefreshing";
+    private static final int SAVED_OFFLINE_LOADER_ID = 2;
+    private static final int SAVED_ONLINE_DATASET_ID = 3;
+    public static final String SAVED_ONLINE_ACTION = "savedOnlineAction";
+    public static final String SAVED_OFFLINE_ACTION = "savedOfflineAction";
+
 
     // generic picker adapters
     private PickerAdapter pickerAdapterOne;
@@ -95,21 +103,36 @@ public class AggregateReportFragment extends Fragment
     private TextView formTextView;
     private TextView formDescriptionTextView;
     private TextView organisationUnitTextView;
+    private ImageView offlineSavedIcon;
 
     // swipe refresh layout
     private SwipeRefreshLayout swipeRefreshLayout;
     private View stubLayout;
     private View rootView;
     private Bundle savedInstanceState;
+    private DatasetInfoHolder currentDataSetInfoHolder;
+    public static Activity activity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
         setHasOptionsMenu(true);
+        initDatesetSentReceiver();
     }
 
+    private void initDatesetSentReceiver() {
+        DatasetSentReceiver datasetSentReceiver = new DatasetSentReceiver();
+        getActivity().registerReceiver(datasetSentReceiver,
+                new IntentFilter(SAVED_ONLINE_ACTION));
+        getActivity().registerReceiver(datasetSentReceiver,
+                new IntentFilter(SAVED_OFFLINE_ACTION));
+    }
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_aggregate_report, container, false);
     }
 
@@ -141,9 +164,9 @@ public class AggregateReportFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(onFormsUpdateListener, new IntentFilter(TAG));
+        showOfflineSaved(currentDataSetInfoHolder);
     }
 
     @Override
@@ -162,25 +185,6 @@ public class AggregateReportFragment extends Fragment
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public Loader<Picker> onCreateLoader(int id, Bundle args) {
-        return new DataLoader(getActivity());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Picker> loader, Picker data) {
-        pickerAdapterOne.swapData(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Picker> loader) {
-        periodPickerLinearLayout.setVisibility(View.GONE);
-        hideSpinners();
-        hideProgressBar();
-        setupViews(rootView, savedInstanceState);
-
     }
 
     private void hideSpinners() {
@@ -215,7 +219,8 @@ public class AggregateReportFragment extends Fragment
     }
 
     private void loadData() {
-        getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null, this).forceLoad();
+        getLoaderManager().restartLoader(AGGREGATE_REPORT_LOADER_ID, null,
+                pickerLoader).forceLoad();
     }
 
     private void setupStubLayout(View view) {
@@ -228,6 +233,7 @@ public class AggregateReportFragment extends Fragment
         formTextView = (TextView) root.findViewById(R.id.choosen_form);
         formDescriptionTextView = (TextView) root.findViewById(R.id.form_description);
         organisationUnitTextView = (TextView) root.findViewById(R.id.choosen_unit);
+        offlineSavedIcon = (ImageView) root.findViewById(R.id.offline_saved_icon);
 
         dataEntryButton.setVisibility(View.GONE);
     }
@@ -398,7 +404,8 @@ public class AggregateReportFragment extends Fragment
                         .newInstance(
                                 choosePeriodPrompt,
                                 options.getPeriodType(),
-                                options.getOpenFuturePeriods());
+                                options.getOpenFuturePeriods(),
+                                options.getDataInputPeriods());
                 periodPicker.setOnPeriodClickListener(new PeriodPicker.OnPeriodClickListener() {
                     @Override
                     public void onPeriodClicked(DateHolder dateHolder) {
@@ -444,7 +451,8 @@ public class AggregateReportFragment extends Fragment
             List<Picker> categoryPickers = pickerAdapterTwo.getData();
             if (categoryPickers != null && !categoryPickers.isEmpty()) {
                 for (Picker categoryPicker : categoryPickers) {
-                    if (categoryPicker.getChildren() == null || categoryPicker.getChildren().isEmpty()) {
+                    if (categoryPicker.getChildren() == null
+                            || categoryPicker.getChildren().isEmpty()) {
                         continue;
                     }
 
@@ -583,6 +591,9 @@ public class AggregateReportFragment extends Fragment
             });
 
             // dataEntryButton.setVisibility(View.VISIBLE);
+            offlineSavedIcon.setVisibility(View.GONE);
+            showOfflineSaved(info);
+            currentDataSetInfoHolder = info;
             if (!dataEntryButton.isShown()) {
                 perfomInAnimation(getActivity(), R.anim.in_left, dataEntryButton);
             }
@@ -597,6 +608,15 @@ public class AggregateReportFragment extends Fragment
             if (dataEntryButton.isShown()) {
                 perfomOutAnimation(getActivity(), R.anim.out_right, true, dataEntryButton);
             }
+        }
+    }
+
+    private void showOfflineSaved(DatasetInfoHolder info) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(DatasetInfoHolder.TAG, info);
+        if (info != null) {
+            getLoaderManager().restartLoader(SAVED_OFFLINE_LOADER_ID, bundle,
+                    offlineDatasetLoader).forceLoad();
         }
     }
 
@@ -653,17 +673,26 @@ public class AggregateReportFragment extends Fragment
 
             if (HTTPClient.isError(networkStatusCode)) {
                 String message = HTTPClient.getErrorMessage(getActivity(), networkStatusCode);
-                ToastManager.makeToast(getActivity(), message, Toast.LENGTH_LONG).show();
+                showError(message, getActivity());
             }
 
             if (parsingStatusCode != JsonHandler.PARSING_OK_CODE) {
                 String message = getString(R.string.bad_response);
-                ToastManager.makeToast(getActivity(), message, Toast.LENGTH_LONG).show();
+                showError(message, getActivity());
             }
 
             loadData();
         }
     };
+
+    private void showError(String message, FragmentActivity activity) {
+        DialogHandler dialogHandler = new DialogHandler(activity, message);
+        dialogHandler.showMessage();
+    }
+
+    public static Activity getActiveActivity(){
+        return activity;
+    }
 
     /* This class is responsible for async. data loading from storage */
     private static class DataLoader extends AsyncTaskLoader<Picker> {
@@ -677,7 +706,8 @@ public class AggregateReportFragment extends Fragment
             String jSourceUnits;
             if (TextFileUtils.doesFileExist(getContext(), TextFileUtils.Directory.ROOT,
                     TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS)) {
-                jSourceUnits = TextFileUtils.readTextFile(getContext(), TextFileUtils.Directory.ROOT,
+                jSourceUnits = TextFileUtils.readTextFile(getContext(),
+                        TextFileUtils.Directory.ROOT,
                         TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS);
             } else {
                 return null;
@@ -778,7 +808,8 @@ public class AggregateReportFragment extends Fragment
                                     endDate = DateTime.parse(option.getEndDate());
                                 }
 
-                                Filter periodFilter = PeriodFilterFactory.getPeriodFilter(startDate, endDate, dataSet.getOptions().getPeriodType());
+                                Filter periodFilter = PeriodFilterFactory.getPeriodFilter(startDate,
+                                        endDate, dataSet.getOptions().getPeriodType());
 
                                 // adding filters which will be triggered in PickerItemAdapter
                                 categoryOptionPicker.addFilter(organisationUnitsFilter);
@@ -821,5 +852,117 @@ public class AggregateReportFragment extends Fragment
 
             return !organisationUnitIds.contains(organisationUnitId);
         }
+    }
+
+    private static class OfflineDataSetLoader extends AsyncTaskLoader<Boolean> {
+        private final DatasetInfoHolder infoHolder;
+
+        public OfflineDataSetLoader(Context context, DatasetInfoHolder infoHolder) {
+            super(context);
+            this.infoHolder = infoHolder;
+        }
+
+        @Override
+        public Boolean loadInBackground() {
+            if (infoHolder.getFormId() != null && TextFileUtils.doesFileExist(
+                    getContext(), TextFileUtils.Directory.DATASETS, infoHolder.getFormId())) {
+
+                // try to fit values
+                // from storage into form
+                return isOfflineDataset();
+            }
+            return false;
+        }
+
+        private boolean isOfflineDataset() {
+
+            String reportKey = DatasetInfoHolder.buildKey(infoHolder);
+            if (isEmpty(reportKey)) {
+                return false;
+            }
+
+            return reportExists(reportKey);
+
+        }
+
+        private boolean reportExists(String reportKey) {
+            if (isEmpty(reportKey)) {
+                return false;
+            }
+
+            if (TextFileUtils.doesFileExist(
+                    getContext(), TextFileUtils.Directory.OFFLINE_DATASETS, reportKey)) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private LoaderManager.LoaderCallbacks<Picker> pickerLoader =
+            new LoaderManager.LoaderCallbacks<Picker>() {
+
+
+                @Override
+                public Loader<Picker> onCreateLoader(int id, Bundle args) {
+                    return new DataLoader(getActivity());
+                }
+
+                @Override
+                public void onLoadFinished(Loader<Picker> loader, Picker data) {
+                    pickerAdapterOne.swapData(data);
+                }
+
+                @Override
+                public void onLoaderReset(Loader<Picker> loader) {
+                    periodPickerLinearLayout.setVisibility(View.GONE);
+                    hideSpinners();
+                    hideProgressBar();
+                    setupViews(rootView, savedInstanceState);
+                }
+            };
+
+    private LoaderManager.LoaderCallbacks<Boolean> offlineDatasetLoader =
+            new LoaderManager.LoaderCallbacks<Boolean>() {
+
+
+                @Override
+                public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+                    DatasetInfoHolder datasetInfoHolder = args.getParcelable(DatasetInfoHolder.TAG);
+                    return new OfflineDataSetLoader(getContext(), datasetInfoHolder);
+                }
+
+                @Override
+                public void onLoadFinished(Loader<Boolean> loader, Boolean hasOfflineDataSet) {
+                    if (hasOfflineDataSet) {
+                        offlineSavedIcon.setVisibility(View.VISIBLE);
+                        offlineSavedIcon.setImageResource(R.drawable.ic_offline);
+                    } else {
+                        offlineSavedIcon.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onLoaderReset(Loader<Boolean> loader) {
+
+                }
+            };
+
+    private class DatasetSentReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            DatasetInfoHolder datasetInfoHolder = intent.getExtras().getParcelable(
+                    DatasetInfoHolder.TAG);
+            if (currentDataSetInfoHolder != null && datasetInfoHolder.getFormId().equals(
+                    currentDataSetInfoHolder.getFormId())) {
+                offlineSavedIcon.setVisibility(View.VISIBLE);
+                if (intent.getAction().equals(SAVED_ONLINE_ACTION)) {
+                    offlineSavedIcon.setImageResource(R.drawable.ic_from_server);
+                } else if (intent.getAction().equals(SAVED_OFFLINE_ACTION)) {
+                    offlineSavedIcon.setImageResource(R.drawable.ic_offline);
+                }
+            }
+        }
+
     }
 }

@@ -36,24 +36,27 @@ import org.joda.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
-    private static final String DATE_LABEL_FORMAT = "%s - %s %s";
-    private static final String S1 = "AprilS1";
-    private static final String S2 = "AprilS2";
+public class BiWeekIterator extends CustomDateIteratorClass<ArrayList<DateHolder>> {
+    private static final String DATE_FORMAT = "%s%s%s";
+    private static final String DATE_LABEL_FORMAT = "%s%s %s - %s";
+    private static final String periodHumanReedable = "Bi-Week ";
+    private static final String periodApi = "BiW";
 
     private int openFuturePeriods;
     private LocalDate cPeriod;
     private LocalDate checkDate;
     private LocalDate maxDate;
 
-    public SixMonthAprilIterator(int openFP, String[] dataInputPeriods) {
+    public BiWeekIterator(int openFP, String[] dataInputPeriods) {
         super(dataInputPeriods);
         openFuturePeriods = openFP;
-        cPeriod = new LocalDate(currentDate.getYear(), APR, 1);
+        cPeriod = new LocalDate(currentDate.withWeekOfWeekyear(1).withDayOfWeek(1));
         checkDate = new LocalDate(cPeriod);
-        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), 1);
-        for (int i = 0; i < openFuturePeriods-1; i++) {
-            maxDate = maxDate.plusMonths(6);
+        maxDate = new LocalDate(currentDate.getYear(), currentDate.getMonthOfYear(), currentDate.getDayOfMonth()-currentDate.getDayOfWeek());
+        if(openFuturePeriods>1) {
+            for (int i = 0; i < (openFuturePeriods-1) / 2; i++) {
+                maxDate = maxDate.plusWeeks(2);
+            }
         }
     }
 
@@ -62,24 +65,12 @@ public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<Dat
         return hasNext(checkDate);
     }
 
-    private boolean hasNext(LocalDate cDate) {
+    private boolean hasNext(LocalDate date) {
         if (openFuturePeriods > 0) {
             return checkDate.isBefore(maxDate);
         } else {
-            return currentDate.isAfter(cDate.plusMonths(6));
+            return currentDate.isAfter(date.plusWeeks(1));
         }
-    }
-
-    @Override
-    public ArrayList<DateHolder> next() {
-        cPeriod = cPeriod.plusYears(1);
-        return generatePeriod();
-    }
-
-    @Override
-    public ArrayList<DateHolder> previous() {
-        cPeriod = cPeriod.minusYears(1);
-        return generatePeriod();
     }
 
     @Override
@@ -92,33 +83,42 @@ public class SixMonthAprilIterator extends CustomDateIteratorClass<ArrayList<Dat
     }
 
     @Override
+    public ArrayList<DateHolder> next() {
+        cPeriod = cPeriod.plusYears(1);
+        cPeriod = cPeriod.plusMonths(1);
+        cPeriod = cPeriod.withWeekOfWeekyear(1).withDayOfWeek(1);
+        return generatePeriod();
+    }
+
+    @Override
+    public ArrayList<DateHolder> previous() {
+        cPeriod = cPeriod.minusYears(1);
+        cPeriod = cPeriod.plusMonths(1);
+        cPeriod = cPeriod.withWeekOfWeekyear(1).withDayOfWeek(1);
+        return generatePeriod();
+    }
+
+    @Override
     protected ArrayList<DateHolder> generatePeriod() {
         ArrayList<DateHolder> dates = new ArrayList<DateHolder>();
         checkDate = new LocalDate(cPeriod);
         int counter = 0;
-
-
-        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusMonths(6))) && counter < 2) {
+        int quantity = checkDate.weekOfWeekyear().getMaximumValue()/2;
+        while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusWeeks(2))) && counter < quantity) {
             String year = checkDate.year().getAsString();
-            String yearLastPeriod = Integer.parseInt(year)+1+"";
-            String label;
-            String date;
+            String cDate = checkDate.toString();
+            String nDate = checkDate.plusWeeks(2).minusDays(1).toString();
 
-            if (checkDate.getMonthOfYear() >= APR && checkDate.getMonthOfYear() <= SEP) {
-                label = String.format(DATE_LABEL_FORMAT, APR_STR_LONG, SEP_STR_LONG, year);
-                date = year + S1;
-            } else {
-                label = String.format(DATE_LABEL_FORMAT, OCT_STR_LONG +" "+ year, MAR_STR_LONG, yearLastPeriod);
-                date = year + S2;
-            }
-
+            String date = String.format(DATE_FORMAT, year, periodApi, counter+1);
+            String label = String.format(DATE_LABEL_FORMAT, periodHumanReedable, counter+1, cDate, nDate);
 
             if (checkDate.isBefore(maxDate) && isInInputPeriods(date)) {
                 DateHolder dateHolder = new DateHolder(date, checkDate.toString(), label);
                 dates.add(dateHolder);
             }
-            checkDate = checkDate.plusMonths(6);
+
             counter++;
+            checkDate = checkDate.plusWeeks(2);
         }
 
         Collections.reverse(dates);

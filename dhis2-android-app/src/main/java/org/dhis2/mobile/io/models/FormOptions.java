@@ -48,6 +48,7 @@ public class FormOptions implements Serializable, Parcelable {
     private String description;
     private String captureCoordinates;
     private String type;
+    private String[] dataInputPeriods;
 
     private FormOptions(Parcel in) {
         openFuturePeriods = in.readInt();
@@ -59,6 +60,7 @@ public class FormOptions implements Serializable, Parcelable {
         description = in.readString();
         captureCoordinates = in.readString();
         type = in.readString();
+        dataInputPeriods = in.createStringArray();
     }
 
     public static final Parcelable.Creator<FormOptions> CREATOR = new Parcelable.Creator<FormOptions>() {
@@ -88,6 +90,7 @@ public class FormOptions implements Serializable, Parcelable {
         parcel.writeString(description);
         parcel.writeString(captureCoordinates);
         parcel.writeString(type);
+        parcel.writeStringArray(dataInputPeriods);
     }
 
     public int getOpenFuturePeriods() {
@@ -120,5 +123,13 @@ public class FormOptions implements Serializable, Parcelable {
 
     public String getType() {
         return type;
+    }
+
+    public String[] getDataInputPeriods() {
+        return dataInputPeriods;
+    }
+
+    public void setDataInputPeriods(String[] dataInputPeriods) {
+        this.dataInputPeriods = dataInputPeriods;
     }
 }

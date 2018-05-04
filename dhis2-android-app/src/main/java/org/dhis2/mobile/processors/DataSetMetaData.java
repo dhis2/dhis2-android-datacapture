@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import org.dhis2.mobile.io.holders.DataElementOperand;
 import org.dhis2.mobile.io.holders.DataSetCategoryOptions;
+import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.CategoryCombo;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
@@ -14,6 +15,9 @@ import org.dhis2.mobile.network.NetworkException;
 import org.dhis2.mobile.network.Response;
 import org.dhis2.mobile.network.URLConstants;
 import org.dhis2.mobile.utils.PrefUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -156,5 +160,23 @@ public class DataSetMetaData {
             }
         }
         return false;
+    }
+
+    public static void addDataInputPeriods(Form form, String jsonContent) throws ParsingException {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonContent);
+            if (jsonContent.contains("dataInputPeriods")) {
+                JSONArray jsonArray = jsonObject.getJSONArray("dataInputPeriods");
+                String[] dataInputPeriods = new String[jsonArray.length()];
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    dataInputPeriods[i] = jsonArray.getJSONObject(i).getJSONObject(
+                            "period").getString("id");
+                }
+                form.getOptions().setDataInputPeriods(dataInputPeriods);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new ParsingException("Error while parsing dataInputPeriods.");
+        }
     }
 }
