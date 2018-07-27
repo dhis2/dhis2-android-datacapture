@@ -19,7 +19,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -167,16 +171,69 @@ public class DataSetMetaData {
             JSONObject jsonObject = new JSONObject(jsonContent);
             if (jsonContent.contains("dataInputPeriods")) {
                 JSONArray jsonArray = jsonObject.getJSONArray("dataInputPeriods");
-                String[] dataInputPeriods = new String[jsonArray.length()];
+                List<String> dataInputPeriods = new ArrayList<>();
+
+                String[] openingDate = new String[jsonArray.length()];
+                String[] closingDate = new String[jsonArray.length()];
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    dataInputPeriods[i] = jsonArray.getJSONObject(i).getJSONObject(
-                            "period").getString("id");
+                    dataInputPeriods.add(jsonArray.getJSONObject(i).getJSONObject(
+                            "period").getString("id"));
+                    if(jsonArray.getJSONObject(i).has("openingDate")){
+                        openingDate[i] = jsonArray.getJSONObject(i).get("openingDate") != null ?
+                                jsonArray.getJSONObject(i).get("openingDate").toString(): "";
+                    }else{
+                        openingDate[i] = "";
+                    }
+                    if(jsonArray.getJSONObject(i).has("closingDate")){
+                        closingDate[i] = jsonArray.getJSONObject(i).get("closingDate") != null ?
+                                jsonArray.getJSONObject(i).get("closingDate").toString(): "";
+                    }else{
+                        closingDate[i] = "";
+                    }
+
                 }
-                form.getOptions().setDataInputPeriods(dataInputPeriods);
+
+                validationDataInputPeriods(form, openingDate, closingDate, dataInputPeriods);
             }
         } catch (JSONException e) {
             e.printStackTrace();
             throw new ParsingException("Error while parsing dataInputPeriods.");
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+    }
+
+    private static void validationDataInputPeriods(Form form, String[] openingDate, String[] closingDate,
+                                            List<String> dataInputPeriods) throws ParseException {
+        List<String> dataInputPeriodsHelper = new ArrayList<>();
+        Calendar calendarOpening = Calendar.getInstance();
+        Calendar calendarClosing = Calendar.getInstance();
+        Calendar currentCalendar = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = formatter.format(currentCalendar.getTime());
+        currentCalendar.setTime(formatter.parse(currentDate));
+
+        for(int i = 0; i < openingDate.length; i++){
+            String strOpening = openingDate[i].split("T")[0];
+            String strClosing = closingDate[i].split("T")[0];
+            boolean hasOpening = false;
+            boolean hasClosing = false;
+            if(!strOpening.equals("")){
+                Date dateOpening = formatter.parse(strOpening);
+                calendarOpening.setTime(dateOpening);
+                hasOpening = true;
+            }
+            if(!strClosing.equals("")){
+                Date dateClosing = formatter.parse(strClosing);
+                calendarClosing.setTime(dateClosing);
+                hasClosing = true;
+            }
+            if((!hasOpening || (hasOpening && (calendarOpening.compareTo(currentCalendar))<= 0))
+                    && (!hasClosing || (hasClosing && (calendarClosing.compareTo(currentCalendar)>=0)))){
+                dataInputPeriodsHelper.add(dataInputPeriods.get(i));
+            }
+        }
+        form.getOptions().setDataInputPeriods(dataInputPeriodsHelper.toArray(new String[dataInputPeriodsHelper.size()]));
+
     }
 }
