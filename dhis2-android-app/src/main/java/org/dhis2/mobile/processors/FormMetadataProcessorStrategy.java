@@ -7,6 +7,7 @@ import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.ParsingException;
 import org.dhis2.mobile.io.models.Form;
 import org.dhis2.mobile.network.NetworkException;
+import org.dhis2.mobile.ui.adapters.dataEntry.FieldAdapter;
 import org.dhis2.mobile.utils.PrefUtils;
 
 class FormMetadataProcessorStrategy {
@@ -18,8 +19,9 @@ class FormMetadataProcessorStrategy {
                 DataElementOperandParser.isFieldCombinationRequiredToForm(jsonContent));
         DataSetMetaData.addCompulsoryDataElements(
                 DataElementOperandParser.parse(jsonContent), form);
-        DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
-                DataSetCategoryOptionParser.parse(jsonContent));
+        if(form.getGroups() != null && form.getGroups().size() > 0 && !form.getGroups().get(0).getLabel().equals(FieldAdapter.FORM_WITHOUT_SECTION))
+            DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form,
+                    DataSetCategoryOptionParser.parse(jsonContent));
 
         boolean isApproved = DataSetApprovals.download(context, info.getFormId(), info.getPeriod(), info.getOrgUnitId());
         form.setApproved(isApproved);

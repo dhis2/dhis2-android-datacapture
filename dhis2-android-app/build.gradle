@@ -7,15 +7,15 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     buildToolsVersion "25.0.2"
 
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 25
-        versionCode 25
-        versionName "1.7.4"
-        applicationId "org.dhis2.mobile_dev"
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 26
+        versionName "1.7.5"
+        applicationId "org.dhis2.mobile"
     }
 
     buildTypes {
@@ -42,6 +42,6 @@ dependencies {
     /// / Java test dependencies
     testCompile "junit:junit:4.12"
     compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
-        transitive = true;
+        transitive = true
     }
 }
