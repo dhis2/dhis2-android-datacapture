@@ -47,6 +47,7 @@ import org.dhis2.mobile.ui.fragments.AboutUsFragment;
 import org.dhis2.mobile.ui.fragments.AggregateReportFragment;
 import org.dhis2.mobile.ui.fragments.MyProfileFragment;
 import org.dhis2.mobile.ui.fragments.SyncLogFragment;
+import org.dhis2.mobile.utils.ViewUtils;
 
 public class MenuActivity extends BaseActivity implements OnNavigationItemSelectedListener {
     private static final String STATE_TOOLBAR_TITLE = "state:toolbarTitle";
@@ -87,26 +88,35 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         } else if (savedInstanceState.containsKey(STATE_TOOLBAR_TITLE) && toolbar != null) {
             setTitle(savedInstanceState.getString(STATE_TOOLBAR_TITLE));
         }
+
+        if(ViewUtils.fragmentSelected != null) {
+            attachFragment(ViewUtils.fragmentSelected);
+            setTitle(ViewUtils.title);
+        }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.drawer_item_aggregate_report: {
-                attachFragment(new AggregateReportFragment());
+                ViewUtils.fragmentSelected = new AggregateReportFragment();
+                attachFragment(ViewUtils.fragmentSelected);
                 break;
             }
             case R.id.drawer_item_profile: {
-                attachFragment(new MyProfileFragment());
+                ViewUtils.fragmentSelected = new MyProfileFragment();
+                attachFragment(ViewUtils.fragmentSelected);
                 break;
             }
             case R.id.drawer_item_about: {
-                attachFragment(new AboutUsFragment());
+                ViewUtils.fragmentSelected = new AboutUsFragment();
+                attachFragment(ViewUtils.fragmentSelected);
 
                 break;
             }
             case R.id.drawer_item_sync_logs: {
-                attachFragment(new SyncLogFragment());
+                ViewUtils.fragmentSelected = new SyncLogFragment();
+                attachFragment(ViewUtils.fragmentSelected);
                 break;
             }
             case R.id.drawer_item_logout: {
@@ -124,6 +134,7 @@ public class MenuActivity extends BaseActivity implements OnNavigationItemSelect
         }
 
         setTitle(item.getTitle());
+        ViewUtils.title = item.getTitle().toString();
         navigationView.setCheckedItem(R.id.drawer_item_aggregate_report);
         drawerLayout.closeDrawers();
 

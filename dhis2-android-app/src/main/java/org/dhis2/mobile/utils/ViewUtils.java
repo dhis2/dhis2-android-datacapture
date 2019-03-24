@@ -30,13 +30,15 @@
 package org.dhis2.mobile.utils;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 public class ViewUtils {
 	private ViewUtils() { }
-
+    public static Fragment fragmentSelected;
+    public static String title;
     public static void perfomInAnimation(Context context, int animId, View... views) {
         if (context != null) {
             Animation anim = AnimationUtils.loadAnimation(context, animId);
