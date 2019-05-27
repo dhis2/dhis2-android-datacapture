@@ -13,8 +13,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 26
-        versionName "1.7.5"
+        versionCode 27
+        versionName "1.7.6"
         applicationId "org.dhis2.mobile"
     }
 
