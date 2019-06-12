@@ -56,6 +56,16 @@ public class Form implements Serializable, Parcelable {
     private boolean fieldCombinationRequired;
     private boolean isApproved;
 
+    public Form(String id, String label, CategoryCombo categoryCombo, FormOptions options, ArrayList<Group> groups, boolean fieldCombinationRequired, boolean isApproved){
+        this.id = id;
+        this.label = label;
+        this.categoryCombo = categoryCombo;
+        this.options = options;
+        this.groups = groups;
+        this.fieldCombinationRequired = fieldCombinationRequired;
+        this.isApproved = isApproved;
+    }
+
     private Form(Parcel in) {
         id = in.readString();
         label = in.readString();

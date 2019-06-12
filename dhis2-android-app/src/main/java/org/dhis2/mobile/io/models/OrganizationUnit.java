@@ -63,6 +63,12 @@ public class OrganizationUnit implements Serializable, Parcelable {
         in.readTypedList(forms, Form.CREATOR);
     }
 
+    public OrganizationUnit(String id, String label, String parent) {
+        this.id = id;
+        this.label = label;
+        this.parent = parent;
+    }
+
     @Override
     public int describeContents() {
         return TAG.length();

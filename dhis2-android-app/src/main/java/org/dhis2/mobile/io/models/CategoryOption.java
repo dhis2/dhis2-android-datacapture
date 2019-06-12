@@ -20,6 +20,11 @@ public class CategoryOption implements Serializable, Parcelable {
         // empty constructor
     }
 
+    public CategoryOption(String id, String label){
+        this.id = id;
+        this.label = label;
+    }
+
     private CategoryOption(Parcel in) {
         this.id = in.readString();
         this.label = in.readString();

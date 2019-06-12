@@ -29,6 +29,12 @@ public class Category implements Serializable, Parcelable {
         // empty constructor
     }
 
+    public Category(String id, String label, List<CategoryOption> categoryOptions){
+        this.id = id;
+        this.label = label;
+        this.categoryOptions = categoryOptions;
+    }
+
     private Category(Parcel in) {
         this.id = in.readString();
         this.label = in.readString();

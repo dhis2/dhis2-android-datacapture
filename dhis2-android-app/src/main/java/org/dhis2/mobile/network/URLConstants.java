@@ -41,6 +41,7 @@ public class URLConstants {
 	public static final String OPTION_SET_URL = "api/optionSets";
 
 	public static final String DATASETS_URL = "api/me/assignedDataSets";
+	public static final String DATA_ORGUNIT = "api/organisationUnits/";
 	public static final String DATASET_UPLOAD_URL = "api/dataValueSets";
 	public static final String DATASET_VALUES_URL = "api/dataSets";
 	public static final String CATEGORY_COMBOS_URL = "api/categoryCombos";
@@ -58,6 +59,8 @@ public class URLConstants {
 	public static final String ORG_UNIT_PARAM = "&ou=";
 	public static final String DATA_SET_PARAM = "?ds=";
 	public static final String CATEGORY_OPTIONS_PARAM = "&categoryOptions=";
+
+	public static final String FILTER_ORGUNIT = "?withinUserHierarchy=true&includeDescendants=true";
 
 
 
