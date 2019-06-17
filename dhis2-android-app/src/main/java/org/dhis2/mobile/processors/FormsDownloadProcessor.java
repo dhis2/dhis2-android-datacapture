@@ -148,7 +148,6 @@ public class FormsDownloadProcessor {
         JsonArray onlyOrgUnitsID = getJsonArray(jsonOrgUnit, ORG_UNITS);
 
         List<OrganizationUnit> listOrgUnit = new ArrayList<>();
-        List<Form> listForm = new ArrayList<>();
 
         List<String> allCatComboOptionsWritables = getAllCatOptions(server, creds);
 
@@ -166,19 +165,24 @@ public class FormsDownloadProcessor {
                 listOrgUnit.add(new OrganizationUnit(idOrg, name, parent));
                 //https://play.dhis2.org/android-current/api/dataSets/?filter=access.data.write:eq:false
                 //Llamar a eso para ver si los dataset que esta devolviendo tienen accesso o no
-                Response responseDataSet = download(server +"api/dataSets/?fields=[id,name,displayName,categoryCombo]&filter=access.data.write:eq:true", creds);
+                Response responseDataSet = download(server +"api/dataSets/?fields=[id,name,displayName,categoryCombo]&filter=access.data.write:eq:true" +
+                        "&filter=organisationUnits.id:eq:"+ idOrg, creds);
                 JsonObject jsonAccessDataSet = buildJsonObject(responseDataSet);
                 JsonArray arrayAccessDataSet = getJsonArray(jsonAccessDataSet, DATASETS);
 
                 JsonArray arrayDataSets = getJsonArray(arrayOrgs.get(y).getAsJsonObject(), "dataSets");
                 Form form = null;
+                List<Form> listForm = new ArrayList<>();
                 for(int x = 0; x < arrayAccessDataSet.size(); x++){
                     JsonObject jdataSet = getAsJsonObject(arrayAccessDataSet.get(x));
-                    Response responseCatOptionCombo = download(server +"api/categoryOptionCombos/?fields=[id,name,displayName,categoryCombo,categoryOptions]&filter=access.data.write:eq:true" +
-                            "&filter=categoryCombo.id:eq:"+jdataSet.get("categoryCombo").getAsJsonObject().get("id"), creds);
+                    /*Response responseCatOptionCombo = download(server +"api/categoryOptionCombos?fields=[id,name,displayName,categoryCombo,categoryOptions]&filter=access.write:eq:true" +
+                            "&filter=categoryCombo.id:eq:"+jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);*/
+                    Response responseCatOptionCombo = download(server +"api/categoryCombos?fields=[categoryOptionCombos]" +
+                            "&filter=id:eq:"+jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);
                     JsonObject jsonCatOptionCombo = buildJsonObject(responseCatOptionCombo);
 
-                    JsonArray arrayCatOptionCombo = getJsonArray(jsonCatOptionCombo, "categoryOptionCombos");
+                    JsonArray arrayCatOptionCombo = getJsonArray(jsonCatOptionCombo.get("categoryCombos").getAsJsonArray().get(0).getAsJsonObject()
+                            , "categoryOptionCombos");
                     List<String> listCatOptionCombo = new ArrayList<>();
                     for(int z = 0; z< arrayCatOptionCombo.size();z++){
                         JsonObject catOptionCombo = getAsJsonObject(arrayCatOptionCombo.get(z));
@@ -187,23 +191,23 @@ public class FormsDownloadProcessor {
                         }
                     }
                     Response responseCategory = download(server +"api/categories?fields=[id,displayName,categoryOptions]&filter=categoryCombos.id:eq:" +
-                            ""+jdataSet.get("categoryCombo").getAsJsonObject().get("id"), creds);
+                            ""+jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);
                     JsonObject jsonCategory = buildJsonObject(responseCategory);
                     JsonArray arrayCategory = getJsonArray(jsonCategory, "categories");
                     List<Category> listCategories = new ArrayList<>();
                     for(int a = 0; a< arrayCategory.size(); a++){
-                        JsonObject jCategory = getAsJsonObject(arrayAccessDataSet.get(a));
+                        JsonObject jCategory = getAsJsonObject(arrayCategory.get(a));
                         String idCategory = getString(jCategory, ID);
-                        String nameCategory = getString(jCategory, "name");
+                        String nameCategory = getString(jCategory, "displayName");
                         Category category = new Category(idCategory, nameCategory, new ArrayList<CategoryOption>());
-                        JsonArray arrayCatOption = getJsonArray(jsonCatOptionCombo, "categoryOptions");
+                        JsonArray arrayCatOption = getJsonArray(jCategory, "categoryOptions");
                         for(JsonElement elementCatOption: arrayCatOption){
                             JsonObject jCatOption = getAsJsonObject(elementCatOption);
                             Response responseCatOption = download(server +"api/categoryOptions/"+getString(jCatOption,ID), creds);
 
                             JsonObject jsonCatOption = buildJsonObject(responseCatOption);
                             if(jsonCatOption.get("access").getAsJsonObject().get("data").getAsJsonObject().get("write").getAsBoolean()){
-                                category.getCategoryOptions().add(new CategoryOption(getString(jsonCatOption, ID), getString(jCatOption, "name")));
+                                category.getCategoryOptions().add(new CategoryOption(getString(jsonCatOption, ID), getString(jsonCatOption, "name")));
                             }
                         }
 
@@ -211,11 +215,12 @@ public class FormsDownloadProcessor {
                     }
 
 
-                    CategoryCombo catCombo = new CategoryCombo(getString(jdataSet, CATEGORY_COMBO), listCategories, listCatOptionCombo);
+                    CategoryCombo catCombo = new CategoryCombo(jdataSet.get(CATEGORY_COMBO).getAsJsonObject().get(ID).getAsString(), listCategories, listCatOptionCombo);
                     ///api/categories?fields=[id,displayName,]&filter=categoryCombos.id:eq:O4VaNks6tta
-
-                    listForm.add(new Form(getString(jdataSet, ID), getString(jdataSet, "displayName"),
+                    listOrgUnit.get(y).getForms().add(new Form(getString(jdataSet, ID), getString(jdataSet, "displayName"),
                             catCombo, null, null, true, true));
+                    /*listForm.add(new Form(getString(jdataSet, ID), getString(jdataSet, "displayName"),
+                            catCombo, null, null, true, true));*/
                 }
 
 
