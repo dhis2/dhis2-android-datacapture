@@ -100,7 +100,8 @@ public class FormsDownloadProcessor {
 
         try {
             downloadDatasets(context, PrefUtils.getServerVersion(context).equals(Constants.API_25),
-                    (PrefUtils.getServerVersion(context).equals(Constants.API_31)) || PrefUtils.getServerVersion(context).equals(Constants.API_32));
+                    (PrefUtils.getServerVersion(context).contains(Constants.API_31)) ||
+                            (PrefUtils.getServerVersion(context).contains(Constants.API_32)));
         } catch (NetworkException e) {
             e.printStackTrace();
             networkStatusCode = e.getErrorCode();
