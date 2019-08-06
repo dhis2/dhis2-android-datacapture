@@ -152,7 +152,7 @@ public class FormsDownloadProcessor {
             List<OrganizationUnit> listOrgUnit = new ArrayList<>();
 
             List<String> allCatComboOptionsWritables = getAllCatOptions(server, creds);
-
+            HashSet<String> optionSetIds = new HashSet<>();
             for (int i = 0; i < onlyOrgUnitsID.size(); i++) {
                 JsonObject jObject = getAsJsonObject(onlyOrgUnitsID.get(i));
                 String id = getString(jObject, ID);
@@ -165,20 +165,30 @@ public class FormsDownloadProcessor {
                     String name = getString(org, "name");
                     String parent = getString(org.get("parent").getAsJsonObject(), ID);
                     listOrgUnit.add(new OrganizationUnit(idOrg, name, parent));
-                    //https://play.dhis2.org/android-current/api/dataSets/?filter=access.data.write:eq:false
-                    //Llamar a eso para ver si los dataset que esta devolviendo tienen accesso o no
+
                     Response responseDataSet = download(server + "api/dataSets/?fields=[*]&filter=access.data.write:eq:true" +
                             "&filter=organisationUnits.id:eq:" + idOrg, creds);
                     JsonObject jsonAccessDataSet = buildJsonObject(responseDataSet);
                     JsonArray arrayAccessDataSet = getJsonArray(jsonAccessDataSet, DATASETS);
 
-                    JsonArray arrayDataSets = getJsonArray(arrayOrgs.get(y).getAsJsonObject(), "dataSets");
-                    Form form = null;
-                    List<Form> listForm = new ArrayList<>();
                     for (int x = 0; x < arrayAccessDataSet.size(); x++) {
                         JsonObject jdataSet = getAsJsonObject(arrayAccessDataSet.get(x));
-                    /*Response responseCatOptionCombo = download(server +"api/categoryOptionCombos?fields=[id,name,displayName,categoryCombo,categoryOptions]&filter=access.write:eq:true" +
-                            "&filter=categoryCombo.id:eq:"+jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);*/
+
+                        for(int c = 0; c < jdataSet.get("dataSetElements").getAsJsonArray().size(); c++){
+                            Response responseDataElement = download(server + "api/dataElements?fields=[optionSet]&filter=id:eq:"+jdataSet.get("dataSetElements").getAsJsonArray().get(c).
+                                    getAsJsonObject().get("dataElement").getAsJsonObject().get("id").getAsString()
+                                    +"&filter=optionSetValue:eq:true", creds);
+                            JsonObject jsonDataElement = buildJsonObject(responseDataElement);
+
+                            if (jsonDataElement.get("dataElements").getAsJsonArray().size() > 0 &&
+                                    jsonDataElement.get("dataElements").getAsJsonArray().get(0).getAsJsonObject().has("optionSet")) {
+                                String idOptionSet = jsonDataElement.get("dataElements").getAsJsonArray().get(0).getAsJsonObject().get("optionSet").getAsJsonObject().get("id").getAsString();
+                                if (!optionSetIds.contains(idOptionSet))
+                                    optionSetIds.add(idOptionSet);
+                            }
+                        }
+
+
                         Response responseCatOptionCombo = download(server + "api/categoryCombos?fields=[categoryOptionCombos]" +
                                 "&filter=id:eq:" + jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);
                         JsonObject jsonCatOptionCombo = buildJsonObject(responseCatOptionCombo);
@@ -186,7 +196,7 @@ public class FormsDownloadProcessor {
                         String periodType = jdataSet.get("periodType").getAsString();
                         int openFuturePeriods = jdataSet.get("openFuturePeriods").getAsInt();
                         int expiryDays = jdataSet.get("expiryDays").getAsInt();
-                        boolean fieldCombinationRequired = jdataSet.get("fieldCombinationRequired").getAsBoolean();
+
                         if (jdataSet.has("dataInputPeriods")) {
                             JsonArray dataInputPeriods = jdataSet.get("dataInputPeriods").getAsJsonArray();
 
@@ -246,11 +256,10 @@ public class FormsDownloadProcessor {
                         CategoryCombo catCombo = null;
                         if (!jdataSet.get(CATEGORY_COMBO).getAsJsonObject().get(ID).getAsString().equals("bjDvmb4bfuf"))
                             catCombo = new CategoryCombo(jdataSet.get(CATEGORY_COMBO).getAsJsonObject().get(ID).getAsString(), listCategories, listCatOptionCombo);
-                        ///api/categories?fields=[id,displayName,]&filter=categoryCombos.id:eq:O4VaNks6tta
+
                         listOrgUnit.get(y).getForms().add(new Form(getString(jdataSet, ID), getString(jdataSet, "displayName"),
                                 catCombo, formOptions, null, false, false));
-                    /*listForm.add(new Form(getString(jdataSet, ID), getString(jdataSet, "displayName"),
-                            catCombo, null, null, true, true));*/
+
                     }
 
                 }
@@ -265,7 +274,7 @@ public class FormsDownloadProcessor {
                             TextFileUtils.Directory.DATASETS, form.getId(), jForm);
                 }
             }
-
+            updateOptionSets(context, optionSetIds);
             OrganizationUnit[] organizationUnits = new OrganizationUnit[listOrgUnit.size()];
             organizationUnits = listOrgUnit.toArray(organizationUnits);
 
