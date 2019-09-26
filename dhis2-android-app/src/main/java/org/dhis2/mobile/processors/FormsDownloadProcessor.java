@@ -25,21 +25,12 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package org.dhis2.mobile.processors;
 
-import static org.dhis2.mobile.io.json.JsonHandler.buildJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
-import static org.dhis2.mobile.io.json.JsonHandler.getAsJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.getJsonArray;
-import static org.dhis2.mobile.io.json.JsonHandler.getJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.getString;
-
 import android.content.Context;
 import android.content.Intent;
-import android.os.Debug;
-import android.os.Parcel;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -78,6 +69,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import static org.dhis2.mobile.io.json.JsonHandler.buildJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
+import static org.dhis2.mobile.io.json.JsonHandler.getAsJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.getJsonArray;
+import static org.dhis2.mobile.io.json.JsonHandler.getJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.getString;
 
 public class FormsDownloadProcessor {
     private static final String TAG = FormsDownloadProcessor.class.getSimpleName();
@@ -126,11 +124,11 @@ public class FormsDownloadProcessor {
 
         Log.i(TAG, "Download finished");
         Intent intent;
-        if(isFirstPull) {
+        if (isFirstPull) {
             intent = new Intent(LoginActivity.TAG);
             intent.putExtra(Response.CODE, networkStatusCode);
             intent.putExtra(LoginActivity.IS_FIRST_PULL, isFirstPull);
-        }else{
+        } else {
             intent = new Intent(AggregateReportFragment.TAG);
             intent.putExtra(Response.CODE, networkStatusCode);
             intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
@@ -140,13 +138,13 @@ public class FormsDownloadProcessor {
     }
 
     private static void downloadDatasets(Context context, boolean oldApi, boolean isNewestApi) throws NetworkException, ParsingException {
-        System.out.println("is old api"+oldApi);
+        System.out.println("is old api" + oldApi);
         final String creds = PrefUtils.getCredentials(context);
-        final String server = PrefUtils.getServerURL(context);
+        String server = PrefUtils.getServerURL(context);
         final String datasetsURL = server + URLConstants.DATASETS_URL;
-        //MIOOOO
-        if(isNewestApi) {
-            Response responseOrgUnit = download(server + "/api/me", creds);
+        if (isNewestApi) {
+            server = server.endsWith("/") ? server : server + "/";
+            Response responseOrgUnit = download(server + "api/me", creds);
             JsonObject jsonOrgUnit = buildJsonObject(responseOrgUnit);
             JsonArray onlyOrgUnitsID = getJsonArray(jsonOrgUnit, ORG_UNITS);
 
@@ -157,14 +155,14 @@ public class FormsDownloadProcessor {
             for (int i = 0; i < onlyOrgUnitsID.size(); i++) {
                 JsonObject jObject = getAsJsonObject(onlyOrgUnitsID.get(i));
                 String id = getString(jObject, ID);
-                Response responseUser = download(server + URLConstants.DATA_ORGUNIT + "/" + id + URLConstants.FILTER_ORGUNIT, creds);
+                Response responseUser = download(server + URLConstants.DATA_ORGUNIT + /*"/" +*/ id + URLConstants.FILTER_ORGUNIT, creds);
                 JsonObject jsonObject = buildJsonObject(responseUser);
                 JsonArray arrayOrgs = getJsonArray(jsonObject, ORG_UNITS);
                 for (int y = 0; y < arrayOrgs.size(); y++) {
                     JsonObject org = getAsJsonObject(arrayOrgs.get(y));
                     String idOrg = getString(org, ID);
                     String name = getString(org, "name");
-                    String parent = getString(org.get("parent").getAsJsonObject(), ID);
+                    String parent = org.has("parent") ? getString(org.get("parent").getAsJsonObject(), ID) : null;
                     listOrgUnit.add(new OrganizationUnit(idOrg, name, parent));
 
                     Response responseDataSet = download(server + "api/dataSets/?fields=[*]&filter=access.data.write:eq:true" +
@@ -175,10 +173,10 @@ public class FormsDownloadProcessor {
                     for (int x = 0; x < arrayAccessDataSet.size(); x++) {
                         JsonObject jdataSet = getAsJsonObject(arrayAccessDataSet.get(x));
 
-                        for(int c = 0; c < jdataSet.get("dataSetElements").getAsJsonArray().size(); c++){
-                            Response responseDataElement = download(server + "api/dataElements?fields=[optionSet]&filter=id:eq:"+jdataSet.get("dataSetElements").getAsJsonArray().get(c).
+                        for (int c = 0; c < jdataSet.get("dataSetElements").getAsJsonArray().size(); c++) {
+                            Response responseDataElement = download(server + "api/dataElements?fields=[optionSet]&filter=id:eq:" + jdataSet.get("dataSetElements").getAsJsonArray().get(c).
                                     getAsJsonObject().get("dataElement").getAsJsonObject().get("id").getAsString()
-                                    +"&filter=optionSetValue:eq:true", creds);
+                                    + "&filter=optionSetValue:eq:true", creds);
                             JsonObject jsonDataElement = buildJsonObject(responseDataElement);
 
                             if (jsonDataElement.get("dataElements").getAsJsonArray().size() > 0 &&
@@ -268,8 +266,8 @@ public class FormsDownloadProcessor {
 
             Gson gson = new Gson();
 
-            for(OrganizationUnit orgUnit: listOrgUnit){
-                for(Form form: orgUnit.getForms()){
+            for (OrganizationUnit orgUnit : listOrgUnit) {
+                for (Form form : orgUnit.getForms()) {
                     String jForm = gson.toJson(form);
                     TextFileUtils.writeTextFile(context,
                             TextFileUtils.Directory.DATASETS, form.getId(), jForm);
@@ -284,7 +282,7 @@ public class FormsDownloadProcessor {
                     TextFileUtils.Directory.ROOT,
                     TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS,
                     orgUnitsWithDatasets);
-        }else {
+        } else {
             //END MIOOO
             Response response = download(datasetsURL, creds);
             JsonObject jSource = buildJsonObject(response);
@@ -329,17 +327,17 @@ public class FormsDownloadProcessor {
         }
     }
 
-    private static List<String> getAllCatOptions(String server, String creds){
+    private static List<String> getAllCatOptions(String server, String creds) {
         List<String> catComboOptions = new ArrayList<>();
         try {
             Response responseUser = download(server + "api/categoryOptions?fields=[id,name,categoryOptionCombos]&filter=access.data.write:eq:true", creds);
             JsonObject jsonObject = buildJsonObject(responseUser);
 
             JsonArray arrayCatOptions = getJsonArray(jsonObject, "categoryOptions");
-            for(int i = 0;i< arrayCatOptions.size(); i++){
+            for (int i = 0; i < arrayCatOptions.size(); i++) {
                 JsonObject catOption = getAsJsonObject(arrayCatOptions.get(i));
                 JsonArray arrayCatOptionCombo = getJsonArray(catOption, "categoryOptionCombos");
-                for(int y = 0; y<arrayCatOptionCombo.size();y++){
+                for (int y = 0; y < arrayCatOptionCombo.size(); y++) {
                     JsonObject cOptionCombo = getAsJsonObject(arrayCatOptionCombo.get(y));
                     catComboOptions.add(getString(cOptionCombo, ID));
                 }
@@ -355,7 +353,7 @@ public class FormsDownloadProcessor {
     }
 
     private static void addDataInputPeriodsToOrgUnits(Form form, OrganizationUnit[] units,
-            String key) {
+                                                      String key) {
         if (form.getOptions().getDataInputPeriods() != null
                 && form.getOptions().getDataInputPeriods().length > 0) {
             for (OrganizationUnit organizationUnit : units) {
@@ -425,7 +423,7 @@ public class FormsDownloadProcessor {
         }
     }
 
-    private static Form addMetaData(Context context, Form form, String uid, boolean oldApi)  throws NetworkException, ParsingException {
+    private static Form addMetaData(Context context, Form form, String uid, boolean oldApi) throws NetworkException, ParsingException {
         String jsonContent = DataSetMetaData.download(context, uid, oldApi);
         DataSetMetaData.addCompulsoryDataElements(DataElementOperandParser.parse(jsonContent), form);
         DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form, DataSetCategoryOptionParser.parse(jsonContent));
