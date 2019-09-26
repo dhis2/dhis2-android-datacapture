@@ -47,7 +47,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 public class HTTPClient {
-    private static final int CONNECTION_TIME_OUT = 1500;
+    private static final int CONNECTION_TIME_OUT = 30000;
 
 	private HTTPClient() { }
 

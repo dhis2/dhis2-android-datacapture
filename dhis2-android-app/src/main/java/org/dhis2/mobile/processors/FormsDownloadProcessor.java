@@ -25,16 +25,9 @@
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package org.dhis2.mobile.processors;
-
-import static org.dhis2.mobile.io.json.JsonHandler.buildJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
-import static org.dhis2.mobile.io.json.JsonHandler.getAsJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.getJsonArray;
-import static org.dhis2.mobile.io.json.JsonHandler.getJsonObject;
-import static org.dhis2.mobile.io.json.JsonHandler.getString;
 
 import android.content.Context;
 import android.content.Intent;
@@ -50,8 +43,12 @@ import com.google.gson.JsonSyntaxException;
 import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
+import org.dhis2.mobile.io.models.Category;
+import org.dhis2.mobile.io.models.CategoryCombo;
+import org.dhis2.mobile.io.models.CategoryOption;
 import org.dhis2.mobile.io.models.Field;
 import org.dhis2.mobile.io.models.Form;
+import org.dhis2.mobile.io.models.FormOptions;
 import org.dhis2.mobile.io.models.Group;
 import org.dhis2.mobile.io.models.OptionSet;
 import org.dhis2.mobile.io.models.OrganizationUnit;
@@ -70,7 +67,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+
+import static org.dhis2.mobile.io.json.JsonHandler.buildJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.fromJson;
+import static org.dhis2.mobile.io.json.JsonHandler.getAsJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.getJsonArray;
+import static org.dhis2.mobile.io.json.JsonHandler.getJsonObject;
+import static org.dhis2.mobile.io.json.JsonHandler.getString;
 
 public class FormsDownloadProcessor {
     private static final String TAG = FormsDownloadProcessor.class.getSimpleName();
@@ -92,7 +97,9 @@ public class FormsDownloadProcessor {
         int parsingStatusCode = JsonHandler.PARSING_OK_CODE;
 
         try {
-            downloadDatasets(context, PrefUtils.getServerVersion(context).equals(Constants.API_25));
+            downloadDatasets(context, PrefUtils.getServerVersion(context).equals(Constants.API_25),
+                    (PrefUtils.getServerVersion(context).contains(Constants.API_31)) ||
+                            (PrefUtils.getServerVersion(context).contains(Constants.API_32)));
         } catch (NetworkException e) {
             e.printStackTrace();
             networkStatusCode = e.getErrorCode();
@@ -117,11 +124,11 @@ public class FormsDownloadProcessor {
 
         Log.i(TAG, "Download finished");
         Intent intent;
-        if(isFirstPull) {
+        if (isFirstPull) {
             intent = new Intent(LoginActivity.TAG);
             intent.putExtra(Response.CODE, networkStatusCode);
             intent.putExtra(LoginActivity.IS_FIRST_PULL, isFirstPull);
-        }else{
+        } else {
             intent = new Intent(AggregateReportFragment.TAG);
             intent.putExtra(Response.CODE, networkStatusCode);
             intent.putExtra(JsonHandler.PARSING_STATUS_CODE, parsingStatusCode);
@@ -130,56 +137,223 @@ public class FormsDownloadProcessor {
 
     }
 
-    private static void downloadDatasets(Context context, boolean oldApi) throws NetworkException, ParsingException {
-        System.out.println("is old api"+oldApi);
+    private static void downloadDatasets(Context context, boolean oldApi, boolean isNewestApi) throws NetworkException, ParsingException {
+        System.out.println("is old api" + oldApi);
         final String creds = PrefUtils.getCredentials(context);
-        final String server = PrefUtils.getServerURL(context);
+        String server = PrefUtils.getServerURL(context);
         final String datasetsURL = server + URLConstants.DATASETS_URL;
+        if (isNewestApi) {
+            server = server.endsWith("/") ? server : server + "/";
+            Response responseOrgUnit = download(server + "api/me", creds);
+            JsonObject jsonOrgUnit = buildJsonObject(responseOrgUnit);
+            JsonArray onlyOrgUnitsID = getJsonArray(jsonOrgUnit, ORG_UNITS);
 
-        Response response = download(datasetsURL, creds);
-        JsonObject jSource = buildJsonObject(response);
+            List<OrganizationUnit> listOrgUnit = new ArrayList<>();
 
-        if (!jSource.has(ORG_UNITS) || !jSource.has(FORMS)) {
-            TextFileUtils.removeFile(context,
-                    TextFileUtils.Directory.ROOT,
-                    TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS);
-            PrefUtils.setResourceState(context,
-                    PrefUtils.Resources.DATASETS,
-                    PrefUtils.State.ATTEMPT_TO_REFRESH_IS_MADE);
-            return;
-        }
+            List<String> allCatComboOptionsWritables = getAllCatOptions(server, creds);
+            HashSet<String> optionSetIds = new HashSet<>();
+            for (int i = 0; i < onlyOrgUnitsID.size(); i++) {
+                JsonObject jObject = getAsJsonObject(onlyOrgUnitsID.get(i));
+                String id = getString(jObject, ID);
+                Response responseUser = download(server + URLConstants.DATA_ORGUNIT + /*"/" +*/ id + URLConstants.FILTER_ORGUNIT, creds);
+                JsonObject jsonObject = buildJsonObject(responseUser);
+                JsonArray arrayOrgs = getJsonArray(jsonObject, ORG_UNITS);
+                for (int y = 0; y < arrayOrgs.size(); y++) {
+                    JsonObject org = getAsJsonObject(arrayOrgs.get(y));
+                    String idOrg = getString(org, ID);
+                    String name = getString(org, "name");
+                    String parent = org.has("parent") ? getString(org.get("parent").getAsJsonObject(), ID) : null;
+                    listOrgUnit.add(new OrganizationUnit(idOrg, name, parent));
 
-        JsonObject jUnits = getJsonObject(jSource, ORG_UNITS);
-        JsonObject jDatasets = getJsonObject(jSource, FORMS);
+                    Response responseDataSet = download(server + "api/dataSets/?fields=[*]&filter=access.data.write:eq:true" +
+                            "&filter=organisationUnits.id:eq:" + idOrg, creds);
+                    JsonObject jsonAccessDataSet = buildJsonObject(responseDataSet);
+                    JsonArray arrayAccessDataSet = getJsonArray(jsonAccessDataSet, DATASETS);
 
-        OrganizationUnit[] units = handleUnitsWithDatasets(jUnits, jDatasets);
-        HashMap<String, Form> forms = handleForms(jDatasets);
-        for (Map.Entry<String, Form> entry : forms.entrySet()) {
-            Form form = forms.get(entry.getKey());
-            form = addMetaData(context, form, entry.getKey(), oldApi);
-            forms.put(entry.getKey(), form);
-            addDataInputPeriodsToOrgUnits(form, units, entry.getKey());
-        }
-        HashSet<String> optionSetIds = getOptionSetIds(forms);
-        updateOptionSets(context, optionSetIds);
+                    for (int x = 0; x < arrayAccessDataSet.size(); x++) {
+                        JsonObject jdataSet = getAsJsonObject(arrayAccessDataSet.get(x));
 
-        Gson gson = new Gson();
-        for (String key : forms.keySet()) {
-            Form form = forms.get(key);
-            String jForm = gson.toJson(form);
+                        for (int c = 0; c < jdataSet.get("dataSetElements").getAsJsonArray().size(); c++) {
+                            Response responseDataElement = download(server + "api/dataElements?fields=[optionSet]&filter=id:eq:" + jdataSet.get("dataSetElements").getAsJsonArray().get(c).
+                                    getAsJsonObject().get("dataElement").getAsJsonObject().get("id").getAsString()
+                                    + "&filter=optionSetValue:eq:true", creds);
+                            JsonObject jsonDataElement = buildJsonObject(responseDataElement);
+
+                            if (jsonDataElement.get("dataElements").getAsJsonArray().size() > 0 &&
+                                    jsonDataElement.get("dataElements").getAsJsonArray().get(0).getAsJsonObject().has("optionSet")) {
+                                String idOptionSet = jsonDataElement.get("dataElements").getAsJsonArray().get(0).getAsJsonObject().get("optionSet").getAsJsonObject().get("id").getAsString();
+                                if (!optionSetIds.contains(idOptionSet))
+                                    optionSetIds.add(idOptionSet);
+                            }
+                        }
+
+
+                        Response responseCatOptionCombo = download(server + "api/categoryCombos?fields=[categoryOptionCombos]" +
+                                "&filter=id:eq:" + jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);
+                        JsonObject jsonCatOptionCombo = buildJsonObject(responseCatOptionCombo);
+                        String[] inputPeriods = null;
+                        String periodType = jdataSet.get("periodType").getAsString();
+                        int openFuturePeriods = jdataSet.get("openFuturePeriods").getAsInt();
+                        int expiryDays = jdataSet.get("expiryDays").getAsInt();
+
+                        if (jdataSet.has("dataInputPeriods")) {
+                            JsonArray dataInputPeriods = jdataSet.get("dataInputPeriods").getAsJsonArray();
+
+                            inputPeriods = new String[dataInputPeriods.size()];
+                            for (int b = 0; b < dataInputPeriods.size(); b++) {
+                                inputPeriods[b] = dataInputPeriods.get(b).getAsJsonObject().get("period").getAsJsonObject().get("id").getAsString();
+                            }
+                        }
+
+                        FormOptions formOptions = new FormOptions(openFuturePeriods, periodType, expiryDays, inputPeriods);
+                        JsonArray arrayCatOptionCombo = getJsonArray(jsonCatOptionCombo.get("categoryCombos").getAsJsonArray().get(0).getAsJsonObject()
+                                , "categoryOptionCombos");
+                        List<String> listCatOptionCombo = new ArrayList<>();
+                        for (int z = 0; z < arrayCatOptionCombo.size(); z++) {
+                            JsonObject catOptionCombo = getAsJsonObject(arrayCatOptionCombo.get(z));
+                            if (allCatComboOptionsWritables.contains(getString(catOptionCombo, ID))) {
+                                listCatOptionCombo.add(getString(catOptionCombo, ID));
+                            }
+                        }
+                        Response responseCategory = download(server + "api/categories?fields=[id,displayName,categoryOptions]&filter=categoryCombos.id:eq:" +
+                                "" + jdataSet.get("categoryCombo").getAsJsonObject().get("id").getAsString(), creds);
+                        JsonObject jsonCategory = buildJsonObject(responseCategory);
+                        JsonArray arrayCategory = getJsonArray(jsonCategory, "categories");
+                        List<Category> listCategories = new ArrayList<>();
+                        for (int a = 0; a < arrayCategory.size(); a++) {
+                            JsonObject jCategory = getAsJsonObject(arrayCategory.get(a));
+                            String idCategory = getString(jCategory, ID);
+                            String nameCategory = getString(jCategory, "displayName");
+                            Category category = new Category(idCategory, nameCategory, new ArrayList<CategoryOption>());
+                            JsonArray arrayCatOption = getJsonArray(jCategory, "categoryOptions");
+                            for (JsonElement elementCatOption : arrayCatOption) {
+                                JsonObject jCatOption = getAsJsonObject(elementCatOption);
+                                Response responseCatOption = null;
+                                try {
+                                    responseCatOption = download(server + "api/categoryOptions/" + getString(jCatOption, ID), creds);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                JsonObject jsonCatOption = buildJsonObject(responseCatOption);
+                                List<String> listOrgUnitAllowed = new ArrayList<>();
+
+                                if (jsonCatOption.get("organisationUnits").getAsJsonArray().size() > 0) {
+                                    for (JsonElement element : jsonCatOption.get("organisationUnits").getAsJsonArray()) {
+                                        listOrgUnitAllowed.add(element.getAsJsonObject().get("id").getAsString());
+                                    }
+                                }
+                                if (jsonCatOption.get("access").getAsJsonObject().get("data").getAsJsonObject().get("read").getAsBoolean()
+                                        && (listOrgUnitAllowed.isEmpty() || listOrgUnitAllowed.contains(idOrg))) {
+                                    String startDate = jsonCatOption.has("startDate") ? getString(jsonCatOption, "startDate") : "";
+                                    String endDate = jsonCatOption.has("endDate") ? getString(jsonCatOption, "endDate") : "";
+                                    category.getCategoryOptions().add(new CategoryOption(getString(jsonCatOption, ID), getString(jsonCatOption, "name"), startDate, endDate));
+                                }
+                            }
+
+                            listCategories.add(category);
+                        }
+                        CategoryCombo catCombo = null;
+                        if (!jdataSet.get(CATEGORY_COMBO).getAsJsonObject().get(ID).getAsString().equals("bjDvmb4bfuf"))
+                            catCombo = new CategoryCombo(jdataSet.get(CATEGORY_COMBO).getAsJsonObject().get(ID).getAsString(), listCategories, listCatOptionCombo);
+
+                        listOrgUnit.get(y).getForms().add(new Form(getString(jdataSet, ID), getString(jdataSet, "displayName"),
+                                catCombo, formOptions, null, false, false));
+
+                    }
+
+                }
+            }
+
+            Gson gson = new Gson();
+
+            for (OrganizationUnit orgUnit : listOrgUnit) {
+                for (Form form : orgUnit.getForms()) {
+                    String jForm = gson.toJson(form);
+                    TextFileUtils.writeTextFile(context,
+                            TextFileUtils.Directory.DATASETS, form.getId(), jForm);
+                }
+            }
+            updateOptionSets(context, optionSetIds);
+            OrganizationUnit[] organizationUnits = new OrganizationUnit[listOrgUnit.size()];
+            organizationUnits = listOrgUnit.toArray(organizationUnits);
+
+            String orgUnitsWithDatasets = gson.toJson(organizationUnits);
             TextFileUtils.writeTextFile(context,
-                    TextFileUtils.Directory.DATASETS, key, jForm);
+                    TextFileUtils.Directory.ROOT,
+                    TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS,
+                    orgUnitsWithDatasets);
+        } else {
+            //END MIOOO
+            Response response = download(datasetsURL, creds);
+            JsonObject jSource = buildJsonObject(response);
+
+            if (!jSource.has(ORG_UNITS) || !jSource.has(FORMS)) {
+                TextFileUtils.removeFile(context,
+                        TextFileUtils.Directory.ROOT,
+                        TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS);
+                PrefUtils.setResourceState(context,
+                        PrefUtils.Resources.DATASETS,
+                        PrefUtils.State.ATTEMPT_TO_REFRESH_IS_MADE);
+                return;
+            }
+
+            JsonObject jUnits = getJsonObject(jSource, ORG_UNITS);
+            JsonObject jDatasets = getJsonObject(jSource, FORMS);
+
+            OrganizationUnit[] units = handleUnitsWithDatasets(jUnits, jDatasets);
+            HashMap<String, Form> forms = handleForms(jDatasets);
+            for (Map.Entry<String, Form> entry : forms.entrySet()) {
+                Form form = forms.get(entry.getKey());
+                form = addMetaData(context, form, entry.getKey(), oldApi);
+                forms.put(entry.getKey(), form);
+                addDataInputPeriodsToOrgUnits(form, units, entry.getKey());
+            }
+            HashSet<String> optionSetIds = getOptionSetIds(forms);
+            updateOptionSets(context, optionSetIds);
+
+            Gson gson = new Gson();
+            for (String key : forms.keySet()) {
+                Form form = forms.get(key);
+                String jForm = gson.toJson(form);
+                TextFileUtils.writeTextFile(context,
+                        TextFileUtils.Directory.DATASETS, key, jForm);
+            }
+
+            String orgUnitsWithDatasets = gson.toJson(units);
+            TextFileUtils.writeTextFile(context,
+                    TextFileUtils.Directory.ROOT,
+                    TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS,
+                    orgUnitsWithDatasets);
+        }
+    }
+
+    private static List<String> getAllCatOptions(String server, String creds) {
+        List<String> catComboOptions = new ArrayList<>();
+        try {
+            Response responseUser = download(server + "api/categoryOptions?fields=[id,name,categoryOptionCombos]&filter=access.data.write:eq:true", creds);
+            JsonObject jsonObject = buildJsonObject(responseUser);
+
+            JsonArray arrayCatOptions = getJsonArray(jsonObject, "categoryOptions");
+            for (int i = 0; i < arrayCatOptions.size(); i++) {
+                JsonObject catOption = getAsJsonObject(arrayCatOptions.get(i));
+                JsonArray arrayCatOptionCombo = getJsonArray(catOption, "categoryOptionCombos");
+                for (int y = 0; y < arrayCatOptionCombo.size(); y++) {
+                    JsonObject cOptionCombo = getAsJsonObject(arrayCatOptionCombo.get(y));
+                    catComboOptions.add(getString(cOptionCombo, ID));
+                }
+
+            }
+        } catch (ParsingException e) {
+            e.printStackTrace();
+        } catch (NetworkException e) {
+            e.printStackTrace();
         }
 
-        String orgUnitsWithDatasets = gson.toJson(units);
-        TextFileUtils.writeTextFile(context,
-                TextFileUtils.Directory.ROOT,
-                TextFileUtils.FileNames.ORG_UNITS_WITH_DATASETS,
-                orgUnitsWithDatasets);
+        return catComboOptions;
     }
 
     private static void addDataInputPeriodsToOrgUnits(Form form, OrganizationUnit[] units,
-            String key) {
+                                                      String key) {
         if (form.getOptions().getDataInputPeriods() != null
                 && form.getOptions().getDataInputPeriods().length > 0) {
             for (OrganizationUnit organizationUnit : units) {
@@ -249,7 +423,7 @@ public class FormsDownloadProcessor {
         }
     }
 
-    private static Form addMetaData(Context context, Form form, String uid, boolean oldApi)  throws NetworkException, ParsingException {
+    private static Form addMetaData(Context context, Form form, String uid, boolean oldApi) throws NetworkException, ParsingException {
         String jsonContent = DataSetMetaData.download(context, uid, oldApi);
         DataSetMetaData.addCompulsoryDataElements(DataElementOperandParser.parse(jsonContent), form);
         DataSetMetaData.removeFieldsWithInvalidCategoryOptionRelation(form, DataSetCategoryOptionParser.parse(jsonContent));

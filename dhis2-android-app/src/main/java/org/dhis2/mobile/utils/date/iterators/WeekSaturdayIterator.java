@@ -113,7 +113,7 @@ public class WeekSaturdayIterator extends CustomDateIteratorClass<ArrayList<Date
         int quantity = checkDate.weekOfWeekyear().getMaximumValue();
         while ((openFuturePeriods > 0 || currentDate.isAfter(checkDate.plusWeeks(1).minusDays(1))) && counter < quantity) {
             String year = checkDate.year().getAsString();
-            String cWeekNumber = checkDate.weekOfWeekyear().getAsString();
+            String cWeekNumber = "" + (Integer.parseInt(checkDate.weekOfWeekyear().getAsString())+ 1 );
             String cDate = checkDate.toString();
             String nDate = checkDate.plusWeeks(1).minusDays(1).toString();
 

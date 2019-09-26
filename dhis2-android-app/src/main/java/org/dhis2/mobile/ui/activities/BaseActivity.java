@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -18,7 +19,6 @@ import org.dhis2.mobile.utils.TypefaceManager;
 public class BaseActivity extends AppCompatActivity {
     private Typeface mCustomTypeFace;
     private NetworkStateReceiver mNetworkStateReceiver;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -63,6 +63,13 @@ public class FormOptions implements Serializable, Parcelable {
         dataInputPeriods = in.createStringArray();
     }
 
+    public FormOptions(int openFuturePeriods, String periodType, int expiryDays, String[] dataInputPeriods){
+        this.openFuturePeriods = openFuturePeriods;
+        this.periodType = periodType;
+        this.expiryDays = expiryDays;
+        this.dataInputPeriods = dataInputPeriods;
+    }
+
     public static final Parcelable.Creator<FormOptions> CREATOR = new Parcelable.Creator<FormOptions>() {
 
         public FormOptions createFromParcel(Parcel in) {

@@ -37,6 +37,7 @@ import android.text.TextUtils;
 
 import com.google.gson.JsonObject;
 
+import org.dhis2.mobile.io.Constants;
 import org.dhis2.mobile.io.holders.DatasetInfoHolder;
 import org.dhis2.mobile.io.json.JsonHandler;
 import org.dhis2.mobile.io.json.ParsingException;
@@ -77,6 +78,30 @@ public class ReportDownloadProcessor {
                     form=null;
                     e.printStackTrace();
                     parsingStatusCode = JsonHandler.PARSING_FAILED_CODE;
+                }
+            }
+        }
+
+        if(responseCode == 500 && url.contains("pe=")){
+            url = url.replace("pe","period");
+            Response response2 = HTTPClient.get(url, creds);
+            responseCode = response2.getCode();
+            parsingStatusCode = JsonHandler.PARSING_OK_CODE;
+            form = null;
+            if (responseCode >= 200 && responseCode < 300) {
+                form = parseForm(response.getBody());
+                if (form != null) {
+                    try {
+                        FormMetadataProcessorStrategy.process(context, form, info);
+                    } catch (NetworkException e) {
+                        form=null;
+                        e.printStackTrace();
+                        responseCode = e.getErrorCode();
+                    } catch (ParsingException e) {
+                        form=null;
+                        e.printStackTrace();
+                        parsingStatusCode = JsonHandler.PARSING_FAILED_CODE;
+                    }
                 }
             }
         }

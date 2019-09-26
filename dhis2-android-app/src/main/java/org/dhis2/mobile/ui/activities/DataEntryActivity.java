@@ -384,8 +384,8 @@ public class DataEntryActivity extends BaseActivity implements LoaderManager.Loa
         if (adapters.size() == 1) {
             formGroupSpinner.setVisibility(View.GONE);
             dataEntryListView.setAdapter(adapters.get(0));
-            if (adapters.get(0).getLabel() != null && !adapters.get(0).getLabel().equals(
-                    FieldAdapter.FORM_WITHOUT_SECTION)) {
+            if (adapters.get(0).getLabel() != null /*&& !adapters.get(0).getLabel().equals(
+                    FieldAdapter.FORM_WITHOUT_SECTION)*/) {
                 setToolbarTitle(adapters.get(0).getLabel());
             }
             return;

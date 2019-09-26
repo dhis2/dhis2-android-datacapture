@@ -40,6 +40,12 @@ public class CategoryCombo implements Serializable, Parcelable {
         this.categoryOptionComboUIdList = categoryOptionComboUIds;
     }
 
+    public CategoryCombo(String id, List<Category> categories, List<String> categoryOptionComboUIds) {
+        this.id = id;
+        this.categories = categories;
+        this.categoryOptionComboUIdList = categoryOptionComboUIds;
+    }
+
     public String getId() {
         return id;
     }
